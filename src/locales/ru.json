@@ -1,0 +1,106 @@
+{
+  "lang": "ru",
+  "nav": {
+    "experiences": "",
+    "philosophy": "",
+    "contact": ""
+  },
+  "footer": {
+    "tagline_1": "",
+    "tagline_2": "",
+    "tagline_3": "",
+    "philosophy": "",
+    "contact": "",
+    "copyright": "\u00a9 2026 CREARE",
+    "sitemap": "",
+    "privacy": "",
+    "cookies": "",
+    "terms": ""
+  },
+  "home": {
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    },
+    "cta": {
+      "label": ""
+    }
+  },
+  "philosophy": {
+    "hero": {
+      "line1": "",
+      "line2": ""
+    },
+    "section1": {
+      "title": "",
+      "body": ""
+    },
+    "section2": {
+      "title": "",
+      "body": ""
+    },
+    "section3": {
+      "title": "",
+      "body": ""
+    },
+    "section4": {
+      "title": "",
+      "body": ""
+    }
+  },
+  "contact": {
+    "title": "",
+    "subtitle": "",
+    "form": {
+      "name": "",
+      "email": "",
+      "message": "",
+      "submit": ""
+    }
+  },
+  "experiences": {
+    "title": "",
+    "subtitle": ""
+  },
+  "signature": {
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "lab": {
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "black": {
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "editorial": {
+    "title": "",
+    "subtitle": ""
+  },
+  "stories": {
+    "title": "",
+    "subtitle": ""
+  },
+  "sitemap": {
+    "breadcrumb_home": "ГЛАВНАЯ",
+    "breadcrumb_current": "КАРТА САЙТА",
+    "experiences": "ОПЫТ",
+    "creare": "CREARE",
+    "legal": "ПРАВОВОЕ",
+    "lab": "LAB™",
+    "signature": "SIGNATURE™",
+    "black": "BLACK™",
+    "philosophy": "Наша философия",
+    "contact": "Контакт",
+    "privacy": "Конфиденциальность",
+    "cookies": "Куки",
+    "terms": "Условия"
+  }
+}

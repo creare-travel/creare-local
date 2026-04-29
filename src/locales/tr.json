@@ -1,0 +1,106 @@
+{
+  "lang": "tr",
+  "nav": {
+    "experiences": "Deneyimler",
+    "philosophy": "Felsefe",
+    "contact": "\u0130leti\u015fim"
+  },
+  "footer": {
+    "tagline_1": "",
+    "tagline_2": "",
+    "tagline_3": "",
+    "philosophy": "FELSEFEM\u0130Z",
+    "contact": "\u0130LET\u0130\u015e\u0130M",
+    "copyright": "\u00a9 2026 CREARE",
+    "sitemap": "Site Haritas\u0131",
+    "privacy": "Gizlilik",
+    "cookies": "\u00c7erezler",
+    "terms": "Ko\u015fullar"
+  },
+  "home": {
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    },
+    "cta": {
+      "label": ""
+    }
+  },
+  "philosophy": {
+    "hero": {
+      "line1": "",
+      "line2": ""
+    },
+    "section1": {
+      "title": "",
+      "body": ""
+    },
+    "section2": {
+      "title": "",
+      "body": ""
+    },
+    "section3": {
+      "title": "",
+      "body": ""
+    },
+    "section4": {
+      "title": "",
+      "body": ""
+    }
+  },
+  "contact": {
+    "title": "",
+    "subtitle": "",
+    "form": {
+      "name": "",
+      "email": "",
+      "message": "",
+      "submit": ""
+    }
+  },
+  "experiences": {
+    "title": "",
+    "subtitle": ""
+  },
+  "signature": {
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "lab": {
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "black": {
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "editorial": {
+    "title": "",
+    "subtitle": ""
+  },
+  "stories": {
+    "title": "",
+    "subtitle": ""
+  },
+  "sitemap": {
+    "breadcrumb_home": "ANA SAYFA",
+    "breadcrumb_current": "SİTE HARİTASI",
+    "experiences": "DENEYİMLER",
+    "creare": "CREARE",
+    "legal": "HUKUKİ",
+    "lab": "LAB™",
+    "signature": "SIGNATURE™",
+    "black": "BLACK™",
+    "philosophy": "Felsefemiz",
+    "contact": "İletişim",
+    "privacy": "Gizlilik",
+    "cookies": "Çerezler",
+    "terms": "Koşullar"
+  }
+}

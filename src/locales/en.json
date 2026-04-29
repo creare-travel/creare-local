@@ -1,0 +1,106 @@
+{
+  "lang": "en",
+  "nav": {
+    "experiences": "Experiences",
+    "philosophy": "Philosophy",
+    "contact": "Contact"
+  },
+  "footer": {
+    "tagline_1": "Creative intelligence.",
+    "tagline_2": "Strategic execution.",
+    "tagline_3": "Refined experiences.",
+    "philosophy": "OUR PHILOSOPHY",
+    "contact": "CONTACT",
+    "copyright": "\u00a9 2026 CREARE",
+    "sitemap": "Sitemap",
+    "privacy": "Privacy",
+    "cookies": "Cookies",
+    "terms": "Terms"
+  },
+  "home": {
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    },
+    "cta": {
+      "label": ""
+    }
+  },
+  "philosophy": {
+    "hero": {
+      "line1": "We believe that the most extraordinary experiences cannot be purchased.",
+      "line2": "They can only be composed."
+    },
+    "section1": {
+      "title": "Against the Itinerary",
+      "body": ""
+    },
+    "section2": {
+      "title": "The Composition",
+      "body": ""
+    },
+    "section3": {
+      "title": "Access as Responsibility",
+      "body": ""
+    },
+    "section4": {
+      "title": "The Client",
+      "body": ""
+    }
+  },
+  "contact": {
+    "title": "",
+    "subtitle": "",
+    "form": {
+      "name": "",
+      "email": "",
+      "message": "",
+      "submit": ""
+    }
+  },
+  "experiences": {
+    "title": "",
+    "subtitle": ""
+  },
+  "signature": {
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "lab": {
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "black": {
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "editorial": {
+    "title": "",
+    "subtitle": ""
+  },
+  "stories": {
+    "title": "",
+    "subtitle": ""
+  },
+  "sitemap": {
+    "breadcrumb_home": "HOME",
+    "breadcrumb_current": "SITE MAP",
+    "experiences": "EXPERIENCES",
+    "creare": "CREARE",
+    "legal": "LEGAL",
+    "lab": "LAB™",
+    "signature": "SIGNATURE™",
+    "black": "BLACK™",
+    "philosophy": "Our Philosophy",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "cookies": "Cookies",
+    "terms": "Terms"
+  }
+}
