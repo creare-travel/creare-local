@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
 import { fetchStrapi } from '@/lib/strapi';
 
+export const dynamic = 'force-dynamic';
+
 const BASE_URL = 'https://crearetravel.com';
 const LAST_MODIFIED = new Date('2026-04-07');
 
