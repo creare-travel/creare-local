@@ -44,6 +44,9 @@ interface StrapiExperience {
   slug: string;
   short_description?: string;
   category?: string;
+  geo_experience_type?: string | null;
+  mood?: string | null;
+  intensity?: string | null;
   location_label?: string;
   duration?: string;
   destination?: {
@@ -51,6 +54,44 @@ interface StrapiExperience {
     slug?: string;
   };
   cover_image?: StrapiCoverImage | null;
+}
+
+function normalizeValue(value?: string | null) {
+  return value?.trim().toLowerCase() ?? '';
+}
+
+function toTitleCase(value?: string | null) {
+  if (!value) return '';
+
+  return value
+    .trim()
+    .split(/[\s_-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
+
+function formatIntensity(value?: string | null) {
+  const normalized = normalizeValue(value);
+  if (!normalized) return '';
+
+  const intensityMap: Record<string, string> = {
+    low: 'Low Intensity',
+    medium: 'Medium Intensity',
+    high: 'High Intensity',
+  };
+
+  return intensityMap[normalized] ?? `${toTitleCase(value)} Intensity`;
+}
+
+function getGeoMetadataLine(exp: StrapiExperience) {
+  return [
+    toTitleCase(exp.geo_experience_type),
+    formatIntensity(exp.intensity),
+    toTitleCase(exp.mood),
+  ]
+    .filter(Boolean)
+    .join(' · ');
 }
 
 async function fetchLabExperiences(): Promise<StrapiExperience[]> {
@@ -320,6 +361,7 @@ export default async function LabPage() {
                   const coverUrl = rawUrl ? mediaUrl(rawUrl) : null;
                   const coverAlt = exp.cover_image?.alternativeText ?? exp.title;
                   const location = exp.destination?.name ?? exp.location_label;
+                  const geoMetadata = getGeoMetadataLine(exp);
 
                   return (
                     <Link
@@ -352,6 +394,12 @@ export default async function LabPage() {
                       >
                         {exp.title}
                       </h3>
+
+                      {geoMetadata && (
+                        <p className="font-body text-[0.68rem] text-neutral-500/80 mb-2">
+                          {geoMetadata}
+                        </p>
+                      )}
 
                       {location && (
                         <p className="font-body text-[0.7rem] text-neutral-500 mb-2">{location}</p>

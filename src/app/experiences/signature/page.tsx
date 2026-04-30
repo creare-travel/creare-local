@@ -60,6 +60,9 @@ interface StrapiExperience {
   cover_image?: StrapiCoverImage;
   category?: string;
   series?: string | null;
+  geo_experience_type?: string | null;
+  mood?: string | null;
+  intensity?: string | null;
   destination?: StrapiExperienceDestination;
   order?: number;
 }
@@ -85,6 +88,48 @@ function getSeriesImage(exp: StrapiExperience) {
   return rawUrl ? (rawUrl.startsWith('http') ? rawUrl : mediaUrl(rawUrl)) : null;
 }
 
+function toTitleCase(value?: string | null) {
+  if (!value) return '';
+
+  return value
+    .trim()
+    .split(/[\s_-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
+
+function formatGeoExperienceType(value?: string | null) {
+  return toTitleCase(value);
+}
+
+function formatIntensity(value?: string | null) {
+  const normalized = normalizeValue(value);
+  if (!normalized) return '';
+
+  const intensityMap: Record<string, string> = {
+    low: 'Low Intensity',
+    medium: 'Medium Intensity',
+    high: 'High Intensity',
+  };
+
+  return intensityMap[normalized] ?? `${toTitleCase(value)} Intensity`;
+}
+
+function formatMood(value?: string | null) {
+  return toTitleCase(value);
+}
+
+function getGeoMetadataLine(exp: StrapiExperience) {
+  return [
+    formatGeoExperienceType(exp.geo_experience_type),
+    formatIntensity(exp.intensity),
+    formatMood(exp.mood),
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
+
 function renderExperienceCard(
   exp: StrapiExperience,
   options?: { compact?: boolean; offsetAfterThird?: boolean }
@@ -92,6 +137,7 @@ function renderExperienceCard(
   const coverUrl = getSeriesImage(exp);
   const coverAlt = exp.cover_image?.alternativeText ?? exp.title;
   const compact = options?.compact ?? false;
+  const geoMetadata = getGeoMetadataLine(exp);
 
   return (
     <Link
@@ -127,6 +173,10 @@ function renderExperienceCard(
       >
         {exp.title}
       </h3>
+
+      {geoMetadata && (
+        <p className="font-body text-[0.68rem] text-neutral-500/80 mb-2">{geoMetadata}</p>
+      )}
 
       {!compact && (exp.destination?.name || exp.location_label) && (
         <p className="font-body text-[0.7rem] text-neutral-500">
