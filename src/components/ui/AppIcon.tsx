@@ -14,8 +14,10 @@ interface IconProps {
   className?: string;
   onClick?: () => void;
   disabled?: boolean;
-  [key: string]: any;
 }
+
+type SvgIconComponent = React.ComponentType<React.ComponentProps<'svg'>>;
+type IconComponentProps = IconProps & Omit<React.ComponentProps<'svg'>, keyof IconProps>;
 
 function Icon({
   name,
@@ -25,9 +27,9 @@ function Icon({
   onClick,
   disabled = false,
   ...props
-}: IconProps) {
+}: IconComponentProps) {
   const iconSet = variant === 'solid' ? HeroIconsSolid : HeroIcons;
-  const IconComponent = iconSet[name as keyof typeof iconSet] as React.ComponentType<any>;
+  const IconComponent = iconSet[name as keyof typeof iconSet] as SvgIconComponent | undefined;
 
   if (!IconComponent) {
     return (

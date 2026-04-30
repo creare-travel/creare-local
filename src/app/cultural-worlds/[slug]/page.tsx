@@ -29,6 +29,7 @@ interface StrapiImage {
   url?: string;
   alternativeText?: string;
   formats?: {
+    large?: { url?: string };
     medium?: { url?: string };
     small?: { url?: string };
   };
@@ -95,7 +96,11 @@ function normalizeRelationArray<T>(value: unknown): T[] {
 }
 
 function resolveImageUrl(image?: StrapiImage | null): string {
-  const rawUrl = image?.formats?.medium?.url ?? image?.formats?.small?.url ?? image?.url;
+  const rawUrl =
+    image?.formats?.large?.url ??
+    image?.formats?.medium?.url ??
+    image?.formats?.small?.url ??
+    image?.url;
 
   return rawUrl ? mediaUrl(rawUrl) : IMAGE_FALLBACK;
 }

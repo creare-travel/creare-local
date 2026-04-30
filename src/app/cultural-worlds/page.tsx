@@ -46,6 +46,7 @@ interface StrapiDestination {
     url?: string;
     alternativeText?: string;
     formats?: {
+      large?: { url?: string };
       medium?: { url?: string };
       small?: { url?: string };
     };
@@ -85,6 +86,7 @@ async function fetchActiveDestinations(): Promise<StrapiDestination[]> {
 
 function getDestinationImageUrl(destination: StrapiDestination): string {
   const rawUrl =
+    destination.cover_image?.formats?.large?.url ??
     destination.cover_image?.formats?.medium?.url ??
     destination.cover_image?.formats?.small?.url ??
     destination.cover_image?.url;

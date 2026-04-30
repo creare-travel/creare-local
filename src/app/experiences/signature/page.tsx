@@ -39,6 +39,10 @@ interface StrapiDestination {
 interface StrapiCoverImage {
   url: string;
   alternativeText?: string;
+  formats?: {
+    medium?: { url?: string };
+    small?: { url?: string };
+  };
 }
 
 interface StrapiExperienceDestination {
@@ -73,9 +77,9 @@ function normalizeValue(value?: string | null) {
 
 function getSeriesImage(exp: StrapiExperience) {
   const rawUrl =
-    (exp.cover_image as any)?.formats?.medium?.url ??
-    (exp.cover_image as any)?.formats?.small?.url ??
-    (exp.cover_image as any)?.url ??
+    exp.cover_image?.formats?.medium?.url ??
+    exp.cover_image?.formats?.small?.url ??
+    exp.cover_image?.url ??
     null;
 
   return rawUrl ? (rawUrl.startsWith('http') ? rawUrl : mediaUrl(rawUrl)) : null;

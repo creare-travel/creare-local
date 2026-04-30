@@ -38,6 +38,10 @@ export const imageHosts = [
     protocol: 'https',
     hostname: '*.strapi.io',
   },
+  {
+    protocol: 'https',
+    hostname: 'res.cloudinary.com',
+  },
   ...(configuredStrapiHost ? [configuredStrapiHost] : []),
   ...(isDevelopment
     ? [
