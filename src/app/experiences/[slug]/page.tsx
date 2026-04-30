@@ -74,6 +74,10 @@ interface StrapiExperienceDetail {
   audience?: StrapiRichTextNode[] | string;
   cta_enabled?: boolean;
   cta_text?: string;
+  geo_experience_type?: string;
+  mood?: string;
+  audience_segment?: string;
+  intensity?: string;
 }
 
 type StrapiExperienceResult =
@@ -163,6 +167,17 @@ function getExperienceDescription(item: StrapiExperienceDetail) {
   return paragraphs[0] ?? '';
 }
 
+function toTitleCase(value?: string | null) {
+  if (!value) return '';
+
+  return value
+    .trim()
+    .split(/[\s_-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
+
 // ── Rich text renderer ────────────────────────────────────────────────────────
 function renderRichText(nodes: StrapiRichTextNode[]): React.ReactNode {
   return nodes.map((node, i) => {
@@ -224,6 +239,40 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
     currentNavIndex >= 0 && currentNavIndex < navigableExperiences.length - 1
       ? navigableExperiences[currentNavIndex + 1]
       : null;
+  const canonicalUrl = `${SITE_URL}/experiences/${slug}`;
+  const destinationUrl = item.destination?.slug
+    ? `${SITE_URL}/cultural-worlds/${item.destination.slug}`
+    : undefined;
+  const schemaProperties = [
+    item.geo_experience_type
+      ? {
+          '@type': 'PropertyValue',
+          name: 'Geo Experience Type',
+          value: toTitleCase(item.geo_experience_type),
+        }
+      : null,
+    item.mood
+      ? {
+          '@type': 'PropertyValue',
+          name: 'Mood',
+          value: toTitleCase(item.mood),
+        }
+      : null,
+    item.audience_segment
+      ? {
+          '@type': 'PropertyValue',
+          name: 'Audience Segment',
+          value: toTitleCase(item.audience_segment),
+        }
+      : null,
+    item.intensity
+      ? {
+          '@type': 'PropertyValue',
+          name: 'Intensity',
+          value: toTitleCase(item.intensity),
+        }
+      : null,
+  ].filter(Boolean);
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -248,13 +297,56 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
       },
     ],
   };
-  const touristTripJsonLd = {
+  const organizationJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'TouristTrip',
+    '@type': 'ProfessionalService',
+    name: 'CREARE',
+    url: SITE_URL,
+    description: 'Experience design studio creating private cultural encounters.',
+  };
+  const placeJsonLd = locationDisplay
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Place',
+        name: locationDisplay,
+        ...(destinationUrl ? { url: destinationUrl } : {}),
+      }
+    : null;
+  const serviceJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
     name: item.title,
     description,
+    provider: {
+      '@type': 'ProfessionalService',
+      name: 'CREARE',
+      description: 'Experience design studio creating private cultural encounters.',
+      url: SITE_URL,
+    },
     ...(coverUrl ? { image: coverUrl } : {}),
-    ...(audienceItems.length > 0 ? { touristType: audienceItems.join(', ') } : {}),
+    ...(item.category || item.geo_experience_type
+      ? {
+          serviceType: toTitleCase(item.geo_experience_type) || toTitleCase(item.category),
+        }
+      : {}),
+    ...(locationDisplay
+      ? {
+          areaServed: {
+            '@type': 'Place',
+            name: locationDisplay,
+            ...(destinationUrl ? { url: destinationUrl } : {}),
+          },
+        }
+      : {}),
+    ...(item.audience_segment || audienceItems.length > 0
+      ? {
+          audience: {
+            '@type': 'Audience',
+            audienceType: toTitleCase(item.audience_segment) || audienceItems.join(', '),
+          },
+        }
+      : {}),
+    ...(schemaProperties.length > 0 ? { additionalProperty: schemaProperties } : {}),
     ...(programItems.length > 0
       ? {
           itinerary: {
@@ -267,22 +359,32 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
           },
         }
       : {}),
-    ...(locationDisplay
-      ? {
-          location: {
-            '@type': 'Place',
-            name: locationDisplay,
-          },
-        }
-      : {}),
-    provider: {
-      '@type': 'Organization',
-      name: 'CREARE',
-      url: 'https://crearetravel.com',
+  };
+  const webPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: item.title,
+    description,
+    url: canonicalUrl,
+    ...(coverUrl ? { image: coverUrl } : {}),
+    isPartOf: {
+      '@type': 'WebSite',
+      name: SITE_NAME,
+      url: SITE_URL,
     },
-    offers: {
-      '@type': 'Offer',
-      availability: 'https://schema.org/LimitedAvailability',
+    about: {
+      '@type': 'Service',
+      name: item.title,
+      ...(item.category || item.geo_experience_type
+        ? {
+            serviceType: toTitleCase(item.geo_experience_type) || toTitleCase(item.category),
+          }
+        : {}),
+    },
+    mainEntity: {
+      '@type': 'Service',
+      name: item.title,
+      description,
     },
   };
 
@@ -298,8 +400,19 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
       <Script id="breadcrumb-jsonld" type="application/ld+json" strategy="afterInteractive">
         {JSON.stringify(breadcrumbJsonLd)}
       </Script>
-      <Script id="touristtrip-jsonld" type="application/ld+json" strategy="afterInteractive">
-        {JSON.stringify(touristTripJsonLd)}
+      <Script id="organization-jsonld" type="application/ld+json" strategy="afterInteractive">
+        {JSON.stringify(organizationJsonLd)}
+      </Script>
+      {placeJsonLd && (
+        <Script id="place-jsonld" type="application/ld+json" strategy="afterInteractive">
+          {JSON.stringify(placeJsonLd)}
+        </Script>
+      )}
+      <Script id="service-jsonld" type="application/ld+json" strategy="afterInteractive">
+        {JSON.stringify(serviceJsonLd)}
+      </Script>
+      <Script id="webpage-jsonld" type="application/ld+json" strategy="afterInteractive">
+        {JSON.stringify(webPageJsonLd)}
       </Script>
       <ExperienceViewTracker slug={slug} title={item.title} category={categoryLabel} />
 
