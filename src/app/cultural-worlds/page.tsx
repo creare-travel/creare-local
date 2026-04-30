@@ -4,6 +4,8 @@ import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
+export const dynamic = 'force-dynamic';
+
 const SITE_URL = 'https://crearetravel.com';
 
 export const metadata: Metadata = {

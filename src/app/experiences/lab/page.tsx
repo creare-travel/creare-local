@@ -4,6 +4,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'LAB™ — Experimental Experiences',
   description:

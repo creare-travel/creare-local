@@ -11,6 +11,9 @@ import {
   DEFAULT_OG_IMAGE_ALT,
 } from '@/lib/seo';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
+
+export const dynamic = 'force-dynamic';
+
 const canonicalInsightSlug = (slug: string | undefined): string | undefined =>
   slug === 'the-private-life-of-istanbul' ? 'private-life-of-istanbul' : slug;
 

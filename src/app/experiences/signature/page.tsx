@@ -4,6 +4,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Signature Experiences',
   description:
