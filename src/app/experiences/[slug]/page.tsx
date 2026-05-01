@@ -50,12 +50,24 @@ interface StrapiDestination {
   slug?: string;
 }
 
+interface StrapiOntologyEntity {
+  name?: string;
+  slug?: string;
+  description?: string;
+  same_as?: string[];
+  semantic_tags?: string[];
+  external_reference_url?: string;
+  confidence_score?: number;
+}
+
 interface StrapiExperienceDetail {
   id: number;
   documentId?: string;
   title: string;
   short_description?: string;
   description?: StrapiRichTextNode[] | string;
+  wow_moment?: string;
+  differentiator?: string;
   intent_level?: string;
   slug?: string;
   cover_image?: StrapiCoverImage;
@@ -78,6 +90,10 @@ interface StrapiExperienceDetail {
   mood?: string;
   audience_segment?: string;
   intensity?: string;
+  mood_entity?: StrapiOntologyEntity;
+  audience_entity?: StrapiOntologyEntity;
+  experience_type_entity?: StrapiOntologyEntity;
+  intensity_entity?: StrapiOntologyEntity;
 }
 
 type StrapiExperienceResult =
@@ -89,7 +105,33 @@ async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperien
   try {
     const params = new URLSearchParams({
       'filters[slug][$eq]': slug,
-      populate: '*',
+      'populate[cover_image]': 'true',
+      'populate[gallery]': 'true',
+      'populate[destination]': 'true',
+      'populate[mood_entity][fields][0]': 'name',
+      'populate[mood_entity][fields][1]': 'slug',
+      'populate[mood_entity][fields][2]': 'description',
+      'populate[mood_entity][fields][3]': 'same_as',
+      'populate[mood_entity][fields][4]': 'external_reference_url',
+      'populate[mood_entity][fields][5]': 'confidence_score',
+      'populate[audience_entity][fields][0]': 'name',
+      'populate[audience_entity][fields][1]': 'slug',
+      'populate[audience_entity][fields][2]': 'description',
+      'populate[audience_entity][fields][3]': 'same_as',
+      'populate[audience_entity][fields][4]': 'external_reference_url',
+      'populate[audience_entity][fields][5]': 'confidence_score',
+      'populate[experience_type_entity][fields][0]': 'name',
+      'populate[experience_type_entity][fields][1]': 'slug',
+      'populate[experience_type_entity][fields][2]': 'description',
+      'populate[experience_type_entity][fields][3]': 'same_as',
+      'populate[experience_type_entity][fields][4]': 'external_reference_url',
+      'populate[experience_type_entity][fields][5]': 'confidence_score',
+      'populate[intensity_entity][fields][0]': 'name',
+      'populate[intensity_entity][fields][1]': 'slug',
+      'populate[intensity_entity][fields][2]': 'description',
+      'populate[intensity_entity][fields][3]': 'same_as',
+      'populate[intensity_entity][fields][4]': 'external_reference_url',
+      'populate[intensity_entity][fields][5]': 'confidence_score',
     });
 
     const json = await fetchStrapi(`/api/experiences?${params.toString()}`);
@@ -167,6 +209,11 @@ function getExperienceDescription(item: StrapiExperienceDetail) {
   return paragraphs[0] ?? '';
 }
 
+function normalizeOptionalText(value?: string | null) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
+}
+
 function toTitleCase(value?: string | null) {
   if (!value) return '';
 
@@ -176,6 +223,59 @@ function toTitleCase(value?: string | null) {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
     .join(' ');
+}
+
+function normalizeSameAs(value?: string[] | null) {
+  if (!Array.isArray(value)) return undefined;
+
+  const normalized = value
+    .map((entry) => entry?.trim())
+    .filter((entry): entry is string => Boolean(entry));
+
+  return normalized.length > 0 ? normalized : undefined;
+}
+
+function getOntologyName(entity?: StrapiOntologyEntity | null, fallback?: string | null) {
+  return entity?.name || toTitleCase(fallback);
+}
+
+function buildOntologyThing(
+  entity?: StrapiOntologyEntity | null,
+  fallbackName?: string | null,
+  type = 'Thing'
+) {
+  const name = getOntologyName(entity, fallbackName);
+
+  if (!name) return null;
+
+  const sameAs = normalizeSameAs(entity?.same_as);
+
+  return {
+    '@type': type,
+    name,
+    ...(entity?.description ? { description: entity.description } : {}),
+    ...(sameAs ? { sameAs } : {}),
+  };
+}
+
+function buildAdditionalProperty(
+  name: string,
+  entity?: StrapiOntologyEntity | null,
+  fallback?: string | null
+) {
+  const value = getOntologyName(entity, fallback);
+
+  if (!value) return null;
+
+  const sameAs = normalizeSameAs(entity?.same_as);
+
+  return {
+    '@type': 'PropertyValue',
+    name,
+    value,
+    ...(entity?.description ? { description: entity.description } : {}),
+    ...(sameAs ? { sameAs } : {}),
+  };
 }
 
 // ── Rich text renderer ────────────────────────────────────────────────────────
@@ -243,33 +343,33 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
   const destinationUrl = item.destination?.slug
     ? `${SITE_URL}/cultural-worlds/${item.destination.slug}`
     : undefined;
-  const schemaProperties = [
-    item.geo_experience_type
-      ? {
-          '@type': 'PropertyValue',
-          name: 'Geo Experience Type',
-          value: toTitleCase(item.geo_experience_type),
-        }
-      : null,
-    item.mood
-      ? {
-          '@type': 'PropertyValue',
-          name: 'Mood',
-          value: toTitleCase(item.mood),
-        }
-      : null,
-    item.audience_segment
-      ? {
-          '@type': 'PropertyValue',
-          name: 'Audience Segment',
-          value: toTitleCase(item.audience_segment),
-        }
-      : null,
+  const moodThing = buildOntologyThing(item.mood_entity, item.mood);
+  const audienceName = getOntologyName(item.audience_entity, item.audience_segment);
+  const experienceTypeName = getOntologyName(
+    item.experience_type_entity,
+    item.geo_experience_type || item.category
+  );
+  const wowMoment = normalizeOptionalText(item.wow_moment);
+  const differentiator = normalizeOptionalText(item.differentiator);
+  const intensityProperty = buildAdditionalProperty(
+    'Intensity',
+    item.intensity_entity,
     item.intensity
+  );
+  const schemaProperties = [
+    buildAdditionalProperty(
+      'Geo Experience Type',
+      item.experience_type_entity,
+      item.geo_experience_type
+    ),
+    buildAdditionalProperty('Mood', item.mood_entity, item.mood),
+    buildAdditionalProperty('Audience Segment', item.audience_entity, item.audience_segment),
+    intensityProperty,
+    differentiator
       ? {
           '@type': 'PropertyValue',
-          name: 'Intensity',
-          value: toTitleCase(item.intensity),
+          name: 'Differentiator',
+          value: differentiator,
         }
       : null,
   ].filter(Boolean);
@@ -316,7 +416,7 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
     '@context': 'https://schema.org',
     '@type': 'Service',
     name: item.title,
-    description,
+    description: wowMoment ? `${wowMoment}${description ? ` ${description}` : ''}` : description,
     provider: {
       '@type': 'ProfessionalService',
       name: 'CREARE',
@@ -324,9 +424,14 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
       url: SITE_URL,
     },
     ...(coverUrl ? { image: coverUrl } : {}),
-    ...(item.category || item.geo_experience_type
+    ...(experienceTypeName
       ? {
-          serviceType: toTitleCase(item.geo_experience_type) || toTitleCase(item.category),
+          serviceType: experienceTypeName,
+        }
+      : {}),
+    ...(item.experience_type_entity?.description
+      ? {
+          additionalType: item.experience_type_entity.description,
         }
       : {}),
     ...(locationDisplay
@@ -338,12 +443,20 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
           },
         }
       : {}),
-    ...(item.audience_segment || audienceItems.length > 0
+    ...(audienceName || audienceItems.length > 0
       ? {
           audience: {
             '@type': 'Audience',
-            audienceType: toTitleCase(item.audience_segment) || audienceItems.join(', '),
+            audienceType: audienceName || audienceItems.join(', '),
+            ...(item.audience_entity?.description
+              ? { description: item.audience_entity.description }
+              : {}),
           },
+        }
+      : {}),
+    ...(moodThing
+      ? {
+          about: [moodThing],
         }
       : {}),
     ...(schemaProperties.length > 0 ? { additionalProperty: schemaProperties } : {}),
@@ -375,9 +488,9 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
     about: {
       '@type': 'Service',
       name: item.title,
-      ...(item.category || item.geo_experience_type
+      ...(experienceTypeName
         ? {
-            serviceType: toTitleCase(item.geo_experience_type) || toTitleCase(item.category),
+            serviceType: experienceTypeName,
           }
         : {}),
     },
@@ -385,6 +498,11 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
       '@type': 'Service',
       name: item.title,
       description,
+      ...(moodThing
+        ? {
+            about: [moodThing],
+          }
+        : {}),
     },
   };
 
@@ -576,6 +694,41 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
               <span className="font-body text-[0.6rem] tracking-[0.2em] text-neutral-600 uppercase border border-neutral-200 px-3 py-1">
                 {item.intent_level}
               </span>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── DEFINING EXPERIENCE SECTION ── */}
+      {(wowMoment || differentiator) && (
+        <section className="py-16 md:py-20 bg-white" aria-label="What defines this experience">
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+            <div className="max-w-3xl border-t border-neutral-200 pt-10">
+              <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
+                What Defines This Experience
+              </p>
+              <div className="grid gap-10 md:grid-cols-2 md:gap-12">
+                {wowMoment && (
+                  <div>
+                    <p className="font-body text-[0.6rem] tracking-[0.24em] text-neutral-400 uppercase mb-3">
+                      Wow Moment
+                    </p>
+                    <p className="font-display font-light text-neutral-800 leading-relaxed text-lg md:text-xl">
+                      {wowMoment}
+                    </p>
+                  </div>
+                )}
+                {differentiator && (
+                  <div>
+                    <p className="font-body text-[0.6rem] tracking-[0.24em] text-neutral-400 uppercase mb-3">
+                      Differentiator
+                    </p>
+                    <p className="font-body text-sm text-neutral-700 leading-relaxed">
+                      {differentiator}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>

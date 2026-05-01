@@ -8,12 +8,10 @@ interface ExperienceCardProps {
 }
 
 const ExperienceCard = memo(function ExperienceCard({ experience }: ExperienceCardProps) {
-  return (
-    <Link
-      href={`/experiences/${experience.slug}`}
-      className="group block"
-      aria-label={`View ${experience.title}`}
-    >
+  const href = experience.slug ? `/experiences/${experience.slug}` : null;
+
+  const card = (
+    <>
       {/* Image */}
       <div className="relative w-full overflow-hidden rounded-xl aspect-[4/3] mb-5">
         <AppImage
@@ -60,7 +58,17 @@ const ExperienceCard = memo(function ExperienceCard({ experience }: ExperienceCa
       <span className="font-body text-[0.6rem] tracking-[0.28em] text-neutral-900 uppercase group-hover:opacity-50 transition-opacity duration-300">
         EXPLORE →
       </span>
+    </>
+  );
+
+  return href ? (
+    <Link href={href} className="group block" aria-label={`View ${experience.title}`}>
+      {card}
     </Link>
+  ) : (
+    <div className="group block" aria-label={experience.title}>
+      {card}
+    </div>
   );
 });
 

@@ -138,14 +138,10 @@ function renderExperienceCard(
   const coverAlt = exp.cover_image?.alternativeText ?? exp.title;
   const compact = options?.compact ?? false;
   const geoMetadata = getGeoMetadataLine(exp);
+  const href = exp.slug ? `/experiences/${exp.slug}` : null;
 
-  return (
-    <Link
-      key={exp.id}
-      href={`/experiences/${exp.slug}`}
-      className={`group block ${options?.offsetAfterThird ? 'mt-6' : ''}`}
-      aria-label={`View ${exp.title}`}
-    >
+  const card = (
+    <>
       <div className="relative w-full overflow-hidden rounded-2xl aspect-[4/3] mb-5">
         {coverUrl ? (
           <Image
@@ -183,7 +179,26 @@ function renderExperienceCard(
           {exp.destination?.name ?? exp.location_label}
         </p>
       )}
+    </>
+  );
+
+  return href ? (
+    <Link
+      key={exp.id}
+      href={href}
+      className={`group block ${options?.offsetAfterThird ? 'mt-6' : ''}`}
+      aria-label={`View ${exp.title}`}
+    >
+      {card}
     </Link>
+  ) : (
+    <div
+      key={exp.id}
+      className={`group block ${options?.offsetAfterThird ? 'mt-6' : ''}`}
+      aria-label={exp.title}
+    >
+      {card}
+    </div>
   );
 }
 

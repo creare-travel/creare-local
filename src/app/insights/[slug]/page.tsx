@@ -265,10 +265,10 @@ function RelatedExperienceCard({
   const imageUrl = resolveImageUrl(experience.cover_image?.url);
   const imageAlt = experience.cover_image?.alternativeText || experience.title || 'Experience';
   const location = experience.destination?.name || experience.location_label || '';
-  const href = experience.slug ? `/experiences/${experience.slug}` : '#';
+  const href = experience.slug ? `/experiences/${experience.slug}` : null;
 
-  return (
-    <Link href={href} className="group block" aria-label={`View ${experience.title}`}>
+  const card = (
+    <>
       {/* Image */}
       <div className="relative w-full overflow-hidden aspect-[4/3] mb-4">
         <Image
@@ -327,7 +327,17 @@ function RelatedExperienceCard({
       <span className="font-body text-[0.6rem] tracking-[0.28em] text-white/60 uppercase group-hover:opacity-50 transition-opacity duration-300">
         EXPLORE →
       </span>
+    </>
+  );
+
+  return href ? (
+    <Link href={href} className="group block" aria-label={`View ${experience.title}`}>
+      {card}
     </Link>
+  ) : (
+    <div className="group block" aria-label={experience.title}>
+      {card}
+    </div>
   );
 }
 

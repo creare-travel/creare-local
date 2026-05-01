@@ -344,14 +344,10 @@ export default async function BlackPage() {
                   const coverAlt = exp.cover_image?.alternativeText ?? exp.title;
                   const location = exp.destination?.name ?? exp.location_label;
                   const geoMetadata = getGeoMetadataLine(exp);
+                  const href = exp.slug ? `/experiences/${exp.slug}` : null;
 
-                  return (
-                    <Link
-                      key={exp.id}
-                      href={`/experiences/${exp.slug}`}
-                      className="group block"
-                      aria-label={`View ${exp.title}`}
-                    >
+                  const card = (
+                    <>
                       <div className="relative w-full overflow-hidden rounded-2xl aspect-[4/3] mb-5 bg-neutral-900/5">
                         {coverUrl ? (
                           <Image
@@ -398,7 +394,22 @@ export default async function BlackPage() {
                           {exp.duration}
                         </p>
                       )}
+                    </>
+                  );
+
+                  return href ? (
+                    <Link
+                      key={exp.id}
+                      href={href}
+                      className="group block"
+                      aria-label={`View ${exp.title}`}
+                    >
+                      {card}
                     </Link>
+                  ) : (
+                    <div key={exp.id} className="group block" aria-label={exp.title}>
+                      {card}
+                    </div>
                   );
                 })}
               </div>
