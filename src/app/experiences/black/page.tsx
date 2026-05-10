@@ -2,6 +2,8 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import JsonLd from '@/components/JsonLd';
+import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -98,9 +100,34 @@ async function fetchBlackExperiences(): Promise<StrapiExperience[]> {
 
 export default async function BlackPage() {
   const blackExperiences = await fetchBlackExperiences();
+  const ids = listingIds('/experiences/black');
+  const blackSchemaGraph = buildExperienceListingGraph({
+    pageId: ids.collection,
+    itemListId: ids.itemList,
+    breadcrumbId: ids.breadcrumbs,
+    path: ids.canonical,
+    title: 'BLACK Experiences',
+    description:
+      'Invitation-only private access, rare encounters, and discreet cultural compositions for select clients.',
+    breadcrumbs: [
+      { name: 'Home', url: buildCanonicalUrl('/') },
+      { name: 'Experiences', url: buildCanonicalUrl('/experiences') },
+      { name: 'BLACK Experiences', url: ids.canonical },
+    ],
+    items: blackExperiences.map((exp) => ({
+      title: exp.title,
+      slug: exp.slug,
+      url: exp.slug ? buildCanonicalUrl(`/experiences/${exp.slug}`) : undefined,
+      description: exp.short_description,
+      image: exp.cover_image ?? undefined,
+      category: exp.category,
+      destinationName: exp.destination?.name ?? exp.location_label ?? null,
+    })),
+  });
 
   return (
     <>
+      <JsonLd id="black-collection-jsonld" schema={blackSchemaGraph} />
       <main>
         {/* ── HERO — Full-bleed dark with grain ── */}
         <section

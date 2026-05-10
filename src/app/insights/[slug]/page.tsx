@@ -2,6 +2,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
+import JsonLd from '@/components/JsonLd';
 import {
   canonicalUrl,
   buildOpenGraph,
@@ -10,6 +11,7 @@ import {
   DEFAULT_OG_IMAGE,
   DEFAULT_OG_IMAGE_ALT,
 } from '@/lib/seo';
+import { buildCanonicalUrl, buildInsightDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 import { getInsightBySlug } from '@/data/insights';
 import { getExperienceBySlug } from '@/lib/experiences';
@@ -372,9 +374,32 @@ export default async function InsightArticlePage({ params }: Props) {
     : [];
 
   const contentNode = renderRichText(insight.content);
+  const insightSchema = buildInsightDetailGraph({
+    pageId: `${canonicalUrl(`/insights/${insight.slug}`)}#webpage`,
+    articleId: `${canonicalUrl(`/insights/${insight.slug}`)}#article`,
+    imageId: `${canonicalUrl(`/insights/${insight.slug}`)}#image`,
+    breadcrumbId: `${canonicalUrl(`/insights/${insight.slug}`)}#breadcrumbs`,
+    path: canonicalUrl(`/insights/${insight.slug}`),
+    breadcrumbs: [
+      { name: 'Home', url: buildCanonicalUrl('/') },
+      { name: 'Insights', url: buildCanonicalUrl('/insights') },
+      {
+        name: insight.title,
+        url: canonicalUrl(`/insights/${insight.slug}`),
+        slugFallback: insight.slug,
+      },
+    ],
+    title: insight.title,
+    slug: insight.slug,
+    description: insight.seo_description || insight.excerpt || '',
+    excerpt: insight.excerpt,
+    image: insight.cover_image ?? undefined,
+    destinationName,
+  });
 
   return (
     <main className="min-h-screen bg-black text-white pb-24">
+      <JsonLd id="insight-detail-jsonld" schema={insightSchema} />
       {/* Hero cover image — always shown (fallback image if missing) */}
       <div className="relative w-full h-[60vh] min-h-[360px] max-h-[600px] overflow-hidden">
         <Image src={coverImageUrl} alt={coverImageAlt} fill className="object-cover" priority />

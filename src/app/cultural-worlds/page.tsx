@@ -2,6 +2,8 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
+import JsonLd from '@/components/JsonLd';
+import { buildCulturalWorldCollectionGraph } from '@/lib/schema-builder';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -96,9 +98,19 @@ function getDestinationImageUrl(destination: StrapiDestination): string {
 
 export default async function CulturalWorldsPage() {
   const destinations = await fetchActiveDestinations();
+  const culturalWorldSchema = buildCulturalWorldCollectionGraph({
+    items: destinations.map((destination) => ({
+      ...destination,
+      description:
+        destination.highlight ??
+        destination.short_description ??
+        'Private cultural access composed around place, narrative, and depth.',
+    })),
+  });
 
   return (
     <main className="bg-black min-h-screen">
+      <JsonLd id="cultural-worlds-jsonld" schema={culturalWorldSchema} />
       {/* Hero */}
       <section className="pt-40 pb-20 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
         <p className="text-white/30 font-body text-xs tracking-[0.2em] uppercase mb-6">Creare</p>

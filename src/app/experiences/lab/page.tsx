@@ -2,6 +2,8 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import JsonLd from '@/components/JsonLd';
+import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -107,9 +109,34 @@ async function fetchLabExperiences(): Promise<StrapiExperience[]> {
 
 export default async function LabPage() {
   const labExperiences = await fetchLabExperiences();
+  const ids = listingIds('/experiences/lab');
+  const labSchemaGraph = buildExperienceListingGraph({
+    pageId: ids.collection,
+    itemListId: ids.itemList,
+    breadcrumbId: ids.breadcrumbs,
+    path: ids.canonical,
+    title: 'LAB Experiences',
+    description:
+      'Co-created, dynamic and exploratory. CREARE LAB is where cultural experiences are designed from scratch around a brief.',
+    breadcrumbs: [
+      { name: 'Home', url: buildCanonicalUrl('/') },
+      { name: 'Experiences', url: buildCanonicalUrl('/experiences') },
+      { name: 'LAB Experiences', url: ids.canonical },
+    ],
+    items: labExperiences.map((exp) => ({
+      title: exp.title,
+      slug: exp.slug,
+      url: exp.slug ? buildCanonicalUrl(`/experiences/${exp.slug}`) : undefined,
+      description: exp.short_description,
+      image: exp.cover_image ?? undefined,
+      category: exp.category,
+      destinationName: exp.destination?.name ?? exp.location_label ?? null,
+    })),
+  });
 
   return (
     <>
+      <JsonLd id="lab-collection-jsonld" schema={labSchemaGraph} />
       <main>
         {/* ── HERO — Split Layout ── */}
         <section

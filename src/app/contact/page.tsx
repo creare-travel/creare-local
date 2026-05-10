@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import JsonLd from '@/components/JsonLd';
+import { buildContactPageGraph } from '@/lib/schema-builder';
 import ContactPageClient from './ContactPageClient';
 
 const SITE_URL = 'https://crearetravel.com';
@@ -38,5 +40,19 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
-  return <ContactPageClient />;
+  const contactSchema = buildContactPageGraph({
+    title: 'Contact — Private Inquiries',
+    description:
+      'For strategic engagements, private commissions, and confidential collaborations. CREARE responds personally to all inquiries.',
+    path: '/contact',
+    email: 'direct@crearetravel.com',
+    telephone: '+90-541-220-3000',
+  });
+
+  return (
+    <>
+      <JsonLd id="contact-page-jsonld" schema={contactSchema} />
+      <ContactPageClient />
+    </>
+  );
 }

@@ -2,7 +2,11 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import JsonLd from '@/components/JsonLd';
+import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
+
+const SITE_URL = 'https://crearetravel.com';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,7 +43,9 @@ interface StrapiDestination {
 interface StrapiCoverImage {
   url: string;
   alternativeText?: string;
+  caption?: string;
   formats?: {
+    large?: { url?: string };
     medium?: { url?: string };
     small?: { url?: string };
   };
@@ -80,6 +86,7 @@ function normalizeValue(value?: string | null) {
 
 function getSeriesImage(exp: StrapiExperience) {
   const rawUrl =
+    exp.cover_image?.formats?.large?.url ??
     exp.cover_image?.formats?.medium?.url ??
     exp.cover_image?.formats?.small?.url ??
     exp.cover_image?.url ??
@@ -261,9 +268,41 @@ export default async function SignatureExperiencesPage() {
   const culinaryExperiences = strapiSignatureExperiences.filter(
     (exp) => normalizeValue(exp.series) === SIGNATURE_SERIES.culinary
   );
+  const visibleExperienceCards = [
+    ...selectedSignatureExperiences,
+    ...historicalExperiences,
+    ...corporateExperiences,
+    ...culinaryExperiences,
+  ];
+  const ids = listingIds('/experiences/signature');
+  const signatureCollectionJsonLd = buildExperienceListingGraph({
+    pageId: ids.collection,
+    itemListId: ids.itemList,
+    breadcrumbId: ids.breadcrumbs,
+    path: ids.canonical,
+    title: 'Signature Experiences',
+    description:
+      'Each encounter is composed around culture, place and narrative. Discover the CREARE Signature collection.',
+    breadcrumbs: [
+      { name: 'Home', url: buildCanonicalUrl('/') },
+      { name: 'Experiences', url: buildCanonicalUrl('/experiences') },
+      { name: 'Signature Experiences', url: ids.canonical },
+    ],
+    items: visibleExperienceCards.map((exp) => ({
+      title: exp.title,
+      slug: exp.slug,
+      url: exp.slug ? `${SITE_URL}/experiences/${exp.slug}` : undefined,
+      description: exp.destination?.name ?? exp.location_label,
+      image: exp.cover_image,
+      category: exp.category,
+      series: exp.series,
+      destinationName: exp.destination?.name ?? exp.location_label ?? null,
+    })),
+  });
 
   return (
     <main>
+      <JsonLd id="signature-collection-jsonld" schema={signatureCollectionJsonLd} />
       {/* ── HERO ── */}
       <section className="relative w-full h-screen min-h-[600px] flex flex-col items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">

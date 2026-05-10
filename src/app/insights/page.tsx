@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
+import JsonLd from '@/components/JsonLd';
 import { insights } from '@/data/insights';
 import {
   canonicalUrl,
@@ -10,6 +11,7 @@ import {
   DEFAULT_OG_IMAGE,
   DEFAULT_OG_IMAGE_ALT,
 } from '@/lib/seo';
+import { buildCanonicalUrl, buildInsightListingGraph } from '@/lib/schema-builder';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -79,7 +81,11 @@ interface NormalizedInsight {
   slug: string;
   title: string;
   excerpt: string;
-  coverImageUrl: string;
+  coverImageUrl?: string;
+  coverImage?: {
+    url?: string;
+    alternativeText?: string;
+  };
   destinationName: string | null;
 }
 
@@ -108,7 +114,24 @@ function normalizeInsight(item: StrapiInsight): NormalizedInsight | null {
   const destinationName =
     item.attributes?.destination?.data?.attributes?.name || item.destination?.name || null;
 
-  return { slug, title, excerpt, coverImageUrl, destinationName };
+  return {
+    slug,
+    title,
+    excerpt,
+    coverImageUrl,
+    coverImage: item.attributes?.cover_image?.data?.attributes?.url
+      ? {
+          url: item.attributes.cover_image.data.attributes.url,
+          alternativeText: title,
+        }
+      : item.cover_image?.url
+        ? {
+            url: item.cover_image.url,
+            alternativeText: title,
+          }
+        : undefined,
+    destinationName,
+  };
 }
 
 async function fetchStrapiInsights(): Promise<NormalizedInsight[] | null> {
@@ -198,15 +221,37 @@ export default async function InsightsPage() {
     title: insight.title,
     excerpt: insight.description,
     coverImageUrl: undefined,
+    coverImage: undefined,
     destinationName: insight.location
       ? insight.location.charAt(0).toUpperCase() + insight.location.slice(1)
       : null,
   }));
 
   const displayItems = strapiInsights ?? (staticFallback.length ? staticFallback : null);
+  const insightsSchema = buildInsightListingGraph({
+    pageId: `${buildCanonicalUrl('/insights')}#collection`,
+    itemListId: `${buildCanonicalUrl('/insights')}#itemlist`,
+    breadcrumbId: `${buildCanonicalUrl('/insights')}#breadcrumbs`,
+    path: buildCanonicalUrl('/insights'),
+    title: 'Insights',
+    description: insightsDescription,
+    breadcrumbs: [
+      { name: 'Home', url: buildCanonicalUrl('/') },
+      { name: 'Insights', url: buildCanonicalUrl('/insights') },
+    ],
+    items:
+      displayItems?.map((insight) => ({
+        title: insight.title,
+        slug: insight.slug,
+        url: buildCanonicalUrl(`/insights/${insight.slug}`),
+        description: insight.excerpt,
+        image: insight.coverImage,
+      })) ?? [],
+  });
 
   return (
     <main className="min-h-screen bg-black text-white pt-24 pb-24">
+      <JsonLd id="insights-list-jsonld" schema={insightsSchema} />
       <div className="max-w-2xl mx-auto px-6 sm:px-10">
         {/* Header */}
         <div className="mb-16">

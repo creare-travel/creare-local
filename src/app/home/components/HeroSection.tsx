@@ -5,10 +5,9 @@ import Link from 'next/link';
 export default function HeroSection() {
   return (
     <section
-      className="relative w-full h-screen min-h-[600px] flex items-center overflow-hidden"
+      className="relative flex h-screen min-h-[600px] w-full items-end overflow-hidden"
       aria-label="Hero — Experiences Composed as Art"
     >
-      {/* Full-bleed background image */}
       <div className="absolute inset-0 z-0">
         <AppImage
           src="https://img.rocket.new/generatedImages/rocket_gen_img_1a084ee29-1772851440502.png"
@@ -19,34 +18,40 @@ export default function HeroSection() {
           sizes="100vw"
         />
 
-        {/* Subtle dark overlay */}
         <div
-          className="absolute inset-0 z-10"
+          className="absolute inset-0 z-10 bg-gradient-to-t from-black/88 via-black/55 to-black/18"
           aria-hidden="true"
-          style={{ background: 'rgba(0,0,0,0.45)' }}
+        />
+
+        <div
+          className="absolute inset-0 z-10 bg-[radial-gradient(ellipse_at_center,transparent_50%,rgba(0,0,0,0.35)_100%)]"
+          aria-hidden="true"
         />
       </div>
 
-      {/* Content — left aligned */}
-      <div className="relative z-30 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+      <div className="relative z-30 mx-auto w-full max-w-7xl px-6 pb-14 sm:px-10 md:pb-20 lg:px-16">
         <div className="max-w-xl">
-          <h1
-            className="font-display font-light text-white leading-[1.08] tracking-tight mb-6"
-            style={{ fontSize: 'clamp(2.8rem, 6vw, 5.5rem)' }}
-          >
-            Experiences.
-            <br />
-            Composed as Art.
-          </h1>
-          <p className="font-body text-white/70 font-light text-xs leading-loose tracking-widest uppercase mb-10">
-            Private access. Cultural composition.
+          <p className="mb-7 font-body text-[0.58rem] font-light uppercase tracking-[0.38em] text-white/35">
+            Curated Cultural Experiences
           </p>
+
+          <h1 className="mb-2 font-display text-[clamp(2.8rem,6vw,5.5rem)] font-light leading-[1.06] tracking-tight text-white">
+            Experiences.
+          </h1>
+
+          <p
+            className="mb-12 font-display text-[clamp(2.8rem,6vw,5.5rem)] font-light leading-[1.06] tracking-tight text-white/55"
+            aria-hidden="true"
+          >
+            Composed as Art.
+          </p>
+
           <Link
             href="/contact"
-            className="inline-block font-body text-[0.65rem] tracking-[0.3em] text-white uppercase border border-white/50 px-8 py-3 hover:bg-white hover:text-black transition-all duration-300"
+            className="font-body text-[0.62rem] uppercase tracking-[0.3em] text-white/70 transition-colors duration-300 hover:text-white"
             aria-label="Inquire privately about CREARE experiences"
           >
-            Inquire Privately
+            Inquire Privately →
           </Link>
         </div>
       </div>

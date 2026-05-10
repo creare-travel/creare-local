@@ -34,28 +34,22 @@ export default async function ExperienceOgImage({ params }: Props) {
       }}
     >
       {/* Hero image background */}
-      {heroImage ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={heroImage}
-          alt={title}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
-        />
-      ) : (
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(160deg, #0a0a0a 0%, #1a1410 100%)',
-          }}
-        />
-      )}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          ...(heroImage
+            ? {
+                backgroundImage: `url(${heroImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              }
+            : {
+                background: 'linear-gradient(160deg, #0a0a0a 0%, #1a1410 100%)',
+              }),
+        }}
+      />
 
       {/* Dark gradient overlay — bottom-heavy for text legibility */}
       <div

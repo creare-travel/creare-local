@@ -1,13 +1,14 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import Link from 'next/link';
 import Image from 'next/image';
 import { experiences } from '@/lib/experiences';
+import JsonLd from '@/components/JsonLd';
 import ExperienceViewTracker from '@/components/experiences/ExperienceViewTracker';
 import GallerySection from '@/components/experiences/GallerySection';
 import InquireCTA from '@/components/experiences/InquireCTA';
 import { buildTwitterCard, SITE_NAME } from '@/lib/seo';
+import { buildExperienceDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 
 const SITE_URL = 'https://crearetravel.com';
@@ -30,7 +31,9 @@ interface StrapiImageFormat {
 
 interface StrapiCoverImage {
   url: string;
+  name?: string;
   alternativeText?: string;
+  caption?: string;
   formats?: {
     large?: StrapiImageFormat;
     medium?: StrapiImageFormat;
@@ -68,6 +71,7 @@ interface StrapiExperienceDetail {
   description?: StrapiRichTextNode[] | string;
   wow_moment?: string;
   differentiator?: string;
+  experience_type?: string | null;
   intent_level?: string;
   slug?: string;
   cover_image?: StrapiCoverImage;
@@ -194,6 +198,7 @@ function getExperienceLocation(item: StrapiExperienceDetail) {
 
 function getExperienceImageUrl(item: StrapiExperienceDetail) {
   const rawUrl =
+    item.cover_image?.formats?.large?.url ||
     item.cover_image?.formats?.medium?.url ||
     item.cover_image?.formats?.small?.url ||
     item.cover_image?.url;
@@ -212,70 +217,6 @@ function getExperienceDescription(item: StrapiExperienceDetail) {
 function normalizeOptionalText(value?: string | null) {
   const trimmed = value?.trim();
   return trimmed ? trimmed : undefined;
-}
-
-function toTitleCase(value?: string | null) {
-  if (!value) return '';
-
-  return value
-    .trim()
-    .split(/[\s_-]+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-    .join(' ');
-}
-
-function normalizeSameAs(value?: string[] | null) {
-  if (!Array.isArray(value)) return undefined;
-
-  const normalized = value
-    .map((entry) => entry?.trim())
-    .filter((entry): entry is string => Boolean(entry));
-
-  return normalized.length > 0 ? normalized : undefined;
-}
-
-function getOntologyName(entity?: StrapiOntologyEntity | null, fallback?: string | null) {
-  return entity?.name || toTitleCase(fallback);
-}
-
-function buildOntologyThing(
-  entity?: StrapiOntologyEntity | null,
-  fallbackName?: string | null,
-  type = 'Thing'
-) {
-  const name = getOntologyName(entity, fallbackName);
-
-  if (!name) return null;
-
-  const sameAs = normalizeSameAs(entity?.same_as);
-
-  return {
-    '@type': type,
-    name,
-    ...(entity?.description ? { description: entity.description } : {}),
-    ...(sameAs ? { sameAs } : {}),
-  };
-}
-
-function buildAdditionalProperty(
-  name: string,
-  entity?: StrapiOntologyEntity | null,
-  fallback?: string | null
-) {
-  const value = getOntologyName(entity, fallback);
-
-  if (!value) return null;
-
-  const sameAs = normalizeSameAs(entity?.same_as);
-
-  return {
-    '@type': 'PropertyValue',
-    name,
-    value,
-    ...(entity?.description ? { description: entity.description } : {}),
-    ...(sameAs ? { sameAs } : {}),
-  };
 }
 
 // ── Rich text renderer ────────────────────────────────────────────────────────
@@ -327,7 +268,6 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
   const coverUrl = getExperienceImageUrl(item);
   const coverAlt = item.cover_image?.alternativeText ?? item.title;
   const locationDisplay = getExperienceLocation(item);
-  const description = getExperienceDescription(item);
   const programItems = extractParagraphs(item.program);
   const audienceItems = extractParagraphs(item.audience);
   const categoryLabel = item.category || item.tier || item.intent_level || '';
@@ -339,172 +279,9 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
     currentNavIndex >= 0 && currentNavIndex < navigableExperiences.length - 1
       ? navigableExperiences[currentNavIndex + 1]
       : null;
-  const canonicalUrl = `${SITE_URL}/experiences/${slug}`;
-  const destinationUrl = item.destination?.slug
-    ? `${SITE_URL}/cultural-worlds/${item.destination.slug}`
-    : undefined;
-  const moodThing = buildOntologyThing(item.mood_entity, item.mood);
-  const audienceName = getOntologyName(item.audience_entity, item.audience_segment);
-  const experienceTypeName = getOntologyName(
-    item.experience_type_entity,
-    item.geo_experience_type || item.category
-  );
   const wowMoment = normalizeOptionalText(item.wow_moment);
   const differentiator = normalizeOptionalText(item.differentiator);
-  const intensityProperty = buildAdditionalProperty(
-    'Intensity',
-    item.intensity_entity,
-    item.intensity
-  );
-  const schemaProperties = [
-    buildAdditionalProperty(
-      'Geo Experience Type',
-      item.experience_type_entity,
-      item.geo_experience_type
-    ),
-    buildAdditionalProperty('Mood', item.mood_entity, item.mood),
-    buildAdditionalProperty('Audience Segment', item.audience_entity, item.audience_segment),
-    intensityProperty,
-    differentiator
-      ? {
-          '@type': 'PropertyValue',
-          name: 'Differentiator',
-          value: differentiator,
-        }
-      : null,
-  ].filter(Boolean);
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: `${SITE_URL}/`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Experiences',
-        item: `${SITE_URL}/experiences`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: item.title,
-        item: `${SITE_URL}/experiences/${slug}`,
-      },
-    ],
-  };
-  const organizationJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'ProfessionalService',
-    name: 'CREARE',
-    url: SITE_URL,
-    description: 'Experience design studio creating private cultural encounters.',
-  };
-  const placeJsonLd = locationDisplay
-    ? {
-        '@context': 'https://schema.org',
-        '@type': 'Place',
-        name: locationDisplay,
-        ...(destinationUrl ? { url: destinationUrl } : {}),
-      }
-    : null;
-  const serviceJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Service',
-    name: item.title,
-    description: wowMoment ? `${wowMoment}${description ? ` ${description}` : ''}` : description,
-    provider: {
-      '@type': 'ProfessionalService',
-      name: 'CREARE',
-      description: 'Experience design studio creating private cultural encounters.',
-      url: SITE_URL,
-    },
-    ...(coverUrl ? { image: coverUrl } : {}),
-    ...(experienceTypeName
-      ? {
-          serviceType: experienceTypeName,
-        }
-      : {}),
-    ...(item.experience_type_entity?.description
-      ? {
-          additionalType: item.experience_type_entity.description,
-        }
-      : {}),
-    ...(locationDisplay
-      ? {
-          areaServed: {
-            '@type': 'Place',
-            name: locationDisplay,
-            ...(destinationUrl ? { url: destinationUrl } : {}),
-          },
-        }
-      : {}),
-    ...(audienceName || audienceItems.length > 0
-      ? {
-          audience: {
-            '@type': 'Audience',
-            audienceType: audienceName || audienceItems.join(', '),
-            ...(item.audience_entity?.description
-              ? { description: item.audience_entity.description }
-              : {}),
-          },
-        }
-      : {}),
-    ...(moodThing
-      ? {
-          about: [moodThing],
-        }
-      : {}),
-    ...(schemaProperties.length > 0 ? { additionalProperty: schemaProperties } : {}),
-    ...(programItems.length > 0
-      ? {
-          itinerary: {
-            '@type': 'ItemList',
-            itemListElement: programItems.map((step, index) => ({
-              '@type': 'ListItem',
-              position: index + 1,
-              name: step,
-            })),
-          },
-        }
-      : {}),
-  };
-  const webPageJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: item.title,
-    description,
-    url: canonicalUrl,
-    ...(coverUrl ? { image: coverUrl } : {}),
-    isPartOf: {
-      '@type': 'WebSite',
-      name: SITE_NAME,
-      url: SITE_URL,
-    },
-    about: {
-      '@type': 'Service',
-      name: item.title,
-      ...(experienceTypeName
-        ? {
-            serviceType: experienceTypeName,
-          }
-        : {}),
-    },
-    mainEntity: {
-      '@type': 'Service',
-      name: item.title,
-      description,
-      ...(moodThing
-        ? {
-            about: [moodThing],
-          }
-        : {}),
-    },
-  };
+  const experienceSchemaGraph = buildExperienceDetailGraph(item, slug);
 
   // Build info bar items — only include if value exists
   const infoItems: { label: string; value: string }[] = [];
@@ -515,23 +292,7 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
 
   return (
     <main className="bg-white min-h-screen">
-      <Script id="breadcrumb-jsonld" type="application/ld+json" strategy="afterInteractive">
-        {JSON.stringify(breadcrumbJsonLd)}
-      </Script>
-      <Script id="organization-jsonld" type="application/ld+json" strategy="afterInteractive">
-        {JSON.stringify(organizationJsonLd)}
-      </Script>
-      {placeJsonLd && (
-        <Script id="place-jsonld" type="application/ld+json" strategy="afterInteractive">
-          {JSON.stringify(placeJsonLd)}
-        </Script>
-      )}
-      <Script id="service-jsonld" type="application/ld+json" strategy="afterInteractive">
-        {JSON.stringify(serviceJsonLd)}
-      </Script>
-      <Script id="webpage-jsonld" type="application/ld+json" strategy="afterInteractive">
-        {JSON.stringify(webPageJsonLd)}
-      </Script>
+      <JsonLd id="experience-detail-jsonld" schema={experienceSchemaGraph} />
       <ExperienceViewTracker slug={slug} title={item.title} category={categoryLabel} />
 
       {/* ── HERO / COVER ── */}

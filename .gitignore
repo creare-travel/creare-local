@@ -37,4 +37,6 @@ jest-test-results.json
 turbo/.env
 .env
 .env.local
+.env.*
+!.env.example
 .vercel

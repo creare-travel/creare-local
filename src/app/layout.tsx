@@ -7,7 +7,12 @@ import Footer from '@/components/Footer';
 import UnderConstruction from '@/components/UnderConstruction';
 import { LanguageProvider } from '@/context/LanguageContext';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
-import Script from 'next/script';
+import JsonLd from '@/components/JsonLd';
+import {
+  buildBrandSchema,
+  buildOrganizationSchema,
+  buildWebSiteSchema,
+} from '@/lib/schema-builder';
 
 const isMaintenanceMode = process.env.NEXT_PUBLIC_SITE_MODE === 'maintenance';
 
@@ -73,41 +78,9 @@ export const metadata: Metadata = {
   },
 };
 
-const organizationSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'Creare',
-  legalName: 'CREARE Travel Consultancy Limited Co.',
-  description: 'Privately curated cultural experiences across Turkey and beyond.',
-  url: 'https://crearetravel.com',
-  logo: 'https://img.rocket.new/generatedImages/rocket_gen_img_167773a44-1775598260952.png',
-  contactPoint: {
-    '@type': 'ContactPoint',
-    telephone: '+90-541-220-3000',
-    contactType: 'customer service',
-  },
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: 'Ferko Signature Plaza, Buyukdere Cd. No.175',
-    addressLocality: 'Şişli',
-    addressRegion: 'İstanbul',
-    addressCountry: 'TR',
-  },
-};
-
-const websiteSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: 'Creare',
-  url: 'https://crearetravel.com',
-  description: 'Private cultural access. Thoughtfully designed encounters.',
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: 'https://crearetravel.com/experiences',
-  },
-};
-
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const globalSchemaGraph = [buildOrganizationSchema(), buildBrandSchema(), buildWebSiteSchema()];
+
   return (
     <html lang="en">
       <head>
@@ -119,12 +92,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Suspense fallback={null}>
           <GoogleAnalytics />
         </Suspense>
-        <Script id="organization-jsonld" type="application/ld+json" strategy="afterInteractive">
-          {JSON.stringify(organizationSchema)}
-        </Script>
-        <Script id="website-jsonld" type="application/ld+json" strategy="afterInteractive">
-          {JSON.stringify(websiteSchema)}
-        </Script>
+        <JsonLd id="global-schema-jsonld" schema={globalSchemaGraph} />
         <LanguageProvider>
           {isMaintenanceMode ? (
             <UnderConstruction />
