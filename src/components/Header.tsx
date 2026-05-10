@@ -39,8 +39,8 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? 'bg-black/95 backdrop-blur-md' : 'bg-black'
+      className={`glass-level-1 fixed left-0 right-0 top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] ${
+        scrolled ? 'border-white/[0.05] bg-white/[0.045]' : 'border-white/[0.04] bg-white/[0.02]'
       }`}
     >
       <nav
@@ -53,18 +53,18 @@ export default function Header() {
           className="flex items-center group flex-shrink-0"
           aria-label="CREARE — Return to homepage"
         >
-          <span className="text-white font-body font-semibold tracking-[0.22em] text-sm uppercase">
+          <span className="font-body text-sm font-semibold uppercase tracking-[0.24em] text-white/90 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] group-hover:text-white">
             CREARE
           </span>
         </Link>
 
         {/* Desktop navigation */}
-        <div className="hidden lg:flex items-center gap-8">
+        <div className="hidden items-center gap-9 lg:flex">
           {navLinks?.map((item) => (
             <Link
               key={item?.label}
               href={item?.href}
-              className="font-body font-medium tracking-[0.18em] text-xs uppercase text-white/80 hover:text-white transition-colors duration-300"
+              className="font-body text-[0.7rem] font-medium uppercase tracking-[0.2em] text-white/68 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] hover:text-white/92"
               aria-label={item?.label}
             >
               {item?.label}
@@ -75,7 +75,7 @@ export default function Header() {
 
         {/* Mobile hamburger */}
         <button
-          className="lg:hidden text-white p-2"
+          className="p-2 text-white/82 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] hover:text-white lg:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
           aria-expanded={mobileOpen}
@@ -99,7 +99,7 @@ export default function Header() {
       {/* Mobile Menu */}
       {mobileOpen && (
         <div
-          className="lg:hidden bg-black border-t border-white/10 px-6 sm:px-10 py-6"
+          className="glass-level-2 border-t border-white/[0.05] px-6 py-6 lg:hidden sm:px-10"
           role="navigation"
           aria-label="Mobile navigation"
         >
@@ -107,7 +107,7 @@ export default function Header() {
             <Link
               key={item?.label}
               href={item?.href}
-              className="block py-3 font-body text-xs tracking-[0.15em] uppercase text-white/80 hover:text-white transition-colors border-b border-white/5"
+              className="block border-b border-white/[0.05] py-3 font-body text-[0.7rem] uppercase tracking-[0.18em] text-white/72 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] hover:text-white"
               onClick={() => setMobileOpen(false)}
               aria-label={item?.label}
             >
