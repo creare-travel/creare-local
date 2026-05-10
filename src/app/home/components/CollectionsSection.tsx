@@ -1,125 +1,161 @@
-import React, { memo } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
 
-interface CollectionCard {
+interface CollectionFeature {
   label: string;
-  trademark: string;
+  title: string;
+  description: string;
+  href: string;
   image: string;
   alt: string;
-  description: string[];
-  features: string[];
-  href: string;
+  imageRight?: boolean;
+  subduedCta?: boolean;
 }
 
-const cards: CollectionCard[] = [
+const collectionFeatures: CollectionFeature[] = [
   {
-    label: 'LAB',
-    trademark: '™',
-    image: 'https://images.unsplash.com/photo-1533822545705-6c02ae3e3a0a',
-    alt: 'Black and white photograph of stone steps with textured granite surface',
-    description: [
-      'Where new ideas are shaped into singular experiences.',
-      'For those who prefer to create rather than simply choose.',
-    ],
-    features: ['Concept creation', 'Strategic experience architecture', 'Bespoke development'],
-    href: '/experiences/lab',
-  },
-  {
-    label: 'SIGNATURE EXPERIENCES',
-    trademark: '™',
-    image: 'https://images.unsplash.com/photo-1505621625254-57bac2f1a872',
-    alt: 'Deep blue and orange sunset sky over a dramatic horizon landscape',
-    description: ['Our most distinguished experiences.', 'Refined, tested and ready to be lived.'],
-    features: ['Established concepts', 'Curated partners', 'Seamless delivery'],
+    label: 'SIGNATURE™',
+    title: 'Curated cultural experiences.',
+    description: 'Designed, tested, and ready to be lived.',
     href: '/experiences/signature',
+    image: 'https://images.unsplash.com/photo-1734970989502-aa1a2e284871',
+    alt: 'Ancient stone courtyard of a historic Ottoman palace with ornate architectural details and warm afternoon light',
+    imageRight: true,
   },
   {
-    label: 'BLACK',
-    trademark: '™',
-    image: 'https://images.unsplash.com/photo-1730759214728-49fea9644175',
-    alt: 'Dark luxury object with intricate texture on a pure black background',
-    description: ['Beyond the expected.', 'Where privilege is carefully composed.'],
-    features: ['Private venues', 'Closed doors', 'After hours'],
+    label: 'LAB™',
+    title: 'Built with you.',
+    description: 'Custom cultural experiences, developed from scratch.',
+    href: '/experiences/lab',
+    image: '/assets/images/lab_tailor_made_hand.png',
+    alt: 'Craftsman hand holding a fine pencil drawing precise architectural lines on white drafting paper — tailor-made from scratch',
+  },
+  {
+    label: 'BLACK™',
+    title: 'Not publicly available.',
+    description: 'Private access to places, collections, and moments.',
     href: '/experiences/black',
+    image: '/assets/images/black_limited_access_key.png',
+    alt: 'Single antique key resting on a pure black matte surface with dramatic side lighting — symbol of limited exclusive access',
+    imageRight: true,
+    subduedCta: true,
   },
 ];
 
-const CollectionCardItem = memo(function CollectionCardItem({ card }: { card: CollectionCard }) {
+export default function CollectionsSection() {
   return (
-    <Link
-      href={card.href}
-      className="group flex flex-col transition duration-500 hover:-translate-y-1 hover:opacity-95"
-      aria-label={`Explore ${card.label} collection`}
-    >
-      <div className="w-full aspect-[3/4] overflow-hidden relative">
-        <AppImage
-          src={card.image}
-          alt={card.alt}
-          fill
-          loading="lazy"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-95"
-        />
-      </div>
+    <div className="w-full bg-neutral-50">
+      <section
+        className="mx-auto max-w-7xl px-6 pb-24 pt-32 sm:px-10 md:pb-36 md:pt-48 lg:px-16"
+        aria-label="SIGNATURE experiences"
+      >
+        <div className="flex flex-col lg:flex-row lg:items-center lg:gap-20 xl:gap-28">
+          <div className="mb-14 lg:mb-0 lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
+            <p className="mb-6 font-body text-[0.6rem] font-bold uppercase tracking-[0.3em] text-neutral-400">
+              {collectionFeatures[0].label}
+            </p>
+            <p className="mb-10 font-display text-[clamp(1.7rem,2.8vw,2.4rem)] font-light leading-[1.1] tracking-tight text-neutral-900">
+              {collectionFeatures[0].title}
+            </p>
+            <p className="mb-12 max-w-xs font-body text-sm leading-relaxed text-neutral-500">
+              {collectionFeatures[0].description}
+            </p>
+            <Link
+              href={collectionFeatures[0].href}
+              className="font-body text-[0.6rem] uppercase tracking-[0.28em] text-neutral-900 transition-opacity duration-[var(--motion-hover)] ease-[var(--ease-luxury)] hover:opacity-40"
+              aria-label="Explore SIGNATURE experiences"
+            >
+              Explore →
+            </Link>
+          </div>
+          <div className="overflow-hidden lg:w-7/12 xl:w-8/12">
+            <div className="origin-right scale-105">
+              <AppImage
+                src={collectionFeatures[0].image}
+                alt={collectionFeatures[0].alt}
+                width={1200}
+                height={780}
+                className="h-auto w-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <p className="mt-6 mb-4 uppercase font-body font-normal text-[0.7rem] tracking-brand text-card-text leading-relaxed">
-        {card.label.split('').join('\u200A')}
-        <sup className="text-[0.5rem] align-super tracking-normal">{card.trademark}</sup>
-      </p>
+      <section
+        className="mx-auto max-w-7xl border-t border-neutral-200 px-6 pb-32 pt-16 sm:px-10 md:pb-48 md:pt-20 lg:px-16"
+        aria-label="LAB experiences"
+      >
+        <div className="flex flex-col lg:flex-row-reverse lg:items-center lg:gap-20 xl:gap-28">
+          <div className="mb-14 lg:mb-0 lg:w-7/12 xl:w-8/12">
+            <div className="w-full overflow-hidden">
+              <AppImage
+                src={collectionFeatures[1].image}
+                alt={collectionFeatures[1].alt}
+                width={1200}
+                height={780}
+                className="h-auto w-full object-cover"
+              />
+            </div>
+          </div>
+          <div className="lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
+            <p className="mb-6 font-body text-[0.6rem] font-bold uppercase tracking-[0.3em] text-neutral-400">
+              {collectionFeatures[1].label}
+            </p>
+            <p className="mb-10 font-display text-[clamp(1.7rem,2.8vw,2.4rem)] font-light leading-[1.1] tracking-tight text-neutral-900">
+              {collectionFeatures[1].title}
+            </p>
+            <p className="mb-12 max-w-xs font-body text-sm leading-relaxed text-neutral-500">
+              {collectionFeatures[1].description}
+            </p>
+            <Link
+              href={collectionFeatures[1].href}
+              className="font-body text-[0.6rem] uppercase tracking-[0.28em] text-neutral-900 transition-opacity duration-[var(--motion-hover)] ease-[var(--ease-luxury)] hover:opacity-40"
+              aria-label="Discover LAB experience design"
+            >
+              Discover →
+            </Link>
+          </div>
+        </div>
+      </section>
 
-      <div className="mb-5 space-y-1.5 font-display text-[0.82rem] font-light leading-body text-card-body">
-        {card.description.map((line) => (
-          <p key={line}>{line}</p>
-        ))}
-      </div>
-
-      <ul className="flex flex-col gap-1.5">
-        {card.features.map((feature) => (
-          <li
-            key={feature}
-            className="flex items-center gap-2 font-body text-[0.68rem] text-card-muted tracking-wide"
-          >
-            <span
-              className="inline-block w-1 h-1 rounded-full bg-card-muted flex-shrink-0"
-              aria-hidden="true"
-            />
-            {feature}
-          </li>
-        ))}
-      </ul>
-    </Link>
+      <section
+        className="mx-auto max-w-7xl border-t border-neutral-200 px-6 pb-40 pt-24 sm:px-10 md:pb-56 md:pt-36 lg:px-16"
+        aria-label="BLACK private access"
+      >
+        <div className="flex flex-col lg:flex-row lg:items-center lg:gap-20 xl:gap-28">
+          <div className="mb-14 lg:mb-0 lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
+            <p className="mb-6 font-body text-[0.6rem] font-bold uppercase tracking-[0.3em] text-neutral-400">
+              {collectionFeatures[2].label}
+            </p>
+            <p className="mb-10 font-display text-[clamp(1.7rem,2.8vw,2.4rem)] font-light leading-[1.1] tracking-tight text-neutral-900">
+              {collectionFeatures[2].title}
+            </p>
+            <p className="mb-12 max-w-xs font-body text-sm leading-relaxed text-neutral-500">
+              {collectionFeatures[2].description}
+            </p>
+            <Link
+              href={collectionFeatures[2].href}
+              className="font-body text-[0.6rem] uppercase tracking-[0.28em] text-neutral-900 opacity-55 transition-opacity duration-[var(--motion-hover)] ease-[var(--ease-luxury)] hover:opacity-100"
+              aria-label="Request private access to BLACK experiences"
+            >
+              Request Private Access →
+            </Link>
+          </div>
+          <div className="lg:w-7/12 xl:w-8/12">
+            <div className="w-full overflow-hidden">
+              <AppImage
+                src={collectionFeatures[2].image}
+                alt={collectionFeatures[2].alt}
+                width={1200}
+                height={780}
+                className="h-auto w-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   );
-});
-
-const CollectionsSection = memo(function CollectionsSection() {
-  return (
-    <section className="w-full bg-stone-light" aria-label="Collections">
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {cards.map((card) => (
-            <CollectionCardItem key={card.label} card={card} />
-          ))}
-        </div>
-
-        <div className="my-16 flex justify-center" aria-hidden="true">
-          <div className="w-full max-w-sm border-t border-divider sm:max-w-md lg:max-w-lg" />
-        </div>
-
-        <div className="flex justify-center">
-          <Link
-            href="/contact"
-            aria-label="Inquire privately about CREARE experiences"
-            className="font-body text-[0.65rem] tracking-[0.3em] text-card-text uppercase hover:opacity-60 transition-opacity"
-          >
-            INQUIRE PRIVATELY
-          </Link>
-        </div>
-
-        <div className="h-20" aria-hidden="true" />
-      </div>
-    </section>
-  );
-});
-
-export default CollectionsSection;
+}

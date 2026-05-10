@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import HeroSection from '@/app/home/components/HeroSection';
-import TaglineSection from '@/app/home/components/TaglineSection';
 import CollectionsSection from '@/app/home/components/CollectionsSection';
 
 export const metadata: Metadata = {
@@ -48,7 +47,6 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-black">
       <HeroSection />
-      <TaglineSection />
       <CollectionsSection />
     </main>
   );
