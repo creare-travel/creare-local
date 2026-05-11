@@ -629,15 +629,12 @@ export default async function CulturalWorldPage({ params }: Props) {
 
       {context.characteristics.length > 0 && (
         <>
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="w-full h-px bg-white/8" />
-          </div>
           <section
-            className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-20"
+            className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-24"
             aria-labelledby="core-characteristics"
           >
             <div className="max-w-3xl">
-              <p className="text-white/25 font-body text-[0.6rem] tracking-[0.35em] uppercase mb-8">
+              <p className="text-white/22 font-body text-[0.58rem] tracking-[0.24em] uppercase mb-7">
                 Core Characteristics
               </p>
               <h2
@@ -647,7 +644,7 @@ export default async function CulturalWorldPage({ params }: Props) {
               >
                 What defines this world.
               </h2>
-              <ul className="space-y-5">
+              <ul className="space-y-6">
                 {context.characteristics.map((characteristic, index) => (
                   <li
                     key={`${destination.slug || 'world'}-characteristic-${index}`}
@@ -666,11 +663,11 @@ export default async function CulturalWorldPage({ params }: Props) {
       {relatedExperiences.length > 0 && (
         <>
           <section
-            className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-20"
+            className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-24"
             aria-labelledby="related-experiences"
           >
             <div className="max-w-3xl mb-14">
-              <p className="text-white/25 font-body text-[0.6rem] tracking-[0.35em] uppercase mb-8">
+              <p className="text-white/22 font-body text-[0.58rem] tracking-[0.24em] uppercase mb-7">
                 Related Experiences
               </p>
               <h2
@@ -691,7 +688,7 @@ export default async function CulturalWorldPage({ params }: Props) {
                   <Link
                     key={experience.slug || experience.id}
                     href={`/experiences/${experience.slug}`}
-                    className="group block border border-white/10 bg-white/[0.02] overflow-hidden"
+                    className="group block rounded-[16px] border border-white/6 bg-white/[0.02] overflow-hidden"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <AppImage
@@ -706,7 +703,7 @@ export default async function CulturalWorldPage({ params }: Props) {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     </div>
                     <div className="p-7 md:p-8">
-                      <p className="text-white/30 font-body text-[0.6rem] tracking-[0.25em] uppercase mb-4">
+                      <p className="text-white/26 font-body text-[0.58rem] tracking-[0.2em] uppercase mb-4">
                         {experience.relationType === 'primary'
                           ? 'Primary relation'
                           : 'Secondary relation'}
@@ -719,7 +716,7 @@ export default async function CulturalWorldPage({ params }: Props) {
                           {experience.short_description}
                         </p>
                       )}
-                      <div className="flex flex-wrap items-center gap-4 text-white/25 font-body text-xs tracking-[0.18em] uppercase">
+                      <div className="flex flex-wrap items-center gap-4 text-white/22 font-body text-xs tracking-[0.14em] uppercase">
                         {experience.category ? <span>{experience.category}</span> : null}
                         {experience.geo_experience_type ? (
                           <span>{experience.geo_experience_type}</span>
@@ -734,9 +731,6 @@ export default async function CulturalWorldPage({ params }: Props) {
               })}
             </div>
           </section>
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="w-full h-px bg-white/8" />
-          </div>
         </>
       )}
 
@@ -746,7 +740,7 @@ export default async function CulturalWorldPage({ params }: Props) {
           aria-label="Related insights"
         >
           <div className="max-w-3xl">
-            <p className="text-white/30 font-body text-[0.6rem] tracking-[0.22em] uppercase mb-2">
+            <p className="text-white/26 font-body text-[0.58rem] tracking-[0.16em] uppercase mb-2">
               Related Insights
             </p>
             <div className="space-y-4">

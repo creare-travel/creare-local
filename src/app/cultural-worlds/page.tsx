@@ -157,7 +157,7 @@ export default async function CulturalWorldsPage() {
                     <h2 className="font-display font-light text-white text-2xl mb-2">{title}</h2>
                     <p className="text-white/60 font-body text-xs leading-relaxed">{tagline}</p>
                     {href && (
-                      <span className="inline-block mt-4 text-white/40 font-body text-xs tracking-[0.18em] uppercase group-hover:text-white transition-colors">
+                      <span className="inline-block mt-4 text-white/34 font-body text-xs tracking-[0.14em] uppercase group-hover:text-white/78 transition-colors">
                         Explore →
                       </span>
                     )}

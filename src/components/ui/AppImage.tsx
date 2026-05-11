@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, memo } from 'react';
+import React, { useState, useCallback, useMemo, memo, useEffect } from 'react';
 import Image from 'next/image';
 
 interface AppImageProps {
@@ -19,6 +19,7 @@ interface AppImageProps {
   fallbackSrc?: string;
   loading?: 'lazy' | 'eager';
   unoptimized?: boolean;
+  atmosphere?: 'light' | 'dark' | 'neutral';
   [key: string]: unknown;
 }
 
@@ -38,10 +39,18 @@ const AppImage = memo(function AppImage({
   fallbackSrc = '/assets/images/no_image.png',
   loading = 'lazy',
   unoptimized = false,
+  atmosphere = 'neutral',
   ...props
 }: AppImageProps) {
   const [imageSrc, setImageSrc] = useState(src);
   const [hasError, setHasError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setImageSrc(src);
+    setHasError(false);
+    setIsLoaded(false);
+  }, [src]);
 
   // External URLs: let Next.js optimize them via remotePatterns (unoptimized=false by default)
   // Only force unoptimized if caller explicitly requests it
@@ -51,14 +60,35 @@ const AppImage = memo(function AppImage({
     if (!hasError && imageSrc !== fallbackSrc) {
       setImageSrc(fallbackSrc);
       setHasError(true);
+      setIsLoaded(false);
     }
   }, [hasError, imageSrc, fallbackSrc]);
 
+  const handleLoad = useCallback(() => {
+    setIsLoaded(true);
+  }, []);
+
   const imageClassName = useMemo(() => {
-    const classes = [className];
-    if (onClick) classes.push('cursor-pointer hover:opacity-90 transition-opacity duration-200');
+    const placeholderSurface =
+      atmosphere === 'dark'
+        ? 'bg-[linear-gradient(135deg,rgba(21,22,24,0.96),rgba(34,36,39,0.92))]'
+        : atmosphere === 'light'
+          ? 'bg-[linear-gradient(135deg,rgba(245,241,234,0.98),rgba(225,217,206,0.94))]'
+          : 'bg-[linear-gradient(135deg,rgba(232,226,216,0.96),rgba(207,198,186,0.92))]';
+
+    const classes = [
+      className,
+      placeholderSurface,
+      'will-change-[opacity,transform,filter] transition-[opacity,transform,filter] duration-[var(--motion-standard)] ease-[var(--ease-luxury)]',
+      isLoaded ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-[1.012] blur-[0.4px]',
+    ];
+    if (onClick) {
+      classes.push(
+        'cursor-pointer hover:opacity-90 active:opacity-80 transition-[opacity,transform] duration-[var(--motion-hover)] ease-[var(--ease-luxury)]'
+      );
+    }
     return classes.filter(Boolean).join(' ');
-  }, [className, onClick]);
+  }, [atmosphere, className, isLoaded, onClick]);
 
   const commonProps = {
     src: imageSrc,
@@ -68,6 +98,7 @@ const AppImage = memo(function AppImage({
     placeholder,
     unoptimized: resolvedUnoptimized,
     onError: handleError,
+    onLoad: handleLoad,
     onClick,
     // priority images are eager-loaded; non-priority respect the loading prop
     ...(priority ? { priority: true, loading: 'eager' as const } : { loading }),

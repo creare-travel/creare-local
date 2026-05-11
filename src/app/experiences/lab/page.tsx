@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
+import AppImage from '@/components/ui/AppImage';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 
@@ -395,16 +396,17 @@ export default async function LabPage() {
                     <>
                       <div className="relative w-full overflow-hidden rounded-2xl aspect-[4/3] mb-5">
                         {coverUrl ? (
-                          <Image
+                          <AppImage
                             src={coverUrl}
                             alt={coverAlt}
                             fill
+                            atmosphere="light"
                             className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             unoptimized={isLocalAssetUrl(coverUrl)}
                           />
                         ) : (
-                          <div className="w-full h-full bg-neutral-200" />
+                          <div className="w-full h-full bg-[linear-gradient(135deg,rgba(245,241,234,0.98),rgba(225,217,206,0.94))]" />
                         )}
                       </div>
 

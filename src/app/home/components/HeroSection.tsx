@@ -19,28 +19,28 @@ export default function HeroSection() {
         />
 
         <div
-          className="absolute inset-0 z-10 bg-gradient-to-t from-black/88 via-black/55 to-black/18"
+          className="absolute inset-0 z-10 bg-gradient-to-t from-black/84 via-black/48 to-black/16"
           aria-hidden="true"
         />
 
         <div
-          className="absolute inset-0 z-10 bg-[radial-gradient(ellipse_at_center,transparent_50%,rgba(0,0,0,0.35)_100%)]"
+          className="absolute inset-0 z-10 bg-[radial-gradient(ellipse_at_center,transparent_46%,rgba(0,0,0,0.3)_100%)]"
           aria-hidden="true"
         />
       </div>
 
-      <div className="relative z-30 mx-auto w-full max-w-7xl px-6 pb-14 sm:px-10 md:pb-20 lg:px-16">
-        <div className="max-w-xl">
-          <p className="mb-7 font-body text-[0.58rem] font-light uppercase tracking-[0.38em] text-white/35">
+      <div className="relative z-30 mx-auto flex w-full max-w-7xl items-end px-6 pb-20 pt-28 sm:px-10 sm:pb-16 sm:pt-32 md:pb-20 lg:px-16">
+        <div className="max-w-[21.5rem] sm:max-w-xl">
+          <p className="mb-8 font-body text-[0.56rem] font-light uppercase tracking-[0.34em] text-white/34 sm:mb-7 sm:text-[0.58rem] sm:tracking-[0.38em]">
             Curated Cultural Experiences
           </p>
 
-          <h1 className="mb-2 font-display text-[clamp(2.8rem,6vw,5.5rem)] font-light leading-[1.06] tracking-tight text-white">
+          <h1 className="mb-3 font-display text-[clamp(2.45rem,10.4vw,5.5rem)] font-light leading-[1.11] tracking-[-0.018em] text-white sm:mb-2 sm:text-[clamp(2.8rem,6vw,5.5rem)] sm:leading-[1.06] sm:tracking-tight">
             Experiences.
           </h1>
 
           <p
-            className="mb-12 font-display text-[clamp(2.8rem,6vw,5.5rem)] font-light leading-[1.06] tracking-tight text-white/55"
+            className="mb-14 font-display text-[clamp(2.45rem,10.4vw,5.5rem)] font-light leading-[1.11] tracking-[-0.018em] text-white/58 sm:mb-12 sm:text-[clamp(2.8rem,6vw,5.5rem)] sm:leading-[1.06] sm:tracking-tight sm:text-white/55"
             aria-hidden="true"
           >
             Composed as Art.
@@ -48,7 +48,7 @@ export default function HeroSection() {
 
           <Link
             href="/contact"
-            className="font-body text-[0.62rem] uppercase tracking-[0.3em] text-white/70 transition-colors duration-300 hover:text-white"
+            className="inline-flex min-h-11 items-center font-body text-[0.62rem] uppercase tracking-[0.24em] text-white/72 transition-colors duration-300 hover:text-white sm:tracking-[0.3em]"
             aria-label="Inquire privately about CREARE experiences"
           >
             Inquire Privately →

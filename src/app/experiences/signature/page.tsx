@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
+import AppImage from '@/components/ui/AppImage';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
@@ -149,22 +150,23 @@ function renderExperienceCard(
 
   const card = (
     <>
-      <div className="relative w-full overflow-hidden rounded-2xl aspect-[4/3] mb-5">
+      <div className="relative w-full overflow-hidden rounded-[18px] aspect-[4/3] mb-5">
         {coverUrl ? (
-          <Image
+          <AppImage
             src={coverUrl}
             alt={coverAlt}
             fill
+            atmosphere="light"
             className="object-cover scale-[1.03] origin-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             unoptimized={coverUrl.startsWith('http://localhost')}
           />
         ) : (
-          <div className="w-full h-full bg-neutral-200" />
+          <div className="w-full h-full bg-[linear-gradient(135deg,rgba(245,241,234,0.98),rgba(225,217,206,0.94))]" />
         )}
       </div>
 
-      <p className="font-body text-[0.55rem] tracking-[0.28em] text-neutral-400 uppercase mb-2">
+      <p className="font-body text-[0.55rem] tracking-[0.22em] text-neutral-400/80 uppercase mb-2">
         {exp.series
           ? `${exp.category ?? 'SIGNATURE'} / ${exp.series}`
           : (exp.category ?? 'SIGNATURE')}
@@ -328,7 +330,7 @@ export default async function SignatureExperiencesPage() {
 
         {/* Centered content */}
         <div className="relative z-10 flex flex-col items-center text-center px-6">
-          <p className="font-body text-[0.6rem] tracking-[0.35em] text-white/70 uppercase mb-8">
+          <p className="font-body text-[0.58rem] tracking-[0.24em] text-white/55 uppercase mb-8">
             CREARE
           </p>
           <h1
@@ -378,7 +380,7 @@ export default async function SignatureExperiencesPage() {
 
           {/* Destinations top links — CMS-driven with static fallback */}
           <nav className="mb-12" aria-label="Destinations">
-            <p className="font-body text-[0.55rem] tracking-[0.3em] text-neutral-400 uppercase mb-4">
+            <p className="font-body text-[0.55rem] tracking-[0.22em] text-neutral-400/80 uppercase mb-4">
               Destinations
             </p>
             <div className="flex flex-wrap gap-x-6 gap-y-2">
@@ -460,7 +462,7 @@ export default async function SignatureExperiencesPage() {
         aria-hidden="true"
       >
         <p
-          className="font-body tracking-[0.28em] text-neutral-700 uppercase text-center"
+          className="font-body tracking-[0.22em] text-neutral-700/60 uppercase text-center"
           style={{ fontSize: 'clamp(0.75rem, 1.1vw, 0.875rem)', opacity: 0.65 }}
         >
           Selected. Not discovered.
@@ -475,7 +477,7 @@ export default async function SignatureExperiencesPage() {
         >
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="text-center mb-20">
-              <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-5">
+              <p className="font-body text-[0.58rem] tracking-[0.22em] text-neutral-400/80 uppercase mb-5">
                 CREARE SIGNATURE™
               </p>
               <h2
@@ -502,7 +504,7 @@ export default async function SignatureExperiencesPage() {
         >
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="text-center mb-20">
-              <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-5">
+              <p className="font-body text-[0.58rem] tracking-[0.22em] text-neutral-400/80 uppercase mb-5">
                 CREARE HISTORICAL SERIES™
               </p>
               <h2
@@ -529,7 +531,7 @@ export default async function SignatureExperiencesPage() {
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             {/* Section heading */}
             <div className="text-center mb-20">
-              <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-5">
+              <p className="font-body text-[0.58rem] tracking-[0.22em] text-neutral-400/80 uppercase mb-5">
                 CREARE CORPORATE SERIES™
               </p>
               <h2
@@ -556,7 +558,7 @@ export default async function SignatureExperiencesPage() {
         >
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="text-center mb-20">
-              <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-5">
+              <p className="font-body text-[0.58rem] tracking-[0.22em] text-neutral-400/80 uppercase mb-5">
                 CREARE CULINARY SERIES™
               </p>
               <h2

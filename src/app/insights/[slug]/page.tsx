@@ -1,8 +1,8 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Metadata } from 'next';
 import JsonLd from '@/components/JsonLd';
+import AppImage from '@/components/ui/AppImage';
 import {
   canonicalUrl,
   buildOpenGraph,
@@ -273,17 +273,18 @@ function RelatedExperienceCard({
     <>
       {/* Image */}
       <div className="relative w-full overflow-hidden aspect-[4/3] mb-4">
-        <Image
+        <AppImage
           src={imageUrl}
           alt={imageAlt}
           fill
           priority={priority}
+          atmosphere="dark"
           className="object-cover transition-transform duration-700 group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         {experience.category && (
           <div className="absolute top-3 left-3 z-10">
-            <span className="font-body text-[0.55rem] tracking-[0.28em] text-white uppercase bg-black/60 backdrop-blur-sm px-3 py-1.5">
+            <span className="font-body text-[0.55rem] tracking-[0.22em] text-white uppercase bg-black/55 backdrop-blur-sm px-3 py-1.5">
               {experience.category}
             </span>
           </div>
@@ -294,7 +295,7 @@ function RelatedExperienceCard({
       {(location || experience.duration) && (
         <div className="flex items-center gap-3 mb-2">
           {location && (
-            <span className="font-body text-[0.6rem] tracking-[0.2em] text-white/40 uppercase">
+            <span className="font-body text-[0.6rem] tracking-[0.16em] text-white/32 uppercase">
               {location}
             </span>
           )}
@@ -302,7 +303,7 @@ function RelatedExperienceCard({
             <span className="w-px h-3 bg-white/20" aria-hidden="true" />
           )}
           {experience.duration && (
-            <span className="font-body text-[0.6rem] tracking-[0.2em] text-white/40 uppercase">
+            <span className="font-body text-[0.6rem] tracking-[0.16em] text-white/32 uppercase">
               {experience.duration}
             </span>
           )}
@@ -326,7 +327,7 @@ function RelatedExperienceCard({
         </p>
       )}
 
-      <span className="font-body text-[0.6rem] tracking-[0.28em] text-white/60 uppercase group-hover:opacity-50 transition-opacity duration-300">
+      <span className="font-body text-[0.6rem] tracking-[0.2em] text-white/52 uppercase group-hover:opacity-50 transition-opacity duration-300">
         EXPLORE →
       </span>
     </>
@@ -402,7 +403,14 @@ export default async function InsightArticlePage({ params }: Props) {
       <JsonLd id="insight-detail-jsonld" schema={insightSchema} />
       {/* Hero cover image — always shown (fallback image if missing) */}
       <div className="relative w-full h-[60vh] min-h-[360px] max-h-[600px] overflow-hidden">
-        <Image src={coverImageUrl} alt={coverImageAlt} fill className="object-cover" priority />
+        <AppImage
+          src={coverImageUrl}
+          alt={coverImageAlt}
+          fill
+          priority
+          atmosphere="dark"
+          className="object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black" />
       </div>
 
@@ -411,7 +419,7 @@ export default async function InsightArticlePage({ params }: Props) {
         <nav className="mb-12" aria-label="Breadcrumb">
           <Link
             href="/insights"
-            className="font-body text-xs tracking-[0.18em] uppercase text-white/30 hover:text-white/60 transition-colors duration-300"
+            className="font-body text-xs tracking-[0.14em] uppercase text-white/28 hover:text-white/60 transition-colors duration-300"
           >
             ← Insights
           </Link>
@@ -421,7 +429,7 @@ export default async function InsightArticlePage({ params }: Props) {
         <header className="mb-12">
           {/* Destination: hide gracefully if missing */}
           {destinationName && (
-            <p className="font-body text-xs tracking-[0.22em] uppercase text-white/30 mb-4">
+            <p className="font-body text-xs tracking-[0.16em] uppercase text-white/26 mb-4">
               {destinationName}
             </p>
           )}
@@ -439,19 +447,19 @@ export default async function InsightArticlePage({ params }: Props) {
         {/* Content: only render if present */}
         {contentNode ? (
           <>
-            <div className="border-t border-white/10 mb-12" />
+            <div className="border-t border-white/6 mb-14" />
             {contentNode}
           </>
         ) : null}
 
         {/* CTA */}
-        <div className="mt-16 border-t border-white/10 pt-10">
+        <div className="mt-18 border-t border-white/6 pt-10">
           <p className="font-body text-xs text-white/30 leading-relaxed mb-4">
             Access is not listed. It is composed.
           </p>
           <Link
             href="/contact"
-            className="font-body text-xs tracking-[0.18em] uppercase text-white/60 hover:text-white transition-colors duration-300"
+            className="font-body text-xs tracking-[0.14em] uppercase text-white/52 hover:text-white transition-colors duration-300"
             aria-label="Inquire privately about a CREARE experience"
           >
             Inquire Privately →
@@ -462,8 +470,8 @@ export default async function InsightArticlePage({ params }: Props) {
       {/* Related Experiences — only rendered if experiences exist */}
       {relatedExperiences.length > 0 && (
         <section className="max-w-5xl mx-auto px-6 sm:px-10 mt-24">
-          <div className="border-t border-white/10 pt-16">
-            <p className="font-body text-xs tracking-[0.22em] uppercase text-white/30 mb-10">
+          <div className="border-t border-white/6 pt-18">
+            <p className="font-body text-xs tracking-[0.16em] uppercase text-white/24 mb-10">
               Related Experiences
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">

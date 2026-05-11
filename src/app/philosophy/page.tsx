@@ -51,7 +51,7 @@ export default function PhilosophyPage() {
       {/* Opening Statement */}
       <section className="min-h-screen flex items-center px-8 sm:px-16 lg:px-24">
         <div className="max-w-[680px]">
-          <p className="text-white/20 font-body text-xs tracking-[0.3em] uppercase mb-16">
+          <p className="text-white/16 font-body text-[0.7rem] tracking-[0.24em] uppercase mb-14">
             Creare / Philosophy
           </p>
           <h1 className="font-display font-light text-white leading-[1.15] text-[clamp(2.2rem,5vw,5rem)]">
@@ -71,7 +71,9 @@ export default function PhilosophyPage() {
         <div className="flex flex-col gap-32">
           {/* 01 — Against the Itinerary */}
           <div>
-            <p className="text-white/20 font-body text-xs tracking-[0.25em] uppercase mb-10">01</p>
+            <p className="text-white/16 font-body text-[0.7rem] tracking-[0.2em] uppercase mb-9">
+              01
+            </p>
             <h2 className="font-display font-light text-white text-3xl md:text-4xl mb-12">
               Against the Itinerary
             </h2>
@@ -90,8 +92,10 @@ export default function PhilosophyPage() {
           </div>
 
           {/* 02 — The Composition */}
-          <div className="border-t border-white/10 pt-32">
-            <p className="text-white/20 font-body text-xs tracking-[0.25em] uppercase mb-10">02</p>
+          <div className="pt-24 md:pt-28">
+            <p className="text-white/16 font-body text-[0.7rem] tracking-[0.2em] uppercase mb-9">
+              02
+            </p>
             <h2 className="font-display font-light text-white text-3xl md:text-4xl mb-12">
               The Composition
             </h2>
@@ -112,8 +116,10 @@ export default function PhilosophyPage() {
           </div>
 
           {/* 03 — Access as Responsibility */}
-          <div className="border-t border-white/10 pt-32">
-            <p className="text-white/20 font-body text-xs tracking-[0.25em] uppercase mb-10">03</p>
+          <div className="border-t border-white/6 pt-24 md:pt-28">
+            <p className="text-white/16 font-body text-[0.7rem] tracking-[0.2em] uppercase mb-9">
+              03
+            </p>
             <h2 className="font-display font-light text-white text-3xl md:text-4xl mb-12">
               Access as Responsibility
             </h2>
@@ -133,8 +139,10 @@ export default function PhilosophyPage() {
           </div>
 
           {/* 04 — The Client */}
-          <div className="border-t border-white/10 pt-32">
-            <p className="text-white/20 font-body text-xs tracking-[0.25em] uppercase mb-10">04</p>
+          <div className="pt-24 md:pt-28">
+            <p className="text-white/16 font-body text-[0.7rem] tracking-[0.2em] uppercase mb-9">
+              04
+            </p>
             <h2 className="font-display font-light text-white text-3xl md:text-4xl mb-12">
               The Client
             </h2>
@@ -160,7 +168,7 @@ export default function PhilosophyPage() {
       </section>
 
       {/* Closing */}
-      <section className="border-t border-white/10 py-32 px-8 sm:px-16 lg:px-24">
+      <section className="border-t border-white/6 py-28 px-8 sm:px-16 lg:px-24">
         <div className="max-w-[660px] mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-12">
           <p className="font-display font-light text-white leading-tight text-[clamp(1.5rem,3vw,2.5rem)]">
             If this resonates,

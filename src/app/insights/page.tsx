@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { Metadata } from 'next';
 import JsonLd from '@/components/JsonLd';
+import AppImage from '@/components/ui/AppImage';
 import { insights } from '@/data/insights';
 import {
   canonicalUrl,
@@ -175,10 +175,11 @@ function InsightsList({
           >
             {insight.coverImageUrl && (
               <div className="relative w-full aspect-[16/9] mb-4 overflow-hidden">
-                <Image
+                <AppImage
                   src={insight.coverImageUrl}
                   alt={insight.title}
                   fill
+                  atmosphere="dark"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                   priority={index === 0}
                   sizes="(max-width: 768px) 100vw, 672px"
@@ -186,7 +187,7 @@ function InsightsList({
               </div>
             )}
             {insight.destinationName && (
-              <p className="font-body text-xs tracking-[0.18em] uppercase text-white/30 mb-2">
+              <p className="font-body text-xs tracking-[0.14em] uppercase text-white/26 mb-2">
                 {insight.destinationName}
               </p>
             )}
@@ -198,11 +199,11 @@ function InsightsList({
                 {insight.excerpt}
               </p>
             )}
-            <span className="font-body text-xs tracking-[0.15em] uppercase text-white/30 group-hover:text-white/60 transition-colors duration-300">
+            <span className="font-body text-xs tracking-[0.12em] uppercase text-white/26 group-hover:text-white/60 transition-colors duration-300">
               Read →
             </span>
           </Link>
-          <div className="border-t border-white/5 mt-10" />
+          <div className="border-t border-white/4 mt-12" />
         </li>
       ))}
     </ol>
@@ -255,7 +256,7 @@ export default async function InsightsPage() {
       <div className="max-w-2xl mx-auto px-6 sm:px-10">
         {/* Header */}
         <div className="mb-16">
-          <p className="font-body text-xs tracking-[0.22em] uppercase text-white/40 mb-6">
+          <p className="font-body text-xs tracking-[0.16em] uppercase text-white/32 mb-6">
             Insights
           </p>
           <h1 className="font-display text-3xl sm:text-4xl font-light tracking-wide text-white leading-snug mb-6">
@@ -269,7 +270,7 @@ export default async function InsightsPage() {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-white/10 mb-12" />
+        <div className="border-t border-white/6 mb-14" />
 
         {/* Article list */}
         {displayItems ? <InsightsList items={displayItems} /> : null}

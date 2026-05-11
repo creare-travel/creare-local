@@ -54,19 +54,22 @@ export default function Header() {
     ? 'text-[#3a342f] hover:text-[#1f1b18]'
     : 'text-white/72 hover:text-white';
   const mobileBorderTone = lightSurface ? 'border-black/[0.06]' : 'border-white/[0.05]';
+  const mobileOverlayTone = lightSurface
+    ? 'bg-[rgba(18,16,14,0.18)] backdrop-blur-[1.5px]'
+    : 'bg-[rgba(6,7,8,0.34)] backdrop-blur-[2px]';
 
   return (
     <header
       className={`fixed left-0 right-0 top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] ${
         lightSurface
-          ? 'border-black/[0.06] bg-[rgba(245,241,234,0.72)] backdrop-blur-[8px]'
+          ? 'border-black/[0.05] bg-[rgba(245,241,234,0.68)] backdrop-blur-[6px]'
           : scrolled
-            ? 'border-white/[0.04] bg-[rgba(11,11,12,0.038)] backdrop-blur-[3px]'
-            : 'border-white/[0.03] bg-[rgba(11,11,12,0.016)] backdrop-blur-[1.5px]'
+            ? 'border-white/[0.035] bg-[rgba(11,11,12,0.03)] backdrop-blur-[2px]'
+            : 'border-white/[0.025] bg-[rgba(11,11,12,0.012)] backdrop-blur-[0.8px]'
       }`}
     >
       <nav
-        className="max-w-7xl mx-auto flex h-16 items-center justify-between px-6 sm:px-10 lg:px-16"
+        className="max-w-7xl mx-auto flex h-16 items-center justify-between px-6 pt-[max(env(safe-area-inset-top),0px)] sm:px-10 lg:px-16"
         aria-label="Main navigation"
       >
         <Link
@@ -98,7 +101,7 @@ export default function Header() {
         </div>
 
         <button
-          className={`p-2 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] lg:hidden ${
+          className={`p-2 transition-[color,opacity] duration-[var(--motion-hover)] ease-[var(--ease-luxury)] active:opacity-75 lg:hidden ${
             lightSurface ? 'hover:text-[#1f1b18]' : 'hover:text-white'
           } ${mobileTone}`}
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -122,30 +125,38 @@ export default function Header() {
         </button>
       </nav>
       {mobileOpen && (
-        <div
-          className={`border-t px-6 py-6 backdrop-blur-[10px] lg:hidden sm:px-10 ${
-            lightSurface
-              ? 'border-black/[0.06] bg-[rgba(245,241,234,0.82)]'
-              : 'border-white/[0.04] bg-[rgba(11,11,12,0.06)]'
-          }`}
-          role="navigation"
-          aria-label="Mobile navigation"
-        >
-          {navLinks?.map((item) => (
-            <Link
-              key={item?.label}
-              href={item?.href}
-              className={`block border-b py-3 font-body text-[0.7rem] uppercase tracking-[0.18em] transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] ${mobileLinkTone} ${mobileBorderTone}`}
-              onClick={() => setMobileOpen(false)}
-              aria-label={item?.label}
-            >
-              {item?.label}
-            </Link>
-          ))}
-          <div className="pt-4">
-            <LanguageSelector />
+        <>
+          <button
+            type="button"
+            className={`fixed inset-0 z-0 transition-[background-color,backdrop-filter,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] lg:hidden ${mobileOverlayTone}`}
+            aria-label="Close navigation menu overlay"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div
+            className={`relative z-10 border-t px-6 py-6 transition-[background-color,border-color,backdrop-filter,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] lg:hidden sm:px-10 ${
+              lightSurface
+                ? 'border-black/[0.05] bg-[rgba(245,241,234,0.8)] backdrop-blur-[6px]'
+                : 'border-white/[0.03] bg-[rgba(11,11,12,0.075)] backdrop-blur-[5px]'
+            }`}
+            role="navigation"
+            aria-label="Mobile navigation"
+          >
+            {navLinks?.map((item) => (
+              <Link
+                key={item?.label}
+                href={item?.href}
+                className={`block border-b py-3.5 font-body text-[0.68rem] uppercase tracking-[0.16em] transition-[color,opacity,border-color] duration-[var(--motion-hover)] ease-[var(--ease-luxury)] active:opacity-70 ${mobileLinkTone} ${mobileBorderTone}`}
+                onClick={() => setMobileOpen(false)}
+                aria-label={item?.label}
+              >
+                {item?.label}
+              </Link>
+            ))}
+            <div className="pt-5">
+              <LanguageSelector />
+            </div>
           </div>
-        </div>
+        </>
       )}
     </header>
   );
