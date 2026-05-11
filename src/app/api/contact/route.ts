@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sgMail from '@sendgrid/mail';
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
+import { getMailConfig } from '@/lib/email/config';
 
 interface ContactPayload {
   name: string;
@@ -47,18 +46,30 @@ export async function POST(request: NextRequest) {
     const ownerText = `New inquiry received via CREARE.\n\nName: ${name.trim()}\nEmail: ${email.trim()}\n${intentLine}${slugLine}Message:\n${message.trim()}`;
     const userText = `${name.trim()},\n\nThank you.\n\nYour inquiry has been received and is being reviewed.\n\nWe will respond personally.\n\nCREARE`;
 
-    const fromAddress = process.env.CONTACT_EMAIL as string;
+    const mailConfig = getMailConfig();
+    if (!mailConfig.ok) {
+      console.error('[/api/contact] Mail configuration error:', mailConfig.error);
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Contact form is temporarily unavailable. Please try again later.',
+        },
+        { status: 503 }
+      );
+    }
+
+    sgMail.setApiKey(mailConfig.config.apiKey);
 
     await Promise.all([
       sgMail.send({
-        to: fromAddress,
-        from: fromAddress,
+        to: mailConfig.config.toEmail,
+        from: mailConfig.config.fromEmail,
         subject: 'New Inquiry — CREARE',
         text: ownerText,
       }),
       sgMail.send({
         to: email.trim(),
-        from: fromAddress,
+        from: mailConfig.config.fromEmail,
         subject: 'Your inquiry has been received — CREARE',
         text: userText,
       }),
