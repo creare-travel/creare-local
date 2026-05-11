@@ -488,7 +488,7 @@ export default async function CulturalWorldPage({ params }: Props) {
           aria-labelledby={`section-${index}`}
         >
           <div className="max-w-3xl">
-            <p className="text-white/30 font-body text-xs tracking-[0.25em] uppercase mb-5">
+            <p className="mb-5 font-body text-xs uppercase tracking-[0.2em] text-white/24">
               {String(section.section_number ?? index + 1).padStart(2, '0')}
             </p>
             {section.title && (
@@ -503,9 +503,11 @@ export default async function CulturalWorldPage({ params }: Props) {
             {body}
           </div>
         </section>
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="w-full h-px bg-white/8" />
-        </div>
+        {index < sections.length - 1 ? (
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+            <div className="h-px w-full bg-white/6" />
+          </div>
+        ) : null}
       </React.Fragment>
     );
   });
@@ -678,7 +680,7 @@ export default async function CulturalWorldPage({ params }: Props) {
                 Encounters that belong to this cultural world.
               </h2>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 gap-9 lg:grid-cols-2">
               {relatedExperiences.map((experience, index) => {
                 const imageUrl = resolveImageUrl(experience.cover_image);
                 const imageAlt =
@@ -688,7 +690,7 @@ export default async function CulturalWorldPage({ params }: Props) {
                   <Link
                     key={experience.slug || experience.id}
                     href={`/experiences/${experience.slug}`}
-                    className="group block rounded-[16px] border border-white/6 bg-white/[0.02] overflow-hidden"
+                    className="group block overflow-hidden rounded-[14px] border border-white/6 bg-white/[0.02]"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <AppImage

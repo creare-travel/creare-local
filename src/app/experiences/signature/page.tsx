@@ -150,7 +150,7 @@ function renderExperienceCard(
 
   const card = (
     <>
-      <div className="relative w-full overflow-hidden rounded-[18px] aspect-[4/3] mb-5">
+      <div className="relative mb-6 aspect-[4/3] w-full overflow-hidden rounded-[16px]">
         {coverUrl ? (
           <AppImage
             src={coverUrl}
@@ -166,21 +166,21 @@ function renderExperienceCard(
         )}
       </div>
 
-      <p className="font-body text-[0.55rem] tracking-[0.22em] text-neutral-400/80 uppercase mb-2">
+      <p className="mb-3 font-body text-[0.55rem] uppercase tracking-[0.2em] text-neutral-400/75">
         {exp.series
           ? `${exp.category ?? 'SIGNATURE'} / ${exp.series}`
           : (exp.category ?? 'SIGNATURE')}
       </p>
 
       <h3
-        className="font-display font-light text-neutral-900 leading-snug mb-2 group-hover:opacity-70 transition-opacity duration-300"
+        className="mb-3 font-display font-light leading-snug text-neutral-900 transition-opacity duration-300 group-hover:opacity-70"
         style={{ fontSize: compact ? 'clamp(1rem, 1.6vw, 1.15rem)' : 'clamp(1rem, 1.8vw, 1.2rem)' }}
       >
         {exp.title}
       </h3>
 
       {geoMetadata && (
-        <p className="font-body text-[0.68rem] text-neutral-500/80 mb-2">{geoMetadata}</p>
+        <p className="mb-3 font-body text-[0.68rem] text-neutral-500/75">{geoMetadata}</p>
       )}
 
       {!compact && (exp.destination?.name || exp.location_label) && (
@@ -195,7 +195,7 @@ function renderExperienceCard(
     <Link
       key={exp.id}
       href={href}
-      className={`group block ${options?.offsetAfterThird ? 'mt-6' : ''}`}
+      className={`group block ${options?.offsetAfterThird ? 'mt-8 lg:mt-10' : ''}`}
       aria-label={`View ${exp.title}`}
     >
       {card}
@@ -203,7 +203,7 @@ function renderExperienceCard(
   ) : (
     <div
       key={exp.id}
-      className={`group block ${options?.offsetAfterThird ? 'mt-6' : ''}`}
+      className={`group block ${options?.offsetAfterThird ? 'mt-8 lg:mt-10' : ''}`}
       aria-label={exp.title}
     >
       {card}
@@ -354,7 +354,7 @@ export default async function SignatureExperiencesPage() {
       </section>
 
       {/* ── INTRO TEXT BLOCK ── */}
-      <section className="bg-[#EDEAE4] pt-28 md:pt-36 pb-10 md:pb-14" aria-label="Introduction">
+      <section className="bg-[#EDEAE4] pt-28 md:pt-36 pb-12 md:pb-16" aria-label="Introduction">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           {/* Breadcrumb */}
           <nav className="mb-16" aria-label="Breadcrumb">
@@ -458,11 +458,11 @@ export default async function SignatureExperiencesPage() {
 
       {/* ── PAUSE MOMENT: "Selected. Not discovered." ── */}
       <div
-        className="bg-[#EDEAE4] py-16 md:py-20 flex items-center justify-center"
+        className="bg-[#EDEAE4] flex items-center justify-center py-[4.5rem] md:py-[5.5rem]"
         aria-hidden="true"
       >
         <p
-          className="font-body tracking-[0.22em] text-neutral-700/60 uppercase text-center"
+          className="text-center font-body uppercase tracking-[0.18em] text-neutral-700/54"
           style={{ fontSize: 'clamp(0.75rem, 1.1vw, 0.875rem)', opacity: 0.65 }}
         >
           Selected. Not discovered.
@@ -472,11 +472,11 @@ export default async function SignatureExperiencesPage() {
       {/* ── SELECTED SIGNATURE EXPERIENCES ── */}
       {selectedSignatureExperiences.length > 0 && (
         <section
-          className="bg-[#EDEAE4] pb-32 md:pb-44"
+          className="bg-[#EDEAE4] pb-36 md:pb-48"
           aria-label="Selected Signature Experiences"
         >
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="text-center mb-20">
+            <div className="text-center mb-22 md:mb-24">
               <p className="font-body text-[0.58rem] tracking-[0.22em] text-neutral-400/80 uppercase mb-5">
                 CREARE SIGNATURE™
               </p>
@@ -487,7 +487,7 @@ export default async function SignatureExperiencesPage() {
                 Selected Signature Experiences
               </h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 lg:gap-x-10 lg:gap-y-20">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-[4.5rem] sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-24">
               {selectedSignatureExperiences.map((exp, index) =>
                 renderExperienceCard(exp, { offsetAfterThird: index >= 3 })
               )}
@@ -499,11 +499,11 @@ export default async function SignatureExperiencesPage() {
       {/* ── CORPORATE SERIES SECTION ── */}
       {historicalExperiences.length > 0 && (
         <section
-          className="bg-[#EDEAE4] pt-28 md:pt-36 pb-28 md:pb-36"
+          className="bg-[#EDEAE4] pt-32 md:pt-40 pb-32 md:pb-40"
           aria-label="CREARE Historical Series"
         >
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="text-center mb-20">
+            <div className="text-center mb-18 md:mb-20">
               <p className="font-body text-[0.58rem] tracking-[0.22em] text-neutral-400/80 uppercase mb-5">
                 CREARE HISTORICAL SERIES™
               </p>
@@ -515,7 +515,7 @@ export default async function SignatureExperiencesPage() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-20 lg:gap-x-14 lg:gap-y-24">
+            <div className="grid grid-cols-1 gap-x-10 gap-y-[5.5rem] sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-[6.5rem]">
               {historicalExperiences.map((exp) => renderExperienceCard(exp, { compact: true }))}
             </div>
           </div>
@@ -525,12 +525,12 @@ export default async function SignatureExperiencesPage() {
       {/* ── CORPORATE SERIES SECTION ── */}
       {corporateExperiences.length > 0 && (
         <section
-          className="bg-[#EDEAE4] pt-28 md:pt-36 pb-28 md:pb-36"
+          className="bg-[#EDEAE4] pt-[7.5rem] md:pt-[9.5rem] pb-32 md:pb-40"
           aria-label="CREARE Corporate Series"
         >
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             {/* Section heading */}
-            <div className="text-center mb-20">
+            <div className="text-center mb-18 md:mb-20">
               <p className="font-body text-[0.58rem] tracking-[0.22em] text-neutral-400/80 uppercase mb-5">
                 CREARE CORPORATE SERIES™
               </p>
@@ -543,7 +543,7 @@ export default async function SignatureExperiencesPage() {
             </div>
 
             {/* Corporate grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-20 lg:gap-x-14 lg:gap-y-24">
+            <div className="grid grid-cols-1 gap-x-10 gap-y-[5.5rem] sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-[6.5rem]">
               {corporateExperiences.map((exp) => renderExperienceCard(exp, { compact: true }))}
             </div>
           </div>
@@ -553,11 +553,11 @@ export default async function SignatureExperiencesPage() {
       {/* ── CULINARY SERIES SECTION ── */}
       {culinaryExperiences.length > 0 && (
         <section
-          className="bg-[#EDEAE4] pt-12 md:pt-20 pb-28 md:pb-36"
+          className="bg-[#EDEAE4] pt-16 md:pt-24 pb-32 md:pb-40"
           aria-label="CREARE Culinary Series"
         >
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="text-center mb-20">
+            <div className="text-center mb-18 md:mb-20">
               <p className="font-body text-[0.58rem] tracking-[0.22em] text-neutral-400/80 uppercase mb-5">
                 CREARE CULINARY SERIES™
               </p>
@@ -569,7 +569,7 @@ export default async function SignatureExperiencesPage() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-20 lg:gap-x-14 lg:gap-y-24">
+            <div className="grid grid-cols-1 gap-x-10 gap-y-[5.5rem] sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-[6.5rem]">
               {culinaryExperiences.map((exp) => renderExperienceCard(exp, { compact: true }))}
             </div>
           </div>

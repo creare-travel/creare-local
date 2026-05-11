@@ -49,12 +49,12 @@ export default function PhilosophyPage() {
   return (
     <main className="bg-black min-h-screen">
       {/* Opening Statement */}
-      <section className="min-h-screen flex items-center px-8 sm:px-16 lg:px-24">
+      <section className="flex min-h-[86vh] items-center px-8 sm:min-h-[92vh] sm:px-16 lg:min-h-screen lg:px-24">
         <div className="max-w-[680px]">
-          <p className="text-white/16 font-body text-[0.7rem] tracking-[0.24em] uppercase mb-14">
+          <p className="mb-12 font-body text-[0.7rem] uppercase tracking-[0.22em] text-white/15">
             Creare / Philosophy
           </p>
-          <h1 className="font-display font-light text-white leading-[1.15] text-[clamp(2.2rem,5vw,5rem)]">
+          <h1 className="font-display font-light leading-[1.18] text-white text-[clamp(2rem,4.6vw,4.4rem)]">
             We believe that the most
             <br />
             extraordinary experiences
@@ -67,7 +67,7 @@ export default function PhilosophyPage() {
       </section>
 
       {/* Manifesto Sections */}
-      <section className="max-w-[660px] mx-auto px-8 sm:px-16 lg:px-0 pb-40">
+      <section className="mx-auto max-w-[660px] px-8 pb-40 sm:px-16 lg:px-0">
         <div className="flex flex-col gap-32">
           {/* 01 — Against the Itinerary */}
           <div>

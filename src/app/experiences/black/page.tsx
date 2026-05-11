@@ -154,7 +154,7 @@ export default async function BlackPage() {
           {/* Content */}
           <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
             {/* Micro-line above title */}
-            <p className="font-body uppercase tracking-[0.35em] text-white/30 mb-10 text-[0.6rem]">
+            <p className="mb-10 font-body text-[0.58rem] uppercase tracking-[0.24em] text-white/38">
               By invitation.
             </p>
 
@@ -162,7 +162,7 @@ export default async function BlackPage() {
               BLACK™
             </h1>
 
-            <p className="font-display font-light text-white/45 leading-loose mb-20 text-[clamp(0.75rem,1.3vw,0.95rem)]">
+            <p className="mb-20 font-display font-light leading-loose text-[clamp(0.78rem,1.3vw,0.96rem)] text-white/54">
               Beyond the expected.
               <br />
               Where privilege is carefully composed.
@@ -170,7 +170,7 @@ export default async function BlackPage() {
 
             <Link
               href="/contact?source=experience&slug=black&exp=black"
-              className="font-body text-[0.6rem] tracking-[0.3em] text-white/60 uppercase border border-white/20 px-10 py-4 hover:border-white/40 hover:text-white/80 transition-all duration-500"
+              className="border border-white/22 px-10 py-4 font-body text-[0.6rem] uppercase tracking-[0.24em] text-white/68 transition-all duration-500 hover:border-white/38 hover:text-white/84"
             >
               Submit Private Inquiry
             </Link>
@@ -207,10 +207,10 @@ export default async function BlackPage() {
               <p className="font-display font-light italic text-neutral-500 leading-loose text-[clamp(0.95rem,1.6vw,1.15rem)]">
                 Not publicly listed. Access is not open.
               </p>
-              <p className="font-display font-light text-neutral-400 text-[clamp(0.9rem,1.5vw,1.05rem)]">
+              <p className="font-display font-light text-[clamp(0.9rem,1.5vw,1.05rem)] text-neutral-500/78">
                 Selected work remains unseen.
               </p>
-              <p className="font-display font-light text-neutral-400 text-[clamp(0.9rem,1.5vw,1.05rem)]">
+              <p className="font-display font-light text-[clamp(0.9rem,1.5vw,1.05rem)] text-neutral-500/78">
                 What we arrange is not found. What we curate is not listed.
               </p>
             </div>
@@ -230,7 +230,7 @@ export default async function BlackPage() {
         {/* ── THIN DIVIDER ── */}
         <div className="bg-[#EAEAE5]">
           <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <hr className="border-t border-neutral-200" />
+            <hr className="border-t border-neutral-300/70" />
           </div>
         </div>
 
@@ -255,9 +255,9 @@ export default async function BlackPage() {
               ].map((item, i) => (
                 <div
                   key={item}
-                  className={`border border-neutral-200/60 px-10 py-14 text-center ${i >= 3 ? '-mt-px' : ''} ${i % 3 !== 0 ? '-ml-px' : ''}`}
+                  className={`border border-neutral-300/60 bg-white/15 px-10 py-14 text-center ${i >= 3 ? '-mt-px' : ''} ${i % 3 !== 0 ? '-ml-px' : ''}`}
                 >
-                  <p className="font-display font-light text-neutral-500/70 text-[clamp(0.8rem,1.3vw,0.95rem)]">
+                  <p className="font-display font-light text-[clamp(0.8rem,1.3vw,0.95rem)] text-neutral-600/82">
                     {item}
                   </p>
                 </div>
@@ -289,7 +289,7 @@ export default async function BlackPage() {
               ].map((principle) => (
                 <p
                   key={principle}
-                  className="font-display font-light text-neutral-400/60 text-[clamp(0.9rem,1.5vw,1.05rem)]"
+                  className="font-display font-light text-[clamp(0.9rem,1.5vw,1.05rem)] text-neutral-500/76"
                 >
                   {principle}
                 </p>
@@ -301,7 +301,7 @@ export default async function BlackPage() {
         {/* ── THIN DIVIDER ── */}
         <div className="bg-[#EAEAE5]">
           <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <hr className="border-t border-neutral-200" />
+            <hr className="border-t border-neutral-300/70" />
           </div>
         </div>
 
@@ -330,10 +330,10 @@ export default async function BlackPage() {
                 },
               ].map((item) => (
                 <div key={item.label} className="flex flex-col items-center">
-                  <p className="font-body text-[0.7rem] tracking-[0.2em] text-neutral-700 uppercase mb-6 font-medium">
+                  <p className="mb-6 font-body text-[0.68rem] font-medium uppercase tracking-[0.16em] text-neutral-700">
                     {item.label}
                   </p>
-                  <p className="font-body text-sm text-neutral-400/50 leading-relaxed">
+                  <p className="font-body text-sm leading-relaxed text-neutral-500/70">
                     {item.body}
                   </p>
                 </div>
@@ -349,7 +349,7 @@ export default async function BlackPage() {
           >
             <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
               <div className="text-center mb-20">
-                <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-4">
+                <p className="mb-4 font-body text-[0.58rem] uppercase tracking-[0.22em] text-neutral-500/70">
                   FROM THE COLLECTION
                 </p>
                 <h2
@@ -375,7 +375,7 @@ export default async function BlackPage() {
 
                   const card = (
                     <>
-                      <div className="relative w-full overflow-hidden rounded-2xl aspect-[4/3] mb-5 bg-neutral-900/5">
+                      <div className="relative mb-6 aspect-[4/3] w-full overflow-hidden rounded-[16px] bg-neutral-900/[0.07]">
                         {coverUrl ? (
                           <Image
                             src={coverUrl}
@@ -390,34 +390,36 @@ export default async function BlackPage() {
                         )}
                       </div>
 
-                      <p className="font-body text-[0.55rem] tracking-[0.28em] text-neutral-400 uppercase mb-2">
+                      <p className="mb-3 font-body text-[0.55rem] uppercase tracking-[0.2em] text-neutral-500/72">
                         {exp.category ?? 'BLACK'}
                       </p>
                       <h3
-                        className="font-display font-light text-neutral-800 leading-snug mb-2 group-hover:opacity-70 transition-opacity duration-300"
+                        className="mb-3 font-display font-light leading-snug text-neutral-900 transition-opacity duration-300 group-hover:opacity-75"
                         style={{ fontSize: 'clamp(1rem, 1.8vw, 1.2rem)' }}
                       >
                         {exp.title}
                       </h3>
 
                       {geoMetadata && (
-                        <p className="font-body text-[0.68rem] text-neutral-500/80 mb-2">
+                        <p className="mb-3 font-body text-[0.68rem] text-neutral-600/80">
                           {geoMetadata}
                         </p>
                       )}
 
                       {location && (
-                        <p className="font-body text-[0.7rem] text-neutral-500 mb-2">{location}</p>
+                        <p className="mb-3 font-body text-[0.7rem] text-neutral-600/80">
+                          {location}
+                        </p>
                       )}
 
                       {exp.short_description && (
-                        <p className="font-body text-sm text-neutral-500 leading-relaxed">
+                        <p className="font-body text-sm leading-relaxed text-neutral-700/78">
                           {exp.short_description}
                         </p>
                       )}
 
                       {exp.duration && (
-                        <p className="mt-3 font-body text-xs tracking-wide text-neutral-500 uppercase">
+                        <p className="mt-4 font-body text-[0.68rem] uppercase tracking-[0.14em] text-neutral-600/78">
                           {exp.duration}
                         </p>
                       )}
@@ -447,7 +449,7 @@ export default async function BlackPage() {
         {/* ── THIN DIVIDER ── */}
         <div className="bg-[#EAEAE5]">
           <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <hr className="border-t border-neutral-200" />
+            <hr className="border-t border-neutral-300/70" />
           </div>
         </div>
 
@@ -459,10 +461,10 @@ export default async function BlackPage() {
               <p className="font-display font-light text-neutral-800 text-[clamp(1.3rem,2.5vw,1.9rem)]">
                 BLACK™ is not marketed. It is not advertised.
               </p>
-              <p className="font-display font-light text-neutral-500 text-[clamp(1rem,1.8vw,1.4rem)]">
+              <p className="font-display font-light text-[clamp(1rem,1.8vw,1.4rem)] text-neutral-600/78">
                 It is extended — selectively.
               </p>
-              <p className="font-body font-light text-neutral-400 text-sm leading-relaxed mt-4">
+              <p className="mt-4 font-body text-sm font-light leading-relaxed text-neutral-500/78">
                 BLACK™ operates across the cultural worlds of{' '}
                 <Link
                   href="/cultural-worlds/istanbul"
@@ -478,7 +480,7 @@ export default async function BlackPage() {
             {/* CTA button */}
             <Link
               href="/contact?source=experience&slug=black&exp=black"
-              className="inline-block font-body text-[0.65rem] tracking-[0.3em] text-white uppercase bg-black px-12 py-5 hover:bg-neutral-800 transition-colors duration-300"
+              className="inline-block bg-black px-12 py-5 font-body text-[0.65rem] uppercase tracking-[0.24em] text-white transition-colors duration-300 hover:bg-neutral-800"
             >
               Request Private Access
             </Link>
