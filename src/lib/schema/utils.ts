@@ -18,6 +18,16 @@ const UNSAFE_SCHEMA_VALUES = new Set([
   'http://schema.org/TravelAgency',
 ]);
 
+const UNSAFE_SAME_AS_VALUES = new Set([
+  ...UNSAFE_SCHEMA_VALUES,
+  'VIPPackage',
+  'https://schema.org/VIPPackage',
+  'http://schema.org/VIPPackage',
+  'PackageTour',
+  'https://schema.org/PackageTour',
+  'http://schema.org/PackageTour',
+]);
+
 export function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }
@@ -81,11 +91,18 @@ export function isUnsafeSchemaType(value?: string | null): boolean {
   return UNSAFE_SCHEMA_VALUES.has(value.trim());
 }
 
+export function isUnsafeSameAsTarget(value?: string | null): boolean {
+  if (!isNonEmptyString(value)) return false;
+  return UNSAFE_SAME_AS_VALUES.has(value.trim());
+}
+
 export function filterUnsafeSchemaValues(values?: Array<string | null | undefined>): string[] {
   return compactArray(
     (values ?? []).map((value) => {
       const normalized = isNonEmptyString(value) ? value.trim() : undefined;
-      if (!normalized || isUnsafeSchemaType(normalized)) return null;
+      if (!normalized || isUnsafeSchemaType(normalized) || isUnsafeSameAsTarget(normalized)) {
+        return null;
+      }
       return normalized;
     })
   );
@@ -100,7 +117,7 @@ export function normalizeSameAs(
     entries.map((entry) => {
       if (!isNonEmptyString(entry)) return null;
       const trimmed = entry.trim();
-      if (isUnsafeSchemaType(trimmed)) return null;
+      if (isUnsafeSchemaType(trimmed) || isUnsafeSameAsTarget(trimmed)) return null;
       if (requireAbsolute && !/^https?:\/\//i.test(trimmed)) return null;
       return trimmed;
     })

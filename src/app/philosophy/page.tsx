@@ -1,6 +1,8 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import JsonLd from '@/components/JsonLd';
+import { buildPhilosophyPageGraph } from '@/lib/schema-builder';
 
 const SITE_URL = 'https://crearetravel.com';
 const OG_IMAGE = `${SITE_URL}/og/default.jpg`;
@@ -46,8 +48,11 @@ export const metadata: Metadata = {
 };
 
 export default function PhilosophyPage() {
+  const philosophySchema = buildPhilosophyPageGraph();
+
   return (
     <main className="bg-black min-h-screen">
+      <JsonLd id="philosophy-page-jsonld" schema={philosophySchema} />
       {/* Opening Statement */}
       <section className="flex min-h-[86vh] items-center px-8 sm:min-h-[92vh] sm:px-16 lg:min-h-screen lg:px-24">
         <div className="max-w-[680px]">

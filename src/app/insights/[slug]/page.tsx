@@ -396,6 +396,7 @@ export default async function InsightArticlePage({ params }: Props) {
     excerpt: insight.excerpt,
     image: insight.cover_image ?? undefined,
     destinationName,
+    destinationSlug: insight.destination?.slug,
   });
 
   return (
@@ -428,11 +429,19 @@ export default async function InsightArticlePage({ params }: Props) {
         {/* Article header */}
         <header className="mb-12">
           {/* Destination: hide gracefully if missing */}
-          {destinationName && (
-            <p className="font-body text-xs tracking-[0.16em] uppercase text-white/26 mb-4">
-              {destinationName}
-            </p>
-          )}
+          {destinationName &&
+            (insight.destination?.slug ? (
+              <Link
+                href={`/cultural-worlds/${insight.destination.slug}`}
+                className="mb-4 inline-block font-body text-xs uppercase tracking-[0.16em] text-white/26 transition-colors duration-300 hover:text-white/54"
+              >
+                {destinationName}
+              </Link>
+            ) : (
+              <p className="font-body text-xs tracking-[0.16em] uppercase text-white/26 mb-4">
+                {destinationName}
+              </p>
+            ))}
           {insight.title && (
             <h1 className="font-display text-3xl sm:text-4xl font-light tracking-wide text-white leading-snug mb-6">
               {insight.title}

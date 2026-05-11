@@ -231,6 +231,13 @@ export function buildExperienceDetailGraph(
       experience.experience_type_entity?.same_as ?? experience.experience_type_entity?.sameAs
     ),
     areaServed: placeNode ? { '@id': ids.place } : undefined,
+    subjectOf: destinationUrl
+      ? {
+          '@type': 'WebPage',
+          name: experience.destination?.name,
+          url: destinationUrl,
+        }
+      : undefined,
     audience: buildAudienceSchema(experience),
     offers: {
       '@type': 'Offer',
@@ -256,6 +263,16 @@ export function buildExperienceDetailGraph(
     mainEntity: { '@id': ids.service },
     about: aboutThings.length > 0 ? aboutThings : undefined,
   });
+
+  if (destinationUrl) {
+    webpageNode.mentions = [
+      {
+        '@type': 'WebPage',
+        name: experience.destination?.name,
+        url: destinationUrl,
+      },
+    ];
+  }
 
   const breadcrumbNode = buildBreadcrumbListSchema(
     [

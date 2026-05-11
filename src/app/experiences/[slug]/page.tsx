@@ -407,7 +407,7 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
                     </p>
                     {infoItem.label === 'Location' && item.destination?.slug ? (
                       <Link
-                        href={`/destinations/${item.destination.slug}`}
+                        href={`/cultural-worlds/${item.destination.slug}`}
                         className="font-body text-sm text-neutral-900 font-medium tracking-wide no-underline hover:text-neutral-500 transition-colors duration-200"
                       >
                         {infoItem.value}

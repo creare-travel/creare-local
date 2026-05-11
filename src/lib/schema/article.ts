@@ -2,8 +2,10 @@ import { buildBreadcrumbListSchema } from './breadcrumbs';
 import { buildImageObjectSchema } from './image';
 import { buildCollectionPageSchema, buildItemListSchema } from './listing';
 import { buildOrganizationReference } from './organization';
+import { buildPlaceSchema } from './place';
 import { buildWebPageSchema } from './webpage';
 import type { ArticleInput, BreadcrumbItemInput, ListingItemInput, SchemaNode } from './types';
+import { buildCanonicalUrl } from './utils';
 
 interface InsightCollectionInput {
   pageId: string;
@@ -69,6 +71,18 @@ export function buildInsightDetailGraph(input: InsightDetailInput): SchemaNode[]
     fallbackName: input.title || 'Insight',
     representativeOfPage: true,
   });
+  const culturalWorldUrl = input.destinationSlug
+    ? buildCanonicalUrl(`/cultural-worlds/${input.destinationSlug}`)
+    : undefined;
+  const culturalWorldPlace =
+    input.destinationName && culturalWorldUrl
+      ? buildPlaceSchema({
+          id: `${culturalWorldUrl}#place`,
+          name: input.destinationName,
+          url: culturalWorldUrl,
+          addressCountry: 'TR',
+        })
+      : undefined;
 
   const article = {
     '@id': input.articleId,
@@ -82,6 +96,7 @@ export function buildInsightDetailGraph(input: InsightDetailInput): SchemaNode[]
     datePublished: input.publishedAt,
     dateModified: input.updatedAt,
     inLanguage: input.inLanguage,
+    about: culturalWorldPlace ? [{ '@id': `${culturalWorldUrl}#place` }] : undefined,
   };
 
   const webpage = buildWebPageSchema({
@@ -93,8 +108,11 @@ export function buildInsightDetailGraph(input: InsightDetailInput): SchemaNode[]
     image: imageObject ? { '@id': input.imageId } : undefined,
     breadcrumbId: input.breadcrumbId,
     mainEntity: { '@id': input.articleId },
+    about: culturalWorldPlace ? [{ '@id': `${culturalWorldUrl}#place` }] : undefined,
     inLanguage: input.inLanguage || undefined,
   });
 
-  return [breadcrumb, imageObject, article, webpage].filter(Boolean) as SchemaNode[];
+  return [breadcrumb, imageObject, culturalWorldPlace, article, webpage].filter(
+    Boolean
+  ) as SchemaNode[];
 }

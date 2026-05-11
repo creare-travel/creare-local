@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import HeroSection from '@/app/home/components/HeroSection';
 import CollectionsSection from '@/app/home/components/CollectionsSection';
+import JsonLd from '@/components/JsonLd';
+import { buildHomepageWebPageGraph } from '@/lib/schema-builder';
 
 export const metadata: Metadata = {
   title: 'Creare — Experiences Composed as Art',
@@ -44,8 +46,11 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
+  const homepageSchema = buildHomepageWebPageGraph();
+
   return (
     <main className="min-h-screen bg-black">
+      <JsonLd id="homepage-webpage-jsonld" schema={homepageSchema} />
       <HeroSection />
       <CollectionsSection />
     </main>
