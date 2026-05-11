@@ -109,7 +109,6 @@ async function fetchInsight(slug: string): Promise<StrapiInsight | null> {
   const params = new URLSearchParams();
   params.set('filters[slug][$eq]', slug);
   params.set('populate[cover_image]', 'true');
-  params.set('populate[destination]', 'true');
   params.set('populate[experiences][populate][cover_image]', 'true');
   const path = `/api/insights?${params.toString()}`;
 
