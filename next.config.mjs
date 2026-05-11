@@ -36,6 +36,16 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/experiences/open-studio-istanbul',
+        destination: '/experiences/the-studio-session',
+        permanent: true,
+      },
+      {
+        source: '/experiences/masterchef-bodrum-culinary-competition',
+        destination: '/experiences/culinary-arena-bodrum',
+        permanent: true,
+      },
+      {
         source: '/home',
         destination: '/',
         permanent: true,
