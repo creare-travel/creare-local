@@ -191,11 +191,36 @@ function buildStaticInsight(slug: string): ResolvedInsight | null {
 
 async function resolveInsight(slug: string): Promise<ResolvedInsight | null> {
   const strapiInsight = await fetchInsight(slug);
-  if (strapiInsight?.slug && strapiInsight.title) {
-    return { ...strapiInsight, source: 'strapi' };
+  const staticInsight = buildStaticInsight(slug);
+
+  if (strapiInsight) {
+    const strapiExperiences = normalizeRelationArray<StrapiExperience>(
+      strapiInsight.experiences
+    ).map((experience) => ({
+      ...experience,
+      cover_image: normalizeSingleRelation<NonNullable<StrapiExperience['cover_image']>>(
+        experience.cover_image
+      ),
+      destination: normalizeSingleRelation<NonNullable<StrapiExperience['destination']>>(
+        experience.destination
+      ),
+    }));
+
+    return {
+      ...staticInsight,
+      ...strapiInsight,
+      title: strapiInsight.title || staticInsight?.title,
+      slug: strapiInsight.slug || staticInsight?.slug,
+      excerpt: strapiInsight.excerpt || staticInsight?.excerpt,
+      content: strapiInsight.content || staticInsight?.content,
+      destination: strapiInsight.destination || staticInsight?.destination || null,
+      experiences:
+        strapiExperiences.length > 0 ? strapiExperiences : (staticInsight?.experiences ?? []),
+      source: 'strapi',
+    };
   }
 
-  return buildStaticInsight(slug);
+  return staticInsight;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
