@@ -28,15 +28,22 @@ interface StrapiInsight {
   content?: unknown;
   seo_title?: string;
   seo_description?: string;
-  cover_image?: {
-    url?: string;
-    alternativeText?: string;
-  } | null;
+  cover_image?: StrapiImage | null;
   destination?: {
     name?: string;
     slug?: string;
   } | null;
   experiences?: StrapiExperience[];
+}
+
+interface StrapiImage {
+  url?: string;
+  alternativeText?: string;
+  formats?: {
+    large?: { url?: string };
+    medium?: { url?: string };
+    small?: { url?: string };
+  };
 }
 
 interface ResolvedInsight extends StrapiInsight {
@@ -98,6 +105,26 @@ function normalizeSingleRelation<T>(value: unknown): T | null {
   return flattenItem<T>(value as Record<string, unknown>);
 }
 
+function normalizeMediaItem<T>(value: unknown): T | null {
+  if (!value) return null;
+
+  if (Array.isArray(value)) {
+    const first = value[0];
+    return first && typeof first === 'object'
+      ? flattenItem<T>(first as Record<string, unknown>)
+      : null;
+  }
+
+  if (value && typeof value === 'object' && Array.isArray((value as { data?: unknown[] }).data)) {
+    const first = (value as { data?: unknown[] }).data?.[0];
+    return first && typeof first === 'object'
+      ? flattenItem<T>(first as Record<string, unknown>)
+      : null;
+  }
+
+  return normalizeSingleRelation<T>(value);
+}
+
 const IMAGE_FALLBACK = '/assets/images/no_image.png';
 const LEGACY_ISTANBUL_INSIGHT_SLUG = 'the-private-life-of-istanbul';
 const CANONICAL_ISTANBUL_INSIGHT_SLUG = 'private-life-of-istanbul';
@@ -121,9 +148,7 @@ async function fetchInsight(slug: string): Promise<StrapiInsight | null> {
 
     return {
       ...insight,
-      cover_image: normalizeSingleRelation<NonNullable<StrapiInsight['cover_image']>>(
-        insight.cover_image
-      ),
+      cover_image: normalizeMediaItem<StrapiImage>(insight.cover_image),
       destination: normalizeSingleRelation<NonNullable<StrapiInsight['destination']>>(
         insight.destination
       ),
