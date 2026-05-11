@@ -62,6 +62,42 @@ interface StrapiExperience {
   } | null;
 }
 
+function flattenItem<T>(raw: Record<string, unknown>): T {
+  if (raw?.attributes && typeof raw.attributes === 'object') {
+    return { id: raw.id, ...(raw.attributes as object) } as T;
+  }
+
+  return raw as T;
+}
+
+function normalizeRelationArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) {
+    return value.map((item) =>
+      item && typeof item === 'object' ? flattenItem<T>(item as Record<string, unknown>) : item
+    ) as T[];
+  }
+
+  if (value && typeof value === 'object' && Array.isArray((value as { data?: unknown[] }).data)) {
+    return ((value as { data: unknown[] }).data ?? []).map((item) =>
+      item && typeof item === 'object' ? flattenItem<T>(item as Record<string, unknown>) : item
+    ) as T[];
+  }
+
+  return [];
+}
+
+function normalizeSingleRelation<T>(value: unknown): T | null {
+  if (!value || typeof value !== 'object') return null;
+
+  if ('data' in (value as Record<string, unknown>)) {
+    const data = (value as { data?: unknown }).data;
+    if (!data || Array.isArray(data) || typeof data !== 'object') return null;
+    return flattenItem<T>(data as Record<string, unknown>);
+  }
+
+  return flattenItem<T>(value as Record<string, unknown>);
+}
+
 const IMAGE_FALLBACK = '/assets/images/no_image.png';
 const LEGACY_ISTANBUL_INSIGHT_SLUG = 'the-private-life-of-istanbul';
 const CANONICAL_ISTANBUL_INSIGHT_SLUG = 'private-life-of-istanbul';
@@ -70,21 +106,45 @@ const canonicalInsightSlug = (slug: string | undefined): string | undefined =>
 
 async function fetchInsight(slug: string): Promise<StrapiInsight | null> {
   if (!slug) return null;
+  const params = new URLSearchParams();
+  params.set('filters[slug][$eq]', slug);
+  params.set('populate[cover_image]', 'true');
+  params.set('populate[destination]', 'true');
+  params.set('populate[experiences][populate][cover_image]', 'true');
+  params.set('populate[experiences][populate][destination]', 'true');
+  const path = `/api/insights?${params.toString()}`;
+
   try {
-    const params = new URLSearchParams({
-      'filters[slug][$eq]': slug,
-      populate: '*',
-    });
-    const path = `/api/insights?${params.toString()}`;
     const json = await fetchStrapi(path);
     const items = json?.data;
     if (!items || items.length === 0) return null;
     const raw = items[0];
-    return raw?.attributes ? { id: raw.id, ...raw.attributes } : raw;
+    const insight = raw?.attributes ? { id: raw.id, ...raw.attributes } : raw;
+
+    return {
+      ...insight,
+      cover_image: normalizeSingleRelation<NonNullable<StrapiInsight['cover_image']>>(
+        insight.cover_image
+      ),
+      destination: normalizeSingleRelation<NonNullable<StrapiInsight['destination']>>(
+        insight.destination
+      ),
+      experiences: normalizeRelationArray<StrapiExperience>(insight.experiences).map(
+        (experience) => ({
+          ...experience,
+          cover_image: normalizeSingleRelation<NonNullable<StrapiExperience['cover_image']>>(
+            experience.cover_image
+          ),
+          destination: normalizeSingleRelation<NonNullable<StrapiExperience['destination']>>(
+            experience.destination
+          ),
+        })
+      ),
+    };
   } catch (error) {
     console.error('Failed to fetch insight detail from Strapi.', {
       route: `/insights/${slug}`,
-      strapiPath: `/api/insights?filters[slug][$eq]=${slug}&populate=*`,
+      strapiPath: path,
       error,
     });
     return null;
