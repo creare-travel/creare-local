@@ -33,9 +33,11 @@ export default function CTASection({
     ? 'border border-white/60 text-white hover:bg-white hover:text-black'
     : 'bg-black text-white hover:bg-neutral-800';
 
-  // Append ?exp=[slug] to /contact links so experience_slug is preserved on the contact page
+  // Preserve experience context when routing into the shared contact form flow.
   const resolvedHref =
-    buttonHref === '/contact' && experienceSlug ? `/contact?exp=${experienceSlug}` : buttonHref;
+    buttonHref === '/contact' && experienceSlug
+      ? `/contact?source=experience&slug=${encodeURIComponent(experienceSlug)}&exp=${encodeURIComponent(experienceSlug)}`
+      : buttonHref;
 
   const handleCtaClick = () => {
     trackCtaClick({

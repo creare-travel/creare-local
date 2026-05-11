@@ -1,6 +1,6 @@
 'use client';
-import React, { useState } from 'react';
-import InquireModal from './InquireModal';
+import React from 'react';
+import Link from 'next/link';
 
 interface InquireCTAProps {
   experienceSlug: string;
@@ -11,27 +11,18 @@ interface InquireCTAProps {
 
 export default function InquireCTA({
   experienceSlug,
-  experienceId,
   label = 'INQUIRE PRIVATELY',
   className = '',
 }: InquireCTAProps) {
-  const [open, setOpen] = useState(false);
+  const href = `/contact?source=experience&slug=${encodeURIComponent(experienceSlug)}&exp=${encodeURIComponent(experienceSlug)}`;
 
   return (
-    <>
-      <button
-        onClick={() => setOpen(true)}
-        className={`inline-block font-body text-[0.65rem] tracking-[0.3em] uppercase px-10 py-4 transition-all duration-300 ${className}`}
-        aria-label={label}
-      >
-        {label}
-      </button>
-      <InquireModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        experienceSlug={experienceSlug}
-        experienceId={experienceId}
-      />
-    </>
+    <Link
+      href={href}
+      className={`inline-block font-body text-[0.65rem] tracking-[0.3em] uppercase px-10 py-4 transition-all duration-300 ${className}`}
+      aria-label={label}
+    >
+      {label}
+    </Link>
   );
 }

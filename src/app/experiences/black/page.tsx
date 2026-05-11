@@ -169,7 +169,7 @@ export default async function BlackPage() {
             </p>
 
             <Link
-              href="/contact"
+              href="/contact?source=experience&slug=black&exp=black"
               className="font-body text-[0.6rem] tracking-[0.3em] text-white/60 uppercase border border-white/20 px-10 py-4 hover:border-white/40 hover:text-white/80 transition-all duration-500"
             >
               Submit Private Inquiry
@@ -477,7 +477,7 @@ export default async function BlackPage() {
 
             {/* CTA button */}
             <Link
-              href="/contact?exp=black"
+              href="/contact?source=experience&slug=black&exp=black"
               className="inline-block font-body text-[0.65rem] tracking-[0.3em] text-white uppercase bg-black px-12 py-5 hover:bg-neutral-800 transition-colors duration-300"
             >
               Request Private Access

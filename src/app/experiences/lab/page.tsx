@@ -170,7 +170,7 @@ export default async function LabPage() {
             </div>
             <div className="flex flex-col items-start gap-6">
               <Link
-                href="/contact?exp=lab"
+                href="/contact?source=experience&slug=lab&exp=lab"
                 className="font-body text-[0.65rem] tracking-[0.3em] text-neutral-900 uppercase border border-neutral-900 px-8 py-4 hover:bg-neutral-900 hover:text-white transition-all duration-300"
               >
                 DESIGN YOUR EXPERIENCE
@@ -328,7 +328,7 @@ export default async function LabPage() {
                   creative direction and compositional intelligence. You bring the narrative.
                 </p>
                 <Link
-                  href="/contact?exp=lab"
+                  href="/contact?source=experience&slug=lab&exp=lab"
                   className="font-body text-[0.65rem] tracking-[0.3em] text-neutral-900 uppercase border-b border-neutral-400 pb-1 hover:border-neutral-900 transition-colors duration-300"
                 >
                   START A CONVERSATION →
@@ -546,7 +546,7 @@ export default async function LabPage() {
             </p>
 
             <Link
-              href="/contact?exp=lab"
+              href="/contact?source=experience&slug=lab&exp=lab"
               className="inline-block font-body text-[0.65rem] tracking-[0.3em] text-white uppercase bg-neutral-900 px-10 py-5 hover:bg-neutral-700 transition-colors duration-300 mb-10"
             >
               START A CONVERSATION
