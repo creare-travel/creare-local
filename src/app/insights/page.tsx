@@ -54,6 +54,7 @@ interface StrapiInsight {
       data?: {
         attributes?: {
           url?: string;
+          alternativeText?: string;
         };
       };
     };
@@ -69,9 +70,16 @@ interface StrapiInsight {
   title?: string;
   slug?: string;
   excerpt?: string;
-  cover_image?: {
-    url?: string;
-  } | null;
+  cover_image?:
+    | {
+        url?: string;
+        alternativeText?: string;
+      }
+    | {
+        url?: string;
+        alternativeText?: string;
+      }[]
+    | null;
   destination?: {
     name?: string;
   } | null;
@@ -89,6 +97,55 @@ interface NormalizedInsight {
   destinationName: string | null;
 }
 
+function resolveFirstInsightCoverImage(item: StrapiInsight): {
+  url?: string;
+  alternativeText?: string;
+} | null {
+  const attributeImage = item.attributes?.cover_image;
+
+  if (Array.isArray(attributeImage?.data)) {
+    const first = attributeImage.data[0];
+    const attrs = first?.attributes;
+    if (attrs?.url) {
+      return {
+        url: attrs.url,
+        alternativeText: attrs.alternativeText,
+      };
+    }
+  }
+
+  if (attributeImage?.data?.attributes?.url) {
+    return {
+      url: attributeImage.data.attributes.url,
+      alternativeText: attributeImage.data.attributes.alternativeText,
+    };
+  }
+
+  if (Array.isArray(item.cover_image)) {
+    const first = item.cover_image[0];
+    if (first?.url) {
+      return {
+        url: first.url,
+        alternativeText: first.alternativeText,
+      };
+    }
+  }
+
+  if (
+    item.cover_image &&
+    !Array.isArray(item.cover_image) &&
+    typeof item.cover_image === 'object' &&
+    item.cover_image.url
+  ) {
+    return {
+      url: item.cover_image.url,
+      alternativeText: item.cover_image.alternativeText,
+    };
+  }
+
+  return null;
+}
+
 function normalizeInsight(item: StrapiInsight): NormalizedInsight | null {
   // Support both Strapi v4 (attributes) and v5 (flat)
   const attrs = item.attributes ?? item;
@@ -99,16 +156,8 @@ function normalizeInsight(item: StrapiInsight): NormalizedInsight | null {
   const excerpt = attrs?.excerpt ?? '';
 
   // cover_image — fallback to no_image.png if missing
-  let coverImageUrl: string = IMAGE_FALLBACK;
-  if (item.attributes?.cover_image?.data?.attributes?.url) {
-    const raw = item.attributes.cover_image.data.attributes.url;
-    coverImageUrl = mediaUrl(raw);
-  } else if (item.cover_image && typeof item.cover_image === 'object') {
-    const ci = item.cover_image as { url?: string };
-    if (ci?.url) {
-      coverImageUrl = mediaUrl(ci.url);
-    }
-  }
+  const coverImage = resolveFirstInsightCoverImage(item);
+  const coverImageUrl = coverImage?.url ? mediaUrl(coverImage.url) : IMAGE_FALLBACK;
 
   // destination.name — safe optional chaining
   const destinationName =
@@ -119,17 +168,12 @@ function normalizeInsight(item: StrapiInsight): NormalizedInsight | null {
     title,
     excerpt,
     coverImageUrl,
-    coverImage: item.attributes?.cover_image?.data?.attributes?.url
+    coverImage: coverImage
       ? {
-          url: item.attributes.cover_image.data.attributes.url,
-          alternativeText: title,
+          url: coverImage.url,
+          alternativeText: coverImage.alternativeText || title,
         }
-      : item.cover_image?.url
-        ? {
-            url: item.cover_image.url,
-            alternativeText: title,
-          }
-        : undefined,
+      : undefined,
     destinationName,
   };
 }
