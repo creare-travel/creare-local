@@ -109,27 +109,53 @@ export default async function CulturalWorldsPage() {
   });
 
   return (
-    <main className="bg-black min-h-screen">
+    <main className="min-h-screen bg-[#0d0d0b]">
       <JsonLd id="cultural-worlds-jsonld" schema={culturalWorldSchema} />
       {/* Hero */}
-      <section className="pt-40 pb-20 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-        <p className="text-white/30 font-body text-xs tracking-[0.2em] uppercase mb-6">Creare</p>
+      <section className="max-w-7xl mx-auto px-6 pt-44 pb-20 sm:px-10 lg:px-16">
+        <p
+          className="mb-8 font-body uppercase"
+          style={{
+            fontSize: '0.6rem',
+            letterSpacing: '0.38em',
+            color: 'rgba(255,255,255,0.20)',
+          }}
+        >
+          Creare — Cultural Atlas
+        </p>
         <h1
-          className="font-display font-light text-white leading-tight"
-          style={{ fontSize: 'clamp(3rem, 7vw, 7rem)' }}
+          className="font-display font-light text-white"
+          style={{
+            fontSize: 'clamp(2.8rem, 6.5vw, 6.2rem)',
+            lineHeight: 1.06,
+            letterSpacing: '-0.015em',
+          }}
         >
           Cultural Worlds
         </h1>
-        <p className="text-white/50 font-body font-light text-base leading-relaxed max-w-lg mt-8">
+        <div
+          className="mb-8 mt-8 h-px w-16"
+          style={{ backgroundColor: 'rgba(255,255,255,0.14)' }}
+        />
+        <p
+          className="font-body font-light"
+          style={{
+            fontSize: 'clamp(0.88rem, 1.4vw, 1.02rem)',
+            lineHeight: 1.9,
+            letterSpacing: '0.01em',
+            maxWidth: '46ch',
+            color: 'rgba(255,255,255,0.42)',
+          }}
+        >
           Each destination holds layers of history, ritual, and meaning. We know them intimately —
           their hidden corners, their cultural custodians, their extraordinary moments.
         </p>
       </section>
 
       {/* World Cards */}
-      <section className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-32">
+      <section className="max-w-7xl mx-auto px-6 pb-24 sm:px-10 lg:px-16">
         {destinations.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 gap-x-7 gap-y-10 md:grid-cols-2">
             {destinations.map((destination, index) => {
               const href = destination.slug ? `/cultural-worlds/${destination.slug}` : null;
               const title = destination.name ?? 'Destination';
@@ -142,23 +168,65 @@ export default async function CulturalWorldsPage() {
                 destination.cover_image?.alternativeText ?? `${title} cultural world`;
 
               const card = (
-                <div className="relative overflow-hidden aspect-[3/4]">
+                <div className="relative aspect-[4/5] overflow-hidden">
                   <AppImage
                     src={imageUrl}
                     alt={imageAlt}
                     fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.03]"
                     priority={index === 0}
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        'linear-gradient(to top, rgba(10,9,7,0.78) 0%, rgba(10,9,7,0.26) 44%, rgba(10,9,7,0.06) 100%)',
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 mix-blend-multiply"
+                    style={{ backgroundColor: 'rgba(22,18,12,0.16)' }}
+                  />
                   <div className="absolute bottom-0 left-0 right-0 p-8">
-                    <h2 className="font-display font-light text-white text-2xl mb-2">{title}</h2>
-                    <p className="text-white/60 font-body text-xs leading-relaxed">{tagline}</p>
+                    <div
+                      className="mb-5 h-px"
+                      style={{ width: '1.8rem', backgroundColor: 'rgba(255,255,255,0.22)' }}
+                    />
+                    <h2
+                      className="font-display font-light text-white"
+                      style={{
+                        fontSize: 'clamp(1.4rem, 2.6vw, 2rem)',
+                        lineHeight: 1.1,
+                        letterSpacing: '-0.01em',
+                        marginBottom: '0.55rem',
+                      }}
+                    >
+                      {title}
+                    </h2>
+                    <p
+                      className="font-body font-light"
+                      style={{
+                        fontSize: 'clamp(0.72rem, 1.1vw, 0.82rem)',
+                        lineHeight: 1.75,
+                        letterSpacing: '0.01em',
+                        color: 'rgba(255,255,255,0.50)',
+                        maxWidth: '28ch',
+                      }}
+                    >
+                      {tagline}
+                    </p>
                     {href && (
-                      <span className="inline-block mt-4 text-white/34 font-body text-xs tracking-[0.14em] uppercase group-hover:text-white/78 transition-colors">
-                        Explore →
+                      <span
+                        className="mt-6 inline-block font-body uppercase transition-colors duration-700 group-hover:text-white/60"
+                        style={{
+                          fontSize: '0.6rem',
+                          letterSpacing: '0.28em',
+                          color: 'rgba(255,255,255,0.28)',
+                        }}
+                      >
+                        Enter
                       </span>
                     )}
                   </div>
