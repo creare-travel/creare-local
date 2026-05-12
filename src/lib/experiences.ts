@@ -351,8 +351,8 @@ export const experiences: Experience[] = [
     culturalWorld: 'Istanbul',
   },
   {
-    title: 'Open Studio Istanbul™',
-    slug: 'open-studio-istanbul',
+    title: 'The Studio Session™',
+    slug: 'the-studio-session',
     category: 'LAB',
     location: 'Karaköy, Istanbul',
     duration: '4 Hours',
@@ -379,7 +379,7 @@ export const experiences: Experience[] = [
       'Those who learn by making',
     ],
     relatedSlugs: ['cultural-immersion-lab', 'narrative-workshop'],
-    seoTitle: 'Open Studio Istanbul™ — Co-Creation Workshop with Artists',
+    seoTitle: 'The Studio Session™ — Co-Creation Workshop with Artists',
     seoDescription:
       "A co-creation session inside one of Istanbul's most experimental creative studios. Participants work alongside resident artists to develop a concept from scratch — no brief, no outcome defined in advance.",
     culturalWorld: 'Istanbul',
@@ -412,7 +412,7 @@ export const experiences: Experience[] = [
       'Creative directors and content strategists',
       'Those seeking authentic local engagement',
     ],
-    relatedSlugs: ['open-studio-istanbul', 'narrative-workshop'],
+    relatedSlugs: ['the-studio-session', 'narrative-workshop'],
     seoTitle: 'Cultural Immersion Lab™ — Balat Neighbourhood Storytelling Experience',
     seoDescription:
       "An immersive day inside the living culture of Balat — Istanbul's most layered neighbourhood. Participants engage directly with local makers, historians and community figures to co-develop a cultural narrative.",
@@ -445,7 +445,7 @@ export const experiences: Experience[] = [
       'Brand teams developing cultural positioning',
       'Those who think in stories',
     ],
-    relatedSlugs: ['open-studio-istanbul', 'cultural-immersion-lab'],
+    relatedSlugs: ['the-studio-session', 'cultural-immersion-lab'],
     seoTitle: 'Narrative Workshop™ — Cultural Storytelling Framework',
     seoDescription:
       'A structured creative workshop exploring the architecture of cultural storytelling. Participants develop original narrative frameworks guided by a writer and cultural strategist.',

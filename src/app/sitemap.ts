@@ -151,7 +151,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // LAB Experience detail pages
     {
-      url: `${BASE_URL}/experiences/open-studio-istanbul`,
+      url: `${BASE_URL}/experiences/the-studio-session`,
       lastModified: LAST_MODIFIED,
       changeFrequency: 'monthly',
       priority: 0.75,

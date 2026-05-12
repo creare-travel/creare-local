@@ -31,7 +31,7 @@ const CULTURAL_WORLD_CONTEXTS: Record<
         "This experience takes place among the Princes' Islands, which have served as retreats for Istanbul's elite since Byzantine times. The islands hold the memory of imperial leisure, monastic communities, and the continuous desire to escape the intensity of the city while remaining within its sphere.",
       'driven-by-performance':
         "This experience is grounded in Istanbul's contemporary culture — a city that has always been defined by motion, transformation, and the drive to exceed limits. The principles of performance you will explore are rooted in the city's own relentless energy.",
-      'open-studio-istanbul':
+      'the-studio-session':
         "This experience takes place in Karaköy, one of Istanbul's most experimental creative districts — a neighbourhood where contemporary artistic practice continues the city's long history of cultural production and artistic innovation.",
       'cultural-immersion-lab':
         "This experience unfolds in Balat, one of Istanbul's most layered neighbourhoods, where Byzantine, Ottoman, and contemporary cultures exist in the same streets. The neighbourhood itself becomes a text to be read, understood, and interpreted.",
