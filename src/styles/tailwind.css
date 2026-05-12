@@ -230,10 +230,10 @@ body {
 ───────────────────────────────────────────────────────────────── */
 .reveal {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(20px);
   transition:
-    opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
-    transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+    opacity 1.1s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .reveal.visible {
@@ -336,7 +336,7 @@ body {
 
 /* Luxury editorial hero — slow zoom on image */
 .hero-img-zoom {
-  animation: heroZoom 12s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: heroZoom 18s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   transform-origin: center center;
 }
 
@@ -349,4 +349,13 @@ body {
 }
 .hero-subtitle {
   animation: fadeSlideUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.85s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

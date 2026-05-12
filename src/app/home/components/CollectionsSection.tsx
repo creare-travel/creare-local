@@ -63,20 +63,23 @@ export default function CollectionsSection() {
             </p>
             <Link
               href={collectionFeatures[0].href}
-              className="inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-900 transition-opacity duration-[var(--motion-hover)] ease-[var(--ease-luxury)] hover:opacity-40 sm:tracking-[0.28em]"
+              className="group/cta inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 transition-colors duration-700 ease-out hover:text-neutral-900 sm:tracking-[0.28em]"
               aria-label="Explore SIGNATURE experiences"
             >
-              Explore →
+              <span className="relative inline-block">
+                Explore →
+                <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-all duration-700 ease-out group-hover/cta:w-full" />
+              </span>
             </Link>
           </div>
-          <div className="overflow-hidden lg:w-7/12 xl:w-8/12">
-            <div className="origin-right scale-105">
+          <div className="group overflow-hidden lg:w-7/12 xl:w-8/12">
+            <div>
               <AppImage
                 src={collectionFeatures[0].image}
                 alt={collectionFeatures[0].alt}
                 width={1200}
                 height={780}
-                className="h-auto w-full object-cover"
+                className="h-auto w-full object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.022]"
               />
             </div>
           </div>
@@ -88,14 +91,14 @@ export default function CollectionsSection() {
         aria-label="LAB experiences"
       >
         <div className="flex flex-col gap-10 lg:flex-row-reverse lg:items-center lg:gap-20 xl:gap-28">
-          <div className="mb-2 lg:mb-0 lg:w-7/12 xl:w-8/12">
+          <div className="group mb-2 lg:mb-0 lg:w-7/12 xl:w-8/12">
             <div className="w-full overflow-hidden">
               <AppImage
                 src={collectionFeatures[1].image}
                 alt={collectionFeatures[1].alt}
                 width={1200}
                 height={780}
-                className="h-auto w-full object-cover"
+                className="h-auto w-full object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.022]"
               />
             </div>
           </div>
@@ -111,10 +114,13 @@ export default function CollectionsSection() {
             </p>
             <Link
               href={collectionFeatures[1].href}
-              className="inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-900 transition-opacity duration-[var(--motion-hover)] ease-[var(--ease-luxury)] hover:opacity-40 sm:tracking-[0.28em]"
+              className="group/cta inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 transition-colors duration-700 ease-out hover:text-neutral-900 sm:tracking-[0.28em]"
               aria-label="Discover LAB experience design"
             >
-              Discover →
+              <span className="relative inline-block">
+                Discover →
+                <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-all duration-700 ease-out group-hover/cta:w-full" />
+              </span>
             </Link>
           </div>
         </div>
@@ -137,20 +143,23 @@ export default function CollectionsSection() {
             </p>
             <Link
               href={collectionFeatures[2].href}
-              className="inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-900 opacity-55 transition-opacity duration-[var(--motion-hover)] ease-[var(--ease-luxury)] hover:opacity-100 sm:tracking-[0.28em]"
+              className="group/cta inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 transition-colors duration-700 ease-out hover:text-neutral-900 sm:tracking-[0.28em]"
               aria-label="Request private access to BLACK experiences"
             >
-              Request Private Access →
+              <span className="relative inline-block">
+                Request Private Access →
+                <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-all duration-700 ease-out group-hover/cta:w-full" />
+              </span>
             </Link>
           </div>
-          <div className="lg:w-7/12 xl:w-8/12">
+          <div className="group lg:w-7/12 xl:w-8/12">
             <div className="w-full overflow-hidden">
               <AppImage
                 src={collectionFeatures[2].image}
                 alt={collectionFeatures[2].alt}
                 width={1200}
                 height={780}
-                className="h-auto w-full object-cover"
+                className="h-auto w-full object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.022]"
               />
             </div>
           </div>

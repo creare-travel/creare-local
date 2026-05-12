@@ -29,21 +29,21 @@ export default function Footer() {
         >
           <Link
             href="/philosophy"
-            className="font-body text-[0.64rem] tracking-[0.22em] text-white/68 uppercase hover:text-white transition-colors"
+            className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
             aria-label="Our Philosophy"
           >
             OUR PHILOSOPHY
           </Link>
           <Link
             href="/insights"
-            className="font-body text-[0.64rem] tracking-[0.22em] text-white/68 uppercase hover:text-white transition-colors"
+            className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
             aria-label="Insights"
           >
             INSIGHTS
           </Link>
           <Link
             href="/contact"
-            className="font-body text-[0.64rem] tracking-[0.22em] text-white/68 uppercase hover:text-white transition-colors"
+            className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
             aria-label="Contact CREARE"
           >
             CONTACT
@@ -54,7 +54,7 @@ export default function Footer() {
             <a
               href="#"
               aria-label="Follow CREARE on Instagram"
-              className="text-white/62 hover:opacity-60 transition-opacity"
+              className="text-white/55 transition-colors duration-700 hover:text-white/90"
             >
               <svg
                 width="18"
@@ -77,7 +77,7 @@ export default function Footer() {
             <a
               href="#"
               aria-label="Follow CREARE on LinkedIn"
-              className="text-white/62 hover:opacity-60 transition-opacity"
+              className="text-white/55 transition-colors duration-700 hover:text-white/90"
             >
               <svg
                 width="18"
@@ -112,7 +112,7 @@ export default function Footer() {
             <Link
               key={item?.label}
               href={item?.href}
-              className="font-body text-[0.62rem] tracking-[0.1em] text-white/30 hover:text-white/60 transition-colors"
+              className="font-body text-[0.62rem] tracking-[0.1em] text-white/25 transition-colors duration-700 hover:text-white/55"
               aria-label={item?.label}
             >
               {item?.label}

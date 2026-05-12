@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import RevealObserver from '@/components/RevealObserver';
 import UnderConstruction from '@/components/UnderConstruction';
 import { LanguageProvider } from '@/context/LanguageContext';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
@@ -98,6 +99,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <UnderConstruction />
           ) : (
             <>
+              <RevealObserver />
               <Header />
               {children}
               <Footer />

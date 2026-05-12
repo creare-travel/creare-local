@@ -192,10 +192,10 @@ export default async function BlackPage() {
         </section>
 
         {/* ── BREADCRUMB + MANIFESTO ── */}
-        <section className="bg-[#EAEAE5] py-20 md:py-28" aria-label="Access statement">
-          <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
+        <section className="bg-[#EAEAE5]" aria-label="Access statement">
+          <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-4xl flex-col px-6 pt-24 sm:px-10 md:min-h-screen md:pt-32 lg:px-16">
             {/* Breadcrumb */}
-            <nav className="mb-16" aria-label="Breadcrumb">
+            <nav className="mb-20" aria-label="Breadcrumb">
               <ol className="flex items-center gap-2">
                 <li>
                   <Link
@@ -222,173 +222,169 @@ export default async function BlackPage() {
               </ol>
             </nav>
 
-            {/* Short sharp lines */}
-            <div className="space-y-7 text-center">
+            <div className="flex flex-1 flex-col justify-center">
+              {/* Short sharp lines */}
+              <div className="space-y-8 text-center">
+                <p
+                  className="font-display text-[clamp(0.95rem,1.6vw,1.15rem)] font-light italic leading-loose"
+                  style={{ color: '#5c5750' }}
+                >
+                  Not publicly listed. Access is not open.
+                </p>
+                <p
+                  className="font-display text-[clamp(0.9rem,1.5vw,1.05rem)] font-light"
+                  style={{ color: '#5c5750' }}
+                >
+                  Selected work remains unseen.
+                </p>
+                <p
+                  className="font-display text-[clamp(0.9rem,1.5vw,1.05rem)] font-light"
+                  style={{ color: '#5c5750' }}
+                >
+                  What we arrange is not found. What we curate is not listed.
+                </p>
+              </div>
+            </div>
+
+            <div className="pb-16 md:pb-20">
               <p
-                className="font-display text-[clamp(0.95rem,1.6vw,1.15rem)] font-light italic leading-loose"
-                style={{ color: '#5c5750' }}
+                className="text-center font-display text-[clamp(0.8rem,1.3vw,0.95rem)] font-light tracking-[0.22em]"
+                aria-hidden="true"
+                style={{ color: '#9e9890' }}
               >
-                Not publicly listed. Access is not open.
+                Not everything is meant to be accessed.
               </p>
-              <p
-                className="font-display text-[clamp(0.9rem,1.5vw,1.05rem)] font-light"
-                style={{ color: '#5c5750' }}
-              >
-                Selected work remains unseen.
-              </p>
-              <p
-                className="font-display text-[clamp(0.9rem,1.5vw,1.05rem)] font-light"
-                style={{ color: '#5c5750' }}
-              >
-                What we arrange is not found. What we curate is not listed.
-              </p>
+              <hr
+                className="mt-16 border-t md:mt-20"
+                style={{ borderColor: 'rgba(200,194,184,0.6)' }}
+              />
             </div>
           </div>
         </section>
-
-        {/* ── SILENCE MOMENT ── */}
-        <div className="bg-[#EAEAE5] py-16 md:py-20">
-          <p
-            className="text-center font-display text-[clamp(0.8rem,1.3vw,0.95rem)] font-light tracking-[0.22em]"
-            aria-hidden="true"
-            style={{ color: '#9e9890' }}
-          >
-            Not everything is meant to be accessed.
-          </p>
-        </div>
-
-        {/* ── THIN DIVIDER ── */}
-        <div className="bg-[#EAEAE5]">
-          <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <hr className="border-t" style={{ borderColor: 'rgba(200,194,184,0.6)' }} />
-          </div>
-        </div>
 
         {/* ── BLACK™ EXPERIENCE DIMENSIONS ── */}
-        <section className="bg-[#EAEAE5] py-22 md:py-30" aria-label="Experience Dimensions">
-          <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="mb-16 text-center md:mb-18">
-              <h2
-                className="font-display text-[clamp(1.18rem,2.15vw,1.72rem)] font-light tracking-[0.01em]"
-                style={{ color: '#5c5650' }}
-              >
-                BLACK™ Experience Dimensions
-              </h2>
-            </div>
-
-            {/* 2×3 Grid — reduced border contrast, increased spacing, lower opacity */}
-            <div className="mx-auto grid max-w-[40rem] grid-cols-1 gap-0 sm:grid-cols-2 md:grid-cols-3 lg:max-w-[42rem]">
-              {[
-                'Private Venues',
-                'After-Hours Access',
-                'Curator-Led Experiences',
-                'Closed Collections',
-                'Invitation-Only Events',
-                'Bespoke Cultural Programming',
-              ].map((item, i) => (
-                <div
-                  key={item}
-                  className={`bg-white/15 px-10 py-14 text-center ${i >= 3 ? '-mt-px' : ''} ${i % 3 !== 0 ? '-ml-px' : ''}`}
-                  style={{ border: '1px solid rgba(212,207,198,0.5)' }}
+        <section className="bg-[#EAEAE5]" aria-label="Experience Dimensions">
+          <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-4xl flex-col px-6 py-16 sm:px-10 md:min-h-screen md:py-20 lg:px-16">
+            <div className="flex flex-1 flex-col justify-center">
+              <div className="mb-24 text-center">
+                <h2
+                  className="font-display text-[clamp(1.18rem,2.15vw,1.72rem)] font-light tracking-[0.01em]"
+                  style={{ color: '#5c5650' }}
                 >
-                  <p
-                    className="font-display text-[clamp(0.78rem,1.2vw,0.9rem)] font-light leading-[1.7]"
-                    style={{ color: '#6b6560' }}
-                  >
-                    {item}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+                  BLACK™ Experience Dimensions
+                </h2>
+              </div>
 
-        {/* ── THIN DIVIDER ── */}
-        <div className="bg-[#EAEAE5]">
-          <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
+              {/* 2×3 Grid — reduced border contrast, increased spacing, lower opacity */}
+              <div className="mx-auto grid max-w-[40rem] grid-cols-1 gap-0 sm:grid-cols-2 md:grid-cols-3 lg:max-w-[42rem]">
+                {[
+                  'Private Venues',
+                  'After-Hours Access',
+                  'Curator-Led Experiences',
+                  'Closed Collections',
+                  'Invitation-Only Events',
+                  'Bespoke Cultural Programming',
+                ].map((item, i) => (
+                  <div
+                    key={item}
+                    className={`bg-white/15 px-10 py-14 text-center ${i >= 3 ? '-mt-px' : ''} ${i % 3 !== 0 ? '-ml-px' : ''}`}
+                    style={{ border: '1px solid rgba(212,207,198,0.5)' }}
+                  >
+                    <p
+                      className="font-display text-[clamp(0.78rem,1.2vw,0.9rem)] font-light leading-[1.7]"
+                      style={{ color: '#6b6560' }}
+                    >
+                      {item}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <hr className="border-t" style={{ borderColor: 'rgba(200,194,184,0.6)' }} />
           </div>
-        </div>
+        </section>
 
         {/* ── ACCESS PRINCIPLES ── */}
-        <section className="bg-[#EAEAE5] py-20 md:py-28" aria-label="Access Principles">
-          <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-            <h2
-              className="mb-20 font-display text-[clamp(1.2rem,2.2vw,1.75rem)] font-light tracking-[0.01em]"
-              style={{ color: '#4a4540' }}
-            >
-              Access Principles
-            </h2>
+        <section className="bg-[#EAEAE5]" aria-label="Access Principles">
+          <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-4xl flex-col px-6 py-16 text-center sm:px-10 md:min-h-screen md:py-20 lg:px-16">
+            <div className="flex flex-1 flex-col justify-center">
+              <h2
+                className="mb-24 font-display text-[clamp(1.2rem,2.2vw,1.75rem)] font-light tracking-[0.01em]"
+                style={{ color: '#4a4540' }}
+              >
+                Access Principles
+              </h2>
 
-            <div className="space-y-11">
-              {[
-                'Referral-based access',
-                'Private consultation',
-                'Discreet execution',
-                'Confidential delivery',
-              ].map((principle) => (
-                <p
-                  key={principle}
-                  className="font-display text-[clamp(0.88rem,1.4vw,1.02rem)] font-light leading-[1.85]"
-                  style={{ color: '#6b6560' }}
-                >
-                  {principle}
-                </p>
-              ))}
+              <div className="space-y-14">
+                {[
+                  'Referral-based access',
+                  'Private consultation',
+                  'Discreet execution',
+                  'Confidential delivery',
+                ].map((principle) => (
+                  <p
+                    key={principle}
+                    className="font-display text-[clamp(0.88rem,1.4vw,1.02rem)] font-light leading-[1.85]"
+                    style={{ color: '#6b6560' }}
+                  >
+                    {principle}
+                  </p>
+                ))}
+              </div>
             </div>
+
+            <hr className="border-t" style={{ borderColor: 'rgba(200,194,184,0.6)' }} />
           </div>
         </section>
 
-        {/* ── THIN DIVIDER ── */}
-        <div className="bg-[#EAEAE5]">
-          <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <hr className="border-t" style={{ borderColor: 'rgba(200,194,184,0.6)' }} />
-          </div>
-        </div>
-
         {/* ── HOW BLACK™ WORKS ── */}
-        <section className="bg-[#EAEAE5] py-24 md:py-32" aria-label="How BLACK™ Works">
-          <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="mb-16 text-center">
-              <h2
-                className="font-display text-[clamp(1.2rem,2.2vw,1.75rem)] font-light tracking-[0.01em]"
-                style={{ color: '#4a4540' }}
-              >
-                How BLACK™ Works
-              </h2>
+        <section className="bg-[#EAEAE5]" aria-label="How BLACK™ Works">
+          <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-4xl flex-col px-6 py-16 sm:px-10 md:min-h-screen md:py-20 lg:px-16">
+            <div className="flex flex-1 flex-col justify-center">
+              <div className="text-center mb-20">
+                <h2
+                  className="font-display text-[clamp(1.2rem,2.2vw,1.75rem)] font-light tracking-[0.01em]"
+                  style={{ color: '#4a4540' }}
+                >
+                  How BLACK™ Works
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 gap-16 text-center md:grid-cols-3 lg:gap-20">
+                {[
+                  {
+                    label: 'Referral and Qualification',
+                    body: 'Access is granted through trusted referrals and qualification review.',
+                  },
+                  {
+                    label: 'Private Consultation',
+                    body: 'We design experiences aligned with your interests and expectations.',
+                  },
+                  {
+                    label: 'Confidential Execution',
+                    body: 'Every detail is arranged discreetly, with full privacy and control.',
+                  },
+                ].map((item) => (
+                  <div key={item.label} className="flex flex-col items-center">
+                    <p
+                      className="mb-7 font-body text-[0.65rem] font-medium uppercase tracking-[0.25em]"
+                      style={{ color: '#4a4540' }}
+                    >
+                      {item.label}
+                    </p>
+                    <p
+                      className="max-w-[18ch] font-body text-[0.8rem] leading-[1.85]"
+                      style={{ color: '#7a7268' }}
+                    >
+                      {item.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-16 text-center md:grid-cols-3 lg:gap-20">
-              {[
-                {
-                  label: 'Referral and Qualification',
-                  body: 'Access is granted through trusted referrals and qualification review.',
-                },
-                {
-                  label: 'Private Consultation',
-                  body: 'We design experiences aligned with your interests and expectations.',
-                },
-                {
-                  label: 'Confidential Execution',
-                  body: 'Every detail is arranged discreetly, with full privacy and control.',
-                },
-              ].map((item) => (
-                <div key={item.label} className="flex flex-col items-center">
-                  <p
-                    className="mb-7 font-body text-[0.65rem] font-medium uppercase tracking-[0.25em]"
-                    style={{ color: '#4a4540' }}
-                  >
-                    {item.label}
-                  </p>
-                  <p
-                    className="max-w-[15ch] font-body text-[0.8rem] leading-[1.85]"
-                    style={{ color: '#7a7268' }}
-                  >
-                    {item.body}
-                  </p>
-                </div>
-              ))}
-            </div>
+            <hr className="border-t" style={{ borderColor: 'rgba(200,194,184,0.6)' }} />
           </div>
         </section>
 
@@ -508,18 +504,11 @@ export default async function BlackPage() {
           </section>
         )}
 
-        {/* ── THIN DIVIDER ── */}
-        <div className="bg-[#EAEAE5]">
-          <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <hr className="border-t" style={{ borderColor: 'rgba(200,194,184,0.6)' }} />
-          </div>
-        </div>
-
         {/* ── FINAL MANIFESTO + CTA ── */}
-        <section className="bg-[#EAEAE5] py-24 md:py-36" aria-label="Request Private Access">
-          <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
+        <section className="bg-[#EAEAE5]" aria-label="Request Private Access">
+          <div className="mx-auto flex min-h-[72vh] max-w-3xl flex-col justify-center px-6 py-20 text-center sm:px-10 md:min-h-[78vh] md:py-24 lg:px-16">
             {/* Refined manifesto */}
-            <div className="mb-20 space-y-5">
+            <div className="space-y-6 mb-24">
               <p
                 className="font-display text-[clamp(1.3rem,2.5vw,1.9rem)] font-light"
                 style={{ color: '#3e3a35' }}
@@ -557,6 +546,22 @@ export default async function BlackPage() {
               <span className="absolute inset-0 translate-y-full bg-neutral-800 transition-transform duration-300 group-hover/btn:translate-y-0" />
               <span className="relative z-10">Request Private Access</span>
             </Link>
+          </div>
+        </section>
+
+        <section className="bg-black" aria-label="Contact handoff">
+          <div className="mx-auto max-w-7xl px-6 pb-10 pt-24 sm:px-10 lg:px-16">
+            <div className="flex flex-col gap-8 border-b border-white/[0.08] pb-10 md:flex-row md:items-center md:justify-between md:gap-12 md:pb-12">
+              <p className="font-display text-[clamp(1.7rem,3vw,2.3rem)] font-light text-white">
+                Begin the conversation.
+              </p>
+              <Link
+                href="/contact"
+                className="inline-flex items-center justify-center self-start border border-white/[0.18] px-10 py-4 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/[0.3] hover:text-white md:self-center"
+              >
+                CONTACT CREARE →
+              </Link>
+            </div>
           </div>
         </section>
       </main>

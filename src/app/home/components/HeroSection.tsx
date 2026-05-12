@@ -14,7 +14,7 @@ export default function HeroSection() {
           alt="Italian monastery colonnade corridor with arched stone columns and terracotta floor"
           fill
           priority
-          className="object-cover w-full h-full"
+          className="hero-img-zoom h-full w-full object-cover"
           sizes="100vw"
         />
 
@@ -31,16 +31,16 @@ export default function HeroSection() {
 
       <div className="relative z-30 mx-auto flex w-full max-w-7xl items-end px-6 pb-20 pt-28 sm:px-10 sm:pb-16 sm:pt-32 md:pb-20 lg:px-16">
         <div className="max-w-[21.5rem] sm:max-w-xl">
-          <p className="mb-8 font-body text-[0.56rem] font-light uppercase tracking-[0.34em] text-white/34 sm:mb-7 sm:text-[0.58rem] sm:tracking-[0.38em]">
+          <p className="hero-label mb-8 font-body text-[0.56rem] font-light uppercase tracking-[0.34em] text-white/34 sm:mb-7 sm:text-[0.58rem] sm:tracking-[0.38em]">
             Curated Cultural Experiences
           </p>
 
-          <h1 className="mb-3 font-display text-[clamp(2.45rem,10.4vw,5.5rem)] font-light leading-[1.11] tracking-[-0.018em] text-white sm:mb-2 sm:text-[clamp(2.8rem,6vw,5.5rem)] sm:leading-[1.06] sm:tracking-tight">
+          <h1 className="hero-title-lg mb-3 font-display text-[clamp(2.45rem,10.4vw,5.5rem)] font-light leading-[1.11] tracking-[-0.018em] text-white sm:mb-2 sm:text-[clamp(2.8rem,6vw,5.5rem)] sm:leading-[1.06] sm:tracking-tight">
             Experiences.
           </h1>
 
           <p
-            className="mb-14 font-display text-[clamp(2.45rem,10.4vw,5.5rem)] font-light leading-[1.11] tracking-[-0.018em] text-white/58 sm:mb-12 sm:text-[clamp(2.8rem,6vw,5.5rem)] sm:leading-[1.06] sm:tracking-tight sm:text-white/55"
+            className="hero-subtitle mb-14 font-display text-[clamp(2.45rem,10.4vw,5.5rem)] font-light leading-[1.11] tracking-[-0.018em] text-white/58 sm:mb-12 sm:text-[clamp(2.8rem,6vw,5.5rem)] sm:leading-[1.06] sm:tracking-tight sm:text-white/55"
             aria-hidden="true"
           >
             Composed as Art.
@@ -48,10 +48,13 @@ export default function HeroSection() {
 
           <Link
             href="/contact"
-            className="inline-flex min-h-11 items-center font-body text-[0.62rem] uppercase tracking-[0.24em] text-white/72 transition-colors duration-300 hover:text-white sm:tracking-[0.3em]"
+            className="hero-cta group/cta inline-flex min-h-11 items-center font-body text-[0.62rem] uppercase tracking-[0.24em] text-white/60 transition-colors duration-700 hover:text-white/90 sm:tracking-[0.3em]"
             aria-label="Inquire privately about CREARE experiences"
           >
-            Inquire Privately →
+            <span className="relative inline-block">
+              Inquire Privately →
+              <span className="absolute -bottom-px left-0 h-px w-0 bg-white/50 transition-all duration-700 ease-out group-hover/cta:w-full" />
+            </span>
           </Link>
         </div>
       </div>

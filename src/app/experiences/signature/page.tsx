@@ -5,6 +5,7 @@ import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
+import { experiences as staticExperiences } from '@/lib/experiences';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
 const SITE_URL = 'https://crearetravel.com';
@@ -138,10 +139,7 @@ function getGeoMetadataLine(exp: StrapiExperience) {
     .join(' · ');
 }
 
-function renderExperienceCard(
-  exp: StrapiExperience,
-  options?: { compact?: boolean; offsetAfterThird?: boolean }
-) {
+function renderExperienceCard(exp: StrapiExperience, options?: { compact?: boolean }) {
   const coverUrl = getSeriesImage(exp);
   const coverAlt = exp.cover_image?.alternativeText ?? exp.title;
   const compact = options?.compact ?? false;
@@ -192,23 +190,32 @@ function renderExperienceCard(
   );
 
   return href ? (
-    <Link
-      key={exp.id}
-      href={href}
-      className={`group block ${options?.offsetAfterThird ? 'mt-8 lg:mt-10' : ''}`}
-      aria-label={`View ${exp.title}`}
-    >
+    <Link key={exp.id} href={href} className="group block" aria-label={`View ${exp.title}`}>
       {card}
     </Link>
   ) : (
-    <div
-      key={exp.id}
-      className={`group block ${options?.offsetAfterThird ? 'mt-8 lg:mt-10' : ''}`}
-      aria-label={exp.title}
-    >
+    <div key={exp.id} className="group block" aria-label={exp.title}>
       {card}
     </div>
   );
+}
+
+function buildStaticPerformanceFallback(): StrapiExperience[] {
+  return staticExperiences
+    .filter((experience) => experience.category === 'PERFORMANCE')
+    .map((experience, index) => ({
+      id: 1000 + index,
+      title: experience.title,
+      slug: experience.slug,
+      location_label: experience.location,
+      category: 'performance',
+      series: 'corporate',
+      geo_experience_type: experience.category,
+      cover_image: {
+        url: experience.heroImage,
+        alternativeText: experience.heroImageAlt,
+      },
+    }));
 }
 
 // ── Strapi fetch helpers ──────────────────────────────────────────────────────
@@ -264,12 +271,14 @@ export default async function SignatureExperiencesPage() {
   const historicalExperiences = strapiSignatureExperiences.filter(
     (exp) => normalizeValue(exp.series) === SIGNATURE_SERIES.historical
   );
-  const corporateExperiences = strapiSignatureExperiences.filter(
+  const cmsCorporateExperiences = strapiSignatureExperiences.filter(
     (exp) => normalizeValue(exp.series) === SIGNATURE_SERIES.corporate
   );
   const culinaryExperiences = strapiSignatureExperiences.filter(
     (exp) => normalizeValue(exp.series) === SIGNATURE_SERIES.culinary
   );
+  const corporateExperiences =
+    cmsCorporateExperiences.length > 0 ? cmsCorporateExperiences : buildStaticPerformanceFallback();
   const visibleExperienceCards = [
     ...selectedSignatureExperiences,
     ...historicalExperiences,
@@ -476,21 +485,8 @@ export default async function SignatureExperiencesPage() {
           aria-label="Selected Signature Experiences"
         >
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="text-center mb-22 md:mb-24">
-              <p className="font-body text-[0.58rem] tracking-[0.22em] text-neutral-400/80 uppercase mb-5">
-                CREARE SIGNATURE™
-              </p>
-              <h2
-                className="font-display font-light text-neutral-900 leading-tight"
-                style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)' }}
-              >
-                Selected Signature Experiences
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 gap-x-8 gap-y-[4.5rem] sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-24">
-              {selectedSignatureExperiences.map((exp, index) =>
-                renderExperienceCard(exp, { offsetAfterThird: index >= 3 })
-              )}
+            <div className="grid grid-cols-1 gap-x-8 gap-y-16 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-20">
+              {selectedSignatureExperiences.map((exp) => renderExperienceCard(exp))}
             </div>
           </div>
         </section>
@@ -515,7 +511,7 @@ export default async function SignatureExperiencesPage() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 gap-x-10 gap-y-[5.5rem] sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-[6.5rem]">
+            <div className="grid grid-cols-1 gap-x-10 gap-y-20 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-24">
               {historicalExperiences.map((exp) => renderExperienceCard(exp, { compact: true }))}
             </div>
           </div>
@@ -543,7 +539,7 @@ export default async function SignatureExperiencesPage() {
             </div>
 
             {/* Corporate grid */}
-            <div className="grid grid-cols-1 gap-x-10 gap-y-[5.5rem] sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-[6.5rem]">
+            <div className="grid grid-cols-1 gap-x-10 gap-y-20 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-24">
               {corporateExperiences.map((exp) => renderExperienceCard(exp, { compact: true }))}
             </div>
           </div>
@@ -569,7 +565,7 @@ export default async function SignatureExperiencesPage() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 gap-x-10 gap-y-[5.5rem] sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-[6.5rem]">
+            <div className="grid grid-cols-1 gap-x-10 gap-y-20 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-24">
               {culinaryExperiences.map((exp) => renderExperienceCard(exp, { compact: true }))}
             </div>
           </div>
