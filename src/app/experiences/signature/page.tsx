@@ -501,14 +501,6 @@ export default async function SignatureExperiencesPage() {
         </section>
       )}
 
-      {hasLowerSeriesContent && (
-        <section className="bg-[#EDEAE4] pt-6 md:pt-10" aria-hidden="true">
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="h-px w-full bg-[#c8c2b8]/60" />
-          </div>
-        </section>
-      )}
-
       {historicalExperiences.length > 0 && (
         <section
           className="bg-[#EDEAE4] pb-28 pt-24 md:pb-36 md:pt-32"
@@ -589,8 +581,8 @@ export default async function SignatureExperiencesPage() {
 
       {hasLowerSeriesContent && (
         <section className="bg-black" aria-label="Signature contact handoff">
-          <div className="max-w-7xl mx-auto px-6 py-16 sm:px-10 md:py-20 lg:px-16">
-            <div className="flex flex-col gap-8 border-t border-white/10 pt-12 md:pt-14 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
+          <div className="max-w-7xl mx-auto px-6 pb-0 pt-16 sm:px-10 md:pt-20 lg:px-16">
+            <div className="flex flex-col gap-8 pb-12 md:pb-14 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
               <h2 className="font-display text-[clamp(1.4rem,2.6vw,2rem)] font-light leading-[1.15] text-white">
                 Begin the conversation.
               </h2>
@@ -601,6 +593,7 @@ export default async function SignatureExperiencesPage() {
                 CONTACT CREARE →
               </Link>
             </div>
+            <div className="h-px w-full bg-white/10" aria-hidden="true" />
           </div>
         </section>
       )}
