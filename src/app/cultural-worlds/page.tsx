@@ -111,6 +111,12 @@ export default async function CulturalWorldsPage() {
   return (
     <main className="min-h-screen bg-[#0d0d0b]">
       <JsonLd id="cultural-worlds-jsonld" schema={culturalWorldSchema} />
+      <style>{`
+        header button[aria-label='Open navigation menu'] svg path,
+        header button[aria-label='Close navigation menu'] svg path {
+          stroke: currentColor !important;
+        }
+      `}</style>
       {/* Hero */}
       <section className="max-w-7xl mx-auto px-6 pt-44 pb-20 sm:px-10 lg:px-16">
         <p
@@ -257,6 +263,22 @@ export default async function CulturalWorldsPage() {
             </p>
           </div>
         )}
+      </section>
+
+      <section className="bg-[#0d0d0b]" aria-label="Contact handoff">
+        <div className="mx-auto max-w-7xl px-6 pb-10 pt-24 sm:px-10 lg:px-16">
+          <div className="flex flex-col gap-8 border-b border-white/[0.08] pb-10 md:flex-row md:items-center md:justify-between md:gap-12 md:pb-12">
+            <p className="font-display text-[clamp(1.7rem,3vw,2.3rem)] font-light text-white">
+              Begin the conversation.
+            </p>
+            <Link
+              href="/contact"
+              className="inline-flex items-center justify-center self-start border border-white/[0.18] px-10 py-4 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/[0.3] hover:text-white md:self-center"
+            >
+              CONTACT CREARE →
+            </Link>
+          </div>
+        </div>
       </section>
     </main>
   );

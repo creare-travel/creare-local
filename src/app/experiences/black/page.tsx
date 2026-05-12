@@ -128,17 +128,24 @@ export default async function BlackPage() {
   return (
     <>
       <JsonLd id="black-collection-jsonld" schema={blackSchemaGraph} />
+      <style>{`
+        header button[aria-label='Open navigation menu'] svg path,
+        header button[aria-label='Close navigation menu'] svg path {
+          stroke: currentColor !important;
+        }
+      `}</style>
       <main>
         {/* ── HERO — Full-bleed dark with grain ── */}
         <section
-          className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#0a0a0a]"
+          className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#0d0d0b]"
           aria-label="CREARE BLACK™ hero"
         >
           {/* Grain texture overlay */}
           <div
-            className="absolute inset-0 opacity-40 pointer-events-none"
+            className="pointer-events-none absolute inset-0"
             aria-hidden="true"
             style={{
+              opacity: 0.14,
               backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
               backgroundRepeat: 'repeat',
               backgroundSize: '200px 200px',
@@ -147,22 +154,26 @@ export default async function BlackPage() {
 
           {/* Dark vignette */}
           <div
-            className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.2)_0%,rgba(0,0,0,0.7)_100%)]"
+            className="pointer-events-none absolute inset-0"
             aria-hidden="true"
+            style={{
+              background:
+                'radial-gradient(ellipse at center, rgba(28,26,22,0.0) 0%, rgba(8,8,6,0.72) 100%)',
+            }}
           />
 
           {/* Content */}
           <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
             {/* Micro-line above title */}
-            <p className="mb-10 font-body text-[0.58rem] uppercase tracking-[0.24em] text-white/38">
+            <p className="mb-10 font-body text-[0.58rem] uppercase tracking-[0.42em] text-white/22">
               By invitation.
             </p>
 
-            <h1 className="font-display font-light text-white mb-10 tracking-wide text-[clamp(3.5rem,8vw,7rem)] leading-[1.15]">
+            <h1 className="mb-10 font-display text-[clamp(3.2rem,7vw,6.5rem)] font-light leading-[1.08] tracking-[-0.01em] text-white">
               BLACK™
             </h1>
 
-            <p className="mb-20 font-display font-light leading-loose text-[clamp(0.78rem,1.3vw,0.96rem)] text-white/54">
+            <p className="mb-20 font-display text-[clamp(0.72rem,1.2vw,0.9rem)] font-light leading-[1.9] text-white/38">
               Beyond the expected.
               <br />
               Where privilege is carefully composed.
@@ -170,7 +181,10 @@ export default async function BlackPage() {
 
             <Link
               href="/contact?source=experience&slug=black&exp=black"
-              className="border border-white/22 px-10 py-4 font-body text-[0.6rem] uppercase tracking-[0.24em] text-white/68 transition-all duration-500 hover:border-white/38 hover:text-white/84"
+              className="border border-white/14 px-12 py-5 font-body text-[0.58rem] uppercase tracking-[0.35em] text-white/45 transition-all duration-500 hover:border-white/28 hover:text-white/65"
+              style={{
+                minWidth: '19rem',
+              }}
             >
               Submit Private Inquiry
             </Link>
@@ -178,24 +192,30 @@ export default async function BlackPage() {
         </section>
 
         {/* ── BREADCRUMB + MANIFESTO ── */}
-        <section className="bg-[#EAEAE5] py-28 md:py-40" aria-label="Access statement">
+        <section className="bg-[#EAEAE5] py-20 md:py-28" aria-label="Access statement">
           <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
             {/* Breadcrumb */}
-            <nav className="mb-20" aria-label="Breadcrumb">
+            <nav className="mb-16" aria-label="Breadcrumb">
               <ol className="flex items-center gap-2">
                 <li>
                   <Link
                     href="/"
-                    className="font-body text-[0.6rem] tracking-[0.22em] text-neutral-400 uppercase hover:text-neutral-700 transition-colors"
+                    className="font-body text-[0.6rem] uppercase tracking-[0.22em] transition-colors"
+                    style={{ color: '#b0aa9f' }}
                   >
                     ← HOME
                   </Link>
                 </li>
                 <li aria-hidden="true">
-                  <span className="font-body text-[0.6rem] text-neutral-300 mx-1">/</span>
+                  <span className="mx-1 font-body text-[0.6rem]" style={{ color: '#c8c2b8' }}>
+                    /
+                  </span>
                 </li>
                 <li>
-                  <span className="font-body text-[0.6rem] tracking-[0.22em] text-neutral-600 uppercase">
+                  <span
+                    className="font-body text-[0.6rem] uppercase tracking-[0.22em]"
+                    style={{ color: '#6b6560' }}
+                  >
                     BLACK™
                   </span>
                 </li>
@@ -203,14 +223,23 @@ export default async function BlackPage() {
             </nav>
 
             {/* Short sharp lines */}
-            <div className="text-center space-y-8">
-              <p className="font-display font-light italic text-neutral-500 leading-loose text-[clamp(0.95rem,1.6vw,1.15rem)]">
+            <div className="space-y-7 text-center">
+              <p
+                className="font-display text-[clamp(0.95rem,1.6vw,1.15rem)] font-light italic leading-loose"
+                style={{ color: '#5c5750' }}
+              >
                 Not publicly listed. Access is not open.
               </p>
-              <p className="font-display font-light text-[clamp(0.9rem,1.5vw,1.05rem)] text-neutral-500/78">
+              <p
+                className="font-display text-[clamp(0.9rem,1.5vw,1.05rem)] font-light"
+                style={{ color: '#5c5750' }}
+              >
                 Selected work remains unseen.
               </p>
-              <p className="font-display font-light text-[clamp(0.9rem,1.5vw,1.05rem)] text-neutral-500/78">
+              <p
+                className="font-display text-[clamp(0.9rem,1.5vw,1.05rem)] font-light"
+                style={{ color: '#5c5750' }}
+              >
                 What we arrange is not found. What we curate is not listed.
               </p>
             </div>
@@ -218,10 +247,11 @@ export default async function BlackPage() {
         </section>
 
         {/* ── SILENCE MOMENT ── */}
-        <div className="bg-[#EAEAE5] py-20 md:py-28">
+        <div className="bg-[#EAEAE5] py-16 md:py-20">
           <p
-            className="text-center font-display font-light text-neutral-400/50 text-[clamp(0.8rem,1.3vw,0.95rem)] tracking-[0.08em]"
+            className="text-center font-display text-[clamp(0.8rem,1.3vw,0.95rem)] font-light tracking-[0.22em]"
             aria-hidden="true"
+            style={{ color: '#9e9890' }}
           >
             Not everything is meant to be accessed.
           </p>
@@ -230,21 +260,24 @@ export default async function BlackPage() {
         {/* ── THIN DIVIDER ── */}
         <div className="bg-[#EAEAE5]">
           <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <hr className="border-t border-neutral-300/70" />
+            <hr className="border-t" style={{ borderColor: 'rgba(200,194,184,0.6)' }} />
           </div>
         </div>
 
         {/* ── BLACK™ EXPERIENCE DIMENSIONS ── */}
-        <section className="bg-[#EAEAE5] py-28 md:py-40" aria-label="Experience Dimensions">
+        <section className="bg-[#EAEAE5] py-22 md:py-30" aria-label="Experience Dimensions">
           <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="text-center mb-20">
-              <h2 className="font-display font-light text-neutral-700 text-[clamp(1.4rem,2.5vw,2rem)]">
+            <div className="mb-16 text-center md:mb-18">
+              <h2
+                className="font-display text-[clamp(1.18rem,2.15vw,1.72rem)] font-light tracking-[0.01em]"
+                style={{ color: '#5c5650' }}
+              >
                 BLACK™ Experience Dimensions
               </h2>
             </div>
 
             {/* 2×3 Grid — reduced border contrast, increased spacing, lower opacity */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-0">
+            <div className="mx-auto grid max-w-[40rem] grid-cols-1 gap-0 sm:grid-cols-2 md:grid-cols-3 lg:max-w-[42rem]">
               {[
                 'Private Venues',
                 'After-Hours Access',
@@ -255,9 +288,13 @@ export default async function BlackPage() {
               ].map((item, i) => (
                 <div
                   key={item}
-                  className={`border border-neutral-300/60 bg-white/15 px-10 py-14 text-center ${i >= 3 ? '-mt-px' : ''} ${i % 3 !== 0 ? '-ml-px' : ''}`}
+                  className={`bg-white/15 px-10 py-14 text-center ${i >= 3 ? '-mt-px' : ''} ${i % 3 !== 0 ? '-ml-px' : ''}`}
+                  style={{ border: '1px solid rgba(212,207,198,0.5)' }}
                 >
-                  <p className="font-display font-light text-[clamp(0.8rem,1.3vw,0.95rem)] text-neutral-600/82">
+                  <p
+                    className="font-display text-[clamp(0.78rem,1.2vw,0.9rem)] font-light leading-[1.7]"
+                    style={{ color: '#6b6560' }}
+                  >
                     {item}
                   </p>
                 </div>
@@ -269,18 +306,21 @@ export default async function BlackPage() {
         {/* ── THIN DIVIDER ── */}
         <div className="bg-[#EAEAE5]">
           <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <hr className="border-t border-neutral-200" />
+            <hr className="border-t" style={{ borderColor: 'rgba(200,194,184,0.6)' }} />
           </div>
         </div>
 
         {/* ── ACCESS PRINCIPLES ── */}
-        <section className="bg-[#EAEAE5] py-28 md:py-40" aria-label="Access Principles">
+        <section className="bg-[#EAEAE5] py-20 md:py-28" aria-label="Access Principles">
           <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-            <h2 className="font-display font-light text-neutral-700 mb-20 text-[clamp(1.4rem,2.5vw,2rem)]">
+            <h2
+              className="mb-20 font-display text-[clamp(1.2rem,2.2vw,1.75rem)] font-light tracking-[0.01em]"
+              style={{ color: '#4a4540' }}
+            >
               Access Principles
             </h2>
 
-            <div className="space-y-10">
+            <div className="space-y-11">
               {[
                 'Referral-based access',
                 'Private consultation',
@@ -289,7 +329,8 @@ export default async function BlackPage() {
               ].map((principle) => (
                 <p
                   key={principle}
-                  className="font-display font-light text-[clamp(0.9rem,1.5vw,1.05rem)] text-neutral-500/76"
+                  className="font-display text-[clamp(0.88rem,1.4vw,1.02rem)] font-light leading-[1.85]"
+                  style={{ color: '#6b6560' }}
                 >
                   {principle}
                 </p>
@@ -301,20 +342,23 @@ export default async function BlackPage() {
         {/* ── THIN DIVIDER ── */}
         <div className="bg-[#EAEAE5]">
           <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <hr className="border-t border-neutral-300/70" />
+            <hr className="border-t" style={{ borderColor: 'rgba(200,194,184,0.6)' }} />
           </div>
         </div>
 
         {/* ── HOW BLACK™ WORKS ── */}
-        <section className="bg-[#EAEAE5] py-28 md:py-40" aria-label="How BLACK™ Works">
+        <section className="bg-[#EAEAE5] py-24 md:py-32" aria-label="How BLACK™ Works">
           <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="text-center mb-20">
-              <h2 className="font-display font-light text-neutral-800 text-[clamp(1.4rem,2.5vw,2rem)]">
+            <div className="mb-16 text-center">
+              <h2
+                className="font-display text-[clamp(1.2rem,2.2vw,1.75rem)] font-light tracking-[0.01em]"
+                style={{ color: '#4a4540' }}
+              >
                 How BLACK™ Works
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-24 text-center">
+            <div className="grid grid-cols-1 gap-16 text-center md:grid-cols-3 lg:gap-20">
               {[
                 {
                   label: 'Referral and Qualification',
@@ -330,10 +374,16 @@ export default async function BlackPage() {
                 },
               ].map((item) => (
                 <div key={item.label} className="flex flex-col items-center">
-                  <p className="mb-6 font-body text-[0.68rem] font-medium uppercase tracking-[0.16em] text-neutral-700">
+                  <p
+                    className="mb-7 font-body text-[0.65rem] font-medium uppercase tracking-[0.25em]"
+                    style={{ color: '#4a4540' }}
+                  >
                     {item.label}
                   </p>
-                  <p className="font-body text-sm leading-relaxed text-neutral-500/70">
+                  <p
+                    className="max-w-[15ch] font-body text-[0.8rem] leading-[1.85]"
+                    style={{ color: '#7a7268' }}
+                  >
                     {item.body}
                   </p>
                 </div>
@@ -349,12 +399,15 @@ export default async function BlackPage() {
           >
             <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
               <div className="text-center mb-20">
-                <p className="mb-4 font-body text-[0.58rem] uppercase tracking-[0.22em] text-neutral-500/70">
+                <p
+                  className="mb-4 font-body text-[0.58rem] uppercase tracking-[0.22em]"
+                  style={{ color: '#9e9890' }}
+                >
                   FROM THE COLLECTION
                 </p>
                 <h2
-                  className="font-display font-light text-neutral-800"
-                  style={{ fontSize: 'clamp(1.4rem,2.5vw,2rem)' }}
+                  className="font-display font-light"
+                  style={{ fontSize: 'clamp(1.4rem,2.5vw,2rem)', color: '#4a4540' }}
                 >
                   BLACK Experiences
                 </h2>
@@ -390,36 +443,45 @@ export default async function BlackPage() {
                         )}
                       </div>
 
-                      <p className="mb-3 font-body text-[0.55rem] uppercase tracking-[0.2em] text-neutral-500/72">
+                      <p
+                        className="mb-3 font-body text-[0.55rem] uppercase tracking-[0.2em]"
+                        style={{ color: '#9e9890' }}
+                      >
                         {exp.category ?? 'BLACK'}
                       </p>
                       <h3
-                        className="mb-3 font-display font-light leading-snug text-neutral-900 transition-opacity duration-300 group-hover:opacity-75"
-                        style={{ fontSize: 'clamp(1rem, 1.8vw, 1.2rem)' }}
+                        className="mb-3 font-display font-light leading-snug transition-opacity duration-300 group-hover:opacity-75"
+                        style={{ fontSize: 'clamp(1rem, 1.8vw, 1.2rem)', color: '#3e3a35' }}
                       >
                         {exp.title}
                       </h3>
 
                       {geoMetadata && (
-                        <p className="mb-3 font-body text-[0.68rem] text-neutral-600/80">
+                        <p className="mb-3 font-body text-[0.68rem]" style={{ color: '#6b6560' }}>
                           {geoMetadata}
                         </p>
                       )}
 
                       {location && (
-                        <p className="mb-3 font-body text-[0.7rem] text-neutral-600/80">
+                        <p className="mb-3 font-body text-[0.7rem]" style={{ color: '#6b6560' }}>
                           {location}
                         </p>
                       )}
 
                       {exp.short_description && (
-                        <p className="font-body text-sm leading-relaxed text-neutral-700/78">
+                        <p
+                          className="font-body text-sm leading-relaxed"
+                          style={{ color: '#5c5750' }}
+                        >
                           {exp.short_description}
                         </p>
                       )}
 
                       {exp.duration && (
-                        <p className="mt-4 font-body text-[0.68rem] uppercase tracking-[0.14em] text-neutral-600/78">
+                        <p
+                          className="mt-4 font-body text-[0.68rem] uppercase tracking-[0.14em]"
+                          style={{ color: '#6b6560' }}
+                        >
                           {exp.duration}
                         </p>
                       )}
@@ -449,26 +511,36 @@ export default async function BlackPage() {
         {/* ── THIN DIVIDER ── */}
         <div className="bg-[#EAEAE5]">
           <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
-            <hr className="border-t border-neutral-300/70" />
+            <hr className="border-t" style={{ borderColor: 'rgba(200,194,184,0.6)' }} />
           </div>
         </div>
 
         {/* ── FINAL MANIFESTO + CTA ── */}
-        <section className="bg-[#EAEAE5] py-32 md:py-48" aria-label="Request Private Access">
+        <section className="bg-[#EAEAE5] py-24 md:py-36" aria-label="Request Private Access">
           <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
             {/* Refined manifesto */}
-            <div className="space-y-6 mb-24">
-              <p className="font-display font-light text-neutral-800 text-[clamp(1.3rem,2.5vw,1.9rem)]">
+            <div className="mb-20 space-y-5">
+              <p
+                className="font-display text-[clamp(1.3rem,2.5vw,1.9rem)] font-light"
+                style={{ color: '#3e3a35' }}
+              >
                 BLACK™ is not marketed. It is not advertised.
               </p>
-              <p className="font-display font-light text-[clamp(1rem,1.8vw,1.4rem)] text-neutral-600/78">
+              <p
+                className="font-display text-[clamp(1rem,1.8vw,1.4rem)] font-light"
+                style={{ color: '#5c5750' }}
+              >
                 It is extended — selectively.
               </p>
-              <p className="mt-4 font-body text-sm font-light leading-relaxed text-neutral-500/78">
+              <p
+                className="mt-4 font-body text-sm font-light leading-relaxed"
+                style={{ color: '#8c8478' }}
+              >
                 BLACK™ operates across the cultural worlds of{' '}
                 <Link
                   href="/cultural-worlds/istanbul"
-                  className="underline underline-offset-2 hover:text-neutral-600 transition-colors"
+                  className="underline underline-offset-2 transition-colors hover:opacity-80"
+                  style={{ color: '#5c5750' }}
                 >
                   Istanbul
                 </Link>{' '}
@@ -480,9 +552,10 @@ export default async function BlackPage() {
             {/* CTA button */}
             <Link
               href="/contact?source=experience&slug=black&exp=black"
-              className="inline-block bg-black px-12 py-5 font-body text-[0.65rem] uppercase tracking-[0.24em] text-white transition-colors duration-300 hover:bg-neutral-800"
+              className="group/btn relative inline-flex overflow-hidden border border-neutral-700/40 px-12 py-5 font-body text-[0.62rem] uppercase tracking-[0.32em] text-neutral-800 transition-colors duration-300 hover:text-white/80"
             >
-              Request Private Access
+              <span className="absolute inset-0 translate-y-full bg-neutral-800 transition-transform duration-300 group-hover/btn:translate-y-0" />
+              <span className="relative z-10">Request Private Access</span>
             </Link>
           </div>
         </section>
