@@ -471,8 +471,11 @@ export default async function SignatureExperiencesPage() {
         aria-hidden="true"
       >
         <p
-          className="text-center font-body uppercase tracking-[0.18em] text-neutral-700/54"
-          style={{ fontSize: 'clamp(0.75rem, 1.1vw, 0.875rem)', opacity: 0.65 }}
+          className="text-center font-body uppercase tracking-[0.18em]"
+          style={{
+            fontSize: 'clamp(0.75rem, 1.1vw, 0.875rem)',
+            color: 'rgba(26,26,24,0.38)',
+          }}
         >
           Selected. Not discovered.
         </p>

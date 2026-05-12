@@ -367,12 +367,14 @@ export default async function BlackPage() {
                   },
                 ].map((item) => (
                   <div key={item.label} className="flex flex-col items-center">
-                    <p
-                      className="mb-7 font-body text-[0.65rem] font-medium uppercase tracking-[0.25em]"
-                      style={{ color: '#4a4540' }}
-                    >
-                      {item.label}
-                    </p>
+                    <div className="mb-7 flex items-start justify-center md:min-h-[3.1rem]">
+                      <p
+                        className="font-body text-[0.65rem] font-medium uppercase tracking-[0.25em]"
+                        style={{ color: '#4a4540' }}
+                      >
+                        {item.label}
+                      </p>
+                    </div>
                     <p
                       className="max-w-[18ch] font-body text-[0.8rem] leading-[1.85]"
                       style={{ color: '#7a7268' }}
