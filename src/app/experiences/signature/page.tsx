@@ -319,9 +319,19 @@ export default async function SignatureExperiencesPage() {
     })),
   });
 
+  const hasLowerSeriesContent =
+    historicalExperiences.length > 0 ||
+    corporateLayerExperiences.length > 0 ||
+    culinaryExperiences.length > 0;
+
   return (
-    <main>
+    <main data-signature-page>
       <JsonLd id="signature-collection-jsonld" schema={signatureCollectionJsonLd} />
+      <style>{`
+        body:has(main[data-signature-page]) header button[aria-label*='navigation menu'] svg path {
+          stroke: currentColor !important;
+        }
+      `}</style>
       {/* ── HERO ── */}
       <section className="relative flex h-screen min-h-[600px] w-full flex-col items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
@@ -491,9 +501,7 @@ export default async function SignatureExperiencesPage() {
         </section>
       )}
 
-      {(historicalExperiences.length > 0 ||
-        corporateExperiences.length > 0 ||
-        culinaryExperiences.length > 0) && (
+      {hasLowerSeriesContent && (
         <section className="bg-[#EDEAE4] pt-6 md:pt-10" aria-hidden="true">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="h-px w-full bg-[#c8c2b8]/60" />
@@ -532,6 +540,7 @@ export default async function SignatureExperiencesPage() {
           aria-label="CREARE Corporate Series"
         >
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+            <div className="mb-16 h-px w-full bg-[#c8c2b8]/60 md:mb-20" aria-hidden="true" />
             <div className="mx-auto mb-18 max-w-[50rem] text-center md:mb-20">
               <p
                 className="mb-5 font-body text-[0.6rem] uppercase tracking-[0.3em]"
@@ -573,6 +582,24 @@ export default async function SignatureExperiencesPage() {
             </div>
             <div className="grid grid-cols-1 gap-x-10 gap-y-20 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-24">
               {culinaryExperiences.map((exp) => renderExperienceCard(exp, { compact: true }))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {hasLowerSeriesContent && (
+        <section className="bg-black" aria-label="Signature contact handoff">
+          <div className="max-w-7xl mx-auto px-6 py-16 sm:px-10 md:py-20 lg:px-16">
+            <div className="flex flex-col gap-8 border-t border-white/10 pt-12 md:pt-14 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
+              <h2 className="font-display text-[clamp(1.4rem,2.6vw,2rem)] font-light leading-[1.15] text-white">
+                Begin the conversation.
+              </h2>
+              <Link
+                href="/contact"
+                className="inline-flex items-center justify-center border border-white/16 px-6 py-3 font-body text-[0.62rem] uppercase tracking-[0.24em] text-white/70 transition-colors hover:border-white/30 hover:text-white"
+              >
+                CONTACT CREARE →
+              </Link>
             </div>
           </div>
         </section>
