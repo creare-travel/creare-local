@@ -36,7 +36,7 @@ const AppImage = memo(function AppImage({
   fill = false,
   sizes,
   onClick,
-  fallbackSrc = '/assets/images/no_image.png',
+  fallbackSrc = '/assets/images/creare-image-placeholder.jpg',
   loading = 'lazy',
   unoptimized = false,
   atmosphere = 'neutral',

@@ -75,7 +75,7 @@ interface StrapiInsight {
   } | null;
 }
 
-const IMAGE_FALLBACK = '/assets/images/no_image.png';
+const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

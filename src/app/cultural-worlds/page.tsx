@@ -93,7 +93,7 @@ function getDestinationImageUrl(destination: StrapiDestination): string {
     destination.cover_image?.formats?.small?.url ??
     destination.cover_image?.url;
 
-  return rawUrl ? mediaUrl(rawUrl) : '/assets/images/no_image.png';
+  return rawUrl ? mediaUrl(rawUrl) : '/assets/images/creare-image-placeholder.jpg';
 }
 
 export default async function CulturalWorldsPage() {

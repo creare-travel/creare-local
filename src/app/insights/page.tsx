@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   }),
 };
 
-const IMAGE_FALLBACK = '/assets/images/no_image.png';
+const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
 
 interface StrapiInsight {
   id: number;
@@ -155,7 +155,7 @@ function normalizeInsight(item: StrapiInsight): NormalizedInsight | null {
 
   const excerpt = attrs?.excerpt ?? '';
 
-  // cover_image — fallback to no_image.png if missing
+  // cover_image — fallback to owned placeholder if missing
   const coverImage = resolveFirstInsightCoverImage(item);
   const coverImageUrl = coverImage?.url ? mediaUrl(coverImage.url) : IMAGE_FALLBACK;
 

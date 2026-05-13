@@ -558,7 +558,7 @@ export const experiences: Experience[] = [
     location: 'Bodrum Peninsula (Aegean)',
     duration: 'Half-day to full evening',
     groupSize: 'Max 10 guests',
-    heroImage: '/assets/images/no_image.png',
+    heroImage: '/assets/images/creare-image-placeholder.jpg',
     heroImageAlt:
       'A single table set on a hillside olive farm above the Aegean, overlooking the Gulf of Gökova at dusk',
     heroHeadline: 'There is only one table.',

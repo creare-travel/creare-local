@@ -12,7 +12,7 @@ import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 const SITE_URL = 'https://crearetravel.com';
 const FALLBACK_DESCRIPTION =
   'A cultural world composed through editorial destination content, related experiences, and further reading.';
-const IMAGE_FALLBACK = '/assets/images/no_image.png';
+const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
 const canonicalInsightSlug = (slug?: string) =>
   slug === 'the-private-life-of-istanbul' ? 'private-life-of-istanbul' : slug;
 

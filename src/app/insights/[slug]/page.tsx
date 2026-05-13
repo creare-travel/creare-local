@@ -125,7 +125,7 @@ function normalizeMediaItem<T>(value: unknown): T | null {
   return normalizeSingleRelation<T>(value);
 }
 
-const IMAGE_FALLBACK = '/assets/images/no_image.png';
+const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
 const LEGACY_ISTANBUL_INSIGHT_SLUG = 'the-private-life-of-istanbul';
 const CANONICAL_ISTANBUL_INSIGHT_SLUG = 'private-life-of-istanbul';
 const canonicalInsightSlug = (slug: string | undefined): string | undefined =>
@@ -471,7 +471,7 @@ export default async function InsightArticlePage({ params }: Props) {
     notFound();
   }
 
-  // Image: fallback to no_image.png if cover_image is missing
+  // Image: fallback to owned placeholder if cover_image is missing
   const coverImageUrl = resolveImageUrl(insight.cover_image?.url);
   const coverImageAlt = insight.cover_image?.alternativeText || insight.title || 'Insight cover';
 
