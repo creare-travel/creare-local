@@ -1,10 +1,10 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
+import { buildExperienceInquiryHref } from '@/lib/inquiry';
 
 interface InquireCTAProps {
   experienceSlug: string;
-  experienceId?: number;
   label?: string;
   className?: string;
 }
@@ -14,7 +14,7 @@ export default function InquireCTA({
   label = 'INQUIRE PRIVATELY',
   className = '',
 }: InquireCTAProps) {
-  const href = `/contact?source=experience&slug=${encodeURIComponent(experienceSlug)}&exp=${encodeURIComponent(experienceSlug)}`;
+  const href = buildExperienceInquiryHref(experienceSlug);
 
   return (
     <Link

@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { trackCtaClick } from '@/lib/analytics/tracking';
+import { buildExperienceInquiryHref } from '@/lib/inquiry';
 
 interface CTASectionProps {
   heading?: string;
@@ -36,7 +37,7 @@ export default function CTASection({
   // Preserve experience context when routing into the shared contact form flow.
   const resolvedHref =
     buttonHref === '/contact' && experienceSlug
-      ? `/contact?source=experience&slug=${encodeURIComponent(experienceSlug)}&exp=${encodeURIComponent(experienceSlug)}`
+      ? buildExperienceInquiryHref(experienceSlug)
       : buttonHref;
 
   const handleCtaClick = () => {

@@ -228,12 +228,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: {
-      canonical: canonicalUrl(`/destinations/${slug}`),
+      canonical: canonicalUrl(`/cultural-worlds/${slug}`),
     },
     openGraph: buildOpenGraph({
       title,
       description,
-      path: `/destinations/${slug}`,
+      path: `/cultural-worlds/${slug}`,
       type: 'article',
     }),
     twitter: buildTwitterCard({

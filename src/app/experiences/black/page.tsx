@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
+import { buildExperienceInquiryHref } from '@/lib/inquiry';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -180,7 +181,7 @@ export default async function BlackPage() {
             </p>
 
             <Link
-              href="/contact?source=experience&slug=black&exp=black"
+              href={buildExperienceInquiryHref('black')}
               className="border border-white/14 px-12 py-5 font-body text-[0.58rem] uppercase tracking-[0.35em] text-white/45 transition-all duration-500 hover:border-white/28 hover:text-white/65"
               style={{
                 minWidth: '19rem',
@@ -542,7 +543,7 @@ export default async function BlackPage() {
 
             {/* CTA button */}
             <Link
-              href="/contact?source=experience&slug=black&exp=black"
+              href={buildExperienceInquiryHref('black')}
               className="group/btn relative inline-flex overflow-hidden border border-neutral-700/40 px-12 py-5 font-body text-[0.62rem] uppercase tracking-[0.32em] text-neutral-800 transition-colors duration-300 hover:text-white/80"
             >
               <span className="absolute inset-0 translate-y-full bg-neutral-800 transition-transform duration-300 group-hover/btn:translate-y-0" />

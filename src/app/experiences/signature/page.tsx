@@ -397,7 +397,7 @@ export default async function SignatureExperiencesPage() {
                 strapiDestinations.map((dest) => (
                   <Link
                     key={dest.id}
-                    href={`/destinations/${dest.slug}`}
+                    href={`/cultural-worlds/${dest.slug}`}
                     className="font-body text-[0.7rem] tracking-[0.15em] text-neutral-600 uppercase hover:text-neutral-900 transition-colors underline underline-offset-2"
                   >
                     {dest.name}
@@ -406,13 +406,13 @@ export default async function SignatureExperiencesPage() {
               ) : (
                 <>
                   <Link
-                    href="/destinations/istanbul"
+                    href="/cultural-worlds/istanbul"
                     className="font-body text-[0.7rem] tracking-[0.15em] text-neutral-600 uppercase hover:text-neutral-900 transition-colors underline underline-offset-2"
                   >
                     Istanbul
                   </Link>
                   <Link
-                    href="/destinations/cappadocia"
+                    href="/cultural-worlds/cappadocia"
                     className="font-body text-[0.7rem] tracking-[0.15em] text-neutral-600 uppercase hover:text-neutral-900 transition-colors underline underline-offset-2"
                   >
                     Cappadocia

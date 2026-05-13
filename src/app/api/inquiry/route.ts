@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendOwnerNotification, sendUserConfirmation } from '@/lib/email/sendEmail';
+import {
+  normalizeInquiryIntent,
+  type InquirySubmissionInput,
+  validateInquirySubmission,
+} from '@/lib/inquiry';
+import { submitInquiry } from '@/lib/email/submitInquiry';
 
-interface InquiryPayload {
-  name: string;
-  email: string;
-  message?: string;
+interface InquiryPayload extends InquirySubmissionInput {
   intents?: string[];
 }
 
@@ -15,31 +17,19 @@ interface InquiryPayload {
 export async function POST(request: NextRequest) {
   try {
     const body: InquiryPayload = await request.json();
-
-    const { name, email, message, intents } = body;
-
-    // Validation
-    if (!name || typeof name !== 'string' || name.trim() === '') {
-      return NextResponse.json({ success: false, error: 'Name is required.' }, { status: 400 });
-    }
-
-    if (!email || typeof email !== 'string' || email.trim() === '') {
-      return NextResponse.json({ success: false, error: 'Email is required.' }, { status: 400 });
-    }
-
-    if (!message || typeof message !== 'string' || message.trim() === '') {
-      return NextResponse.json({ success: false, error: 'Message is required.' }, { status: 400 });
-    }
-
-    const inquiryData = {
-      name: name.trim(),
-      email: email.trim(),
-      message: message.trim(),
-      intents,
+    const inquiryData: InquirySubmissionInput = {
+      name: body.name,
+      email: body.email,
+      message: body.message,
+      intent: normalizeInquiryIntent(body.intents ?? body.intent),
+      experience_slug: body.experience_slug,
     };
+    const validationError = validateInquirySubmission(inquiryData);
+    if (validationError) {
+      return NextResponse.json({ success: false, error: validationError }, { status: 400 });
+    }
 
-    // Send both emails concurrently
-    await Promise.all([sendOwnerNotification(inquiryData), sendUserConfirmation(inquiryData)]);
+    await submitInquiry(inquiryData);
 
     return NextResponse.json(
       { success: true, message: 'Inquiry received. We will be in touch shortly.' },
@@ -53,6 +43,16 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('[/api/inquiry] Failed to process inquiry request.', err);
+
+    if (err instanceof Error && err.message.startsWith('Mail service is not configured.')) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Inquiry service is temporarily unavailable. Please try again later.',
+        },
+        { status: 503 }
+      );
+    }
 
     return NextResponse.json(
       { success: false, error: 'An error occurred. Please try again.' },

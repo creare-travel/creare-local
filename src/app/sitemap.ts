@@ -12,12 +12,39 @@ interface SitemapDestination {
   visibility_status?: string;
 }
 
+interface SitemapExperience {
+  id: number;
+  slug?: string;
+  category?: string;
+}
+
+interface SitemapInsight {
+  id: number;
+  slug?: string;
+}
+
 function flattenDestination(raw: Record<string, unknown>): SitemapDestination {
   if (raw?.attributes && typeof raw.attributes === 'object') {
     return { id: Number(raw.id), ...(raw.attributes as object) } as SitemapDestination;
   }
 
   return raw as unknown as SitemapDestination;
+}
+
+function flattenExperience(raw: Record<string, unknown>): SitemapExperience {
+  if (raw?.attributes && typeof raw.attributes === 'object') {
+    return { id: Number(raw.id), ...(raw.attributes as object) } as SitemapExperience;
+  }
+
+  return raw as unknown as SitemapExperience;
+}
+
+function flattenInsight(raw: Record<string, unknown>): SitemapInsight {
+  if (raw?.attributes && typeof raw.attributes === 'object') {
+    return { id: Number(raw.id), ...(raw.attributes as object) } as SitemapInsight;
+  }
+
+  return raw as unknown as SitemapInsight;
 }
 
 async function fetchActiveCulturalWorldUrls() {
@@ -66,8 +93,66 @@ async function fetchActiveCulturalWorldUrls() {
   }
 }
 
+async function fetchCanonicalExperienceUrls() {
+  const path =
+    '/api/experiences?fields[0]=slug&fields[1]=category&pagination[pageSize]=100';
+
+  try {
+    const json = await fetchStrapi(path);
+    const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
+
+    return items
+      .map((item) => flattenExperience(item))
+      .filter((item) => item.slug)
+      .filter((item) => item.category?.toLowerCase() !== 'black')
+      .map((item) => ({
+        url: `${BASE_URL}/experiences/${item.slug}`,
+        lastModified: LAST_MODIFIED,
+        changeFrequency: 'monthly' as const,
+        priority: 0.8,
+      }));
+  } catch (error) {
+    console.error('Failed to build dynamic experience sitemap entries.', {
+      route: '/sitemap.xml',
+      strapiPath: path,
+      error,
+    });
+    return [];
+  }
+}
+
+async function fetchCanonicalInsightUrls() {
+  const path = '/api/insights?fields[0]=slug&pagination[pageSize]=100';
+
+  try {
+    const json = await fetchStrapi(path);
+    const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
+
+    return items
+      .map((item) => flattenInsight(item))
+      .filter((item) => item.slug)
+      .map((item) => ({
+        url: `${BASE_URL}/insights/${item.slug}`,
+        lastModified: LAST_MODIFIED,
+        changeFrequency: 'monthly' as const,
+        priority: 0.75,
+      }));
+  } catch (error) {
+    console.error('Failed to build dynamic insight sitemap entries.', {
+      route: '/sitemap.xml',
+      strapiPath: path,
+      error,
+    });
+    return [];
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const culturalWorldEntries = await fetchActiveCulturalWorldUrls();
+  const [culturalWorldEntries, experienceEntries, insightEntries] = await Promise.all([
+    fetchActiveCulturalWorldUrls(),
+    fetchCanonicalExperienceUrls(),
+    fetchCanonicalInsightUrls(),
+  ]);
 
   return [
     // Core
@@ -86,88 +171,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.85,
     },
-
-    // Signature Experience detail pages
-    {
-      url: `${BASE_URL}/experiences/floating-salon-d-opera`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/experiences/beylerbeyi-1869`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/experiences/imperial-flavors`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/experiences/istanbul-through-the-lens`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/experiences/curated-art-salon`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/experiences/silk-road-istanbul`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/experiences/table-to-farm-bodrum`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/experiences/private-bosphorus-access`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.75,
-    },
-    {
-      url: `${BASE_URL}/experiences/closed-collection-viewing`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.75,
-    },
-    {
-      url: `${BASE_URL}/experiences/after-hours-palace`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.75,
-    },
-
-    // LAB Experience detail pages
-    {
-      url: `${BASE_URL}/experiences/the-studio-session`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.75,
-    },
-    {
-      url: `${BASE_URL}/experiences/cultural-immersion-lab`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.75,
-    },
-    {
-      url: `${BASE_URL}/experiences/narrative-workshop`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: 'monthly',
-      priority: 0.75,
-    },
+    ...experienceEntries,
 
     // Cultural Worlds — semantic SEO engine
     {
@@ -177,6 +181,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     ...culturalWorldEntries,
+    {
+      url: `${BASE_URL}/insights`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    ...insightEntries,
     // Core pages
     {
       url: `${BASE_URL}/philosophy`,

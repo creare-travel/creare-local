@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import sgMail from '@sendgrid/mail';
-import { getMailConfig } from '@/lib/email/config';
-
-interface ContactPayload {
-  name: string;
-  email: string;
-  message: string;
-  intent?: string;
-  experience_slug?: string;
-}
+import { type InquirySubmissionInput, validateInquirySubmission } from '@/lib/inquiry';
+import { submitInquiry } from '@/lib/email/submitInquiry';
 
 /**
  * POST /api/contact
@@ -16,64 +8,13 @@ interface ContactPayload {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body: ContactPayload = await request.json();
-
-    const { name, email, message, intent, experience_slug } = body;
-
-    // Validation
-    if (!name || typeof name !== 'string' || name.trim() === '') {
-      return NextResponse.json({ success: false, error: 'Name is required.' }, { status: 400 });
+    const body: InquirySubmissionInput = await request.json();
+    const validationError = validateInquirySubmission(body);
+    if (validationError) {
+      return NextResponse.json({ success: false, error: validationError }, { status: 400 });
     }
 
-    if (!email || typeof email !== 'string' || email.trim() === '') {
-      return NextResponse.json({ success: false, error: 'Email is required.' }, { status: 400 });
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      return NextResponse.json(
-        { success: false, error: 'A valid email address is required.' },
-        { status: 400 }
-      );
-    }
-
-    if (!message || typeof message !== 'string' || message.trim() === '') {
-      return NextResponse.json({ success: false, error: 'Message is required.' }, { status: 400 });
-    }
-
-    const intentLine = intent ? `Intent: ${intent}\n` : '';
-    const slugLine = experience_slug ? `Experience: ${experience_slug}\n` : '';
-
-    const ownerText = `New inquiry received via CREARE.\n\nName: ${name.trim()}\nEmail: ${email.trim()}\n${intentLine}${slugLine}Message:\n${message.trim()}`;
-    const userText = `${name.trim()},\n\nThank you.\n\nYour inquiry has been received and is being reviewed.\n\nWe will respond personally.\n\nCREARE`;
-
-    const mailConfig = getMailConfig();
-    if (!mailConfig.ok) {
-      console.error('[/api/contact] Mail configuration error:', mailConfig.error);
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Contact form is temporarily unavailable. Please try again later.',
-        },
-        { status: 503 }
-      );
-    }
-
-    sgMail.setApiKey(mailConfig.config.apiKey);
-
-    await Promise.all([
-      sgMail.send({
-        to: mailConfig.config.toEmail,
-        from: mailConfig.config.fromEmail,
-        subject: 'New Inquiry — CREARE',
-        text: ownerText,
-      }),
-      sgMail.send({
-        to: email.trim(),
-        from: mailConfig.config.fromEmail,
-        subject: 'Your inquiry has been received — CREARE',
-        text: userText,
-      }),
-    ]);
+    await submitInquiry(body);
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {
@@ -82,7 +23,17 @@ export async function POST(request: NextRequest) {
     }
 
     const error = err as Error;
-    console.error('[/api/contact] SendGrid error:', error);
+    console.error('[/api/contact] Inquiry processing error:', error);
+
+    if (error.message.startsWith('Mail service is not configured.')) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Contact form is temporarily unavailable. Please try again later.',
+        },
+        { status: 503 }
+      );
+    }
 
     if (process.env.NODE_ENV === 'development') {
       return NextResponse.json(
