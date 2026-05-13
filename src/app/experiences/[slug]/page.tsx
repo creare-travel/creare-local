@@ -53,6 +53,15 @@ interface StrapiDestination {
   slug?: string;
 }
 
+interface StrapiRelatedInsight {
+  id: number;
+  slug?: string;
+  title?: string;
+  excerpt?: string;
+  cover_image?: StrapiCoverImage | null;
+  destination?: StrapiDestination | null;
+}
+
 interface StrapiOntologyEntity {
   name?: string;
   slug?: string;
@@ -98,12 +107,50 @@ interface StrapiExperienceDetail {
   audience_entity?: StrapiOntologyEntity;
   experience_type_entity?: StrapiOntologyEntity;
   intensity_entity?: StrapiOntologyEntity;
+  related_experiences?: StrapiExperienceDetail[] | { data?: Record<string, unknown>[] };
+  related_insights?: StrapiRelatedInsight[] | { data?: Record<string, unknown>[] };
 }
 
 type StrapiExperienceResult =
   | { status: 'ok'; item: StrapiExperienceDetail }
   | { status: 'not_found' }
   | { status: 'error'; error: Error };
+
+function flattenItem<T>(raw: Record<string, unknown>): T {
+  if (raw?.attributes && typeof raw.attributes === 'object') {
+    return { id: raw.id, ...(raw.attributes as object) } as T;
+  }
+
+  return raw as T;
+}
+
+function normalizeRelationArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) {
+    return value.map((item) =>
+      item && typeof item === 'object' ? flattenItem<T>(item as Record<string, unknown>) : item
+    ) as T[];
+  }
+
+  if (value && typeof value === 'object' && Array.isArray((value as { data?: unknown[] }).data)) {
+    return ((value as { data: unknown[] }).data ?? []).map((item) =>
+      item && typeof item === 'object' ? flattenItem<T>(item as Record<string, unknown>) : item
+    ) as T[];
+  }
+
+  return [];
+}
+
+function normalizeSingleRelation<T>(value: unknown): T | null {
+  if (!value || typeof value !== 'object') return null;
+
+  if ('data' in (value as Record<string, unknown>)) {
+    const data = (value as { data?: unknown }).data;
+    if (!data || Array.isArray(data) || typeof data !== 'object') return null;
+    return flattenItem<T>(data as Record<string, unknown>);
+  }
+
+  return flattenItem<T>(value as Record<string, unknown>);
+}
 
 async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperienceResult> {
   try {
@@ -112,6 +159,10 @@ async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperien
       'populate[cover_image]': 'true',
       'populate[gallery]': 'true',
       'populate[destination]': 'true',
+      'populate[related_experiences][populate][cover_image]': 'true',
+      'populate[related_experiences][populate][destination]': 'true',
+      'populate[related_insights][populate][cover_image]': 'true',
+      'populate[related_insights][populate][destination]': 'true',
       'populate[mood_entity][fields][0]': 'name',
       'populate[mood_entity][fields][1]': 'slug',
       'populate[mood_entity][fields][2]': 'description',
@@ -144,7 +195,30 @@ async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperien
     if (!item) {
       return { status: 'not_found' };
     }
-    return { status: 'ok', item };
+    const cmsRelatedExperiences = normalizeRelationArray<StrapiExperienceDetail>(
+      item.related_experiences
+    ).map((experience) => ({
+      ...experience,
+      cover_image: normalizeSingleRelation<StrapiCoverImage>(experience.cover_image) ?? undefined,
+      destination: normalizeSingleRelation<StrapiDestination>(experience.destination) ?? undefined,
+    }));
+    const cmsRelatedInsights = normalizeRelationArray<StrapiRelatedInsight>(
+      item.related_insights
+    ).map((insight) => ({
+      ...insight,
+      cover_image: normalizeSingleRelation<StrapiCoverImage>(insight.cover_image) ?? undefined,
+      destination: normalizeSingleRelation<StrapiDestination>(insight.destination) ?? undefined,
+    }));
+
+    return {
+      status: 'ok',
+      item: {
+        ...item,
+        destination: normalizeSingleRelation<StrapiDestination>(item.destination) ?? undefined,
+        related_experiences: cmsRelatedExperiences,
+        related_insights: cmsRelatedInsights,
+      },
+    };
   } catch (error) {
     const normalizedError =
       error instanceof Error ? error : new Error('Unknown Strapi experience fetch failure');
@@ -270,6 +344,14 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
   const locationDisplay = getExperienceLocation(item);
   const programItems = extractParagraphs(item.program);
   const audienceItems = extractParagraphs(item.audience);
+  const cmsRelatedExperiences = normalizeRelationArray<StrapiExperienceDetail>(
+    item.related_experiences
+  )
+    .filter((experience) => experience.slug && experience.title && experience.slug !== slug)
+    .slice(0, 3);
+  const cmsRelatedInsights = normalizeRelationArray<StrapiRelatedInsight>(item.related_insights)
+    .filter((insight) => insight.slug && insight.title)
+    .slice(0, 3);
   const categoryLabel = item.category || item.tier || item.intent_level || '';
   const groupSize = item.group_size || (item.max_guests ? String(item.max_guests) : '');
   const navigableExperiences = experiences.filter((experience) => experience.category !== 'BLACK');
@@ -566,6 +648,98 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
 
       {/* ── GALLERY ── */}
       {item.gallery && item.gallery.length > 0 && <GallerySection images={item.gallery} />}
+
+      {(cmsRelatedExperiences.length > 0 || cmsRelatedInsights.length > 0) && (
+        <section className="py-20 md:py-24 bg-white" aria-label="Related editorial references">
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+            <div className="border-t border-neutral-200 pt-10">
+              {cmsRelatedExperiences.length > 0 && (
+                <div className={cmsRelatedInsights.length > 0 ? 'mb-16 md:mb-20' : ''}>
+                  <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
+                    Adjacent Experiences
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10">
+                    {cmsRelatedExperiences.map((experience, index) => {
+                      const imageUrl = getExperienceImageUrl(experience);
+                      const imageAlt = experience.cover_image?.alternativeText ?? experience.title;
+                      const relatedLocation =
+                        experience.destination?.name || experience.location_label || null;
+
+                      return (
+                        <Link
+                          key={experience.id}
+                          href={`/experiences/${experience.slug}`}
+                          className="group block"
+                          aria-label={`View adjacent experience: ${experience.title}`}
+                        >
+                          {imageUrl ? (
+                            <div className="relative aspect-[4/3] overflow-hidden mb-5 bg-neutral-100">
+                              <Image
+                                src={imageUrl}
+                                alt={imageAlt || 'Experience image'}
+                                fill
+                                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                                priority={index === 0}
+                                unoptimized={isLocalAssetUrl(imageUrl)}
+                              />
+                            </div>
+                          ) : null}
+                          {relatedLocation && (
+                            <p className="font-body text-[0.58rem] tracking-[0.18em] text-neutral-400 uppercase mb-2">
+                              {relatedLocation}
+                            </p>
+                          )}
+                          <h3 className="font-display font-light text-neutral-900 leading-snug mb-2 group-hover:opacity-70 transition-opacity duration-300">
+                            {experience.title}
+                          </h3>
+                          {experience.short_description && (
+                            <p className="font-body text-sm text-neutral-600 leading-relaxed">
+                              {experience.short_description}
+                            </p>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {cmsRelatedInsights.length > 0 && (
+                <div className="max-w-3xl">
+                  <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
+                    Further Cultural Reading
+                  </p>
+                  <div className="space-y-6">
+                    {cmsRelatedInsights.map((insight) => (
+                      <Link
+                        key={insight.id}
+                        href={`/insights/${insight.slug}`}
+                        className="group block border-b border-neutral-200/80 pb-6 last:border-b-0 last:pb-0"
+                        aria-label={`Read further cultural context: ${insight.title}`}
+                      >
+                        {insight.destination?.name && (
+                          <p className="font-body text-[0.58rem] tracking-[0.18em] text-neutral-400 uppercase mb-2">
+                            {insight.destination.name}
+                          </p>
+                        )}
+                        <h3 className="font-display font-light text-neutral-900 leading-snug mb-2 group-hover:opacity-70 transition-opacity duration-300">
+                          {insight.title}
+                        </h3>
+                        {insight.excerpt && (
+                          <p className="font-body text-sm text-neutral-600 leading-relaxed">
+                            {insight.excerpt}
+                          </p>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {(prevExperience || nextExperience) && (
         <section

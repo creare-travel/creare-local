@@ -85,6 +85,7 @@ interface StrapiDestination {
   cover_image?: StrapiImage | null;
   sections?: StrapiSection[] | { data?: Record<string, unknown>[] };
   experiences?: StrapiExperience[] | { data?: Record<string, unknown>[] };
+  secondary_experiences?: StrapiExperience[] | { data?: Record<string, unknown>[] };
   insights?: StrapiInsight[] | { data?: Record<string, unknown>[] };
 }
 
@@ -245,6 +246,20 @@ function buildRelatedExperiences(
   const primarySlugs = new Set(
     primaryExperiences.map((experience) => experience.slug).filter(Boolean)
   );
+  const cmsSecondaryExperiences = normalizeRelationArray<StrapiExperience>(
+    destination.secondary_experiences
+  )
+    .map((experience) =>
+      experience.slug ? fullExperienceIndex.get(experience.slug) || experience : experience
+    )
+    .filter(
+      (experience) => experience.slug && experience.title && !primarySlugs.has(experience.slug)
+    )
+    .map((experience, index) => ({
+      ...experience,
+      relationType: 'secondary' as const,
+      relationScore: 900 - index,
+    }));
   const preferredMoods = new Set(
     (context.preferredMoods ?? []).map((value) => value.toLowerCase())
   );
@@ -256,45 +271,48 @@ function buildRelatedExperiences(
     (context.secondaryExperienceSlugs ?? []).map((slug, index) => [slug, index] as const)
   );
 
-  const secondaryExperiences = allExperiences
-    .filter(
-      (experience) => experience.slug && experience.title && !primarySlugs.has(experience.slug)
-    )
-    .map((experience) => {
-      const slug = experience.slug as string;
-      const mood = experience.mood?.toLowerCase() ?? '';
-      const geoType = experience.geo_experience_type?.toLowerCase() ?? '';
-      const tags = normalizeTags(experience.tags);
+  const secondaryExperiences =
+    cmsSecondaryExperiences.length > 0
+      ? cmsSecondaryExperiences.slice(0, primaryExperiences.length > 0 ? 3 : 4)
+      : (allExperiences
+          .filter((experience) => {
+            return experience.slug && experience.title && !primarySlugs.has(experience.slug);
+          })
+          .map((experience) => {
+            const slug = experience.slug as string;
+            const mood = experience.mood?.toLowerCase() ?? '';
+            const geoType = experience.geo_experience_type?.toLowerCase() ?? '';
+            const tags = normalizeTags(experience.tags);
 
-      let score = 0;
+            let score = 0;
 
-      if (manualSecondary.has(slug)) {
-        score += 100 - (manualSecondary.get(slug) ?? 0);
-      }
+            if (manualSecondary.has(slug)) {
+              score += 100 - (manualSecondary.get(slug) ?? 0);
+            }
 
-      if (preferredMoods.has(mood)) score += 20;
-      if (preferredGeoTypes.has(geoType)) score += 20;
-      if (experience.destination?.slug && experience.destination.slug === destination.slug)
-        score += 12;
-      if (tags.some((tag) => preferredTags.has(tag))) score += 10;
+            if (preferredMoods.has(mood)) score += 20;
+            if (preferredGeoTypes.has(geoType)) score += 20;
+            if (experience.destination?.slug && experience.destination.slug === destination.slug)
+              score += 12;
+            if (tags.some((tag) => preferredTags.has(tag))) score += 10;
 
-      if (score <= 0) return null;
+            if (score <= 0) return null;
 
-      return {
-        ...experience,
-        relationType: 'secondary' as const,
-        relationScore: score,
-      };
-    })
-    .filter(Boolean)
-    .sort((left, right) => {
-      if ((right?.relationScore ?? 0) !== (left?.relationScore ?? 0)) {
-        return (right?.relationScore ?? 0) - (left?.relationScore ?? 0);
-      }
+            return {
+              ...experience,
+              relationType: 'secondary' as const,
+              relationScore: score,
+            };
+          })
+          .filter(Boolean)
+          .sort((left, right) => {
+            if ((right?.relationScore ?? 0) !== (left?.relationScore ?? 0)) {
+              return (right?.relationScore ?? 0) - (left?.relationScore ?? 0);
+            }
 
-      return (left?.title ?? '').localeCompare(right?.title ?? '');
-    })
-    .slice(0, primaryExperiences.length > 0 ? 3 : 4) as RelatedExperience[];
+            return (left?.title ?? '').localeCompare(right?.title ?? '');
+          })
+          .slice(0, primaryExperiences.length > 0 ? 3 : 4) as RelatedExperience[]);
 
   return [...primaryExperiences, ...secondaryExperiences];
 }
@@ -386,6 +404,8 @@ async function fetchDestination(slug: string): Promise<StrapiDestination | null>
   const params = new URLSearchParams({
     'filters[slug][$eq]': slug,
     populate: '*',
+    'populate[secondary_experiences][populate][cover_image]': 'true',
+    'populate[secondary_experiences][populate][destination]': 'true',
   });
   const path = `/api/destinations?${params.toString()}`;
 
@@ -408,6 +428,15 @@ async function fetchDestination(slug: string): Promise<StrapiDestination | null>
           ),
         })
       ),
+      secondary_experiences: normalizeRelationArray<StrapiExperience>(
+        destination.secondary_experiences
+      ).map((experience) => ({
+        ...experience,
+        cover_image: normalizeSingleRelation<StrapiImage>(experience.cover_image),
+        destination: normalizeSingleRelation<{ slug?: string; name?: string }>(
+          experience.destination
+        ),
+      })),
       insights: normalizeRelationArray<StrapiInsight>(destination.insights),
     };
   } catch (error) {
