@@ -94,8 +94,7 @@ async function fetchActiveCulturalWorldUrls() {
 }
 
 async function fetchCanonicalExperienceUrls() {
-  const path =
-    '/api/experiences?fields[0]=slug&fields[1]=category&pagination[pageSize]=100';
+  const path = '/api/experiences?fields[0]=slug&fields[1]=category&pagination[pageSize]=100';
 
   try {
     const json = await fetchStrapi(path);
