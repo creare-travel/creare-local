@@ -3,6 +3,7 @@ import HeroSection from '@/app/home/components/HeroSection';
 import CollectionsSection from '@/app/home/components/CollectionsSection';
 import JsonLd from '@/components/JsonLd';
 import { buildHomepageWebPageGraph } from '@/lib/schema-builder';
+import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Creare — Experiences Composed as Art',
@@ -26,10 +27,10 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://img.rocket.new/generatedImages/rocket_gen_img_167773a44-1775598260952.png',
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: 'Creare — Private Cultural Experiences Composed as Art',
+        alt: DEFAULT_OG_IMAGE_ALT,
       },
     ],
   },
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Creare — Experiences Composed as Art',
     description: 'Private cultural access. Thoughtfully designed encounters.',
-    images: ['https://crearetravel.com/og/default.jpg'],
+    images: [DEFAULT_OG_IMAGE],
   },
   robots: {
     index: true,

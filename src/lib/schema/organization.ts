@@ -1,8 +1,7 @@
 import type { SchemaNode } from './types';
 import { BRAND_ID, ORGANIZATION_ID, SITE_URL, WEBSITE_ID } from './utils';
 
-const LOGO_URL =
-  'https://img.rocket.new/generatedImages/rocket_gen_img_167773a44-1775598260952.png';
+const LOGO_URL = `${SITE_URL}/assets/images/app_logo.png`;
 
 export function buildOrganizationReference(): SchemaNode {
   return { '@id': ORGANIZATION_ID };

@@ -14,6 +14,7 @@ import {
   buildOrganizationSchema,
   buildWebSiteSchema,
 } from '@/lib/schema-builder';
+import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT } from '@/lib/seo';
 
 const isMaintenanceMode = process.env.NEXT_PUBLIC_SITE_MODE === 'maintenance';
 
@@ -60,10 +61,10 @@ export const metadata: Metadata = {
     url: 'https://crearetravel.com',
     images: [
       {
-        url: 'https://img.rocket.new/generatedImages/rocket_gen_img_167773a44-1775598260952.png',
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: 'Creare — Private Cultural Experiences Composed as Art',
+        alt: DEFAULT_OG_IMAGE_ALT,
       },
     ],
   },
@@ -75,7 +76,7 @@ export const metadata: Metadata = {
     description: isMaintenanceMode
       ? 'CREARE is finalizing a private portfolio of experiences designed for a limited circle of clients.'
       : 'Private cultural access. Thoughtfully designed encounters.',
-    images: ['https://crearetravel.com/og/default.jpg'],
+    images: [DEFAULT_OG_IMAGE],
   },
 };
 
