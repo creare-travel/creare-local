@@ -644,7 +644,6 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
             </p>
             <InquireCTA
               experienceSlug={slug}
-              experienceId={item.id}
               label={item.cta_text || 'Begin a Private Conversation'}
               className="border border-white/30 text-white hover:bg-white hover:text-neutral-900"
             />
@@ -682,7 +681,6 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
             </p>
             <InquireCTA
               experienceSlug={slug}
-              experienceId={item.id}
               label="INQUIRE PRIVATELY"
               className="bg-black text-white hover:bg-neutral-800"
             />
