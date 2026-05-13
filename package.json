@@ -2,6 +2,7 @@
   "name": "creare",
   "version": "0.1.0",
   "private": true,
+  "coderabbit-test": true,
   "rocketCritical": {
     "dependencies": [
       "next",
