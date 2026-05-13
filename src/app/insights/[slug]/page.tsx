@@ -14,7 +14,6 @@ import {
 import { buildCanonicalUrl, buildInsightDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 import { getInsightBySlug } from '@/data/insights';
-import { getExperienceBySlug } from '@/lib/experiences';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -175,26 +174,62 @@ async function fetchInsight(slug: string): Promise<StrapiInsight | null> {
   }
 }
 
+async function fetchExperiencesBySlugs(slugs: string[]): Promise<StrapiExperience[]> {
+  const uniqueSlugs = [...new Set(slugs.filter(Boolean))];
+  if (uniqueSlugs.length === 0) return [];
+
+  const params = new URLSearchParams();
+  uniqueSlugs.forEach((slug, index) => params.set(`filters[slug][$in][${index}]`, slug));
+  params.set('filters[visibility_status][$eqi]', 'active');
+  params.set('fields[0]', 'slug');
+  params.set('fields[1]', 'title');
+  params.set('fields[2]', 'short_description');
+  params.set('fields[3]', 'category');
+  params.set('fields[4]', 'duration');
+  params.set('fields[5]', 'location_label');
+  params.set('populate[cover_image]', 'true');
+  params.set('populate[destination]', 'true');
+  params.set('pagination[pageSize]', String(uniqueSlugs.length));
+
+  try {
+    const json = await fetchStrapi(`/api/experiences?${params.toString()}`);
+    const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
+    const entries: [string, StrapiExperience][] = items
+      .map((item) => flattenItem<StrapiExperience>(item))
+      .map((experience) => {
+        const normalizedExperience: StrapiExperience = {
+          ...experience,
+          cover_image: normalizeSingleRelation<NonNullable<StrapiExperience['cover_image']>>(
+            experience.cover_image
+          ),
+          destination: normalizeSingleRelation<NonNullable<StrapiExperience['destination']>>(
+            experience.destination
+          ),
+        };
+
+        return experience.slug
+          ? ([experience.slug, normalizedExperience] as [string, StrapiExperience])
+          : null;
+      })
+      .filter((entry): entry is [string, StrapiExperience] => Boolean(entry));
+    const bySlug = new Map(entries);
+
+    return uniqueSlugs
+      .map((slug) => bySlug.get(slug))
+      .filter((experience): experience is StrapiExperience => Boolean(experience));
+  } catch (error) {
+    console.error('Failed to fetch fallback related experiences from Strapi.', {
+      route: '/insights/[slug]',
+      slugs: uniqueSlugs,
+      error,
+    });
+    return [];
+  }
+}
+
 function buildStaticInsight(slug: string): ResolvedInsight | null {
   const insight = getInsightBySlug(slug);
   if (!insight) return null;
-
-  const relatedExperiences = insight.relatedExperiences
-    .map((experienceSlug, index) => {
-      const experience = getExperienceBySlug(experienceSlug);
-      if (!experience) return null;
-
-      return {
-        id: index + 1,
-        slug: experience.slug,
-        title: experience.title,
-        short_description: experience.intro,
-        category: experience.category,
-        duration: experience.duration,
-        location_label: experience.location,
-      } satisfies StrapiExperience;
-    })
-    .filter(Boolean) as StrapiExperience[];
 
   return {
     id: 0,
@@ -203,7 +238,7 @@ function buildStaticInsight(slug: string): ResolvedInsight | null {
     title: insight.title,
     excerpt: insight.description,
     content: insight.content,
-    experiences: relatedExperiences,
+    experiences: [],
     destination: insight.location
       ? {
           slug: insight.culturalWorldSlug,
@@ -241,6 +276,17 @@ async function resolveInsight(slug: string): Promise<ResolvedInsight | null> {
       experiences:
         strapiExperiences.length > 0 ? strapiExperiences : (staticInsight?.experiences ?? []),
       source: 'strapi',
+    };
+  }
+
+  if (staticInsight) {
+    const staticExperiences = await fetchExperiencesBySlugs(
+      getInsightBySlug(slug)?.relatedExperiences ?? []
+    );
+
+    return {
+      ...staticInsight,
+      experiences: staticExperiences,
     };
   }
 

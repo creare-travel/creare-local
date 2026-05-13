@@ -2,7 +2,6 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { experiences } from '@/lib/experiences';
 import JsonLd from '@/components/JsonLd';
 import ExperienceViewTracker from '@/components/experiences/ExperienceViewTracker';
 import GallerySection from '@/components/experiences/GallerySection';
@@ -51,6 +50,15 @@ interface StrapiGalleryImage {
 interface StrapiDestination {
   name?: string;
   slug?: string;
+}
+
+interface StrapiExperienceNavigationItem {
+  id: number;
+  slug?: string;
+  title?: string;
+  category?: string | null;
+  visibility_status?: string | null;
+  publishedAt?: string | null;
 }
 
 interface StrapiRelatedInsight {
@@ -112,7 +120,11 @@ interface StrapiExperienceDetail {
 }
 
 type StrapiExperienceResult =
-  | { status: 'ok'; item: StrapiExperienceDetail }
+  | {
+      status: 'ok';
+      item: StrapiExperienceDetail;
+      navigationItems: StrapiExperienceNavigationItem[];
+    }
   | { status: 'not_found' }
   | { status: 'error'; error: Error };
 
@@ -150,6 +162,41 @@ function normalizeSingleRelation<T>(value: unknown): T | null {
   }
 
   return flattenItem<T>(value as Record<string, unknown>);
+}
+
+async function fetchExperienceNavigationItems(
+  category?: string | null
+): Promise<StrapiExperienceNavigationItem[]> {
+  const params = new URLSearchParams({
+    'filters[visibility_status][$eqi]': 'active',
+    'fields[0]': 'slug',
+    'fields[1]': 'title',
+    'fields[2]': 'category',
+    'fields[3]': 'visibility_status',
+    'fields[4]': 'publishedAt',
+    'sort[0]': 'publishedAt:asc',
+    'sort[1]': 'title:asc',
+    'pagination[pageSize]': '200',
+  });
+
+  if (category) {
+    params.set('filters[category][$eqi]', category);
+  }
+
+  const json = await fetchStrapi(`/api/experiences?${params.toString()}`);
+  const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
+
+  return items
+    .map((item) => flattenItem<StrapiExperienceNavigationItem>(item))
+    .filter(
+      (item) =>
+        typeof item.slug === 'string' &&
+        item.slug.length > 0 &&
+        typeof item.title === 'string' &&
+        item.title.length > 0 &&
+        item.visibility_status?.toLowerCase() === 'active' &&
+        Boolean(item.publishedAt)
+    );
 }
 
 async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperienceResult> {
@@ -208,6 +255,7 @@ async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperien
       cover_image: normalizeSingleRelation<StrapiCoverImage>(insight.cover_image) ?? undefined,
       destination: normalizeSingleRelation<StrapiDestination>(insight.destination) ?? undefined,
     }));
+    const navigationItems = await fetchExperienceNavigationItems(item.category);
 
     return {
       status: 'ok',
@@ -217,6 +265,7 @@ async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperien
         related_experiences: cmsRelatedExperiences,
         related_insights: cmsRelatedInsights,
       },
+      navigationItems,
     };
   } catch (error) {
     const normalizedError =
@@ -337,7 +386,15 @@ function renderRichText(nodes: StrapiRichTextNode[]): React.ReactNode {
 }
 
 // ── Strapi detail page component ──────────────────────────────────────────────
-function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; slug: string }) {
+function StrapiExperiencePage({
+  item,
+  slug,
+  navigationItems,
+}: {
+  item: StrapiExperienceDetail;
+  slug: string;
+  navigationItems: StrapiExperienceNavigationItem[];
+}) {
   const coverUrl = getExperienceImageUrl(item);
   const coverAlt = item.cover_image?.alternativeText ?? item.title;
   const locationDisplay = getExperienceLocation(item);
@@ -353,12 +410,11 @@ function StrapiExperiencePage({ item, slug }: { item: StrapiExperienceDetail; sl
     .slice(0, 3);
   const categoryLabel = item.category || item.tier || item.intent_level || '';
   const groupSize = item.group_size || (item.max_guests ? String(item.max_guests) : '');
-  const navigableExperiences = experiences.filter((experience) => experience.category !== 'BLACK');
-  const currentNavIndex = navigableExperiences.findIndex((experience) => experience.slug === slug);
-  const prevExperience = currentNavIndex > 0 ? navigableExperiences[currentNavIndex - 1] : null;
+  const currentNavIndex = navigationItems.findIndex((experience) => experience.slug === slug);
+  const prevExperience = currentNavIndex > 0 ? navigationItems[currentNavIndex - 1] : null;
   const nextExperience =
-    currentNavIndex >= 0 && currentNavIndex < navigableExperiences.length - 1
-      ? navigableExperiences[currentNavIndex + 1]
+    currentNavIndex >= 0 && currentNavIndex < navigationItems.length - 1
+      ? navigationItems[currentNavIndex + 1]
       : null;
   const wowMoment = normalizeOptionalText(item.wow_moment);
   const differentiator = normalizeOptionalText(item.differentiator);
@@ -963,5 +1019,11 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
     return <div style={{ padding: 40 }}>Not found</div>;
   }
 
-  return <StrapiExperiencePage item={result.item} slug={slugValue} />;
+  return (
+    <StrapiExperiencePage
+      item={result.item}
+      slug={slugValue}
+      navigationItems={result.navigationItems}
+    />
+  );
 }
