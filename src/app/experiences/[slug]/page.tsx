@@ -162,7 +162,6 @@ async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperien
       'populate[related_experiences][populate][cover_image]': 'true',
       'populate[related_experiences][populate][destination]': 'true',
       'populate[related_insights][populate][cover_image]': 'true',
-      'populate[related_insights][populate][destination]': 'true',
       'populate[mood_entity][fields][0]': 'name',
       'populate[mood_entity][fields][1]': 'slug',
       'populate[mood_entity][fields][2]': 'description',
