@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import {
-  canonicalUrl,
+  buildMetadataAlternates,
   buildOpenGraph,
   buildTwitterCard,
   SITE_NAME,
@@ -227,9 +227,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: {
-      canonical: canonicalUrl(`/cultural-worlds/${slug}`),
-    },
+    alternates: buildMetadataAlternates(`/cultural-worlds/${slug}`),
     openGraph: buildOpenGraph({
       title,
       description,

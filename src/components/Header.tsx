@@ -79,14 +79,14 @@ export default function Header() {
         backdropFilter: `blur(${(scrollDensity * 3).toFixed(2)}px)`,
         boxShadow: `0 10px 34px rgba(0,0,0,${(scrollDensity * 0.04).toFixed(3)})`,
         transition:
-          'background-color 600ms cubic-bezier(0.16,1,0.3,1), box-shadow 600ms cubic-bezier(0.16,1,0.3,1), color 400ms ease',
+          'background-color var(--motion-standard) var(--ease-luxury), box-shadow var(--motion-standard) var(--ease-luxury), color var(--motion-hover) var(--ease-luxury)',
       }
     : {
         backgroundColor: `rgba(0,0,0,${(0.012 + scrollDensity * 0.032).toFixed(3)})`,
         backdropFilter: `blur(${(0.5 + scrollDensity * 3.5).toFixed(2)}px)`,
         boxShadow: 'none',
         transition:
-          'background-color 600ms cubic-bezier(0.16,1,0.3,1), box-shadow 600ms cubic-bezier(0.16,1,0.3,1), color 400ms ease',
+          'background-color var(--motion-standard) var(--ease-luxury), box-shadow var(--motion-standard) var(--ease-luxury), color var(--motion-hover) var(--ease-luxury)',
       };
 
   return (
@@ -119,12 +119,12 @@ export default function Header() {
             <Link
               key={item?.label}
               href={item?.href}
-              className={`group/nav relative font-body text-[0.7rem] font-medium uppercase tracking-[0.2em] transition-colors duration-500 ${navTone} ${navHoverTone}`}
+              className={`group/nav relative font-body text-[0.7rem] font-medium uppercase tracking-[0.2em] motion-link ${navTone} ${navHoverTone}`}
               aria-label={item?.label}
             >
               {item?.label}
               <span
-                className={`absolute left-0 -bottom-px h-px w-0 transition-all duration-[400ms] ease-out group-hover/nav:w-full ${navUnderlineTone}`}
+                className={`absolute left-0 -bottom-px h-px w-0 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/nav:w-full ${navUnderlineTone}`}
               />
             </Link>
           ))}

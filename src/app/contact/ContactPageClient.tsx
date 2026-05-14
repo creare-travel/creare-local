@@ -222,7 +222,7 @@ export default function ContactPageClient() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="View CREARE office location on Google Maps — 32G7+P8 Şişli, İstanbul"
-                    className="text-blue-400 font-body text-sm hover:text-blue-300 transition-colors duration-200"
+                    className="motion-link text-blue-400 font-body text-sm hover:text-blue-300"
                   >
                     📍 32G7+P8 Şişli, İstanbul
                   </a>
@@ -231,7 +231,7 @@ export default function ContactPageClient() {
                 <button
                   type="button"
                   aria-label="Request a meeting with CREARE"
-                  className="border border-white text-white bg-black font-body text-sm tracking-wide px-6 py-3 hover:bg-white hover:text-black transition-colors duration-300"
+                  className="motion-button-editorial border border-white bg-black px-6 py-3 font-body text-sm tracking-wide text-white hover:bg-white hover:text-black"
                 >
                   Speak with CREARE™
                 </button>
@@ -298,7 +298,7 @@ export default function ContactPageClient() {
                       onChange={handleChange}
                       placeholder="Name"
                       disabled={formStatus === 'loading'}
-                      className="bg-transparent border-0 border-b border-white/20 focus:border-white/50 outline-none text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-300 w-full disabled:opacity-50"
+                      className="bg-transparent border-0 border-b border-white/20 focus:border-white/50 outline-none text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] w-full disabled:opacity-50"
                     />
 
                     {errors.name && (
@@ -335,7 +335,7 @@ export default function ContactPageClient() {
                       onChange={handleChange}
                       placeholder="Email address"
                       disabled={formStatus === 'loading'}
-                      className="bg-transparent border-0 border-b border-white/20 focus:border-white/50 outline-none text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-300 w-full disabled:opacity-50"
+                      className="bg-transparent border-0 border-b border-white/20 focus:border-white/50 outline-none text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] w-full disabled:opacity-50"
                     />
 
                     {errors.email && (
@@ -364,7 +364,7 @@ export default function ContactPageClient() {
                             aria-pressed={isSelected}
                             onClick={() => toggleIntent(intent)}
                             disabled={formStatus === 'loading'}
-                            className={`px-4 py-2 rounded-full font-body text-sm transition-all duration-200 disabled:opacity-50 ${
+                            className={`motion-button-editorial rounded-full px-4 py-2 font-body text-sm disabled:opacity-50 ${
                               isSelected
                                 ? 'border border-white text-white'
                                 : 'border border-white/25 text-white/70 hover:border-white/50 hover:text-white'
@@ -393,7 +393,7 @@ export default function ContactPageClient() {
                       onChange={handleChange}
                       placeholder="Tell us about your vision..."
                       disabled={formStatus === 'loading'}
-                      className="bg-transparent border-0 border-b border-white/20 focus:border-white/50 outline-none text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-300 w-full resize-none disabled:opacity-50"
+                      className="bg-transparent border-0 border-b border-white/20 focus:border-white/50 outline-none text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] w-full resize-none disabled:opacity-50"
                     />
 
                     <p className="text-white/35 font-body text-xs mt-1">
@@ -407,7 +407,7 @@ export default function ContactPageClient() {
                       type="submit"
                       aria-label="Submit your private inquiry"
                       disabled={formStatus === 'loading'}
-                      className="text-white font-body text-sm tracking-[0.2em] uppercase text-left hover:text-white/70 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
+                      className="motion-link text-white font-body text-sm tracking-[0.2em] uppercase text-left hover:text-white/70 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
                     >
                       {formStatus === 'loading' ? (
                         <>

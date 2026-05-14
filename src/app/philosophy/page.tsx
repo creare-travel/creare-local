@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import JsonLd from '@/components/JsonLd';
 import { buildPhilosophyPageGraph } from '@/lib/schema-builder';
+import { buildMetadataAlternates } from '@/lib/seo';
 
 const SITE_URL = 'https://crearetravel.com';
 const OG_IMAGE = `${SITE_URL}/og/default.jpg`;
@@ -11,16 +12,7 @@ export const metadata: Metadata = {
   title: 'Philosophy',
   description:
     'The Creare philosophy. Why we exist, how we think, and what we believe about the nature of experience.',
-  alternates: {
-    canonical: `${SITE_URL}/philosophy`,
-    languages: {
-      en: `${SITE_URL}/philosophy`,
-      tr: `${SITE_URL}/philosophy`,
-      ru: `${SITE_URL}/philosophy`,
-      zh: `${SITE_URL}/philosophy`,
-      'x-default': `${SITE_URL}/philosophy`,
-    },
-  },
+  alternates: buildMetadataAlternates('/philosophy'),
   robots: { index: true, follow: true },
   openGraph: {
     title: 'Philosophy — Creare',
@@ -91,7 +83,7 @@ export default function PhilosophyPage() {
               <p>We are not in that business.</p>
               <p>
                 Creare creates the conditions for genuine encounter — between a person and a place,
-                a traveller and a culture, a moment and its full meaning.
+                a guest and a cultural world, a moment and its full meaning.
               </p>
             </div>
           </div>

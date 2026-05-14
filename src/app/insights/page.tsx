@@ -4,7 +4,7 @@ import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import { insights } from '@/data/insights';
 import {
-  canonicalUrl,
+  buildMetadataAlternates,
   buildOpenGraph,
   buildTwitterCard,
   SITE_NAME,
@@ -26,9 +26,7 @@ const insightsDescription =
 export const metadata: Metadata = {
   title: insightsTitle,
   description: insightsDescription,
-  alternates: {
-    canonical: canonicalUrl('/insights'),
-  },
+  alternates: buildMetadataAlternates('/insights'),
   openGraph: buildOpenGraph({
     title: insightsTitle,
     description: insightsDescription,
@@ -224,7 +222,8 @@ function InsightsList({
                   alt={insight.title}
                   fill
                   atmosphere="dark"
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  deliveryProfile="card"
+                  className="motion-media-drift object-cover"
                   priority={index === 0}
                   sizes="(max-width: 768px) 100vw, 672px"
                 />
@@ -235,7 +234,7 @@ function InsightsList({
                 {insight.destinationName}
               </p>
             )}
-            <h2 className="font-display text-lg sm:text-xl font-light text-white group-hover:text-white/70 transition-colors duration-300 mb-2 leading-snug">
+            <h2 className="motion-link font-display text-lg sm:text-xl font-light text-white group-hover:text-white/70 mb-2 leading-snug">
               {insight.title}
             </h2>
             {insight.excerpt && (
@@ -243,7 +242,7 @@ function InsightsList({
                 {insight.excerpt}
               </p>
             )}
-            <span className="font-body text-xs tracking-[0.12em] uppercase text-white/26 group-hover:text-white/60 transition-colors duration-300">
+            <span className="motion-link font-body text-xs tracking-[0.12em] uppercase text-white/26 group-hover:text-white/60">
               Read →
             </span>
           </Link>

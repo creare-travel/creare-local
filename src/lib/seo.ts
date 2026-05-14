@@ -13,8 +13,9 @@ export const SITE_NAME = 'Creare';
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og/default.jpg`;
 export const DEFAULT_OG_IMAGE_ALT = 'Creare — Private Cultural Experiences Composed as Art';
 
-// Supported languages for hreflang
-export const SUPPORTED_LANGUAGES = ['en', 'tr', 'ru', 'zh'];
+// Active hreflang foundation for current production. Future locales can be
+// added here once locale-specific routes are actually live.
+export const ACTIVE_HREFLANGS = ['en'] as const;
 
 export const DEFAULT_METADATA = {
   metadataBase: new URL(SITE_URL),
@@ -41,7 +42,7 @@ export function buildHreflangs(path: string) {
   const normalized = path.startsWith('/') ? path : `/${path}`;
   const alternates: Array<{ hrefLang: string; href: string }> = [];
 
-  SUPPORTED_LANGUAGES.forEach((lang) => {
+  ACTIVE_HREFLANGS.forEach((lang) => {
     alternates.push({
       hrefLang: lang,
       href: `${SITE_URL}${normalized}`,
@@ -54,6 +55,18 @@ export function buildHreflangs(path: string) {
   });
 
   return alternates;
+}
+
+export function buildMetadataAlternates(path: string) {
+  const canonical = canonicalUrl(path);
+
+  return {
+    canonical,
+    languages: {
+      en: canonical,
+      'x-default': canonical,
+    },
+  };
 }
 
 /**

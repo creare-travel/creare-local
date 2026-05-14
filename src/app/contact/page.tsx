@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import JsonLd from '@/components/JsonLd';
 import { buildContactPageGraph } from '@/lib/schema-builder';
+import { buildMetadataAlternates } from '@/lib/seo';
 import ContactPageClient from './ContactPageClient';
 
 const SITE_URL = 'https://crearetravel.com';
@@ -10,16 +11,7 @@ export const metadata: Metadata = {
   title: 'Contact — Private Inquiries',
   description:
     'For strategic engagements, private commissions, and confidential collaborations. CREARE responds personally to all inquiries.',
-  alternates: {
-    canonical: `${SITE_URL}/contact`,
-    languages: {
-      en: `${SITE_URL}/contact`,
-      tr: `${SITE_URL}/contact`,
-      ru: `${SITE_URL}/contact`,
-      zh: `${SITE_URL}/contact`,
-      'x-default': `${SITE_URL}/contact`,
-    },
-  },
+  alternates: buildMetadataAlternates('/contact'),
   robots: { index: true, follow: true },
   openGraph: {
     title: 'Contact — Private Inquiries — Creare',

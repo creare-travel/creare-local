@@ -5,6 +5,7 @@ import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { buildExperienceInquiryHref } from '@/lib/inquiry';
+import { buildMetadataAlternates } from '@/lib/seo';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   title: 'BLACK™ — Private Access',
   description:
     'Invitation-only. Rare access. Discreet execution. CREARE BLACK™ is reserved for those for whom exclusivity is not a preference — it is a requirement.',
-  alternates: { canonical: 'https://crearetravel.com/experiences/black' },
+  alternates: buildMetadataAlternates('/experiences/black'),
   robots: { index: false, follow: false },
   openGraph: {
     title: 'CREARE BLACK™ — Private Access',

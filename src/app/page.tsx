@@ -3,22 +3,13 @@ import HeroSection from '@/app/home/components/HeroSection';
 import CollectionsSection from '@/app/home/components/CollectionsSection';
 import JsonLd from '@/components/JsonLd';
 import { buildHomepageWebPageGraph } from '@/lib/schema-builder';
-import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT } from '@/lib/seo';
+import { buildMetadataAlternates, DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Creare — Experiences Composed as Art',
   description:
-    'Creare curates private cultural encounters across Turkey and beyond — monastery access, atelier visits, and extraordinary moments for discerning clients.',
-  alternates: {
-    canonical: 'https://crearetravel.com',
-    languages: {
-      en: 'https://crearetravel.com',
-      tr: 'https://crearetravel.com',
-      ru: 'https://crearetravel.com',
-      zh: 'https://crearetravel.com',
-      'x-default': 'https://crearetravel.com',
-    },
-  },
+    'Creare curates private cultural encounters through access, narrative, and composition — monastery entry, atelier visits, and extraordinary moments for discerning clients.',
+  alternates: buildMetadataAlternates('/'),
   openGraph: {
     title: 'Creare — Experiences Composed as Art',
     description: 'Private cultural access. Thoughtfully designed encounters.',

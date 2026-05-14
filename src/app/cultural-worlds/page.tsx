@@ -4,6 +4,7 @@ import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
 import JsonLd from '@/components/JsonLd';
 import { buildCulturalWorldCollectionGraph } from '@/lib/schema-builder';
+import { buildMetadataAlternates } from '@/lib/seo';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -14,16 +15,7 @@ export const metadata: Metadata = {
   title: 'Cultural Worlds — Creare',
   description:
     'Each destination is a world unto itself. Creare provides private cultural access to the deepest layers of extraordinary places shaped by history, ritual, and meaning.',
-  alternates: {
-    canonical: `${SITE_URL}/cultural-worlds`,
-    languages: {
-      en: `${SITE_URL}/cultural-worlds`,
-      tr: `${SITE_URL}/cultural-worlds`,
-      ru: `${SITE_URL}/cultural-worlds`,
-      zh: `${SITE_URL}/cultural-worlds`,
-      'x-default': `${SITE_URL}/cultural-worlds`,
-    },
-  },
+  alternates: buildMetadataAlternates('/cultural-worlds'),
   robots: { index: true, follow: true },
   openGraph: {
     title: 'Cultural Worlds — Creare',
@@ -179,7 +171,8 @@ export default async function CulturalWorldsPage() {
                     src={imageUrl}
                     alt={imageAlt}
                     fill
-                    className="object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.03]"
+                    deliveryProfile="cardPortrait"
+                    className="motion-media-drift object-cover"
                     priority={index === 0}
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
@@ -225,7 +218,7 @@ export default async function CulturalWorldsPage() {
                     </p>
                     {href && (
                       <span
-                        className="mt-6 inline-block font-body uppercase transition-colors duration-700 group-hover:text-white/60"
+                        className="motion-link mt-6 inline-block font-body uppercase group-hover:text-white/60"
                         style={{
                           fontSize: '0.6rem',
                           letterSpacing: '0.28em',

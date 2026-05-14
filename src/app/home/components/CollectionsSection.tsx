@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
+import { buildCloudinaryUrl } from '@/lib/cloudinary';
 
 interface CollectionFeature {
   label: string;
@@ -19,7 +20,9 @@ const collectionFeatures: CollectionFeature[] = [
     title: 'Curated cultural experiences.',
     description: 'Designed, tested, and ready to be lived.',
     href: '/experiences/signature',
-    image: 'https://images.unsplash.com/photo-1734970989502-aa1a2e284871',
+    image: buildCloudinaryUrl('creare/homepage/collections/signature/main', {
+      profile: 'hero',
+    }),
     alt: 'Ancient stone courtyard of a historic Ottoman palace with ornate architectural details and warm afternoon light',
     imageRight: true,
   },
@@ -63,12 +66,12 @@ export default function CollectionsSection() {
             </p>
             <Link
               href={collectionFeatures[0].href}
-              className="group/cta inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 transition-colors duration-700 ease-out hover:text-neutral-900 sm:tracking-[0.28em]"
+              className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
               aria-label="Explore SIGNATURE experiences"
             >
               <span className="relative inline-block">
                 Explore →
-                <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-all duration-700 ease-out group-hover/cta:w-full" />
+                <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
               </span>
             </Link>
           </div>
@@ -79,7 +82,9 @@ export default function CollectionsSection() {
                 alt={collectionFeatures[0].alt}
                 width={1200}
                 height={780}
-                className="h-auto w-full object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.022]"
+                deliveryProfile="hero"
+                className="motion-media-drift h-auto w-full object-cover"
+                sizes="(max-width: 1024px) 100vw, 66vw"
               />
             </div>
           </div>
@@ -98,7 +103,9 @@ export default function CollectionsSection() {
                 alt={collectionFeatures[1].alt}
                 width={1200}
                 height={780}
-                className="h-auto w-full object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.022]"
+                deliveryProfile="hero"
+                className="motion-media-drift h-auto w-full object-cover"
+                sizes="(max-width: 1024px) 100vw, 66vw"
               />
             </div>
           </div>
@@ -114,12 +121,12 @@ export default function CollectionsSection() {
             </p>
             <Link
               href={collectionFeatures[1].href}
-              className="group/cta inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 transition-colors duration-700 ease-out hover:text-neutral-900 sm:tracking-[0.28em]"
+              className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
               aria-label="Discover LAB experience design"
             >
               <span className="relative inline-block">
                 Discover →
-                <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-all duration-700 ease-out group-hover/cta:w-full" />
+                <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
               </span>
             </Link>
           </div>
@@ -143,12 +150,12 @@ export default function CollectionsSection() {
             </p>
             <Link
               href={collectionFeatures[2].href}
-              className="group/cta inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 transition-colors duration-700 ease-out hover:text-neutral-900 sm:tracking-[0.28em]"
+              className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
               aria-label="Request private access to BLACK experiences"
             >
               <span className="relative inline-block">
                 Request Private Access →
-                <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-all duration-700 ease-out group-hover/cta:w-full" />
+                <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
               </span>
             </Link>
           </div>
@@ -159,7 +166,9 @@ export default function CollectionsSection() {
                 alt={collectionFeatures[2].alt}
                 width={1200}
                 height={780}
-                className="h-auto w-full object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.022]"
+                deliveryProfile="hero"
+                className="motion-media-drift h-auto w-full object-cover"
+                sizes="(max-width: 1024px) 100vw, 66vw"
               />
             </div>
           </div>

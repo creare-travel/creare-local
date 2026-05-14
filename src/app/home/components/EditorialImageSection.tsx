@@ -15,7 +15,9 @@ export default function EditorialImageSection() {
               alt="Dramatic architectural stone arch corridor with dark atmospheric lighting"
               width={1200}
               height={700}
+              deliveryProfile="editorialWide"
               className="w-full h-auto object-cover"
+              sizes="(max-width: 1024px) 100vw, 896px"
             />
           </div>
         </div>

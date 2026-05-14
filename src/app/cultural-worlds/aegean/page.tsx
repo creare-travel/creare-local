@@ -1,16 +1,13 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-
-const SITE_URL = 'https://crearetravel.com';
+import { buildMetadataAlternates } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Aegean — Cultural World — Creare',
   description:
     'The Aegean is where civilisation, coastline, and continuity meet. Private cultural access shaped by the sea, archaeology, and the table.',
-  alternates: {
-    canonical: `${SITE_URL}/cultural-worlds/aegean`,
-  },
+  alternates: buildMetadataAlternates('/cultural-worlds/aegean'),
   robots: { index: false, follow: false },
 };
 

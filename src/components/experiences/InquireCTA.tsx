@@ -19,7 +19,7 @@ export default function InquireCTA({
   return (
     <Link
       href={href}
-      className={`inline-block font-body text-[0.65rem] tracking-[0.3em] uppercase px-10 py-4 transition-all duration-300 ${className}`}
+      className={`motion-button-editorial inline-block font-body text-[0.65rem] tracking-[0.3em] uppercase px-10 py-4 ${className}`}
       aria-label={label}
     >
       {label}

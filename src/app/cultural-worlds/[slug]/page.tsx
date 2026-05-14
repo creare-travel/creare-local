@@ -1,15 +1,14 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import { getCulturalWorldContext } from '@/lib/cultural-world-context';
+import { buildMetadataAlternates } from '@/lib/seo';
 import { buildCanonicalUrl, buildCulturalWorldDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
-
-const SITE_URL = 'https://crearetravel.com';
+import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 const FALLBACK_DESCRIPTION =
   'A cultural world composed through editorial destination content, related experiences, and further reading.';
 const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
@@ -465,9 +464,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title:
       destination.meta_title || `${destination.name || 'Destination'} — Cultural World — Creare`,
     description: destination.meta_description || destination.highlight || FALLBACK_DESCRIPTION,
-    alternates: {
-      canonical: `${SITE_URL}/cultural-worlds/${slug}`,
-    },
+    alternates: buildMetadataAlternates(`/cultural-worlds/${slug}`),
     robots: { index: true, follow: true },
   };
 }
@@ -565,17 +562,24 @@ export default async function CulturalWorldPage({ params }: Props) {
       body: section.body,
     })),
   });
+  const coverBlurDataUrl = buildCinematicBlurDataUrl(coverImageUrl, {
+    atmosphere: 'dark',
+    profile: 'hero',
+  });
 
   return (
     <main className="bg-black min-h-screen">
       <JsonLd id="cultural-world-detail-jsonld" schema={culturalWorldSchema} />
       <section className="relative w-full h-[90vh] min-h-[620px] flex items-end overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image
+          <AppImage
             src={coverImageUrl}
             alt={coverImageAlt}
             fill
             priority
+            blurDataURL={coverBlurDataUrl}
+            atmosphere="dark"
+            deliveryProfile="hero"
             className="object-cover hero-img-zoom"
             sizes="100vw"
             unoptimized={isLocalAssetUrl(coverImageUrl)}
@@ -726,7 +730,8 @@ export default async function CulturalWorldPage({ params }: Props) {
                         src={imageUrl}
                         alt={imageAlt}
                         fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        deliveryProfile="card"
+                        className="motion-media-drift object-cover"
                         priority={index < 2}
                         sizes="(max-width: 1024px) 100vw, 50vw"
                         unoptimized={isLocalAssetUrl(imageUrl)}
@@ -816,7 +821,7 @@ export default async function CulturalWorldPage({ params }: Props) {
           </p>
           <Link
             href="/contact"
-            className="inline-block font-body text-[0.65rem] tracking-[0.3em] text-white/70 uppercase border border-white/20 px-8 py-4 hover:border-white/50 hover:text-white transition-all duration-300"
+            className="motion-button-editorial inline-block border border-white/20 px-8 py-4 font-body text-[0.65rem] uppercase tracking-[0.3em] text-white/70 hover:border-white/50 hover:text-white"
             aria-label={`Begin a private conversation about ${destination.name || 'this destination'}`}
           >
             Begin a Private Conversation →

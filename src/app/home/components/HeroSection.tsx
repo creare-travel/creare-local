@@ -1,6 +1,12 @@
 import React from 'react';
 import AppImage from '@/components/ui/AppImage';
 import Link from 'next/link';
+import { buildCinematicBlurDataUrl } from '@/lib/lqip';
+
+const HERO_BLUR_DATA_URL = buildCinematicBlurDataUrl(
+  'https://img.rocket.new/generatedImages/rocket_gen_img_1a084ee29-1772851440502.png',
+  { atmosphere: 'dark', profile: 'hero' }
+);
 
 export default function HeroSection() {
   return (
@@ -14,6 +20,9 @@ export default function HeroSection() {
           alt="Italian monastery colonnade corridor with arched stone columns and terracotta floor"
           fill
           priority
+          deliveryProfile="hero"
+          blurDataURL={HERO_BLUR_DATA_URL}
+          atmosphere="dark"
           className="hero-img-zoom h-full w-full object-cover"
           sizes="100vw"
         />
@@ -48,12 +57,12 @@ export default function HeroSection() {
 
           <Link
             href="/contact"
-            className="hero-cta group/cta inline-flex min-h-11 items-center font-body text-[0.62rem] uppercase tracking-[0.24em] text-white/60 transition-colors duration-700 hover:text-white/90 sm:tracking-[0.3em]"
+            className="hero-cta group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.62rem] uppercase tracking-[0.24em] text-white/60 hover:text-white/90 sm:tracking-[0.3em]"
             aria-label="Inquire privately about CREARE experiences"
           >
             <span className="relative inline-block">
               Inquire Privately →
-              <span className="absolute -bottom-px left-0 h-px w-0 bg-white/50 transition-all duration-700 ease-out group-hover/cta:w-full" />
+              <span className="absolute -bottom-px left-0 h-px w-0 bg-white/50 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
             </span>
           </Link>
         </div>

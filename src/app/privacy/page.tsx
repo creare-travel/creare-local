@@ -1,12 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { buildMetadataAlternates } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description:
     'CREARE privacy policy — how we collect, use, and protect your personal information.',
-  alternates: { canonical: 'https://crearetravel.com/privacy' },
+  alternates: buildMetadataAlternates('/privacy'),
 };
 
 interface PolicySection {

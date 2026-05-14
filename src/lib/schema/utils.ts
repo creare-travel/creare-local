@@ -264,7 +264,7 @@ export function experienceIds(slug: string) {
     webpage: `${canonical}#webpage`,
     service: `${canonical}#service`,
     image: `${canonical}#image`,
-    itinerary: `${canonical}#itinerary`,
+    sequence: `${canonical}#encounter-sequence`,
     place: `${canonical}#place`,
     breadcrumbs: `${canonical}#breadcrumbs`,
   };

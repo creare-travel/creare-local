@@ -3,14 +3,21 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
+import AppImage from '@/components/ui/AppImage';
 import ExperienceViewTracker from '@/components/experiences/ExperienceViewTracker';
 import GallerySection from '@/components/experiences/GallerySection';
 import InquireCTA from '@/components/experiences/InquireCTA';
-import { buildTwitterCard, SITE_NAME } from '@/lib/seo';
+import { buildCloudinaryUrl } from '@/lib/cloudinary';
+import { buildMetadataAlternates, buildTwitterCard, SITE_NAME } from '@/lib/seo';
 import { buildExperienceDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
+import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 
 const SITE_URL = 'https://crearetravel.com';
+const GOVERNED_TABLE_TO_FARM_HERO_URL = buildCloudinaryUrl(
+  'creare/experiences/table-to-farm-bodrum/hero/main',
+  { profile: 'hero' }
+);
 
 // ── Strapi types ──────────────────────────────────────────────────────────────
 interface StrapiRichTextNode {
@@ -328,6 +335,14 @@ function getExperienceImageUrl(item: StrapiExperienceDetail) {
   return rawUrl ? mediaUrl(rawUrl) : null;
 }
 
+function getGovernedExperienceImageUrl(item: StrapiExperienceDetail, slug: string) {
+  if (slug === 'table-to-farm-bodrum') {
+    return GOVERNED_TABLE_TO_FARM_HERO_URL;
+  }
+
+  return getExperienceImageUrl(item);
+}
+
 function getExperienceDescription(item: StrapiExperienceDetail) {
   if (item.seo_description) return item.seo_description;
   if (item.short_description) return item.short_description;
@@ -395,7 +410,7 @@ function StrapiExperiencePage({
   slug: string;
   navigationItems: StrapiExperienceNavigationItem[];
 }) {
-  const coverUrl = getExperienceImageUrl(item);
+  const coverUrl = getGovernedExperienceImageUrl(item, slug);
   const coverAlt = item.cover_image?.alternativeText ?? item.title;
   const locationDisplay = getExperienceLocation(item);
   const programItems = extractParagraphs(item.program);
@@ -419,6 +434,9 @@ function StrapiExperiencePage({
   const wowMoment = normalizeOptionalText(item.wow_moment);
   const differentiator = normalizeOptionalText(item.differentiator);
   const experienceSchemaGraph = buildExperienceDetailGraph(item, slug);
+  const coverBlurDataUrl = coverUrl
+    ? buildCinematicBlurDataUrl(coverUrl, { atmosphere: 'dark', profile: 'hero' })
+    : undefined;
 
   // Build info bar items — only include if value exists
   const infoItems: { label: string; value: string }[] = [];
@@ -436,11 +454,14 @@ function StrapiExperiencePage({
       {coverUrl ? (
         <section className="relative w-full h-[80vh] min-h-[560px] flex items-end overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <Image
+            <AppImage
               src={coverUrl}
               alt={coverAlt || 'Experience image'}
               fill
               priority
+              blurDataURL={coverBlurDataUrl}
+              atmosphere="dark"
+              deliveryProfile="hero"
               className="object-cover object-center"
               sizes="100vw"
               unoptimized={isLocalAssetUrl(coverUrl)}
@@ -733,7 +754,7 @@ function StrapiExperiencePage({
                                 src={imageUrl}
                                 alt={imageAlt || 'Experience image'}
                                 fill
-                                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                className="motion-media-drift object-cover"
                                 sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                                 priority={index === 0}
                                 unoptimized={isLocalAssetUrl(imageUrl)}
@@ -745,7 +766,7 @@ function StrapiExperiencePage({
                               {relatedLocation}
                             </p>
                           )}
-                          <h3 className="font-display font-light text-neutral-900 leading-snug mb-2 group-hover:opacity-70 transition-opacity duration-300">
+                          <h3 className="motion-copy-fade font-display font-light text-neutral-900 leading-snug mb-2">
                             {experience.title}
                           </h3>
                           {experience.short_description && (
@@ -778,7 +799,7 @@ function StrapiExperiencePage({
                             {insight.destination.name}
                           </p>
                         )}
-                        <h3 className="font-display font-light text-neutral-900 leading-snug mb-2 group-hover:opacity-70 transition-opacity duration-300">
+                        <h3 className="motion-copy-fade font-display font-light text-neutral-900 leading-snug mb-2">
                           {insight.title}
                         </h3>
                         {insight.excerpt && (
@@ -807,7 +828,7 @@ function StrapiExperiencePage({
                 {prevExperience ? (
                   <Link
                     href={`/experiences/${prevExperience.slug}`}
-                    className="group flex flex-col gap-2 text-left hover:opacity-80 transition-opacity"
+                    className="group flex flex-col gap-2 text-left motion-link hover:opacity-80"
                     aria-label={`Previous experience: ${prevExperience.title}`}
                   >
                     <span className="font-body text-[0.58rem] tracking-[0.3em] text-white/40 uppercase">
@@ -832,7 +853,7 @@ function StrapiExperiencePage({
                 {nextExperience ? (
                   <Link
                     href={`/experiences/${nextExperience.slug}`}
-                    className="group flex flex-col gap-2 text-right hover:opacity-80 transition-opacity"
+                    className="group flex flex-col gap-2 text-right motion-link hover:opacity-80"
                     aria-label={`Next experience: ${nextExperience.title}`}
                   >
                     <span className="font-body text-[0.58rem] tracking-[0.3em] text-white/40 uppercase">
@@ -881,7 +902,7 @@ function StrapiExperiencePage({
                 href={`https://wa.me/+905412203000?text=I'm interested in ${encodeURIComponent(item.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase text-white/40 hover:text-white/70 transition-all duration-300"
+                className="motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase text-white/40 hover:text-white/70"
                 aria-label="Contact via WhatsApp"
               >
                 Contact via WhatsApp
@@ -918,7 +939,7 @@ function StrapiExperiencePage({
                 href={`https://wa.me/+905412203000?text=I'm interested in ${encodeURIComponent(item.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase text-neutral-400 hover:text-neutral-600 transition-all duration-300"
+                className="motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase text-neutral-400 hover:text-neutral-600"
                 aria-label="Contact via WhatsApp"
               >
                 Contact via WhatsApp
@@ -958,21 +979,12 @@ export async function generateMetadata({
 
   const ogTitle = strapiItem.seo_title ?? `${strapiItem.title} — CREARE`;
   const ogDescription = getExperienceDescription(strapiItem);
-  const coverUrl = getExperienceImageUrl(strapiItem);
+  const coverUrl = getGovernedExperienceImageUrl(strapiItem, slugValue);
 
   return {
     title: ogTitle,
     description: ogDescription,
-    alternates: {
-      canonical: `${SITE_URL}/experiences/${slugValue}`,
-      languages: {
-        en: `${SITE_URL}/experiences/${slugValue}`,
-        tr: `${SITE_URL}/experiences/${slugValue}`,
-        ru: `${SITE_URL}/experiences/${slugValue}`,
-        zh: `${SITE_URL}/experiences/${slugValue}`,
-        'x-default': `${SITE_URL}/experiences/${slugValue}`,
-      },
-    },
+    alternates: buildMetadataAlternates(`/experiences/${slugValue}`),
     robots: { index: true, follow: true },
     openGraph: {
       title: ogTitle,

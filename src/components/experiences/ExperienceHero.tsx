@@ -34,6 +34,7 @@ export default function ExperienceHero({
           alt={heroImageAlt}
           fill
           priority
+          deliveryProfile="hero"
           className="object-cover w-full h-full"
           sizes="100vw"
         />
@@ -87,7 +88,7 @@ export default function ExperienceHero({
             viewBox="0 0 16 16"
             fill="none"
             aria-hidden="true"
-            className="text-white/60 animate-bounce"
+            className="motion-float-subtle text-white/60"
           >
             <path
               d="M8 3v10M3 9l5 5 5-5"

@@ -121,17 +121,17 @@ function buildAudienceSchema(experience: StrapiExperience): SchemaNode | undefin
   };
 }
 
-function buildItineraryNode(
+function buildEncounterSequenceNode(
   experience: StrapiExperience,
-  itineraryId: string
+  sequenceId: string
 ): SchemaNode | undefined {
   const programItems = extractParagraphs(experience.program);
   if (!programItems.length) return undefined;
 
   return {
-    '@id': itineraryId,
+    '@id': sequenceId,
     '@type': 'ItemList',
-    name: `${experience.title} itinerary`,
+    name: `${experience.title} program structure`,
     itemListElement: programItems.map((step, index) => ({
       '@type': 'ListItem',
       position: index + 1,
@@ -176,7 +176,7 @@ export function buildExperienceDetailGraph(
         addressCountry: 'TR',
       })
     : undefined;
-  const itineraryNode = buildItineraryNode(experience, ids.itinerary);
+  const encounterSequenceNode = buildEncounterSequenceNode(experience, ids.sequence);
   const aboutThings = buildAboutThings(experience);
   const additionalProperties = [
     buildPropertyValue(
@@ -250,7 +250,7 @@ export function buildExperienceDetailGraph(
     },
     about: aboutThings.length > 0 ? aboutThings : undefined,
     additionalProperty: additionalProperties.length > 0 ? additionalProperties : undefined,
-    itinerary: itineraryNode ? { '@id': ids.itinerary } : undefined,
+    hasPart: encounterSequenceNode ? [{ '@id': ids.sequence }] : undefined,
   };
 
   const webpageNode = buildWebPageSchema({
@@ -283,7 +283,12 @@ export function buildExperienceDetailGraph(
     ids.breadcrumbs
   );
 
-  return [breadcrumbNode, imageObject, placeNode, itineraryNode, serviceNode, webpageNode].filter(
-    Boolean
-  ) as SchemaNode[];
+  return [
+    breadcrumbNode,
+    imageObject,
+    placeNode,
+    encounterSequenceNode,
+    serviceNode,
+    webpageNode,
+  ].filter(Boolean) as SchemaNode[];
 }

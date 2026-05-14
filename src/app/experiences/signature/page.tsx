@@ -6,6 +6,7 @@ import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { experiences as staticExperiences } from '@/lib/experiences';
+import { buildMetadataAlternates } from '@/lib/seo';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
 const SITE_URL = 'https://crearetravel.com';
@@ -16,16 +17,7 @@ export const metadata: Metadata = {
   title: 'Signature Experiences',
   description:
     'Each encounter is composed around culture, place and narrative. Discover the CREARE Signature collection.',
-  alternates: {
-    canonical: 'https://crearetravel.com/experiences/signature',
-    languages: {
-      en: 'https://crearetravel.com/experiences/signature',
-      tr: 'https://crearetravel.com/experiences/signature',
-      ru: 'https://crearetravel.com/experiences/signature',
-      zh: 'https://crearetravel.com/experiences/signature',
-      'x-default': 'https://crearetravel.com/experiences/signature',
-    },
-  },
+  alternates: buildMetadataAlternates('/experiences/signature'),
   robots: { index: true, follow: true },
   openGraph: {
     title: 'Signature Experiences — CREARE',

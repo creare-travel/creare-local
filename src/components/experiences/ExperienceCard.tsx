@@ -19,7 +19,8 @@ const ExperienceCard = memo(function ExperienceCard({ experience }: ExperienceCa
           alt={experience.heroImageAlt}
           fill
           loading="lazy"
-          className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+          deliveryProfile="card"
+          className="motion-media-drift object-cover w-full h-full"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         {/* Category badge */}
@@ -43,7 +44,7 @@ const ExperienceCard = memo(function ExperienceCard({ experience }: ExperienceCa
 
       {/* Title */}
       <h3
-        className="font-display font-light text-neutral-900 leading-snug mb-3 group-hover:opacity-70 transition-opacity duration-300"
+        className="motion-copy-fade font-display font-light text-neutral-900 leading-snug mb-3"
         style={{ fontSize: 'clamp(1.1rem, 2vw, 1.35rem)' }}
       >
         {experience.title}
@@ -55,7 +56,7 @@ const ExperienceCard = memo(function ExperienceCard({ experience }: ExperienceCa
       </p>
 
       {/* CTA */}
-      <span className="font-body text-[0.6rem] tracking-[0.28em] text-neutral-900 uppercase group-hover:opacity-50 transition-opacity duration-300">
+      <span className="motion-copy-fade font-body text-[0.6rem] tracking-[0.28em] text-neutral-900 uppercase">
         EXPLORE →
       </span>
     </>

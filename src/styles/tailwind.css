@@ -187,9 +187,9 @@ body {
   font-weight: 500;
   padding: 0.875rem 2rem;
   transition:
-    background 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
-    color 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
-    border-color 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+    background-color var(--motion-hover) var(--ease-luxury),
+    color var(--motion-hover) var(--ease-luxury),
+    border-color var(--motion-hover) var(--ease-luxury);
   cursor: pointer;
   font-family: var(--font-body);
 }
@@ -214,8 +214,9 @@ body {
   font-weight: 500;
   padding: 0.875rem 2rem;
   transition:
-    background 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
-    color 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+    background-color var(--motion-hover) var(--ease-luxury),
+    color var(--motion-hover) var(--ease-luxury),
+    border-color var(--motion-hover) var(--ease-luxury);
   cursor: pointer;
   font-family: var(--font-body);
 }
@@ -232,8 +233,8 @@ body {
   opacity: 0;
   transform: translateY(20px);
   transition:
-    opacity 1.1s cubic-bezier(0.2, 0.8, 0.2, 1),
-    transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+    opacity var(--motion-standard) var(--ease-luxury),
+    transform var(--motion-standard) var(--ease-luxury);
 }
 
 .reveal.visible {
@@ -252,6 +253,85 @@ body {
 }
 .reveal-delay-4 {
   transition-delay: 0.46s;
+}
+
+.motion-link {
+  transition: color var(--motion-hover) var(--ease-luxury);
+}
+
+.motion-link-underline {
+  transition:
+    color var(--motion-hover) var(--ease-luxury),
+    opacity var(--motion-hover) var(--ease-luxury);
+}
+
+.motion-link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+  transition:
+    width var(--motion-standard) var(--ease-luxury),
+    opacity var(--motion-hover) var(--ease-luxury);
+}
+
+.motion-link-underline:hover::after,
+.motion-link-underline:focus-visible::after {
+  width: 100%;
+}
+
+.motion-media-drift {
+  transition: transform var(--motion-standard) var(--ease-luxury);
+}
+
+.motion-media-drift:hover,
+.group:hover .motion-media-drift,
+.group:focus-within .motion-media-drift {
+  transform: scale(1.025);
+}
+
+.motion-copy-fade {
+  transition: opacity var(--motion-hover) var(--ease-luxury);
+}
+
+.motion-copy-fade:hover,
+.group:hover .motion-copy-fade,
+.group:focus-within .motion-copy-fade {
+  opacity: 0.72;
+}
+
+.motion-button-editorial {
+  transition:
+    background-color var(--motion-hover) var(--ease-luxury),
+    color var(--motion-hover) var(--ease-luxury),
+    border-color var(--motion-hover) var(--ease-luxury),
+    opacity var(--motion-hover) var(--ease-luxury),
+    transform var(--motion-hover) var(--ease-luxury);
+}
+
+.motion-button-editorial:hover,
+.motion-button-editorial:focus-visible {
+  transform: translateY(-1px);
+}
+
+@keyframes luxury-float {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.58;
+  }
+  50% {
+    transform: translateY(4px);
+    opacity: 0.72;
+  }
+}
+
+.motion-float-subtle {
+  animation: luxury-float 4.8s var(--ease-luxury) infinite;
 }
 
 /* ─────────────────────────────────────────────────────────────────

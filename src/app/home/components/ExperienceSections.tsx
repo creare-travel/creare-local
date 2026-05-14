@@ -48,7 +48,9 @@ function ExperienceCard({
             alt={alt}
             width={1200}
             height={700}
+            deliveryProfile="editorialWide"
             className="w-full h-auto object-cover"
+            sizes="(max-width: 1024px) 100vw, 896px"
           />
         </div>
       </div>

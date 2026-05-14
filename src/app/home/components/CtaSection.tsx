@@ -29,7 +29,7 @@ export default function CtaSection() {
       aria-label="Private inquiry call to action"
     >
       <div
-        className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 text-center transition-all duration-1000 ease-out"
+        className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 text-center transition-all duration-[var(--motion-standard)] ease-[var(--ease-luxury)]"
         style={{
           opacity: visible ? 1 : 0,
           transform: visible ? 'translateY(0)' : 'translateY(24px)',
@@ -55,9 +55,8 @@ export default function CtaSection() {
         </p>
         <Link
           href="/contact"
-          className="inline-block font-body text-[0.65rem] tracking-[0.3em] text-stone-900 uppercase border border-stone-900 px-10 py-4 bg-white hover:bg-stone-900 hover:text-white transition-all duration-300 hover:scale-105 active:scale-100"
+          className="motion-button-editorial inline-block border border-stone-900 bg-white px-10 py-4 font-body text-[0.65rem] uppercase tracking-[0.3em] text-stone-900 hover:bg-stone-900 hover:text-white"
           aria-label="Submit a private inquiry"
-          style={{ transitionProperty: 'background-color, color, transform' }}
         >
           PRIVATE INQUIRY
         </Link>

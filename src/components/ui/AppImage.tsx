@@ -2,6 +2,11 @@
 
 import React, { useState, useCallback, useMemo, memo, useEffect } from 'react';
 import Image from 'next/image';
+import {
+  cloudinaryLoader,
+  normalizeCloudinaryAsset,
+  type CloudinaryDeliveryProfile,
+} from '@/lib/cloudinary';
 
 interface AppImageProps {
   src: string;
@@ -20,6 +25,7 @@ interface AppImageProps {
   loading?: 'lazy' | 'eager';
   unoptimized?: boolean;
   atmosphere?: 'light' | 'dark' | 'neutral';
+  deliveryProfile?: CloudinaryDeliveryProfile;
   [key: string]: unknown;
 }
 
@@ -30,7 +36,7 @@ const AppImage = memo(function AppImage({
   height,
   className = '',
   priority = false,
-  quality = 85,
+  quality,
   placeholder = 'empty',
   blurDataURL,
   fill = false,
@@ -40,6 +46,7 @@ const AppImage = memo(function AppImage({
   loading = 'lazy',
   unoptimized = false,
   atmosphere = 'neutral',
+  deliveryProfile = 'default',
   ...props
 }: AppImageProps) {
   const [imageSrc, setImageSrc] = useState(src);
@@ -55,6 +62,19 @@ const AppImage = memo(function AppImage({
   // External URLs: let Next.js optimize them via remotePatterns (unoptimized=false by default)
   // Only force unoptimized if caller explicitly requests it
   const resolvedUnoptimized = unoptimized;
+  const normalizedAsset = useMemo(
+    () => normalizeCloudinaryAsset(imageSrc, { profile: deliveryProfile }),
+    [deliveryProfile, imageSrc]
+  );
+  const resolvedPlaceholder = blurDataURL ? 'blur' : placeholder;
+  const loader = useMemo(
+    () =>
+      normalizedAsset.isCloudinary
+        ? (loaderProps: Parameters<typeof cloudinaryLoader>[0]) =>
+            cloudinaryLoader(loaderProps, { profile: normalizedAsset.profile })
+        : undefined,
+    [normalizedAsset.isCloudinary, normalizedAsset.profile]
+  );
 
   const handleError = useCallback(() => {
     if (!hasError && imageSrc !== fallbackSrc) {
@@ -91,18 +111,19 @@ const AppImage = memo(function AppImage({
   }, [atmosphere, className, isLoaded, onClick]);
 
   const commonProps = {
-    src: imageSrc,
+    src: normalizedAsset.src,
     alt: alt || 'Image',
     className: imageClassName,
-    quality,
-    placeholder,
+    placeholder: resolvedPlaceholder,
     unoptimized: resolvedUnoptimized,
+    loader,
     onError: handleError,
     onLoad: handleLoad,
     onClick,
+    ...(typeof quality === 'number' ? { quality } : {}),
     // priority images are eager-loaded; non-priority respect the loading prop
     ...(priority ? { priority: true, loading: 'eager' as const } : { loading }),
-    ...(blurDataURL && placeholder === 'blur' ? { blurDataURL } : {}),
+    ...(blurDataURL && resolvedPlaceholder === 'blur' ? { blurDataURL } : {}),
   };
 
   if (fill) {

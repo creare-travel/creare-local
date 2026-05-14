@@ -1,11 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { buildMetadataAlternates } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Cookie Policy',
   description: 'CREARE cookie policy — how we use cookies and similar tracking technologies.',
-  alternates: { canonical: 'https://crearetravel.com/cookies' },
+  alternates: buildMetadataAlternates('/cookies'),
 };
 
 interface PolicySection {

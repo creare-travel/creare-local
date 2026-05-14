@@ -70,7 +70,7 @@ export default function CTASection({
         <Link
           href={resolvedHref}
           onClick={handleCtaClick}
-          className={`inline-block font-body text-[0.65rem] tracking-[0.3em] uppercase px-10 py-4 transition-all duration-300 ${btnClass}`}
+          className={`motion-button-editorial inline-block font-body text-[0.65rem] tracking-[0.3em] uppercase px-10 py-4 ${btnClass}`}
           aria-label={buttonLabel}
         >
           {buttonLabel}
@@ -81,7 +81,7 @@ export default function CTASection({
               href={`https://wa.me/+905412203000?text=I'm interested in ${encodeURIComponent(experienceTitle)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className={`inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase transition-all duration-300 ${dark ? 'text-white/40 hover:text-white/70' : 'text-neutral-400 hover:text-neutral-600'}`}
+              className={`motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase ${dark ? 'text-white/40 hover:text-white/70' : 'text-neutral-400 hover:text-neutral-600'}`}
               aria-label="Contact via WhatsApp"
             >
               Contact via WhatsApp

@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import {
+  buildMetadataAlternates,
   canonicalUrl,
   buildOpenGraph,
   buildTwitterCard,
@@ -14,6 +15,7 @@ import {
 import { buildCanonicalUrl, buildInsightDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 import { getInsightBySlug } from '@/data/insights';
+import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -312,9 +314,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: {
-      canonical: canonicalUrl(`/insights/${canonicalSlug}`),
-    },
+    alternates: buildMetadataAlternates(`/insights/${canonicalSlug}`),
     openGraph: buildOpenGraph({
       title,
       description,
@@ -434,7 +434,8 @@ function RelatedExperienceCard({
           fill
           priority={priority}
           atmosphere="dark"
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          deliveryProfile="card"
+          className="motion-media-drift object-cover"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         {experience.category && (
@@ -468,7 +469,7 @@ function RelatedExperienceCard({
       {/* Title */}
       {experience.title && (
         <h3
-          className="font-display font-light text-white leading-snug mb-2 group-hover:opacity-70 transition-opacity duration-300"
+          className="motion-copy-fade font-display font-light text-white leading-snug mb-2"
           style={{ fontSize: 'clamp(1rem, 2vw, 1.2rem)' }}
         >
           {experience.title}
@@ -482,7 +483,7 @@ function RelatedExperienceCard({
         </p>
       )}
 
-      <span className="font-body text-[0.6rem] tracking-[0.2em] text-white/52 uppercase group-hover:opacity-50 transition-opacity duration-300">
+      <span className="motion-copy-fade font-body text-[0.6rem] tracking-[0.2em] text-white/52 uppercase">
         EXPLORE →
       </span>
     </>
@@ -520,6 +521,10 @@ export default async function InsightArticlePage({ params }: Props) {
   // Image: fallback to owned placeholder if cover_image is missing
   const coverImageUrl = resolveImageUrl(insight.cover_image?.url);
   const coverImageAlt = insight.cover_image?.alternativeText || insight.title || 'Insight cover';
+  const coverBlurDataUrl = buildCinematicBlurDataUrl(coverImageUrl, {
+    atmosphere: 'dark',
+    profile: 'hero',
+  });
 
   // Destination: safe optional chaining
   const destinationName = insight.destination?.name || '';
@@ -564,8 +569,11 @@ export default async function InsightArticlePage({ params }: Props) {
           alt={coverImageAlt}
           fill
           priority
+          blurDataURL={coverBlurDataUrl}
           atmosphere="dark"
+          deliveryProfile="hero"
           className="object-cover"
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black" />
       </div>

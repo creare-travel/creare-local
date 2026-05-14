@@ -6,6 +6,7 @@ import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { buildExperienceInquiryHref } from '@/lib/inquiry';
+import { buildMetadataAlternates } from '@/lib/seo';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -14,16 +15,7 @@ export const metadata: Metadata = {
   title: 'LAB™ — Experimental Experiences',
   description:
     'Co-created, dynamic and exploratory. CREARE LAB™ is where cultural experiences are designed from scratch — open-ended, experimental, and built around your brief.',
-  alternates: {
-    canonical: 'https://crearetravel.com/experiences/lab',
-    languages: {
-      en: 'https://crearetravel.com/experiences/lab',
-      tr: 'https://crearetravel.com/experiences/lab',
-      ru: 'https://crearetravel.com/experiences/lab',
-      zh: 'https://crearetravel.com/experiences/lab',
-      'x-default': 'https://crearetravel.com/experiences/lab',
-    },
-  },
+  alternates: buildMetadataAlternates('/experiences/lab'),
   robots: { index: true, follow: true },
   openGraph: {
     title: 'CREARE LAB™ — Experimental Experiences',
