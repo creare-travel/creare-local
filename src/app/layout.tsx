@@ -4,11 +4,12 @@ import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import GoogleTagManager from '@/components/GoogleTagManager';
 import RevealObserver from '@/components/RevealObserver';
 import UnderConstruction from '@/components/UnderConstruction';
 import { LanguageProvider } from '@/context/LanguageContext';
-import GoogleAnalytics from '@/components/GoogleAnalytics';
 import JsonLd from '@/components/JsonLd';
+import { GTM_ID, isGtmEnabled } from '@/lib/analytics/gtm';
 import {
   buildBrandSchema,
   buildOrganizationSchema,
@@ -85,12 +86,23 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <head>
         {/* Preconnect to external image CDNs for faster LCP */}
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="preconnect" href="https://img.rocket.new" />
       </head>
       <body className="bg-black text-white antialiased">
+        {isGtmEnabled() ? (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+              height="0"
+              width="0"
+              style={{ display: 'none', visibility: 'hidden' }}
+            />
+          </noscript>
+        ) : null}
         <Suspense fallback={null}>
-          <GoogleAnalytics />
+          <GoogleTagManager />
         </Suspense>
         <JsonLd id="global-schema-jsonld" schema={globalSchemaGraph} />
         <LanguageProvider>

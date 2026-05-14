@@ -42,7 +42,6 @@ Open [http://localhost:4028](http://localhost:4028) in your browser.
 
 | Variable                        | Required  | Description                                                    |
 | ------------------------------- | --------- | -------------------------------------------------------------- |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Optional  | GA4 Measurement ID (e.g. `G-XXXXXXXXXX`). App runs without it. |
 | `SENDGRID_API_KEY`              | For email | SendGrid API key for contact form emails.                      |
 | `CONTACT_EMAIL`                 | For email | Verified sender/recipient email for SendGrid.                  |
 | `NEXT_PUBLIC_SUPABASE_URL`      | Optional  | Supabase project URL.                                          |
@@ -52,7 +51,6 @@ All other variables (`OPENAI_API_KEY`, `STRIPE_*`, etc.) are optional and only n
 
 ### Mock / Fallback Behaviour
 
-- **Google Analytics** — If `NEXT_PUBLIC_GA_MEASUREMENT_ID` is missing or set to a placeholder like `G-XXXXXXXXXX`, GA simply won't fire. No errors, no crashes.
 - **SendGrid** — If `SENDGRID_API_KEY` is a mock value, contact form submissions will return an API error. The UI handles this gracefully with an error state.
 
 ---
