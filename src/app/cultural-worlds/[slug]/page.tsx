@@ -136,6 +136,15 @@ function resolveImageUrl(image?: StrapiImage | null): string {
   return rawUrl ? mediaUrl(rawUrl) : IMAGE_FALLBACK;
 }
 
+function buildLocalHeroImage(imageUrl?: string, imageAlt?: string): StrapiImage | null {
+  if (!imageUrl) return null;
+
+  return {
+    url: imageUrl,
+    alternativeText: imageAlt,
+  };
+}
+
 function normalizeTags(value: unknown): string[] {
   if (Array.isArray(value)) {
     return value
@@ -492,6 +501,7 @@ export default async function CulturalWorldPage({ params }: Props) {
   }
 
   const localContent = getCulturalWorldContent(slug);
+  const localHeroImage = buildLocalHeroImage(localContent?.heroImage, localContent?.heroImageAlt);
   const mergedDestination: StrapiDestination = {
     ...destination,
     name: destination.name || localContent?.title,
@@ -500,6 +510,7 @@ export default async function CulturalWorldPage({ params }: Props) {
     intro_text: localContent?.heroStatement || destination.intro_text,
     meta_title: localContent?.metaTitle || destination.meta_title,
     meta_description: localContent?.metaDescription || destination.meta_description,
+    cover_image: localHeroImage ?? destination.cover_image ?? null,
   };
 
   const cmsSections = normalizeRelationArray<StrapiSection>(destination.sections)
