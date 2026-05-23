@@ -136,8 +136,14 @@ function resolveImageUrl(image?: StrapiImage | null): string {
   return rawUrl ? mediaUrl(rawUrl) : IMAGE_FALLBACK;
 }
 
+function isApprovedLocalHeroPath(imageUrl?: string): boolean {
+  return Boolean(
+    imageUrl && ['/assets/', '/images/', '/uploads/'].some((prefix) => imageUrl.startsWith(prefix))
+  );
+}
+
 function buildLocalHeroImage(imageUrl?: string, imageAlt?: string): StrapiImage | null {
-  if (!imageUrl) return null;
+  if (!imageUrl || !isApprovedLocalHeroPath(imageUrl)) return null;
 
   return {
     url: imageUrl,
@@ -510,7 +516,7 @@ export default async function CulturalWorldPage({ params }: Props) {
     intro_text: localContent?.heroStatement || destination.intro_text,
     meta_title: localContent?.metaTitle || destination.meta_title,
     meta_description: localContent?.metaDescription || destination.meta_description,
-    cover_image: localHeroImage ?? destination.cover_image ?? null,
+    cover_image: destination.cover_image ?? localHeroImage ?? null,
   };
 
   const cmsSections = normalizeRelationArray<StrapiSection>(destination.sections)

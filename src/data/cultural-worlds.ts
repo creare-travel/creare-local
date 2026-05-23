@@ -20,8 +20,8 @@ export interface CulturalWorldContent {
   title: string;
   shortDescription: string;
   heroStatement: string;
-  heroImage: string;
-  heroImageAlt: string;
+  heroImage?: string;
+  heroImageAlt?: string;
   metaTitle: string;
   metaDescription: string;
   sections: CulturalWorldSection[];
@@ -36,9 +36,6 @@ export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
     shortDescription:
       'A layered cultural world of water, thresholds, imperial memory, and private interiors still shaped by living custodianship.',
     heroStatement: 'Where water, empire, and private interiors remain in active conversation.',
-    heroImage: 'https://images.unsplash.com/photo-1637156620944-a0609ba4b028',
-    heroImageAlt:
-      'Grand Ottoman palace interior with gilded ceilings, crystal chandeliers, and layered architectural detail in Istanbul',
     metaTitle: 'Istanbul — Cultural World — Creare',
     metaDescription:
       'A layered cultural world of Bosphorus crossings, Ottoman and Byzantine memory, private interiors, and encounters shaped through access, pace, and cultural intelligence.',
@@ -83,9 +80,6 @@ export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
     shortDescription:
       'An Aegean cultural world shaped by Halicarnassus, maritime routes, cultivated tables, and the slower codes of the peninsula.',
     heroStatement: 'An Aegean peninsula of Halicarnassus, maritime rhythm, and cultivated quiet.',
-    heroImage: 'https://images.unsplash.com/photo-1587240852847-64aa45b0a993',
-    heroImageAlt:
-      'Whitewashed Bodrum hillside above the turquoise Aegean with maritime inlets and wind-shaped coastal light',
     metaTitle: 'Bodrum — Cultural World — Creare',
     metaDescription:
       'An Aegean cultural world of Halicarnassus, maritime routes, olive groves, underwater archaeology, and composed encounters shaped by the peninsula rather than resort surface.',
@@ -129,9 +123,6 @@ export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
     shortDescription:
       'A cultural world of carved stone, subterranean life, rock monasteries, and volcanic craft traditions paced by geological time.',
     heroStatement: 'A landscape of carved stone, subterranean life, and volcanic memory.',
-    heroImage: 'https://images.unsplash.com/photo-1574624779046-a3839ec6a1a0',
-    heroImageAlt:
-      'Sculpted stone terrain at first light with weathered rock formations and a geological horizon evocative of Cappadocia',
     metaTitle: 'Cappadocia — Cultural World — Creare',
     metaDescription:
       'A cultural world of carved stone, subterranean settlements, rock monasteries, volcanic craft traditions, and encounters shaped by silence, scale, and geological time.',
