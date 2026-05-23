@@ -19,6 +19,8 @@ export type GTMEventName = GTMInitialEventName | GTMLegacyEventName;
 interface GTMEventBase {
   event: GTMEventName;
   page_path?: string;
+  page_title?: string;
+  page_location?: string;
 }
 
 export interface GTMPageViewEvent extends GTMEventBase {
@@ -40,9 +42,9 @@ export interface GTMExperienceViewEvent extends GTMEventBase {
 
 export interface GTMInquiryClickEvent extends GTMEventBase {
   event: 'inquiry_click';
-  label: string;
+  cta_label: string;
+  inquiry_source?: string;
   experience_slug?: string;
-  source?: string;
   intent_level?: 'low' | 'medium' | 'high';
   experience_type?: 'signature' | 'lab' | 'black';
   session_origin?: 'experience_entry' | 'direct';
@@ -52,9 +54,9 @@ export interface GTMInquiryClickEvent extends GTMEventBase {
 
 export interface GTMContactSubmitEvent extends GTMEventBase {
   event: 'contact_submit';
-  experience_slug?: string;
-  source?: string;
   form_id?: string;
+  form_status?: 'success';
+  experience_slug?: string;
   intent_level?: 'low' | 'medium' | 'high';
   experience_type?: 'signature' | 'lab' | 'black';
   session_origin?: 'experience_entry' | 'direct';
@@ -63,7 +65,9 @@ export interface GTMContactSubmitEvent extends GTMEventBase {
 
 export interface GTMOutboundClickEvent extends GTMEventBase {
   event: 'outbound_click';
-  destination_url: string;
+  outbound_url: string;
+  outbound_domain?: string;
+  destination_url?: string;
   label?: string;
   source?: string;
 }

@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import OutboundLink from '@/components/analytics/OutboundLink';
 import {
   trackFormStart,
   trackFormSubmit,
@@ -217,15 +218,17 @@ export default function ContactPageClient() {
                   Buyukdere Cd. No.175
                 </p>
                 <p className="mb-4">
-                  <a
+                  <OutboundLink
                     href="https://maps.google.com/?q=32G7%2BP8+%C5%9Ei%C5%9Fli,+%C4%B0stanbul"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="View CREARE office location on Google Maps — 32G7+P8 Şişli, İstanbul"
                     className="motion-link text-blue-400 font-body text-sm hover:text-blue-300"
+                    trackingLabel="contact_google_maps"
+                    trackingSource="contact_page"
                   >
                     📍 32G7+P8 Şişli, İstanbul
-                  </a>
+                  </OutboundLink>
                 </p>
                 <p className="text-white font-body text-sm mb-6">Meetings by appointment only.</p>
                 <button

@@ -6,6 +6,12 @@ type SessionOrigin = 'experience_entry' | 'direct';
 type CtaPosition = 'hero' | 'inline' | 'footer';
 type ContentContext = 'luxury' | 'cultural_depth' | 'experimental';
 
+interface PageContext {
+  page_path: string;
+  page_title?: string;
+  page_location?: string;
+}
+
 function getExperienceType(slug: string | null | undefined): ExperienceType | undefined {
   if (slug === 'signature' || slug === 'lab' || slug === 'black') return slug;
   return undefined;
@@ -15,6 +21,33 @@ function getSessionOrigin(): SessionOrigin {
   if (typeof window === 'undefined') return 'direct';
   const parts = window.location.pathname.split('/');
   return parts[1] === 'experiences' && parts[2] ? 'experience_entry' : 'direct';
+}
+
+function getPageContext(pagePath?: string): PageContext {
+  if (typeof window === 'undefined') {
+    return {
+      page_path: pagePath ?? '',
+    };
+  }
+
+  const resolvedPath = pagePath ?? window.location.pathname;
+
+  return {
+    page_path: resolvedPath,
+    page_title: document.title || undefined,
+    page_location: window.location.href,
+  };
+}
+
+function getOutboundDomain(url: string): string | undefined {
+  if (!url) return undefined;
+
+  try {
+    const baseOrigin = typeof window !== 'undefined' ? window.location.origin : undefined;
+    return new URL(url, baseOrigin).hostname;
+  } catch {
+    return undefined;
+  }
 }
 
 function buildIntelligenceParams(opts: {
@@ -50,12 +83,12 @@ export function getExperienceSlug(): string {
 }
 
 export function trackEvent(eventName: GTMLegacyEventName, params: Record<string, unknown> = {}) {
-  const pagePath =
-    params.page_path ?? (typeof window !== 'undefined' ? window.location.pathname : undefined);
+  const pagePath = typeof params.page_path === 'string' ? params.page_path : undefined;
+  const pageContext = getPageContext(pagePath);
 
   pushDataLayerEvent({
     event: eventName,
-    ...(pagePath ? { page_path: String(pagePath) } : {}),
+    ...pageContext,
     ...params,
   });
 }
@@ -63,7 +96,7 @@ export function trackEvent(eventName: GTMLegacyEventName, params: Record<string,
 export function trackPageView(url: string) {
   pushDataLayerEvent({
     event: 'page_view',
-    page_path: url,
+    ...getPageContext(url),
   });
 }
 
@@ -78,7 +111,7 @@ export interface ExperienceViewParams {
 export function trackExperienceView(params: ExperienceViewParams) {
   pushDataLayerEvent({
     event: 'experience_view',
-    page_path: typeof window !== 'undefined' ? window.location.pathname : undefined,
+    ...getPageContext(),
     experience_slug: params.experience_slug,
     experience_title: params.experience_title ?? '',
     experience_category: params.experience_category ?? '',
@@ -101,17 +134,16 @@ export interface CtaClickParams {
 }
 
 export function trackCtaClick(params: CtaClickParams) {
-  const resolvedPath =
-    params.page_path ?? (typeof window !== 'undefined' ? window.location.pathname : '');
+  const pageContext = getPageContext(params.page_path);
   const resolvedSlug =
     params.experience_slug !== undefined ? params.experience_slug : getExperienceSlug();
 
   pushDataLayerEvent({
     event: 'inquiry_click',
-    page_path: resolvedPath,
-    label: params.label,
+    ...pageContext,
+    cta_label: params.label,
+    inquiry_source: params.source ?? 'unknown',
     experience_slug: resolvedSlug,
-    source: params.source ?? 'unknown',
     ...buildIntelligenceParams({
       intent_level: 'medium',
       slug: resolvedSlug,
@@ -164,8 +196,7 @@ export function trackFormSubmit(params: FormEventParams = {}) {
 }
 
 export function trackFormSuccess(params: FormEventParams = {}) {
-  const resolvedPath =
-    params.page_path ?? (typeof window !== 'undefined' ? window.location.pathname : '');
+  const pageContext = getPageContext(params.page_path);
   const resolvedSlug =
     params.experience_slug !== undefined ? params.experience_slug : getExperienceSlug();
   const intelligence = buildIntelligenceParams({
@@ -176,15 +207,15 @@ export function trackFormSuccess(params: FormEventParams = {}) {
 
   pushDataLayerEvent({
     event: 'contact_submit',
-    page_path: resolvedPath,
-    experience_slug: resolvedSlug,
-    source: params.source ?? 'contact_page',
+    ...pageContext,
     form_id: params.form_id ?? 'inquiry_form',
+    form_status: 'success',
+    experience_slug: resolvedSlug,
     ...intelligence,
   });
 
   trackEvent('form_success', {
-    page_path: resolvedPath,
+    ...pageContext,
     experience_slug: resolvedSlug,
     source: params.source ?? 'contact_page',
     form_id: params.form_id ?? 'inquiry_form',
@@ -206,16 +237,22 @@ export function trackFormError(params: FormEventParams & { error_message?: strin
 }
 
 export interface OutboundClickParams {
-  destination_url: string;
+  outbound_url?: string;
+  destination_url?: string;
   label?: string;
   source?: string;
   page_path?: string;
 }
 
 export function trackOutboundClick(params: OutboundClickParams) {
+  const outboundUrl = params.outbound_url ?? params.destination_url ?? '';
+  const pageContext = getPageContext(params.page_path);
+
   pushDataLayerEvent({
     event: 'outbound_click',
-    page_path: params.page_path ?? (typeof window !== 'undefined' ? window.location.pathname : ''),
+    ...pageContext,
+    outbound_url: outboundUrl,
+    outbound_domain: getOutboundDomain(outboundUrl),
     destination_url: params.destination_url,
     label: params.label,
     source: params.source,

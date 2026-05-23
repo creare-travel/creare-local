@@ -1,0 +1,29 @@
+{
+  "measurementId": "G-0ZCE6MFRJK",
+  "events": [
+    "page_view",
+    "experience_view",
+    "inquiry_click",
+    "contact_submit",
+    "outbound_click"
+  ],
+  "customDimensions": [
+    "page_path",
+    "page_title",
+    "page_location",
+    "experience_slug",
+    "experience_title",
+    "experience_category",
+    "inquiry_source",
+    "cta_label",
+    "outbound_url",
+    "outbound_domain",
+    "form_id",
+    "form_status"
+  ],
+  "keyEvents": ["contact_submit"],
+  "notes": [
+    "Diff-only plan. No create/update/delete.",
+    "Requires GOOGLE_GA4_PROPERTY_ID to compare against live Admin API state."
+  ]
+}

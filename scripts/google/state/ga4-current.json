@@ -1,0 +1,225 @@
+{
+  "generatedAt": "2026-05-15T15:24:41.718Z",
+  "property": {
+    "propertyId": "properties/526869943"
+  },
+  "dataStreams": [
+    {
+      "name": "properties/526869943/dataStreams/13700566506",
+      "type": "WEB_DATA_STREAM",
+      "displayName": "CREARE Travel",
+      "measurementId": "G-0ZCE6MFRJK",
+      "defaultUri": "https://www.crearetravel.com"
+    }
+  ],
+  "customDimensions": [
+    {
+      "name": "properties/526869943/customDimensions/14333426551",
+      "parameterName": "source",
+      "displayName": "source",
+      "scope": "EVENT"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14333470724",
+      "parameterName": "page_path",
+      "displayName": "page_path",
+      "scope": "EVENT"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14333484188",
+      "parameterName": "experience_slug",
+      "displayName": "experience_slug",
+      "scope": "EVENT"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14333795874",
+      "parameterName": "content_context",
+      "displayName": "content_context",
+      "scope": "EVENT"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14333800927",
+      "parameterName": "session_origin",
+      "displayName": "session_origin",
+      "scope": "EVENT"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14333830725",
+      "parameterName": "experience_type",
+      "displayName": "experience_type",
+      "scope": "EVENT"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14333834447",
+      "parameterName": "intent_level",
+      "displayName": "intent_level",
+      "scope": "EVENT"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14333845059",
+      "parameterName": "cta_position",
+      "displayName": "cta_position",
+      "scope": "EVENT"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14881392405",
+      "parameterName": "form_status",
+      "displayName": "form_status",
+      "scope": "EVENT",
+      "description": "Form status"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14881455344",
+      "parameterName": "inquiry_source",
+      "displayName": "inquiry_source",
+      "scope": "EVENT",
+      "description": "Inquiry source"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14881460977",
+      "parameterName": "cta_label",
+      "displayName": "cta_label",
+      "scope": "EVENT",
+      "description": "CTA label"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14881461364",
+      "parameterName": "experience_category",
+      "displayName": "experience_category",
+      "scope": "EVENT",
+      "description": "CREARE experience category"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14881464176",
+      "parameterName": "form_id",
+      "displayName": "form_id",
+      "scope": "EVENT",
+      "description": "Form identifier"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14881477616",
+      "parameterName": "experience_title",
+      "displayName": "experience_title",
+      "scope": "EVENT",
+      "description": "CREARE experience title"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14886088430",
+      "parameterName": "page_title",
+      "displayName": "page_title",
+      "scope": "EVENT",
+      "description": "Page Title"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14886095213",
+      "parameterName": "outbound_domain",
+      "displayName": "outbound_domain",
+      "scope": "EVENT",
+      "description": "Outbound Domain"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14886163084",
+      "parameterName": "page_location",
+      "displayName": "page_location",
+      "scope": "EVENT",
+      "description": "Page Location"
+    },
+    {
+      "name": "properties/526869943/customDimensions/14886178084",
+      "parameterName": "outbound_url",
+      "displayName": "outbound_url",
+      "scope": "EVENT",
+      "description": "Outbound URL"
+    }
+  ],
+  "keyEvents": [
+    {
+      "name": "properties/526869943/keyEvents/13700566505",
+      "eventName": "purchase",
+      "countingMethod": "ONCE_PER_EVENT"
+    },
+    {
+      "name": "properties/526869943/keyEvents/13700597034",
+      "eventName": "close_convert_lead",
+      "countingMethod": "ONCE_PER_EVENT",
+      "custom": true
+    },
+    {
+      "name": "properties/526869943/keyEvents/13700597035",
+      "eventName": "qualify_lead",
+      "countingMethod": "ONCE_PER_EVENT",
+      "custom": true
+    },
+    {
+      "name": "properties/526869943/keyEvents/13783585691",
+      "eventName": "first_visit",
+      "countingMethod": "ONCE_PER_EVENT",
+      "custom": true
+    },
+    {
+      "name": "properties/526869943/keyEvents/13784388118",
+      "eventName": "session_start",
+      "countingMethod": "ONCE_PER_EVENT"
+    },
+    {
+      "name": "properties/526869943/keyEvents/13784858311",
+      "eventName": "page_view",
+      "countingMethod": "ONCE_PER_EVENT",
+      "custom": true
+    },
+    {
+      "name": "properties/526869943/keyEvents/14881480285",
+      "eventName": "scroll",
+      "countingMethod": "ONCE_PER_EVENT",
+      "custom": true
+    },
+    {
+      "name": "properties/526869943/keyEvents/14881504096",
+      "eventName": "user_engagement",
+      "countingMethod": "ONCE_PER_EVENT",
+      "custom": true
+    },
+    {
+      "name": "properties/526869943/keyEvents/14881511716",
+      "eventName": "form_start",
+      "countingMethod": "ONCE_PER_EVENT",
+      "custom": true
+    },
+    {
+      "name": "properties/526869943/keyEvents/14881516043",
+      "eventName": "form_success",
+      "countingMethod": "ONCE_PER_EVENT",
+      "custom": true
+    },
+    {
+      "name": "properties/526869943/keyEvents/14881536485",
+      "eventName": "form_submit",
+      "countingMethod": "ONCE_PER_EVENT",
+      "custom": true
+    },
+    {
+      "name": "properties/526869943/keyEvents/14881550156",
+      "eventName": "contact_submit",
+      "countingMethod": "ONCE_PER_EVENT",
+      "custom": true
+    },
+    {
+      "name": "properties/526869943/keyEvents/14881562862",
+      "eventName": "form_error",
+      "countingMethod": "ONCE_PER_EVENT",
+      "custom": true
+    },
+    {
+      "name": "properties/526869943/keyEvents/14881583888",
+      "eventName": "cultural_world_view",
+      "countingMethod": "ONCE_PER_EVENT",
+      "custom": true
+    },
+    {
+      "name": "properties/526869943/keyEvents/14881589909",
+      "eventName": "experience_view",
+      "countingMethod": "ONCE_PER_EVENT",
+      "custom": true
+    }
+  ]
+}

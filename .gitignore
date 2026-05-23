@@ -40,3 +40,9 @@ turbo/.env
 .env.*
 !.env.example
 .vercel
+
+# Local Google API automation credentials
+credentials/
+*.credentials.json
+*.tokens.json
+scripts/google/.tokens/

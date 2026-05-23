@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import OutboundLink from '@/components/analytics/OutboundLink';
 import { trackCtaClick } from '@/lib/analytics/tracking';
 import { buildExperienceInquiryHref } from '@/lib/inquiry';
 
@@ -46,6 +47,7 @@ export default function CTASection({
       page_path: pathname,
       experience_slug: experienceSlug,
       source,
+      cta_position: 'footer',
     });
   };
 
@@ -77,15 +79,17 @@ export default function CTASection({
         </Link>
         {experienceTitle && (
           <div className="mt-5">
-            <a
+            <OutboundLink
               href={`https://wa.me/+905412203000?text=I'm interested in ${encodeURIComponent(experienceTitle)}`}
               target="_blank"
               rel="noopener noreferrer"
               className={`motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase ${dark ? 'text-white/40 hover:text-white/70' : 'text-neutral-400 hover:text-neutral-600'}`}
               aria-label="Contact via WhatsApp"
+              trackingLabel="experience_whatsapp_contact"
+              trackingSource="experience_cta_section"
             >
               Contact via WhatsApp
-            </a>
+            </OutboundLink>
           </div>
         )}
       </div>

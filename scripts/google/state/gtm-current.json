@@ -1,0 +1,192 @@
+{
+  "generatedAt": "2026-05-15T09:44:25.513Z",
+  "accountSummary": [
+    {
+      "accountId": "6342296430",
+      "name": "CREARE",
+      "path": "accounts/6342296430"
+    }
+  ],
+  "containerSummary": [
+    {
+      "accountId": "6342296430",
+      "accountName": "CREARE",
+      "containers": [
+        {
+          "containerId": "245237069",
+          "publicId": "GTM-K99ZH56G",
+          "name": "www.crearetravel.com",
+          "path": "accounts/6342296430/containers/245237069",
+          "usageContext": [
+            "web"
+          ]
+        }
+      ]
+    }
+  ],
+  "container": {
+    "accountId": "6342296430",
+    "containerId": "245237069",
+    "publicId": "GTM-K99ZH56G",
+    "name": "www.crearetravel.com",
+    "path": "accounts/6342296430/containers/245237069",
+    "usageContext": [
+      "web"
+    ]
+  },
+  "workspace": {
+    "workspaceId": "8",
+    "name": "Default Workspace",
+    "path": "accounts/6342296430/containers/245237069/workspaces/8"
+  },
+  "variables": [
+    {
+      "variableId": "19",
+      "name": "CREARE - DLV - form_id",
+      "type": "v",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/variables/19"
+    },
+    {
+      "variableId": "20",
+      "name": "CREARE - DLV - form_status",
+      "type": "v",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/variables/20"
+    },
+    {
+      "variableId": "15",
+      "name": "CREARE - DLV - cta_label",
+      "type": "v",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/variables/15"
+    },
+    {
+      "variableId": "16",
+      "name": "CREARE - DLV - inquiry_source",
+      "type": "v",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/variables/16"
+    },
+    {
+      "variableId": "10",
+      "name": "CREARE - DLV - experience_slug",
+      "type": "v",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/variables/10"
+    },
+    {
+      "variableId": "11",
+      "name": "CREARE - DLV - experience_title",
+      "type": "v",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/variables/11"
+    },
+    {
+      "variableId": "12",
+      "name": "CREARE - DLV - experience_category",
+      "type": "v",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/variables/12"
+    },
+    {
+      "variableId": "5",
+      "name": "CREARE - DLV - page_path",
+      "type": "v",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/variables/5"
+    },
+    {
+      "variableId": "23",
+      "name": "CREARE - DLV - page_title",
+      "type": "v",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/variables/23"
+    },
+    {
+      "variableId": "24",
+      "name": "CREARE - DLV - page_location",
+      "type": "v",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/variables/24"
+    },
+    {
+      "variableId": "25",
+      "name": "CREARE - DLV - outbound_url",
+      "type": "v",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/variables/25"
+    },
+    {
+      "variableId": "26",
+      "name": "CREARE - DLV - outbound_domain",
+      "type": "v",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/variables/26"
+    }
+  ],
+  "triggers": [
+    {
+      "triggerId": "21",
+      "name": "CREARE - Trigger - contact_submit",
+      "type": "customEvent",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/triggers/21"
+    },
+    {
+      "triggerId": "17",
+      "name": "CREARE - Trigger - inquiry_click",
+      "type": "customEvent",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/triggers/17"
+    },
+    {
+      "triggerId": "13",
+      "name": "CREARE - Trigger - experience_view",
+      "type": "customEvent",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/triggers/13"
+    },
+    {
+      "triggerId": "6",
+      "name": "CREARE - Trigger - page_view",
+      "type": "customEvent",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/triggers/6"
+    },
+    {
+      "triggerId": "27",
+      "name": "CREARE - Trigger - outbound_click",
+      "type": "customEvent",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/triggers/27"
+    }
+  ],
+  "tags": [
+    {
+      "tagId": "8",
+      "name": "CREARE - GA4 - Config",
+      "type": "googtag",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/tags/8"
+    },
+    {
+      "tagId": "4",
+      "name": "Microsoft Clarity - Official",
+      "type": "cvt_MQDKZ",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/tags/4"
+    },
+    {
+      "tagId": "7",
+      "name": "CREARE - GA4 - Event - page_view",
+      "type": "gaawe",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/tags/7"
+    },
+    {
+      "tagId": "14",
+      "name": "CREARE - GA4 - Event - experience_view",
+      "type": "gaawe",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/tags/14"
+    },
+    {
+      "tagId": "18",
+      "name": "CREARE - GA4 - Event - inquiry_click",
+      "type": "gaawe",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/tags/18"
+    },
+    {
+      "tagId": "22",
+      "name": "CREARE - GA4 - Event - contact_submit",
+      "type": "gaawe",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/tags/22"
+    },
+    {
+      "tagId": "28",
+      "name": "CREARE - GA4 - Event - outbound_click",
+      "type": "gaawe",
+      "path": "accounts/6342296430/containers/245237069/workspaces/8/tags/28"
+    }
+  ]
+}

@@ -2,10 +2,13 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { trackCtaClick } from '@/lib/analytics/tracking';
 
 export default function CtaSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -55,6 +58,14 @@ export default function CtaSection() {
         </p>
         <Link
           href="/contact"
+          onClick={() =>
+            trackCtaClick({
+              label: 'PRIVATE INQUIRY',
+              page_path: pathname,
+              source: 'home_cta_section',
+              cta_position: 'footer',
+            })
+          }
           className="motion-button-editorial inline-block border border-stone-900 bg-white px-10 py-4 font-body text-[0.65rem] uppercase tracking-[0.3em] text-stone-900 hover:bg-stone-900 hover:text-white"
           aria-label="Submit a private inquiry"
         >

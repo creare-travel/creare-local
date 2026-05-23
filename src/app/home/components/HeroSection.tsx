@@ -1,6 +1,10 @@
+'use client';
+
 import React from 'react';
 import AppImage from '@/components/ui/AppImage';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { trackCtaClick } from '@/lib/analytics/tracking';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 
 const HERO_BLUR_DATA_URL = buildCinematicBlurDataUrl(
@@ -9,6 +13,8 @@ const HERO_BLUR_DATA_URL = buildCinematicBlurDataUrl(
 );
 
 export default function HeroSection() {
+  const pathname = usePathname();
+
   return (
     <section
       className="relative flex h-screen min-h-[600px] w-full items-end overflow-hidden"
@@ -57,6 +63,14 @@ export default function HeroSection() {
 
           <Link
             href="/contact"
+            onClick={() =>
+              trackCtaClick({
+                label: 'INQUIRE PRIVATELY',
+                page_path: pathname,
+                source: 'home_hero',
+                cta_position: 'hero',
+              })
+            }
             className="hero-cta group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.62rem] uppercase tracking-[0.24em] text-white/60 hover:text-white/90 sm:tracking-[0.3em]"
             aria-label="Inquire privately about CREARE experiences"
           >

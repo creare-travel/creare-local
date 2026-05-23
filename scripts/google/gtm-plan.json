@@ -1,0 +1,63 @@
+{
+  "containerPublicId": "GTM-K99ZH56G",
+  "workspaceStrategy": "manual-review-only",
+  "events": [
+    {
+      "event": "page_view",
+      "parameters": ["page_path", "page_title", "page_location"]
+    },
+    {
+      "event": "experience_view",
+      "parameters": [
+        "page_path",
+        "experience_slug",
+        "experience_title",
+        "experience_category"
+      ]
+    },
+    {
+      "event": "inquiry_click",
+      "parameters": ["page_path", "cta_label", "inquiry_source"]
+    },
+    {
+      "event": "contact_submit",
+      "parameters": ["page_path", "form_id", "form_status"]
+    },
+    {
+      "event": "outbound_click",
+      "parameters": ["page_path", "outbound_url", "outbound_domain"]
+    }
+  ],
+  "variables": [
+    "page_path",
+    "page_title",
+    "page_location",
+    "experience_slug",
+    "experience_title",
+    "experience_category",
+    "inquiry_source",
+    "cta_label",
+    "outbound_url",
+    "outbound_domain",
+    "form_id",
+    "form_status"
+  ],
+  "triggers": [
+    "page_view",
+    "experience_view",
+    "inquiry_click",
+    "contact_submit",
+    "outbound_click"
+  ],
+  "tags": [
+    "CREARE - GA4 - Event - page_view",
+    "CREARE - GA4 - Event - experience_view",
+    "CREARE - GA4 - Event - inquiry_click",
+    "CREARE - GA4 - Event - contact_submit",
+    "CREARE - GA4 - Event - outbound_click"
+  ],
+  "notes": [
+    "Diff-only plan. No automatic apply or publish.",
+    "GTM config tag remains intentionally outside this dry-run comparison layer."
+  ]
+}

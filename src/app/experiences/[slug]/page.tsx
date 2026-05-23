@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
+import OutboundLink from '@/components/analytics/OutboundLink';
 import AppImage from '@/components/ui/AppImage';
 import ExperienceViewTracker from '@/components/experiences/ExperienceViewTracker';
 import GallerySection from '@/components/experiences/GallerySection';
@@ -898,15 +899,17 @@ function StrapiExperiencePage({
               className="border border-white/30 text-white hover:bg-white hover:text-neutral-900"
             />
             <div className="mt-5">
-              <a
+              <OutboundLink
                 href={`https://wa.me/+905412203000?text=I'm interested in ${encodeURIComponent(item.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase text-white/40 hover:text-white/70"
                 aria-label="Contact via WhatsApp"
+                trackingLabel="experience_whatsapp_contact"
+                trackingSource="experience_detail_page"
               >
                 Contact via WhatsApp
-              </a>
+              </OutboundLink>
             </div>
           </div>
         </section>
@@ -935,15 +938,17 @@ function StrapiExperiencePage({
               className="bg-black text-white hover:bg-neutral-800"
             />
             <div className="mt-5">
-              <a
+              <OutboundLink
                 href={`https://wa.me/+905412203000?text=I'm interested in ${encodeURIComponent(item.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase text-neutral-400 hover:text-neutral-600"
                 aria-label="Contact via WhatsApp"
+                trackingLabel="experience_whatsapp_contact"
+                trackingSource="experience_detail_page"
               >
                 Contact via WhatsApp
-              </a>
+              </OutboundLink>
             </div>
           </div>
         </section>

@@ -1,0 +1,137 @@
+{
+  "model_name": "CREARE Qualified Intent Score",
+  "version": 1,
+  "purpose": "Estimate the quality and commercial-cultural seriousness of a visitor session using event-based intent signals rather than vanity metrics.",
+  "score_granularity": "session",
+  "score_range": {
+    "min": 0,
+    "max": 100
+  },
+  "scoring_model": {
+    "base_rules": [
+      {
+        "event": "experience_view",
+        "weight": 10,
+        "reason": "Core signal of directed interest in a CREARE experience."
+      },
+      {
+        "event": "cultural_world_view",
+        "weight": 8,
+        "reason": "Editorial discovery signal that often precedes deeper experience interest."
+      },
+      {
+        "event": "outbound_click",
+        "weight": 6,
+        "reason": "Curiosity and research signal, but weaker than direct inquiry behavior."
+      },
+      {
+        "event": "inquiry_click",
+        "weight": 22,
+        "reason": "Clear expression of explicit private-interest intent."
+      },
+      {
+        "event": "form_start",
+        "weight": 18,
+        "reason": "Strong progression from curiosity into inquiry action."
+      },
+      {
+        "event": "contact_submit",
+        "weight": 36,
+        "reason": "Highest-confidence live intent outcome in the current model."
+      }
+    ],
+    "session_modifiers": [
+      {
+        "condition": "engaged_session",
+        "weight": 8,
+        "reason": "Boost sessions that GA4 recognizes as meaningfully engaged."
+      },
+      {
+        "condition": "returning_session_when_available",
+        "weight": 6,
+        "reason": "Repeat attention often indicates stronger human intent than one-off browsing."
+      }
+    ],
+    "caps_and_rules": [
+      {
+        "rule": "cap_total_score_at_100"
+      },
+      {
+        "rule": "count_contact_submit_as_terminal_high_intent_signal"
+      },
+      {
+        "rule": "allow_multiple_signal_accumulation_within_single_session"
+      }
+    ],
+    "thresholds": {
+      "low_intent": {
+        "min": 0,
+        "max": 19
+      },
+      "qualified_interest": {
+        "min": 20,
+        "max": 49
+      },
+      "high_intent": {
+        "min": 50,
+        "max": 79
+      },
+      "inquiry_ready": {
+        "min": 80,
+        "max": 100
+      }
+    }
+  },
+  "event_weights": {
+    "experience_view": 10,
+    "cultural_world_view": 8,
+    "outbound_click": 6,
+    "inquiry_click": 22,
+    "form_start": 18,
+    "contact_submit": 36,
+    "engaged_session_modifier": 8,
+    "returning_session_modifier": 6
+  },
+  "required_dimensions": [
+    "page_path",
+    "page_title",
+    "page_location",
+    "experience_slug",
+    "experience_title",
+    "experience_category",
+    "inquiry_source",
+    "cta_label",
+    "form_id",
+    "form_status",
+    "outbound_url",
+    "outbound_domain",
+    "content_context",
+    "session_origin",
+    "intent_level",
+    "cta_position",
+    "source"
+  ],
+  "required_events": [
+    "experience_view",
+    "cultural_world_view",
+    "outbound_click",
+    "inquiry_click",
+    "form_start",
+    "contact_submit"
+  ],
+  "dashboard_use_cases": [
+    "Identify high-value sessions before inquiry completion.",
+    "Rank experiences by quality of attention, not just view volume.",
+    "Separate editorial discovery from commercially meaningful intent.",
+    "Build executive weekly reporting around qualified human demand.",
+    "Support Looker Studio scorecards for High Intent Sessions and Qualified Human Visitors."
+  ],
+  "limitations": [
+    "This model is heuristic and should not be treated as a deterministic lead score.",
+    "It depends on internal and developer traffic filters being verified.",
+    "Returning-session logic requires reliable GA4 availability or downstream modeling.",
+    "Outbound clicks can reflect distraction as well as interest.",
+    "Supplier or partner traffic is not yet distinctly classified.",
+    "The model is strongest when read at session or cohort level, not person-level identity."
+  ]
+}

@@ -45,6 +45,14 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,md,json}\"",
+    "google:auth:refresh-token": "node --import tsx scripts/google/get-refresh-token.ts",
+    "google:auth:refresh-token:gtm-edit": "node --import tsx scripts/google/get-refresh-token.ts --gtm-edit",
+    "google:diff": "node --import tsx scripts/google/diff-google-state.ts",
+    "google:apply:ga4-custom-dimensions": "node --import tsx scripts/google/apply-ga4-custom-dimensions.ts",
+    "google:apply:gtm-outbound": "node --import tsx scripts/google/apply-gtm-outbound-layer.ts",
+    "google:discover:gtm": "node --import tsx scripts/google/discover-gtm-state.ts",
+    "google:discover:ga4": "node --import tsx scripts/google/discover-ga4-state.ts",
+    "google:plan:gtm-outbound": "node --import tsx scripts/google/plan-gtm-outbound-layer.ts",
     "serve": "next start",
     "type-check": "tsc --noEmit"
   },
@@ -76,6 +84,7 @@
     "prettier": "^3.5.3",
     "tailwindcss": "3.4.6",
     "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }
