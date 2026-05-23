@@ -2,8 +2,10 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import CulturalWorldViewTracker from '@/components/CulturalWorldViewTracker';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
+import { getCulturalWorldContent } from '@/data/cultural-worlds';
 import { getCulturalWorldContext } from '@/lib/cultural-world-context';
 import { buildMetadataAlternates } from '@/lib/seo';
 import { buildCanonicalUrl, buildCulturalWorldDetailGraph } from '@/lib/schema-builder';
@@ -77,6 +79,7 @@ interface StrapiDestination {
   name?: string;
   visibility_status?: string;
   highlight?: string;
+  short_description?: string;
   intro_text?: string;
   description?: StrapiRichTextNode[] | string;
   meta_title?: string;
@@ -451,6 +454,7 @@ async function fetchDestination(slug: string): Promise<StrapiDestination | null>
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const destination = await fetchDestination(slug);
+  const localContent = getCulturalWorldContent(slug);
 
   if (!destination || destination.visibility_status?.toLowerCase() !== 'active') {
     return {
@@ -462,8 +466,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title:
-      destination.meta_title || `${destination.name || 'Destination'} — Cultural World — Creare`,
-    description: destination.meta_description || destination.highlight || FALLBACK_DESCRIPTION,
+      localContent?.metaTitle ||
+      destination.meta_title ||
+      `${destination.name || localContent?.title || 'Destination'} — Cultural World — Creare`,
+    description:
+      localContent?.metaDescription ||
+      destination.meta_description ||
+      destination.highlight ||
+      localContent?.shortDescription ||
+      FALLBACK_DESCRIPTION,
     alternates: buildMetadataAlternates(`/cultural-worlds/${slug}`),
     robots: { index: true, follow: true },
   };
@@ -480,29 +491,63 @@ export default async function CulturalWorldPage({ params }: Props) {
     notFound();
   }
 
-  const sections = normalizeRelationArray<StrapiSection>(destination.sections)
+  const localContent = getCulturalWorldContent(slug);
+  const mergedDestination: StrapiDestination = {
+    ...destination,
+    name: destination.name || localContent?.title,
+    highlight: localContent?.shortDescription || destination.highlight,
+    short_description: localContent?.shortDescription || destination.short_description,
+    intro_text: localContent?.heroStatement || destination.intro_text,
+    meta_title: localContent?.metaTitle || destination.meta_title,
+    meta_description: localContent?.metaDescription || destination.meta_description,
+  };
+
+  const cmsSections = normalizeRelationArray<StrapiSection>(destination.sections)
     .filter((section) => section.title || section.body)
     .sort((a, b) => (a.section_number ?? Infinity) - (b.section_number ?? Infinity));
+  const fallbackSections = (localContent?.sections ?? []).map((section, index) => ({
+    id: -(index + 1),
+    section_number: index + 1,
+    title: section.title,
+    body: section.body,
+  }));
+  const sections = (fallbackSections.length > 0 ? fallbackSections : cmsSections).filter(
+    (section) => section.title || section.body
+  );
 
   const experiences = normalizeRelationArray<StrapiExperience>(destination.experiences)
     .filter((experience) => experience.slug && experience.title)
     .sort((a, b) => (a.order_index ?? Infinity) - (b.order_index ?? Infinity));
-  const relatedExperiences = buildRelatedExperiences(destination, experiences, allExperiences);
+  const relatedExperiences = buildRelatedExperiences(
+    mergedDestination,
+    experiences,
+    allExperiences
+  );
 
-  const insights = normalizeRelationArray<StrapiInsight>(destination.insights).filter(
+  const cmsInsights = normalizeRelationArray<StrapiInsight>(destination.insights).filter(
+    (insight) => insight.slug && insight.title
+  );
+  const fallbackInsights = (localContent?.furtherReading ?? []).map((insight, index) => ({
+    id: -(index + 1),
+    slug: insight.slug,
+    title: insight.title,
+  }));
+  const insights = (fallbackInsights.length > 0 ? fallbackInsights : cmsInsights).filter(
     (insight) => insight.slug && insight.title
   );
   const context = getCulturalWorldContext({
-    name: destination.name,
-    slug: destination.slug,
-    highlight: destination.highlight,
-    introText: destination.intro_text,
-    description: destination.description,
+    name: mergedDestination.name,
+    slug: mergedDestination.slug,
+    highlight: mergedDestination.highlight,
+    introText: mergedDestination.intro_text,
+    description: mergedDestination.description,
   });
 
-  const coverImageUrl = resolveImageUrl(destination.cover_image);
+  const coverImageUrl = resolveImageUrl(mergedDestination.cover_image);
   const coverImageAlt =
-    destination.cover_image?.alternativeText || destination.name || 'Cultural world cover image';
+    mergedDestination.cover_image?.alternativeText ||
+    mergedDestination.name ||
+    'Cultural world cover image';
   const editorialSections = sections.map((section, index) => {
     const body = renderBodyContent(section.body);
     if (!body) return null;
@@ -539,7 +584,7 @@ export default async function CulturalWorldPage({ params }: Props) {
   });
 
   const culturalWorldSchema = buildCulturalWorldDetailGraph({
-    destination,
+    destination: mergedDestination,
     slug,
     relatedExperiences: relatedExperiences
       .filter((experience) => experience.slug && experience.title)
@@ -570,6 +615,7 @@ export default async function CulturalWorldPage({ params }: Props) {
   return (
     <main className="bg-black min-h-screen">
       <JsonLd id="cultural-world-detail-jsonld" schema={culturalWorldSchema} />
+      <CulturalWorldViewTracker location={slug} />
       <section className="relative w-full h-[90vh] min-h-[620px] flex items-end overflow-hidden">
         <div className="absolute inset-0 z-0">
           <AppImage
@@ -595,11 +641,11 @@ export default async function CulturalWorldPage({ params }: Props) {
             className="hero-title-lg font-display font-light text-white leading-[0.95] tracking-tight"
             style={{ fontSize: 'clamp(4rem, 9vw, 9rem)' }}
           >
-            {destination.name || 'Destination'}
+            {mergedDestination.name || 'Destination'}
           </h1>
-          {context.definition && (
+          {(localContent?.heroStatement || context.definition) && (
             <p className="hero-subtitle text-white/60 font-body font-light text-base mt-6 max-w-sm leading-relaxed tracking-wide">
-              {context.definition}
+              {localContent?.heroStatement || context.definition}
             </p>
           )}
         </div>
@@ -782,7 +828,7 @@ export default async function CulturalWorldPage({ params }: Props) {
             <div className="space-y-4">
               {insights.map((insight) => (
                 <Link
-                  key={insight.id}
+                  key={`${insight.id}-${insight.slug}`}
                   href={`/insights/${canonicalInsightSlug(insight.slug)}`}
                   className="block font-body text-sm text-white/55 hover:text-white/80 transition-colors underline underline-offset-4 decoration-white/20"
                 >
@@ -802,27 +848,29 @@ export default async function CulturalWorldPage({ params }: Props) {
       >
         <div className="border border-white/10 p-12 md:p-16 max-w-2xl">
           <p className="text-white/30 font-body text-[0.6rem] tracking-[0.25em] uppercase mb-6">
-            By introduction only
+            {localContent?.cta.eyebrow || 'By introduction only'}
           </p>
           <p
             className="font-display font-light text-white/80 leading-relaxed mb-2"
             style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)' }}
           >
-            Access is limited.
+            {localContent?.cta.title || 'Access is limited.'}
           </p>
           <p
             className="font-display font-light text-white/50 leading-relaxed mb-3"
             style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)' }}
           >
-            Each cultural world is composed through a small number of encounters each season.
+            {localContent?.cta.subtitle ||
+              'Each cultural world is composed through a small number of encounters each season.'}
           </p>
           <p className="text-white/30 font-body font-light text-sm leading-relaxed mb-10">
-            Availability is shaped by access, timing, and cultural permission.
+            {localContent?.cta.note ||
+              'Availability is shaped by access, timing, and cultural permission.'}
           </p>
           <Link
             href="/contact"
             className="motion-button-editorial inline-block border border-white/20 px-8 py-4 font-body text-[0.65rem] uppercase tracking-[0.3em] text-white/70 hover:border-white/50 hover:text-white"
-            aria-label={`Begin a private conversation about ${destination.name || 'this destination'}`}
+            aria-label={`Begin a private conversation about ${mergedDestination.name || 'this destination'}`}
           >
             Begin a Private Conversation →
           </Link>
