@@ -10,7 +10,6 @@ import { getCulturalWorldContext } from '@/lib/cultural-world-context';
 import { buildMetadataAlternates } from '@/lib/seo';
 import { buildCanonicalUrl, buildCulturalWorldDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
-import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 const FALLBACK_DESCRIPTION =
   'A cultural world composed through editorial destination content, related experiences, and further reading.';
 const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
@@ -624,11 +623,6 @@ export default async function CulturalWorldPage({ params }: Props) {
       body: section.body,
     })),
   });
-  const coverBlurDataUrl = buildCinematicBlurDataUrl(coverImageUrl, {
-    atmosphere: 'dark',
-    profile: 'hero',
-  });
-
   return (
     <main className="bg-black min-h-screen">
       <JsonLd id="cultural-world-detail-jsonld" schema={culturalWorldSchema} />
@@ -640,7 +634,6 @@ export default async function CulturalWorldPage({ params }: Props) {
             alt={coverImageAlt}
             fill
             priority
-            blurDataURL={coverBlurDataUrl}
             atmosphere="dark"
             className="object-cover hero-img-zoom"
             sizes="100vw"
