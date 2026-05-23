@@ -162,6 +162,22 @@ export default function PhilosophyPage() {
             </div>
           </div>
         </div>
+
+        <div className="mt-28 border-t border-white/6 pt-14">
+          <p className="mb-4 font-body text-[0.7rem] uppercase tracking-[0.2em] text-white/18">
+            Continued Thinking
+          </p>
+          <p className="max-w-[36rem] font-body text-sm leading-[2] text-white/52">
+            Our insights extend this philosophy into places, atmospheres, and forms of permission
+            that cannot be reduced to a catalogue.
+          </p>
+          <Link
+            href="/insights"
+            className="mt-6 inline-flex font-body text-xs uppercase tracking-[0.14em] text-white/34 transition-colors hover:text-white/70"
+          >
+            Enter Insights
+          </Link>
+        </div>
       </section>
 
       {/* Closing */}

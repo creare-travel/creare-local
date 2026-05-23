@@ -312,6 +312,27 @@ export default async function InsightsPage() {
           </p>
         </div>
 
+        <section
+          aria-label="Editorial framing"
+          className="mb-14 border-l border-white/8 pl-6 sm:pl-8"
+        >
+          <div className="max-w-xl space-y-5">
+            <p className="font-body text-[0.72rem] uppercase tracking-[0.18em] text-white/26">
+              A Knowledge Layer
+            </p>
+            <p className="font-body text-sm leading-relaxed text-white/56">
+              CREARE publishes selectively. These texts exist to make visible the thinking behind
+              our work: context before itinerary, permission before access, atmosphere before
+              display. They are part of the same cultural intelligence that shapes our experiences.
+            </p>
+            <p className="font-body text-sm leading-relaxed text-white/44">
+              Some pieces are about place. Others are about pace, discretion, or the social
+              architecture around entry. Together they form an editorial record of how we read a
+              cultural world before we invite anyone into it.
+            </p>
+          </div>
+        </section>
+
         {/* Divider */}
         <div className="border-t border-white/6 mb-14" />
 
