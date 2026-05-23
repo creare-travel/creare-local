@@ -159,6 +159,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Experiences — canonical routes only (BLACK excluded: invitation-only, noindex)
     {
+      url: `${BASE_URL}/experiences`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
       url: `${BASE_URL}/experiences/lab`,
       lastModified: LAST_MODIFIED,
       changeFrequency: 'weekly',

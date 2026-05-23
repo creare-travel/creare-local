@@ -16,11 +16,6 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/experiences',
-        destination: '/experiences/signature',
-        permanent: true,
-      },
-      {
         source: '/experience/:slug',
         destination: '/experiences/:slug',
         permanent: true,
