@@ -419,7 +419,11 @@ async function fetchDestination(slug: string): Promise<StrapiDestination | null>
 
   const params = new URLSearchParams({
     'filters[slug][$eq]': slug,
-    populate: '*',
+    'populate[cover_image]': 'true',
+    'populate[sections]': 'true',
+    'populate[insights]': 'true',
+    'populate[experiences][populate][cover_image]': 'true',
+    'populate[experiences][populate][destination]': 'true',
     'populate[secondary_experiences][populate][cover_image]': 'true',
     'populate[secondary_experiences][populate][destination]': 'true',
   });
@@ -434,6 +438,7 @@ async function fetchDestination(slug: string): Promise<StrapiDestination | null>
 
     return {
       ...destination,
+      cover_image: normalizeSingleRelation<StrapiImage>(destination.cover_image),
       sections: normalizeRelationArray<StrapiSection>(destination.sections),
       experiences: normalizeRelationArray<StrapiExperience>(destination.experiences).map(
         (experience) => ({
