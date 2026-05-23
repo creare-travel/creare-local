@@ -642,7 +642,6 @@ export default async function CulturalWorldPage({ params }: Props) {
             priority
             blurDataURL={coverBlurDataUrl}
             atmosphere="dark"
-            deliveryProfile="hero"
             className="object-cover hero-img-zoom"
             sizes="100vw"
             unoptimized={isLocalAssetUrl(coverImageUrl)}
