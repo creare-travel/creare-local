@@ -1,4 +1,9 @@
 import { MetadataRoute } from 'next';
+import {
+  filterCanonicalCulturalWorlds,
+  filterPublicExperiences,
+  filterPublicInsights,
+} from '@/lib/canonical-gates';
 import { fetchStrapi } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -16,12 +21,22 @@ interface SitemapExperience {
   id: number;
   slug?: string;
   category?: string;
+  title?: string;
+  visibility_status?: string;
+  publishedAt?: string | null;
 }
 
 interface SitemapInsight {
   id: number;
   slug?: string;
+  title?: string;
+  visibility_status?: string;
+  publishedAt?: string | null;
 }
+
+const LEGACY_INSIGHT_SLUG_MAP: Record<string, string> = {
+  'the-private-life-of-istanbul': 'private-life-of-istanbul',
+};
 
 function flattenDestination(raw: Record<string, unknown>): SitemapDestination {
   if (raw?.attributes && typeof raw.attributes === 'object') {
@@ -55,15 +70,14 @@ async function fetchActiveCulturalWorldUrls() {
     const json = await fetchStrapi(path);
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
 
-    return items
-      .map((item) => flattenDestination(item))
-      .filter((item) => item.slug && item.visibility_status?.toLowerCase() === 'active')
-      .map((item) => ({
+    return filterCanonicalCulturalWorlds(items.map((item) => flattenDestination(item))).map(
+      (item) => ({
         url: `${BASE_URL}/cultural-worlds/${item.slug}`,
         lastModified: LAST_MODIFIED,
         changeFrequency: 'weekly' as const,
         priority: 0.85,
-      }));
+      })
+    );
   } catch (error) {
     console.error('Failed to build dynamic cultural-world sitemap entries.', {
       route: '/sitemap.xml',
@@ -94,14 +108,14 @@ async function fetchActiveCulturalWorldUrls() {
 }
 
 async function fetchCanonicalExperienceUrls() {
-  const path = '/api/experiences?fields[0]=slug&fields[1]=category&pagination[pageSize]=100';
+  const path =
+    '/api/experiences?fields[0]=slug&fields[1]=category&fields[2]=title&fields[3]=visibility_status&fields[4]=publishedAt&pagination[pageSize]=100';
 
   try {
     const json = await fetchStrapi(path);
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
 
-    return items
-      .map((item) => flattenExperience(item))
+    return filterPublicExperiences(items.map((item) => flattenExperience(item)))
       .filter((item) => item.slug)
       .filter((item) => item.category?.toLowerCase() !== 'black')
       .map((item) => ({
@@ -121,15 +135,26 @@ async function fetchCanonicalExperienceUrls() {
 }
 
 async function fetchCanonicalInsightUrls() {
-  const path = '/api/insights?fields[0]=slug&pagination[pageSize]=100';
+  const path =
+    '/api/insights?fields[0]=slug&fields[1]=title&fields[2]=visibility_status&fields[3]=publishedAt&pagination[pageSize]=100';
 
   try {
     const json = await fetchStrapi(path);
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
 
-    return items
-      .map((item) => flattenInsight(item))
+    const seen = new Set<string>();
+
+    return filterPublicInsights(items.map((item) => flattenInsight(item)))
+      .map((item) => ({
+        ...item,
+        slug: LEGACY_INSIGHT_SLUG_MAP[item.slug ?? ''] ?? item.slug,
+      }))
       .filter((item) => item.slug)
+      .filter((item) => {
+        if (!item.slug || seen.has(item.slug)) return false;
+        seen.add(item.slug);
+        return true;
+      })
       .map((item) => ({
         url: `${BASE_URL}/insights/${item.slug}`,
         lastModified: LAST_MODIFIED,

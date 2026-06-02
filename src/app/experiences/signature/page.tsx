@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
+import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { experiences as staticExperiences } from '@/lib/experiences';
 import { buildMetadataAlternates } from '@/lib/seo';
@@ -65,6 +66,8 @@ interface StrapiExperience {
   intensity?: string | null;
   destination?: StrapiExperienceDestination;
   order?: number;
+  visibility_status?: string;
+  publishedAt?: string | null;
 }
 
 const SIGNATURE_CATEGORY = 'signature';
@@ -230,13 +233,15 @@ async function fetchStrapiSignatureExperiences(): Promise<StrapiExperience[]> {
       return [];
     }
 
-    return all
-      .filter((exp) => normalizeValue(exp.category) === SIGNATURE_CATEGORY)
-      .sort((a, b) => {
-        const aOrder = a.order ?? Infinity;
-        const bOrder = b.order ?? Infinity;
-        return aOrder - bOrder;
-      });
+    return filterPublicExperiences(
+      all
+        .filter((exp) => normalizeValue(exp.category) === SIGNATURE_CATEGORY)
+        .sort((a, b) => {
+          const aOrder = a.order ?? Infinity;
+          const bOrder = b.order ?? Infinity;
+          return aOrder - bOrder;
+        })
+    );
   } catch (error) {
     console.error('Failed to fetch signature experiences from Strapi.', error);
     return [];

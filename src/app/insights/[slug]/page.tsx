@@ -14,6 +14,7 @@ import {
 } from '@/lib/seo';
 import { buildCanonicalUrl, buildInsightDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
+import { filterPublicExperiences, isPublicInsightRecord } from '@/lib/canonical-gates';
 import { getInsightBySlug, isCanonicalCulturalWorldSlug, type Insight } from '@/data/insights';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 
@@ -27,6 +28,8 @@ interface StrapiInsight {
   slug?: string;
   excerpt?: string;
   content?: unknown;
+  visibility_status?: string | null;
+  publishedAt?: string | null;
   seo_title?: string;
   seo_description?: string;
   cover_image?: StrapiImage | null;
@@ -60,6 +63,8 @@ interface StrapiExperience {
   category?: string;
   duration?: string;
   location_label?: string;
+  visibility_status?: string | null;
+  publishedAt?: string | null;
   cover_image?: {
     url?: string;
     alternativeText?: string;
@@ -149,6 +154,7 @@ async function fetchInsight(slug: string): Promise<StrapiInsight | null> {
     if (!items || items.length === 0) return null;
     const raw = items[0];
     const insight = raw?.attributes ? { id: raw.id, ...raw.attributes } : raw;
+    if (!isPublicInsightRecord(insight)) return null;
 
     return {
       ...insight,
@@ -191,6 +197,8 @@ async function fetchExperiencesBySlugs(slugs: string[]): Promise<StrapiExperienc
   params.set('fields[3]', 'category');
   params.set('fields[4]', 'duration');
   params.set('fields[5]', 'location_label');
+  params.set('fields[6]', 'visibility_status');
+  params.set('fields[7]', 'publishedAt');
   params.set('populate[cover_image]', 'true');
   params.set('populate[destination]', 'true');
   params.set('pagination[pageSize]', String(uniqueSlugs.length));
@@ -198,8 +206,9 @@ async function fetchExperiencesBySlugs(slugs: string[]): Promise<StrapiExperienc
   try {
     const json = await fetchStrapi(`/api/experiences?${params.toString()}`);
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
-    const entries: [string, StrapiExperience][] = items
-      .map((item) => flattenItem<StrapiExperience>(item))
+    const entries: [string, StrapiExperience][] = filterPublicExperiences(
+      items.map((item) => flattenItem<StrapiExperience>(item))
+    )
       .map((experience) => {
         const normalizedExperience: StrapiExperience = {
           ...experience,

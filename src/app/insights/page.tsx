@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import { insights } from '@/data/insights';
+import { filterPublicInsights } from '@/lib/canonical-gates';
 import {
   buildMetadataAlternates,
   buildOpenGraph,
@@ -68,6 +69,8 @@ interface StrapiInsight {
   title?: string;
   slug?: string;
   excerpt?: string;
+  visibility_status?: string;
+  publishedAt?: string | null;
   cover_image?:
     | {
         url?: string;
@@ -246,7 +249,9 @@ async function fetchStrapiInsights(): Promise<NormalizedInsight[] | null> {
     const json = await fetchStrapi(path);
     const items: StrapiInsight[] = json?.data ?? [];
     if (!items.length) return null;
-    const normalized = items.map(normalizeInsight).filter(Boolean) as NormalizedInsight[];
+    const normalized = filterPublicInsights(items)
+      .map(normalizeInsight)
+      .filter(Boolean) as NormalizedInsight[];
     return normalized.length ? normalized : null;
   } catch (error) {
     console.error('Failed to fetch insights index data from Strapi.', {

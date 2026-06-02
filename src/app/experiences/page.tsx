@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
+import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { fetchStrapi } from '@/lib/strapi';
 import { buildCanonicalUrl, buildExperienceListingGraph } from '@/lib/schema-builder';
 import {
@@ -85,6 +86,8 @@ interface StrapiExperience {
   title: string;
   short_description?: string;
   slug?: string;
+  visibility_status?: string;
+  publishedAt?: string | null;
 }
 
 function isPublishedExperience(item: unknown): item is StrapiExperience {
@@ -105,11 +108,11 @@ function isPublishedExperience(item: unknown): item is StrapiExperience {
 async function fetchPublishedExperiences(): Promise<StrapiExperience[]> {
   try {
     const json = await fetchStrapi(
-      '/api/experiences?fields[0]=title&fields[1]=slug&fields[2]=short_description&pagination[pageSize]=12'
+      '/api/experiences?fields[0]=title&fields[1]=slug&fields[2]=short_description&fields[3]=visibility_status&fields[4]=publishedAt&pagination[pageSize]=12'
     );
     const items: unknown[] = Array.isArray(json?.data) ? json.data : [];
 
-    return items.filter(isPublishedExperience);
+    return filterPublicExperiences(items.filter(isPublishedExperience));
   } catch {
     return [];
   }

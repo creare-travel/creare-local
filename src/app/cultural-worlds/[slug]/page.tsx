@@ -6,6 +6,11 @@ import CulturalWorldViewTracker from '@/components/CulturalWorldViewTracker';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import { getCulturalWorldContent, type CulturalWorldSystemMapping } from '@/data/cultural-worlds';
+import {
+  filterPublicExperiences,
+  filterPublicInsights,
+  isCanonicalCulturalWorldSlug,
+} from '@/lib/canonical-gates';
 import { getCulturalWorldContext } from '@/lib/cultural-world-context';
 import { buildMetadataAlternates } from '@/lib/seo';
 import { buildCanonicalUrl, buildCulturalWorldDetailGraph } from '@/lib/schema-builder';
@@ -56,6 +61,7 @@ interface StrapiExperience {
   category?: string;
   order_index?: number;
   visibility_status?: string;
+  publishedAt?: string | null;
   geo_experience_type?: string | null;
   mood?: string | null;
   tags?: unknown;
@@ -70,6 +76,8 @@ interface StrapiInsight {
   id: number;
   slug?: string;
   title?: string;
+  visibility_status?: string;
+  publishedAt?: string | null;
 }
 
 interface StrapiDestination {
@@ -213,7 +221,8 @@ async function fetchAllExperiences(): Promise<StrapiExperience[]> {
           experience.destination
         ),
       }))
-      .filter((experience) => experience.slug && experience.title);
+      .filter((experience) => experience.slug && experience.title)
+      .filter((experience) => filterPublicExperiences([experience]).length > 0);
   } catch (error) {
     console.error('Failed to fetch experiences for cultural world related mapping.', {
       route: '/cultural-worlds/[slug]',
@@ -271,8 +280,8 @@ function buildRelatedExperiences(
   const primarySlugs = new Set(
     primaryExperiences.map((experience) => experience.slug).filter(Boolean)
   );
-  const cmsSecondaryExperiences = normalizeRelationArray<StrapiExperience>(
-    destination.secondary_experiences
+  const cmsSecondaryExperiences = filterPublicExperiences(
+    normalizeRelationArray<StrapiExperience>(destination.secondary_experiences)
   )
     .map((experience) =>
       experience.slug ? fullExperienceIndex.get(experience.slug) || experience : experience
@@ -481,6 +490,13 @@ async function fetchDestination(slug: string): Promise<StrapiDestination | null>
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  if (!isCanonicalCulturalWorldSlug(slug)) {
+    return {
+      title: 'Not Found — Cultural World — Creare',
+      description: FALLBACK_DESCRIPTION,
+      robots: { index: false, follow: false },
+    };
+  }
   const destination = await fetchDestination(slug);
   const localContent = getCulturalWorldContent(slug);
 
@@ -510,6 +526,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CulturalWorldPage({ params }: Props) {
   const { slug } = await params;
+  if (!isCanonicalCulturalWorldSlug(slug)) {
+    notFound();
+  }
   const [destination, allExperiences] = await Promise.all([
     fetchDestination(slug),
     fetchAllExperiences(),
@@ -545,7 +564,9 @@ export default async function CulturalWorldPage({ params }: Props) {
     (section) => section.title || section.body
   );
 
-  const experiences = normalizeRelationArray<StrapiExperience>(destination.experiences)
+  const experiences = filterPublicExperiences(
+    normalizeRelationArray<StrapiExperience>(destination.experiences)
+  )
     .filter((experience) => experience.slug && experience.title)
     .sort((a, b) => (a.order_index ?? Infinity) - (b.order_index ?? Infinity));
   const allRelatedExperiences = buildRelatedExperiences(
@@ -557,9 +578,9 @@ export default async function CulturalWorldPage({ params }: Props) {
     (experience) => experience.relationType === 'primary'
   );
 
-  const cmsInsights = normalizeRelationArray<StrapiInsight>(destination.insights).filter(
-    (insight) => insight.slug && insight.title
-  );
+  const cmsInsights = filterPublicInsights(
+    normalizeRelationArray<StrapiInsight>(destination.insights)
+  ).filter((insight) => insight.slug && insight.title);
   const fallbackInsights = (localContent?.furtherReading ?? []).map((insight, index) => ({
     id: -(index + 1),
     slug: insight.slug,

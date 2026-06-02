@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
+import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { buildExperienceInquiryHref } from '@/lib/inquiry';
 import { buildMetadataAlternates } from '@/lib/seo';
@@ -49,6 +50,8 @@ interface StrapiExperience {
     slug?: string;
   };
   cover_image?: StrapiCoverImage | null;
+  visibility_status?: string;
+  publishedAt?: string | null;
 }
 
 function normalizeValue(value?: string | null) {
@@ -93,7 +96,7 @@ async function fetchBlackExperiences(): Promise<StrapiExperience[]> {
   try {
     const json = await fetchStrapi('/api/experiences?filters[category][$eqi]=black&populate=*');
     const items: StrapiExperience[] = Array.isArray(json?.data) ? json.data : [];
-    return items;
+    return filterPublicExperiences(items);
   } catch (error) {
     console.error('Failed to fetch BLACK experiences from Strapi.', error);
     return [];

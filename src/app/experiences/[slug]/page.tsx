@@ -10,6 +10,11 @@ import ExperienceViewTracker from '@/components/experiences/ExperienceViewTracke
 import GallerySection from '@/components/experiences/GallerySection';
 import InquireCTA from '@/components/experiences/InquireCTA';
 import { insights as staticInsights, isCanonicalCulturalWorldSlug } from '@/data/insights';
+import {
+  filterPublicExperiences,
+  filterPublicInsights,
+  isPublicExperienceRecord,
+} from '@/lib/canonical-gates';
 import { buildCloudinaryUrl } from '@/lib/cloudinary';
 import { buildMetadataAlternates, buildTwitterCard, SITE_NAME } from '@/lib/seo';
 import { buildExperienceDetailGraph } from '@/lib/schema-builder';
@@ -76,6 +81,8 @@ interface StrapiRelatedInsight {
   slug?: string;
   title?: string;
   excerpt?: string;
+  visibility_status?: string | null;
+  publishedAt?: string | null;
   cover_image?: StrapiCoverImage | null;
   destination?: StrapiDestination | null;
 }
@@ -127,6 +134,8 @@ interface StrapiExperienceDetail {
   intensity_entity?: StrapiOntologyEntity;
   related_experiences?: StrapiExperienceDetail[] | { data?: Record<string, unknown>[] };
   related_insights?: StrapiRelatedInsight[] | { data?: Record<string, unknown>[] };
+  visibility_status?: string | null;
+  publishedAt?: string | null;
 }
 
 type StrapiExperienceResult =
@@ -258,15 +267,19 @@ async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperien
     if (!item) {
       return { status: 'not_found' };
     }
-    const cmsRelatedExperiences = normalizeRelationArray<StrapiExperienceDetail>(
-      item.related_experiences
+    if (!isPublicExperienceRecord(item)) {
+      return { status: 'not_found' };
+    }
+
+    const cmsRelatedExperiences = filterPublicExperiences(
+      normalizeRelationArray<StrapiExperienceDetail>(item.related_experiences)
     ).map((experience) => ({
       ...experience,
       cover_image: normalizeSingleRelation<StrapiCoverImage>(experience.cover_image) ?? undefined,
       destination: normalizeSingleRelation<StrapiDestination>(experience.destination) ?? undefined,
     }));
-    const cmsRelatedInsights = normalizeRelationArray<StrapiRelatedInsight>(
-      item.related_insights
+    const cmsRelatedInsights = filterPublicInsights(
+      normalizeRelationArray<StrapiRelatedInsight>(item.related_insights)
     ).map((insight) => ({
       ...insight,
       cover_image: normalizeSingleRelation<StrapiCoverImage>(insight.cover_image) ?? undefined,

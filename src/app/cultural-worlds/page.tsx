@@ -4,6 +4,7 @@ import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
 import JsonLd from '@/components/JsonLd';
 import { buildCulturalWorldCollectionGraph } from '@/lib/schema-builder';
+import { filterCanonicalCulturalWorlds } from '@/lib/canonical-gates';
 import { buildMetadataAlternates } from '@/lib/seo';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
@@ -60,14 +61,13 @@ async function fetchActiveDestinations(): Promise<StrapiDestination[]> {
     const json = await fetchStrapi(path);
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
 
-    return items
-      .map((item) => flattenDestination(item))
-      .filter((item) => item.name)
-      .sort((a, b) => {
+    return filterCanonicalCulturalWorlds(items.map((item) => flattenDestination(item))).sort(
+      (a, b) => {
         const aOrder = a.order ?? Infinity;
         const bOrder = b.order ?? Infinity;
         return aOrder - bOrder;
-      });
+      }
+    );
   } catch (error) {
     console.error('Failed to fetch active cultural worlds destinations.', {
       route: '/cultural-worlds',
