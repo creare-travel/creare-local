@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import { notFound, permanentRedirect } from 'next/navigation';
 import JsonLd from '@/components/JsonLd';
 import OutboundLink from '@/components/analytics/OutboundLink';
 import AppImage from '@/components/ui/AppImage';
@@ -136,6 +137,13 @@ type StrapiExperienceResult =
     }
   | { status: 'not_found' }
   | { status: 'error'; error: Error };
+
+interface ResolvedExperienceDetail {
+  status: 'ok';
+  item: StrapiExperienceDetail;
+  navigationItems: StrapiExperienceNavigationItem[];
+  canonicalSlug: string;
+}
 
 function flattenItem<T>(raw: Record<string, unknown>): T {
   if (raw?.attributes && typeof raw.attributes === 'object') {
@@ -379,6 +387,52 @@ function normalizeExperienceSlugForInsightGraph(slug?: string | null) {
   return EXPERIENCE_SLUG_CANONICAL_MAP[slug] ?? slug;
 }
 
+function getExperienceAliasCandidates(slug: string) {
+  const normalizedSlug = slug.trim();
+  const familyCanonicalSlug = EXPERIENCE_SLUG_CANONICAL_MAP[normalizedSlug];
+
+  if (!familyCanonicalSlug) {
+    return [normalizedSlug];
+  }
+
+  const familySlugs = Object.entries(EXPERIENCE_SLUG_CANONICAL_MAP)
+    .filter(([, canonicalSlug]) => canonicalSlug === familyCanonicalSlug)
+    .map(([aliasSlug]) => aliasSlug);
+
+  return [normalizedSlug, ...familySlugs.filter((aliasSlug) => aliasSlug !== normalizedSlug)];
+}
+
+async function resolveExperienceDetailBySlug(
+  requestedSlug: string
+): Promise<ResolvedExperienceDetail | { status: 'not_found' } | { status: 'error'; error: Error }> {
+  const candidateSlugs = getExperienceAliasCandidates(requestedSlug);
+  let lastNotFound = false;
+
+  for (const candidateSlug of candidateSlugs) {
+    const result = await fetchStrapiExperienceBySlug(candidateSlug);
+
+    if (result.status === 'error') {
+      return result;
+    }
+
+    if (result.status === 'not_found') {
+      lastNotFound = true;
+      continue;
+    }
+
+    const canonicalSlug = result.item.slug?.trim() || candidateSlug;
+
+    return {
+      status: 'ok',
+      item: result.item,
+      navigationItems: result.navigationItems,
+      canonicalSlug,
+    };
+  }
+
+  return lastNotFound ? { status: 'not_found' } : { status: 'not_found' };
+}
+
 function toTitleCase(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
@@ -470,14 +524,14 @@ function renderRichText(nodes: StrapiRichTextNode[]): React.ReactNode {
 // ── Strapi detail page component ──────────────────────────────────────────────
 function StrapiExperiencePage({
   item,
-  slug,
+  canonicalSlug,
   navigationItems,
 }: {
   item: StrapiExperienceDetail;
-  slug: string;
+  canonicalSlug: string;
   navigationItems: StrapiExperienceNavigationItem[];
 }) {
-  const coverUrl = getGovernedExperienceImageUrl(item, slug);
+  const coverUrl = getGovernedExperienceImageUrl(item, canonicalSlug);
   const coverAlt = item.cover_image?.alternativeText ?? item.title;
   const locationDisplay = getExperienceLocation(item);
   const programItems = extractParagraphs(item.program);
@@ -485,18 +539,22 @@ function StrapiExperiencePage({
   const cmsRelatedExperiences = normalizeRelationArray<StrapiExperienceDetail>(
     item.related_experiences
   )
-    .filter((experience) => experience.slug && experience.title && experience.slug !== slug)
+    .filter(
+      (experience) => experience.slug && experience.title && experience.slug !== canonicalSlug
+    )
     .slice(0, 3);
   const cmsRelatedInsights = normalizeRelationArray<StrapiRelatedInsight>(item.related_insights)
     .filter((insight) => insight.slug && insight.title)
     .slice(0, MAX_RELATED_INSIGHTS);
   const fallbackRelatedInsights =
-    cmsRelatedInsights.length === 0 ? buildStaticReverseLinkedInsights(slug) : [];
+    cmsRelatedInsights.length === 0 ? buildStaticReverseLinkedInsights(canonicalSlug) : [];
   const relatedInsights =
     cmsRelatedInsights.length > 0 ? cmsRelatedInsights : fallbackRelatedInsights;
   const categoryLabel = item.category || item.tier || item.intent_level || '';
   const groupSize = item.group_size || (item.max_guests ? String(item.max_guests) : '');
-  const currentNavIndex = navigationItems.findIndex((experience) => experience.slug === slug);
+  const currentNavIndex = navigationItems.findIndex(
+    (experience) => experience.slug === canonicalSlug
+  );
   const prevExperience = currentNavIndex > 0 ? navigationItems[currentNavIndex - 1] : null;
   const nextExperience =
     currentNavIndex >= 0 && currentNavIndex < navigationItems.length - 1
@@ -504,7 +562,7 @@ function StrapiExperiencePage({
       : null;
   const wowMoment = normalizeOptionalText(item.wow_moment);
   const differentiator = normalizeOptionalText(item.differentiator);
-  const experienceSchemaGraph = buildExperienceDetailGraph(item, slug, relatedInsights);
+  const experienceSchemaGraph = buildExperienceDetailGraph(item, canonicalSlug, relatedInsights);
   const coverBlurDataUrl = coverUrl
     ? buildCinematicBlurDataUrl(coverUrl, { atmosphere: 'dark', profile: 'hero' })
     : undefined;
@@ -519,7 +577,7 @@ function StrapiExperiencePage({
   return (
     <main className="bg-white min-h-screen">
       <JsonLd id="experience-detail-jsonld" schema={experienceSchemaGraph} />
-      <ExperienceViewTracker slug={slug} title={item.title} category={categoryLabel} />
+      <ExperienceViewTracker slug={canonicalSlug} title={item.title} category={categoryLabel} />
 
       {/* ── HERO / COVER ── */}
       {coverUrl ? (
@@ -964,7 +1022,7 @@ function StrapiExperiencePage({
               Access is limited and curated.
             </p>
             <InquireCTA
-              experienceSlug={slug}
+              experienceSlug={canonicalSlug}
               label={item.cta_text || 'Begin a Private Conversation'}
               className="border border-white/30 text-white hover:bg-white hover:text-neutral-900"
             />
@@ -1003,7 +1061,7 @@ function StrapiExperiencePage({
               Access is limited and curated.
             </p>
             <InquireCTA
-              experienceSlug={slug}
+              experienceSlug={canonicalSlug}
               label="INQUIRE PRIVATELY"
               className="bg-black text-white hover:bg-neutral-800"
             />
@@ -1040,7 +1098,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
-  const result = await fetchStrapiExperienceBySlug(slugValue);
+  const result = await resolveExperienceDetailBySlug(slugValue);
 
   if (result.status === 'error') {
     return { title: 'Experience Unavailable — CREARE' };
@@ -1051,20 +1109,21 @@ export async function generateMetadata({
   }
 
   const strapiItem = result.item;
+  const canonicalSlug = result.canonicalSlug;
 
   const ogTitle = strapiItem.seo_title ?? `${strapiItem.title} — CREARE`;
   const ogDescription = getExperienceDescription(strapiItem);
-  const coverUrl = getGovernedExperienceImageUrl(strapiItem, slugValue);
+  const coverUrl = getGovernedExperienceImageUrl(strapiItem, canonicalSlug);
 
   return {
     title: ogTitle,
     description: ogDescription,
-    alternates: buildMetadataAlternates(`/experiences/${slugValue}`),
+    alternates: buildMetadataAlternates(`/experiences/${canonicalSlug}`),
     robots: { index: true, follow: true },
     openGraph: {
       title: ogTitle,
       description: ogDescription,
-      url: `${SITE_URL}/experiences/${slugValue}`,
+      url: `${SITE_URL}/experiences/${canonicalSlug}`,
       siteName: SITE_NAME,
       ...(coverUrl
         ? {
@@ -1096,20 +1155,24 @@ export async function generateMetadata({
 export default async function ExperienceDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
-  const result = await fetchStrapiExperienceBySlug(slugValue);
+  const result = await resolveExperienceDetailBySlug(slugValue);
 
   if (result.status === 'error') {
     return <div style={{ padding: 40 }}>Experience temporarily unavailable</div>;
   }
 
   if (result.status === 'not_found') {
-    return <div style={{ padding: 40 }}>Not found</div>;
+    notFound();
+  }
+
+  if (slugValue !== result.canonicalSlug) {
+    permanentRedirect(`/experiences/${result.canonicalSlug}`);
   }
 
   return (
     <StrapiExperiencePage
       item={result.item}
-      slug={slugValue}
+      canonicalSlug={result.canonicalSlug}
       navigationItems={result.navigationItems}
     />
   );

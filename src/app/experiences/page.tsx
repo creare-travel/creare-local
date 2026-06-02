@@ -82,10 +82,24 @@ const collectionFeatures: CollectionFeature[] = [
 
 interface StrapiExperience {
   id: number;
-  documentId?: string;
   title: string;
   short_description?: string;
   slug?: string;
+}
+
+function isPublishedExperience(item: unknown): item is StrapiExperience {
+  if (!item || typeof item !== 'object') {
+    return false;
+  }
+
+  const record = item as Record<string, unknown>;
+
+  return (
+    typeof record.title === 'string' &&
+    record.title.length > 0 &&
+    typeof record.slug === 'string' &&
+    record.slug.length > 0
+  );
 }
 
 async function fetchPublishedExperiences(): Promise<StrapiExperience[]> {
@@ -93,7 +107,9 @@ async function fetchPublishedExperiences(): Promise<StrapiExperience[]> {
     const json = await fetchStrapi(
       '/api/experiences?fields[0]=title&fields[1]=slug&fields[2]=short_description&pagination[pageSize]=12'
     );
-    return Array.isArray(json?.data) ? json.data : [];
+    const items: unknown[] = Array.isArray(json?.data) ? json.data : [];
+
+    return items.filter(isPublishedExperience);
   } catch {
     return [];
   }
@@ -241,9 +257,7 @@ export default async function ExperiencesPage() {
 
           <ul className="divide-y divide-white/10">
             {publishedExperiences.map((item) => {
-              const href = item.slug
-                ? `/experiences/${item.slug}`
-                : `/experiences/${item.documentId ?? item.id}`;
+              const href = `/experiences/${item.slug}`;
 
               return (
                 <li key={item.id}>
