@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import CulturalWorldViewTracker from '@/components/CulturalWorldViewTracker';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
-import { getCulturalWorldContent } from '@/data/cultural-worlds';
+import { getCulturalWorldContent, type CulturalWorldSystemMapping } from '@/data/cultural-worlds';
 import { getCulturalWorldContext } from '@/lib/cultural-world-context';
 import { buildMetadataAlternates } from '@/lib/seo';
 import { buildCanonicalUrl, buildCulturalWorldDetailGraph } from '@/lib/schema-builder';
@@ -227,6 +227,15 @@ async function fetchAllExperiences(): Promise<StrapiExperience[]> {
 interface RelatedExperience extends StrapiExperience {
   relationType: 'primary' | 'secondary';
   relationScore: number;
+}
+
+function buildSystemMappingIndex(mappings: CulturalWorldSystemMapping[] = []) {
+  return new Map(
+    mappings.map((mapping) => [
+      mapping.experienceTitle.trim().toLowerCase(),
+      mapping.culturalSystem,
+    ])
+  );
 }
 
 function buildRelatedExperiences(
@@ -569,6 +578,7 @@ export default async function CulturalWorldPage({ params }: Props) {
     mergedDestination.cover_image?.alternativeText ||
     mergedDestination.name ||
     'Cultural world cover image';
+  const systemMappingIndex = buildSystemMappingIndex(localContent?.systemMappings ?? []);
   const editorialSections = sections.map((section, index) => {
     const body = renderBodyContent(section.body);
     if (!body) return null;
@@ -755,6 +765,39 @@ export default async function CulturalWorldPage({ params }: Props) {
         </>
       )}
 
+      {localContent?.culturalSystems?.length ? (
+        <>
+          <section
+            className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-24"
+            aria-labelledby="cultural-systems"
+          >
+            <div className="max-w-3xl">
+              <p className="text-white/22 font-body text-[0.58rem] tracking-[0.24em] uppercase mb-7">
+                Cultural Systems
+              </p>
+              <h2
+                id="cultural-systems"
+                className="font-display font-light text-white leading-tight mb-10"
+                style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}
+              >
+                The cultural systems that structure this world.
+              </h2>
+              <ul className="space-y-6">
+                {localContent.culturalSystems.map((system, index) => (
+                  <li
+                    key={`${mergedDestination.slug || 'world'}-system-${index}`}
+                    className="flex gap-4 text-white/65 font-body font-light text-base leading-relaxed"
+                  >
+                    <span className="mt-2 block h-1.5 w-1.5 rounded-full bg-white/35 shrink-0" />
+                    <span>{system}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        </>
+      ) : null}
+
       {relatedExperiences.length > 0 && (
         <>
           <section
@@ -812,6 +855,14 @@ export default async function CulturalWorldPage({ params }: Props) {
                           {experience.short_description}
                         </p>
                       )}
+                      {experience.title &&
+                      systemMappingIndex.has(experience.title.trim().toLowerCase()) ? (
+                        <p className="mb-5 text-white/42 font-body text-[0.72rem] tracking-[0.14em] uppercase leading-relaxed">
+                          Connected Cultural System
+                          <span className="mx-2 text-white/22">→</span>
+                          {systemMappingIndex.get(experience.title.trim().toLowerCase())}
+                        </p>
+                      ) : null}
                       <div className="flex flex-wrap items-center gap-4 text-white/22 font-body text-xs tracking-[0.14em] uppercase">
                         {experience.category ? <span>{experience.category}</span> : null}
                         {experience.geo_experience_type ? (

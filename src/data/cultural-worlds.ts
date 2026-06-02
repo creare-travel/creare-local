@@ -8,6 +8,11 @@ export interface CulturalWorldLink {
   title: string;
 }
 
+export interface CulturalWorldSystemMapping {
+  experienceTitle: string;
+  culturalSystem: string;
+}
+
 export interface CulturalWorldCta {
   eyebrow?: string;
   title: string;
@@ -25,6 +30,8 @@ export interface CulturalWorldContent {
   metaTitle: string;
   metaDescription: string;
   sections: CulturalWorldSection[];
+  culturalSystems: string[];
+  systemMappings: CulturalWorldSystemMapping[];
   furtherReading: CulturalWorldLink[];
   cta: CulturalWorldCta;
 }
@@ -59,6 +66,47 @@ export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
       {
         title: 'Experience Philosophy',
         body: "Our approach to Istanbul is built on threshold intelligence. We do not assemble a list of monuments. We compose sequences that allow the city's deeper logic to become perceptible.\n\nAn encounter here might begin with first light over water, continue underground in the company of a specialist, and end in a private interior where a single object or story reorganises what the city means. The through-line is not geography but interpretation.\n\nIstanbul rewards those willing to move at the pace of comprehension rather than consumption. That is the pace at which the city becomes legible.",
+      },
+    ],
+    culturalSystems: [
+      'Bosphorus Maritime Culture',
+      'Ottoman Culinary Memory',
+      'Palace Memory',
+      'Byzantine Subterranean Heritage',
+      'Contemporary Craft Traditions',
+    ],
+    systemMappings: [
+      {
+        experienceTitle: 'Imperial Flavors™',
+        culturalSystem: 'Ottoman Culinary Memory',
+      },
+      {
+        experienceTitle: 'Private Ottoman Dining',
+        culturalSystem: 'Ottoman Culinary Memory',
+      },
+      {
+        experienceTitle: "Floating Salon d'Opera™",
+        culturalSystem: 'Bosphorus Maritime Culture',
+      },
+      {
+        experienceTitle: 'Bosphorus at Dawn',
+        culturalSystem: 'Bosphorus Maritime Culture',
+      },
+      {
+        experienceTitle: 'Beylerbeyi 1869™',
+        culturalSystem: 'Palace Memory',
+      },
+      {
+        experienceTitle: 'The Salon of Hands™',
+        culturalSystem: 'Contemporary Craft Traditions',
+      },
+      {
+        experienceTitle: 'Golden Horn Regatta™',
+        culturalSystem: 'Bosphorus Maritime Culture',
+      },
+      {
+        experienceTitle: 'Byzantine Underground',
+        culturalSystem: 'Byzantine Subterranean Heritage',
       },
     ],
     furtherReading: [
@@ -105,6 +153,31 @@ export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
         body: 'Our approach to Bodrum begins by refusing to read it as a Mediterranean backdrop. The peninsula is too historically dense, too spatially specific, and too culturally coded for that.\n\nInstead, we compose encounters around Halicarnassus, the Aegean table, hosted sociability, maritime rhythm, and the literary-intellectual coast that still survives beneath the seasonal surface.\n\nBodrum becomes most legible when approached as an environment of sequence and atmosphere: harbor to hillside, bay to grove, table to water, conversation to return.',
       },
     ],
+    culturalSystems: [
+      'Aegean Coastal Rituals',
+      'Peninsula Hospitality Culture',
+      'Maritime Memory',
+      'Seasonal Gathering Traditions',
+      'Terroir & Producer Networks',
+    ],
+    systemMappings: [
+      {
+        experienceTitle: 'Table to Farm',
+        culturalSystem: 'Terroir & Producer Networks',
+      },
+      {
+        experienceTitle: 'Halicarnassus at First Light',
+        culturalSystem: 'Maritime Memory',
+      },
+      {
+        experienceTitle: 'The Castle After Hours',
+        culturalSystem: 'Maritime Memory',
+      },
+      {
+        experienceTitle: 'Peninsula by Sea',
+        culturalSystem: 'Aegean Coastal Rituals',
+      },
+    ],
     furtherReading: [
       {
         slug: 'bodrum-beyond-the-coast-where-the-aegean-slows-down',
@@ -146,6 +219,27 @@ export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
       {
         title: 'Experience Philosophy',
         body: 'Cappadocia asks to be read through geological time. The landscape is visually immediate, but its deeper meaning appears more slowly: through silence, thresholds, carved interiors, altered scale, and the discipline of moving without haste.\n\nOur approach therefore shifts attention away from surface spectacle and toward inhabitation. A composed encounter here might begin in stillness before dawn, continue underground or within stone, and end at a table where volcanic soil, craft memory, and family continuity meet.\n\nThis is not a place for itinerary thinking. It is a place for patience, structure, and revelation by degrees.',
+      },
+    ],
+    culturalSystems: [
+      'Volcanic Landscape Memory',
+      'Monastic Silence Traditions',
+      'Underground Civilizations',
+      'Geological Time',
+      'Cave Habitat Culture',
+    ],
+    systemMappings: [
+      {
+        experienceTitle: 'Valley Before Dawn',
+        culturalSystem: 'Volcanic Landscape Memory',
+      },
+      {
+        experienceTitle: 'Underground, Unexcavated',
+        culturalSystem: 'Underground Civilizations',
+      },
+      {
+        experienceTitle: 'Volcanic Terroir',
+        culturalSystem: 'Geological Time',
       },
     ],
     furtherReading: [
