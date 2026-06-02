@@ -816,7 +816,7 @@ export default async function CulturalWorldPage({ params }: Props) {
                 Encounters that belong to this cultural world.
               </h2>
             </div>
-            <div className="grid grid-cols-1 gap-9 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
               {relatedExperiences.map((experience, index) => {
                 const imageUrl = resolveImageUrl(experience.cover_image);
                 const imageAlt =
@@ -828,7 +828,7 @@ export default async function CulturalWorldPage({ params }: Props) {
                     href={`/experiences/${experience.slug}`}
                     className="group block overflow-hidden rounded-[14px] border border-white/6 bg-white/[0.02]"
                   >
-                    <div className="relative aspect-[4/3] overflow-hidden">
+                    <div className="relative aspect-[16/10] overflow-hidden">
                       <AppImage
                         src={imageUrl}
                         alt={imageAlt}
@@ -841,34 +841,34 @@ export default async function CulturalWorldPage({ params }: Props) {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     </div>
-                    <div className="p-7 md:p-8">
-                      <p className="text-white/26 font-body text-[0.58rem] tracking-[0.2em] uppercase mb-4">
+                    <div className="p-5 md:p-6">
+                      <p className="mb-3 text-white/26 font-body text-[0.56rem] tracking-[0.18em] uppercase">
                         {experience.relationType === 'primary'
                           ? 'Primary relation'
                           : 'Secondary relation'}
                       </p>
-                      <h3 className="font-display font-light text-white text-2xl leading-snug mb-3">
+                      <h3 className="mb-2.5 font-display font-light text-[1.35rem] leading-snug text-white md:text-[1.5rem]">
                         {experience.title}
                       </h3>
                       {experience.short_description && (
-                        <p className="text-white/55 font-body font-light text-sm leading-relaxed mb-5">
+                        <p className="mb-4 text-white/55 font-body font-light text-sm leading-relaxed md:line-clamp-2">
                           {experience.short_description}
                         </p>
                       )}
                       {experience.title &&
                       systemMappingIndex.has(experience.title.trim().toLowerCase()) ? (
-                        <p className="mb-5 text-white/42 font-body text-[0.72rem] tracking-[0.14em] uppercase leading-relaxed">
+                        <p className="mb-4 text-white/42 font-body text-[0.68rem] tracking-[0.12em] uppercase leading-relaxed">
                           Connected Cultural System
                           <span className="mx-2 text-white/22">→</span>
                           {systemMappingIndex.get(experience.title.trim().toLowerCase())}
                         </p>
                       ) : null}
-                      <div className="flex flex-wrap items-center gap-4 text-white/22 font-body text-xs tracking-[0.14em] uppercase">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-white/22 font-body text-[0.68rem] tracking-[0.12em] uppercase">
                         {experience.category ? <span>{experience.category}</span> : null}
                         {experience.geo_experience_type ? (
                           <span>{experience.geo_experience_type}</span>
                         ) : null}
-                        <span className="text-white/40 group-hover:text-white/70 transition-colors">
+                        <span className="text-white/40 transition-colors group-hover:text-white/70">
                           → View Experience
                         </span>
                       </div>
