@@ -51,7 +51,7 @@ export default function Header() {
   }, [pathname]);
 
   const navLinks = [
-    { label: 'Destinations', href: '/cultural-worlds' },
+    { label: 'Cultural Worlds', href: '/cultural-worlds' },
     { label: 'Insights', href: '/insights' },
     { label: 'Philosophy', href: '/philosophy' },
     { label: 'Contact', href: '/contact' },

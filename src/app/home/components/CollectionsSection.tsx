@@ -49,8 +49,13 @@ const collectionFeatures: CollectionFeature[] = [
 export default function CollectionsSection() {
   return (
     <div className="w-full bg-neutral-50">
+      <div className="mx-auto max-w-7xl px-6 pt-16 sm:px-10 sm:pt-18 lg:px-16 lg:pt-20">
+        <p className="font-body text-[0.66rem] font-medium uppercase tracking-[0.18em] text-neutral-400">
+          Three ways CREARE composes an encounter.
+        </p>
+      </div>
       <section
-        className="mx-auto max-w-7xl px-6 pb-24 pt-28 sm:px-10 md:pb-36 md:pt-48 lg:px-16"
+        className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:px-10 sm:pt-12 md:pb-36 md:pt-16 lg:px-16 lg:pt-18"
         aria-label="SIGNATURE experiences"
       >
         <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-20 xl:gap-28">
