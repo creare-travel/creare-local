@@ -8,6 +8,7 @@ import AppImage from '@/components/ui/AppImage';
 import ExperienceViewTracker from '@/components/experiences/ExperienceViewTracker';
 import GallerySection from '@/components/experiences/GallerySection';
 import InquireCTA from '@/components/experiences/InquireCTA';
+import { insights as staticInsights } from '@/data/insights';
 import { buildCloudinaryUrl } from '@/lib/cloudinary';
 import { buildMetadataAlternates, buildTwitterCard, SITE_NAME } from '@/lib/seo';
 import { buildExperienceDetailGraph } from '@/lib/schema-builder';
@@ -357,6 +358,68 @@ function normalizeOptionalText(value?: string | null) {
   return trimmed ? trimmed : undefined;
 }
 
+const MAX_RELATED_INSIGHTS = 3;
+
+const EXPERIENCE_SLUG_CANONICAL_MAP: Record<string, string> = {
+  'beylerbeyi-1869': 'beylerbeyi-1869',
+  'beylerbeyi-1869-empire-interrupted': 'beylerbeyi-1869',
+  'beylerbeyi-1869tm-empire-interrupted': 'beylerbeyi-1869',
+  'imperial-flavors': 'imperial-flavors',
+  'imperial-flavors-culinary-atelier': 'imperial-flavors',
+};
+
+const STATIC_INSIGHT_MATCH_DENYLIST: Record<string, Set<string>> = {
+  'floating-salon-d-opera': new Set(['bodrum-beyond-the-coast-where-the-aegean-slows-down']),
+  'silk-road-istanbul': new Set(['cappadocia-without-balloons-a-different-kind-of-silence']),
+};
+
+function normalizeExperienceSlugForInsightGraph(slug?: string | null) {
+  if (!slug) return undefined;
+
+  return EXPERIENCE_SLUG_CANONICAL_MAP[slug] ?? slug;
+}
+
+function toTitleCase(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function buildStaticReverseLinkedInsights(currentExperienceSlug: string): StrapiRelatedInsight[] {
+  const normalizedCurrentSlug = normalizeExperienceSlugForInsightGraph(currentExperienceSlug);
+  if (!normalizedCurrentSlug) return [];
+
+  const deniedSlugs = STATIC_INSIGHT_MATCH_DENYLIST[normalizedCurrentSlug] ?? new Set<string>();
+  const matchedInsights = staticInsights.filter((insight) => {
+    if (!insight.relatedExperiences.length || deniedSlugs.has(insight.slug)) {
+      return false;
+    }
+
+    return insight.relatedExperiences.some((relatedExperienceSlug) => {
+      const normalizedRelatedSlug = normalizeExperienceSlugForInsightGraph(relatedExperienceSlug);
+      return normalizedRelatedSlug === normalizedCurrentSlug;
+    });
+  });
+
+  const seen = new Set<string>();
+
+  return matchedInsights
+    .filter((insight) => {
+      if (seen.has(insight.slug)) return false;
+      seen.add(insight.slug);
+      return true;
+    })
+    .slice(0, MAX_RELATED_INSIGHTS)
+    .map((insight, index) => ({
+      id: -(index + 1),
+      slug: insight.slug,
+      title: insight.title,
+      excerpt: insight.description,
+      destination: {
+        slug: insight.culturalWorldSlug,
+        name: toTitleCase(insight.location),
+      },
+    }));
+}
+
 // ── Rich text renderer ────────────────────────────────────────────────────────
 function renderRichText(nodes: StrapiRichTextNode[]): React.ReactNode {
   return nodes.map((node, i) => {
@@ -423,7 +486,11 @@ function StrapiExperiencePage({
     .slice(0, 3);
   const cmsRelatedInsights = normalizeRelationArray<StrapiRelatedInsight>(item.related_insights)
     .filter((insight) => insight.slug && insight.title)
-    .slice(0, 3);
+    .slice(0, MAX_RELATED_INSIGHTS);
+  const fallbackRelatedInsights =
+    cmsRelatedInsights.length === 0 ? buildStaticReverseLinkedInsights(slug) : [];
+  const relatedInsights =
+    cmsRelatedInsights.length > 0 ? cmsRelatedInsights : fallbackRelatedInsights;
   const categoryLabel = item.category || item.tier || item.intent_level || '';
   const groupSize = item.group_size || (item.max_guests ? String(item.max_guests) : '');
   const currentNavIndex = navigationItems.findIndex((experience) => experience.slug === slug);
@@ -726,12 +793,12 @@ function StrapiExperiencePage({
       {/* ── GALLERY ── */}
       {item.gallery && item.gallery.length > 0 && <GallerySection images={item.gallery} />}
 
-      {(cmsRelatedExperiences.length > 0 || cmsRelatedInsights.length > 0) && (
+      {(cmsRelatedExperiences.length > 0 || relatedInsights.length > 0) && (
         <section className="py-20 md:py-24 bg-white" aria-label="Related editorial references">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="border-t border-neutral-200 pt-10">
               {cmsRelatedExperiences.length > 0 && (
-                <div className={cmsRelatedInsights.length > 0 ? 'mb-16 md:mb-20' : ''}>
+                <div className={relatedInsights.length > 0 ? 'mb-16 md:mb-20' : ''}>
                   <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
                     Adjacent Experiences
                   </p>
@@ -782,13 +849,13 @@ function StrapiExperiencePage({
                 </div>
               )}
 
-              {cmsRelatedInsights.length > 0 && (
+              {relatedInsights.length > 0 && (
                 <div className="max-w-3xl">
                   <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
                     Further Cultural Reading
                   </p>
                   <div className="space-y-6">
-                    {cmsRelatedInsights.map((insight) => (
+                    {relatedInsights.map((insight) => (
                       <Link
                         key={insight.id}
                         href={`/insights/${insight.slug}`}
