@@ -25,6 +25,7 @@ interface InsightDetailInput extends ArticleInput {
   breadcrumbId: string;
   path: string;
   breadcrumbs: BreadcrumbItemInput[];
+  relatedEssays?: ListingItemInput[];
 }
 
 export function buildInsightListingGraph(input: InsightCollectionInput): SchemaNode[] {
@@ -83,6 +84,16 @@ export function buildInsightDetailGraph(input: InsightDetailInput): SchemaNode[]
           addressCountry: 'TR',
         })
       : undefined;
+  const relatedEssayMentions = input.relatedEssays?.length
+    ? input.relatedEssays
+        .filter((essay) => essay.url && essay.title)
+        .map((essay) => ({
+          '@type': 'Article',
+          url: essay.url,
+          name: essay.title,
+          description: essay.description,
+        }))
+    : undefined;
 
   const article = {
     '@id': input.articleId,
@@ -97,6 +108,7 @@ export function buildInsightDetailGraph(input: InsightDetailInput): SchemaNode[]
     dateModified: input.updatedAt,
     inLanguage: input.inLanguage,
     about: culturalWorldPlace ? [{ '@id': `${culturalWorldUrl}#place` }] : undefined,
+    mentions: relatedEssayMentions,
   };
 
   const webpage = buildWebPageSchema({

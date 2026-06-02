@@ -14,7 +14,7 @@ import {
 } from '@/lib/seo';
 import { buildCanonicalUrl, buildInsightDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
-import { getInsightBySlug } from '@/data/insights';
+import { getInsightBySlug, type Insight } from '@/data/insights';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 
 interface Props {
@@ -49,6 +49,7 @@ interface StrapiImage {
 
 interface ResolvedInsight extends StrapiInsight {
   source: 'strapi' | 'static';
+  relatedEssays?: string[];
 }
 
 interface StrapiExperience {
@@ -127,6 +128,7 @@ function normalizeMediaItem<T>(value: unknown): T | null {
 }
 
 const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
+const MAX_RELATED_ESSAYS = 4;
 const LEGACY_ISTANBUL_INSIGHT_SLUG = 'the-private-life-of-istanbul';
 const CANONICAL_ISTANBUL_INSIGHT_SLUG = 'private-life-of-istanbul';
 const canonicalInsightSlug = (slug: string | undefined): string | undefined =>
@@ -240,6 +242,7 @@ function buildStaticInsight(slug: string): ResolvedInsight | null {
     title: insight.title,
     excerpt: insight.description,
     content: insight.content,
+    relatedEssays: insight.relatedEssays,
     experiences: [],
     destination: insight.location
       ? {
@@ -293,6 +296,39 @@ async function resolveInsight(slug: string): Promise<ResolvedInsight | null> {
   }
 
   return staticInsight;
+}
+
+interface RelatedEssayReference {
+  slug: string;
+  title: string;
+  excerpt: string;
+  location: Insight['location'];
+}
+
+function buildRelatedEssayReferences(
+  relatedEssaySlugs: string[] | undefined,
+  currentSlug: string
+): RelatedEssayReference[] {
+  if (!relatedEssaySlugs?.length) return [];
+
+  const seen = new Set<string>();
+
+  return relatedEssaySlugs
+    .map((slug) => getInsightBySlug(slug))
+    .filter((essay): essay is Insight => Boolean(essay))
+    .filter((essay) => essay.slug !== currentSlug)
+    .filter((essay) => {
+      if (seen.has(essay.slug)) return false;
+      seen.add(essay.slug);
+      return true;
+    })
+    .slice(0, MAX_RELATED_ESSAYS)
+    .map((essay) => ({
+      slug: essay.slug,
+      title: essay.title,
+      excerpt: essay.description,
+      location: essay.location,
+    }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -500,6 +536,43 @@ function RelatedExperienceCard({
   );
 }
 
+function RelatedEssayList({ essays }: { essays: RelatedEssayReference[] }) {
+  if (!essays.length) return null;
+
+  return (
+    <section className="max-w-3xl mx-auto px-6 sm:px-10 mt-20" aria-label="Related essays">
+      <div className="border-t border-white/6 pt-12">
+        <p className="font-body text-xs tracking-[0.16em] uppercase text-white/24 mb-8">
+          Related Essays
+        </p>
+        <div className="space-y-6">
+          {essays.map((essay) => (
+            <Link
+              key={essay.slug}
+              href={`/insights/${essay.slug}`}
+              className="group block border-b border-white/6 pb-6 last:border-b-0 last:pb-0"
+              aria-label={`Read related essay: ${essay.title}`}
+            >
+              <p className="font-body text-[0.58rem] tracking-[0.18em] text-white/24 uppercase mb-2">
+                {essay.location.charAt(0).toUpperCase() + essay.location.slice(1)}
+              </p>
+              <h2 className="motion-copy-fade font-display text-xl sm:text-2xl font-light text-white leading-snug mb-2 group-hover:text-white/74 transition-colors duration-300">
+                {essay.title}
+              </h2>
+              <p className="font-body text-sm text-white/48 leading-relaxed mb-2.5">
+                {essay.excerpt}
+              </p>
+              <span className="motion-link font-body text-[0.68rem] tracking-[0.14em] uppercase text-white/28 group-hover:text-white/58 transition-colors duration-300">
+                Read →
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default async function InsightArticlePage({ params }: Props) {
   const { slug } = await params;
 
@@ -533,6 +606,7 @@ export default async function InsightArticlePage({ params }: Props) {
   const relatedExperiences: StrapiExperience[] = Array.isArray(insight.experiences)
     ? insight.experiences
     : [];
+  const relatedEssays = buildRelatedEssayReferences(insight.relatedEssays, insight.slug);
 
   const contentNode = renderRichText(insight.content);
   const insightSchema = buildInsightDetailGraph({
@@ -557,6 +631,11 @@ export default async function InsightArticlePage({ params }: Props) {
     image: insight.cover_image ?? undefined,
     destinationName,
     destinationSlug: insight.destination?.slug,
+    relatedEssays: relatedEssays.map((essay) => ({
+      title: essay.title,
+      url: canonicalUrl(`/insights/${essay.slug}`),
+      description: essay.excerpt,
+    })),
   });
 
   return (
@@ -623,21 +702,9 @@ export default async function InsightArticlePage({ params }: Props) {
             {contentNode}
           </>
         ) : null}
-
-        {/* CTA */}
-        <div className="mt-18 border-t border-white/6 pt-10">
-          <p className="font-body text-xs text-white/30 leading-relaxed mb-4">
-            Access is not listed. It is composed.
-          </p>
-          <Link
-            href="/contact"
-            className="font-body text-xs tracking-[0.14em] uppercase text-white/52 hover:text-white transition-colors duration-300"
-            aria-label="Inquire privately about a CREARE experience"
-          >
-            Inquire Privately →
-          </Link>
-        </div>
       </div>
+
+      <RelatedEssayList essays={relatedEssays} />
 
       {/* Related Experiences — only rendered if experiences exist */}
       {relatedExperiences.length > 0 && (
@@ -654,6 +721,22 @@ export default async function InsightArticlePage({ params }: Props) {
           </div>
         </section>
       )}
+
+      {/* CTA */}
+      <div className="max-w-2xl mx-auto px-6 sm:px-10 mt-20">
+        <div className="border-t border-white/6 pt-10">
+          <p className="font-body text-xs text-white/30 leading-relaxed mb-4">
+            Access is not listed. It is composed.
+          </p>
+          <Link
+            href="/contact"
+            className="font-body text-xs tracking-[0.14em] uppercase text-white/52 hover:text-white transition-colors duration-300"
+            aria-label="Inquire privately about a CREARE experience"
+          >
+            Inquire Privately →
+          </Link>
+        </div>
+      </div>
     </main>
   );
 }

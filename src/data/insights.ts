@@ -5,6 +5,7 @@ export interface Insight {
   location: 'istanbul' | 'bodrum' | 'cappadocia' | 'aegean';
   content: string;
   relatedExperiences: string[];
+  relatedEssays?: string[];
   culturalWorldSlug: string;
 }
 
@@ -48,6 +49,10 @@ That is what we offer. Not access as a product. Access as a consequence of trust
 
 The private life of Istanbul survives because it never depended on visibility in the first place. It survives through custodianship, through domestic continuity, through neighborhood memory, and through people who still understand that knowledge is something one receives by permission before one ever receives it by explanation. That is why the city remains inexhaustible. Its deepest life is not hidden because it is rare. It is hidden because continuity has always required guardianship.`,
     relatedExperiences: ['beylerbeyi-1869-empire-interrupted', 'silk-road-istanbul'],
+    relatedEssays: [
+      'private-experiences-istanbul-what-access-really-means',
+      'istanbul-without-the-crowds-where-the-city-still-breathes',
+    ],
   },
   {
     slug: 'bodrum-beyond-the-marina',
@@ -92,6 +97,10 @@ What first light offers, then, is not a better photograph. It offers a more accu
 
 Cappadocia is best understood at that second level. Its deepest meaning does not lie in the spectacle of being above it, but in the recognition that people learned to live inside it. The plateau becomes most legible when it is treated not as a sunrise destination, but as a civilization shaped by volcanic stone, underground knowledge, sacred withdrawal, and the patient intelligence of settlement.`,
     relatedExperiences: [],
+    relatedEssays: [
+      'cappadocia-without-balloons-a-different-kind-of-silence',
+      'private-experiences-cappadocia-silence-space-access',
+    ],
   },
   {
     slug: 'the-aegean-as-a-cultural-argument',
@@ -114,6 +123,7 @@ They involve, above all, the experience of being on the water — on a tradition
 
 That is the Aegean argument. And it is worth making.`,
     relatedExperiences: [],
+    relatedEssays: ['private-experiences-aegean-what-cannot-be-booked'],
   },
   {
     slug: 'private-experiences-istanbul-what-access-really-means',
@@ -144,6 +154,11 @@ This is what access really means in Istanbul. Not a door that opens when you pre
 
 The city has been doing this for two thousand years. It is very good at knowing the difference.`,
     relatedExperiences: ['beylerbeyi-1869-empire-interrupted', 'imperial-flavors-culinary-atelier'],
+    relatedEssays: [
+      'private-life-of-istanbul',
+      'istanbul-without-the-crowds-where-the-city-still-breathes',
+      'what-makes-an-experience-truly-private',
+    ],
   },
   {
     slug: 'bodrum-beyond-the-coast-where-the-aegean-slows-down',
@@ -172,6 +187,10 @@ Exclusive access in Bodrum means something different than it does in a city. It 
 
 The Aegean does not perform. It simply continues. The invitation is to join it — on its own terms, at its own pace, with the patience that the place requires and rewards.`,
     relatedExperiences: ['table-to-farm-bodrum', 'floating-salon-d-opera'],
+    relatedEssays: [
+      'private-experiences-bodrum-beyond-the-marina',
+      'bodrum-without-beach-clubs-a-different-rhythm',
+    ],
   },
   {
     slug: 'cappadocia-without-balloons-a-different-kind-of-silence',
@@ -202,6 +221,11 @@ The Silk Road Istanbul experience offers a parallel understanding of cultural de
 
 That understanding is available. But it requires arriving without the balloon in the foreground. It requires arriving, instead, with the patience to let the landscape speak in its own register — which is geological, which is ancient, and which is, in the end, the only register that matters here.`,
     relatedExperiences: ['silk-road-istanbul'],
+    relatedEssays: [
+      'private-experiences-cappadocia-silence-space-access',
+      'cappadocia-without-tours-moving-outside-the-routes',
+      'cappadocia-at-first-light',
+    ],
   },
   {
     slug: 'what-exclusive-travel-actually-means',
@@ -236,6 +260,10 @@ It also, in the end, produces something that the first kind of travel cannot: th
 
 That is what exclusive travel actually means. And it is worth the distinction.`,
     relatedExperiences: [],
+    relatedEssays: [
+      'what-makes-an-experience-truly-private',
+      'why-most-luxury-travel-is-actually-mass-tourism',
+    ],
   },
   {
     slug: 'private-experiences-bodrum-beyond-the-marina',
@@ -264,6 +292,10 @@ Private access in Bodrum is not about removing other people from the picture. It
 
 That opening is the experience. Everything else is threshold.`,
     relatedExperiences: ['table-to-farm-bodrum'],
+    relatedEssays: [
+      'bodrum-beyond-the-coast-where-the-aegean-slows-down',
+      'bodrum-without-beach-clubs-a-different-rhythm',
+    ],
   },
   {
     slug: 'private-experiences-cappadocia-silence-space-access',
@@ -290,6 +322,11 @@ Space in Cappadocia is not a luxury. It is a condition of the experience. The la
 
 What it actually is, is extraordinary. But it requires silence to hear it.`,
     relatedExperiences: [],
+    relatedEssays: [
+      'cappadocia-without-balloons-a-different-kind-of-silence',
+      'cappadocia-without-tours-moving-outside-the-routes',
+      'cappadocia-at-first-light',
+    ],
   },
   {
     slug: 'private-experiences-aegean-what-cannot-be-booked',
@@ -318,6 +355,7 @@ This is not a selling point. It is a description of what the Aegean actually is.
 
 They were designed to be life. The invitation is to participate in that, briefly, with the seriousness it deserves.`,
     relatedExperiences: [],
+    relatedEssays: ['the-aegean-as-a-cultural-argument'],
   },
   {
     slug: 'bodrum-without-beach-clubs-a-different-rhythm',
@@ -348,6 +386,10 @@ The invitation is to participate in that continuity, briefly, on its own terms. 
 
 That is the different rhythm. It is worth finding.`,
     relatedExperiences: ['table-to-farm-bodrum'],
+    relatedEssays: [
+      'bodrum-beyond-the-coast-where-the-aegean-slows-down',
+      'private-experiences-bodrum-beyond-the-marina',
+    ],
   },
   {
     slug: 'istanbul-without-the-crowds-where-the-city-still-breathes',
@@ -376,6 +418,10 @@ Istanbul without the crowds is not inaccessible. It is simply not on the tourist
 
 The city that breathes is the one that has been breathing for two thousand years. It is not hiding. It is simply waiting for the right kind of attention.`,
     relatedExperiences: ['beylerbeyi-1869-empire-interrupted'],
+    relatedEssays: [
+      'private-life-of-istanbul',
+      'private-experiences-istanbul-what-access-really-means',
+    ],
   },
   {
     slug: 'cappadocia-without-tours-moving-outside-the-routes',
@@ -408,6 +454,10 @@ Cappadocia without tours is not Cappadocia without knowledge. It is Cappadocia w
 
 That willingness is the beginning of the actual experience.`,
     relatedExperiences: [],
+    relatedEssays: [
+      'private-experiences-cappadocia-silence-space-access',
+      'cappadocia-without-balloons-a-different-kind-of-silence',
+    ],
   },
   {
     slug: 'why-most-luxury-travel-is-actually-mass-tourism',
@@ -440,6 +490,10 @@ This is the structural problem that the industry cannot solve. It can build bett
 
 The distinction is not semantic. It is the difference between a transaction and a relationship. And it is, in the end, the only distinction that matters in travel.`,
     relatedExperiences: ['beylerbeyi-1869-empire-interrupted'],
+    relatedEssays: [
+      'what-exclusive-travel-actually-means',
+      'what-makes-an-experience-truly-private',
+    ],
   },
   {
     slug: 'what-makes-an-experience-truly-private',
@@ -474,6 +528,11 @@ What makes an experience truly private is not the absence of other people. It is
 
 They were designed to be something else. The invitation is to be present for that something else — with the seriousness it deserves, and the patience it requires.`,
     relatedExperiences: ['imperial-flavors-culinary-atelier', 'beylerbeyi-1869-empire-interrupted'],
+    relatedEssays: [
+      'private-experiences-istanbul-what-access-really-means',
+      'what-exclusive-travel-actually-means',
+      'why-most-luxury-travel-is-actually-mass-tourism',
+    ],
   },
 ];
 
