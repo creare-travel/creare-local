@@ -13,6 +13,7 @@ interface WebPageInput {
   breadcrumbId?: string;
   mainEntity?: SchemaNode;
   about?: SchemaNode | SchemaNode[];
+  mentions?: SchemaNode | SchemaNode[];
   inLanguage?: string;
 }
 
@@ -28,6 +29,7 @@ export function buildWebPageSchema(input: WebPageInput): SchemaNode {
     breadcrumb: input.breadcrumbId ? { '@id': input.breadcrumbId } : undefined,
     mainEntity: input.mainEntity,
     about: input.about,
+    mentions: input.mentions,
     inLanguage: input.inLanguage,
   };
 }

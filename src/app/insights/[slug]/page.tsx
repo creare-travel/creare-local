@@ -636,6 +636,14 @@ export default async function InsightArticlePage({ params }: Props) {
       url: canonicalUrl(`/insights/${essay.slug}`),
       description: essay.excerpt,
     })),
+    relatedExperiences: relatedExperiences
+      .filter((experience) => experience.slug && experience.title)
+      .map((experience) => ({
+        title: experience.title,
+        slug: experience.slug,
+        url: canonicalUrl(`/experiences/${experience.slug}`),
+        description: experience.short_description,
+      })),
   });
 
   return (

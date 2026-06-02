@@ -5,7 +5,7 @@ import { buildOrganizationReference } from './organization';
 import { buildPlaceSchema } from './place';
 import { buildWebPageSchema } from './webpage';
 import type { ArticleInput, BreadcrumbItemInput, ListingItemInput, SchemaNode } from './types';
-import { buildCanonicalUrl } from './utils';
+import { buildCanonicalUrl, experienceIds } from './utils';
 
 interface InsightCollectionInput {
   pageId: string;
@@ -26,6 +26,7 @@ interface InsightDetailInput extends ArticleInput {
   path: string;
   breadcrumbs: BreadcrumbItemInput[];
   relatedEssays?: ListingItemInput[];
+  relatedExperiences?: ListingItemInput[];
 }
 
 export function buildInsightListingGraph(input: InsightCollectionInput): SchemaNode[] {
@@ -94,6 +95,19 @@ export function buildInsightDetailGraph(input: InsightDetailInput): SchemaNode[]
           description: essay.description,
         }))
     : undefined;
+  const relatedExperienceMentions = input.relatedExperiences?.length
+    ? input.relatedExperiences
+        .filter((experience) => experience.url && experience.title && experience.slug)
+        .map((experience) => ({
+          '@type': 'Service',
+          '@id': experienceIds(experience.slug as string).service,
+          url: experience.url,
+          name: experience.title,
+          description: experience.description,
+          provider: buildOrganizationReference(),
+        }))
+    : undefined;
+  const mentions = [relatedEssayMentions ?? [], relatedExperienceMentions ?? []].flat();
 
   const article = {
     '@id': input.articleId,
@@ -108,7 +122,7 @@ export function buildInsightDetailGraph(input: InsightDetailInput): SchemaNode[]
     dateModified: input.updatedAt,
     inLanguage: input.inLanguage,
     about: culturalWorldPlace ? [{ '@id': `${culturalWorldUrl}#place` }] : undefined,
-    mentions: relatedEssayMentions,
+    mentions: mentions.length > 0 ? mentions : undefined,
   };
 
   const webpage = buildWebPageSchema({
@@ -121,6 +135,7 @@ export function buildInsightDetailGraph(input: InsightDetailInput): SchemaNode[]
     breadcrumbId: input.breadcrumbId,
     mainEntity: { '@id': input.articleId },
     about: culturalWorldPlace ? [{ '@id': `${culturalWorldUrl}#place` }] : undefined,
+    mentions: relatedExperienceMentions?.length ? relatedExperienceMentions : undefined,
     inLanguage: input.inLanguage || undefined,
   });
 

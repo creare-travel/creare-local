@@ -501,7 +501,7 @@ function StrapiExperiencePage({
       : null;
   const wowMoment = normalizeOptionalText(item.wow_moment);
   const differentiator = normalizeOptionalText(item.differentiator);
-  const experienceSchemaGraph = buildExperienceDetailGraph(item, slug);
+  const experienceSchemaGraph = buildExperienceDetailGraph(item, slug, relatedInsights);
   const coverBlurDataUrl = coverUrl
     ? buildCinematicBlurDataUrl(coverUrl, { atmosphere: 'dark', profile: 'hero' })
     : undefined;

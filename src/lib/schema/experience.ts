@@ -9,10 +9,17 @@ import {
   extractParagraphs,
   getPrimaryDescription,
   getSafeAdditionalTypeUrl,
+  insightIds,
   normalizeEnumValue,
   normalizeSameAs,
 } from './utils';
 import { buildWebPageSchema } from './webpage';
+
+interface RelatedInsightReference {
+  slug?: string;
+  title?: string;
+  excerpt?: string;
+}
 
 function getLocation(experience: StrapiExperience): string | undefined {
   return experience.destination?.name || experience.location_label || undefined;
@@ -153,7 +160,8 @@ function getExperienceDescription(experience: StrapiExperience): string {
 
 export function buildExperienceDetailGraph(
   experience: StrapiExperience,
-  slug: string
+  slug: string,
+  relatedInsights: RelatedInsightReference[] = []
 ): SchemaNode[] {
   const ids = experienceIds(slug);
   const title = experience.title || 'Experience';
@@ -210,6 +218,18 @@ export function buildExperienceDetailGraph(
         }
       : null,
   ].filter(Boolean) as SchemaNode[];
+  const relatedInsightMentions = relatedInsights
+    .filter((insight) => insight.slug && insight.title)
+    .map((insight) => {
+      const ids = insightIds(insight.slug as string);
+      return {
+        '@type': 'Article',
+        '@id': ids.article,
+        url: ids.canonical,
+        name: insight.title,
+        description: insight.excerpt,
+      };
+    });
 
   const serviceType =
     normalizeOptionalText(experience.experience_type) ||
@@ -249,6 +269,7 @@ export function buildExperienceDetailGraph(
       },
     },
     about: aboutThings.length > 0 ? aboutThings : undefined,
+    mentions: relatedInsightMentions.length > 0 ? relatedInsightMentions : undefined,
     additionalProperty: additionalProperties.length > 0 ? additionalProperties : undefined,
     hasPart: encounterSequenceNode ? [{ '@id': ids.sequence }] : undefined,
   };
@@ -271,7 +292,10 @@ export function buildExperienceDetailGraph(
         name: experience.destination?.name,
         url: destinationUrl,
       },
+      ...relatedInsightMentions,
     ];
+  } else if (relatedInsightMentions.length > 0) {
+    webpageNode.mentions = relatedInsightMentions;
   }
 
   const breadcrumbNode = buildBreadcrumbListSchema(
