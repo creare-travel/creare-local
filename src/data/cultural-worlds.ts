@@ -11,6 +11,7 @@ export interface CulturalWorldLink {
 export interface CulturalWorldSystemMapping {
   experienceTitle: string;
   culturalSystem: string;
+  secondaryCulturalSystem?: string;
 }
 
 export interface CulturalWorldCta {
@@ -126,62 +127,73 @@ export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
     slug: 'bodrum',
     title: 'Bodrum',
     shortDescription:
-      'An Aegean cultural world shaped by Halicarnassus, maritime routes, cultivated tables, and the slower codes of the peninsula.',
-    heroStatement: 'An Aegean peninsula of Halicarnassus, maritime rhythm, and cultivated quiet.',
+      'A Halicarnassian cultural world shaped by archaeological memory, maritime movement, cultivated landscapes, hosted tables, and the literary afterlife of the peninsula.',
+    heroStatement:
+      'A peninsula where Halicarnassus, sea movement, cultivated ground, and hosted social ritual remain in active relation.',
     metaTitle: 'Bodrum — Cultural World — Creare',
     metaDescription:
-      'An Aegean cultural world of Halicarnassus, maritime routes, olive groves, underwater archaeology, and composed encounters shaped by the peninsula rather than resort surface.',
+      'A Halicarnassian cultural world of archaeological memory, Aegean maritime culture, cultivated landscapes, hosted table rituals, and literary afterlife beyond the resort surface.',
     sections: [
       {
         title: 'Cultural Identity',
-        body: 'Bodrum is ancient Halicarnassus before it is a seasonal image. It carries the memory of one of the Seven Wonders of the Ancient World, a Crusader castle built from its remains, and a peninsula whose cultural life has been shaped by sea routes, cultivation, and recurring return.\n\nIts modern identity is equally specific. Bodrum became a literary and intellectual coast as much as a leisure one, shaped by artists, writers, and those who read the Aegean as a place of form rather than escape.\n\nWhat matters is the coexistence of harbor life, village life, archaeological memory, and hosted sociability. The peninsula is not one mood. It is a series of spatial codes.',
+        body: 'Bodrum is Halicarnassus before it is a season. The peninsula carries the memory of ancient Caria, of Mausolus and Artemisia II, of a monument so consequential that it gave another language its word for mausoleum. That archaeological inheritance did not vanish when the monument fell. It persisted in reused stone, in Bodrum Castle, in the Museum of Underwater Archaeology, and in the peninsula’s continuing sense of itself as a site of accumulated civilisation.\n\nThe sea is the second structure of this world. Bodrum has always been approached by water as much as by land: through anchorages, trade routes, gulet passages, sponge-diving histories, fishing rhythms, and coastal navigation that binds village, harbor, bay, and workshop into one moving system.\n\nIts modern identity is equally specific. Bodrum became a literary and intellectual coast as much as a leisure one, shaped by Halikarnas Balıkçısı, by artists and seasonal returners, and by those who understood the Aegean not as escape but as a disciplined way of living with light, conversation, and recurring return. What defines the peninsula is the coexistence of archaeology, maritime life, cultivated ground, and hosted sociability.',
       },
       {
         title: 'Hidden Layers',
-        body: "Beneath Bodrum's visible polish lies a peninsula of submerged history, unexcavated traces, inland villages, olive ground, and private bays whose meanings are local rather than performative.\n\nThe sea is part of the archive here. Trade routes, wreck sites, anchorages, and coastal approaches all remain present in how the place is understood from the water.\n\nFurther inland, the peninsula's slower life persists through cultivation, workshop knowledge, and family-held settings that do not announce themselves but continue to structure the atmosphere of the coast.",
+        body: 'Beneath Bodrum’s visible polish lies a more exact peninsula: submerged history, unexcavated traces of Halicarnassus, inland villages, olive ground, and private bays whose meanings remain local rather than performative.\n\nThe sea is part of the archive here. Wreck sites, maritime approaches, workshop traditions, and remembered anchorages continue to shape how the peninsula is understood from the water. Bodrum Castle is not only a skyline object; it is part of a longer sequence linking the Mausoleum, Crusader reuse, and underwater archaeological memory.\n\nFurther inland, the peninsula’s slower intelligence persists through cultivation, family-held settings, citrus and olive production, workshop knowledge, and table customs that do not announce themselves yet continue to structure the coast from within. The hidden layer is not secrecy for its own sake. It is continuity that has never needed display.',
       },
       {
         title: 'Gastronomy & Rituals',
-        body: "Bodrum's table belongs to the wider Aegean tradition: olive oil, fish, herbs, orchard produce, and a discipline of restraint that values source and season over elaboration.\n\nThe peninsula's food culture is not separate from its geography. Shoreline, garden, village, and market all contribute to how hospitality is staged and how time is spent.\n\nThe most meaningful encounters are often the least signposted: a family table, an olive harvest, a kitchen whose intelligence depends on continuity rather than display.",
+        body: 'Bodrum’s table belongs to the wider Aegean world, but it has its own peninsula logic: meze as pacing, fish as daily measure, olive oil as continuity, orchard and vineyard produce as season made visible, and hosting as a social form rather than an industry.\n\nWhat matters is not restaurant prestige but table culture. A hosted meal on this peninsula carries codes of reception, tempo, sequence, and conversation that are inseparable from place. Shoreline, market, garden, village, and kitchen all contribute to how the evening unfolds.\n\nThe most meaningful encounters are often the least signposted: a family-run table, a producer gathering, an olive harvest, a kitchen whose authority depends on repetition rather than novelty. In Bodrum, food is one of the peninsula’s most durable ways of remembering itself.',
       },
       {
         title: 'Private Access Potential',
-        body: "Private access in Bodrum is defined as much by setting as by status. A vessel changes the peninsula. So does entry into a private estate, a protected bay, an after-hours institutional space, or a hosted domestic table.\n\nSome of the most compelling encounters here come from the interplay between land and sea: archaeology approached from the water, a culinary sequence shaped by cultivation and shoreline movement, or a residence whose position on the peninsula reframes the entire coast.\n\nWhat private access offers in Bodrum is not generic exclusivity. It is a more exact reading of the peninsula's social and maritime logic.",
+        body: 'Private access in Bodrum is defined by sequence and setting rather than generic exclusivity. A vessel changes the peninsula. So does entry into an after-hours archaeological or institutional site, a private estate, a workshop, a protected bay, or a hosted domestic table.\n\nSome of the strongest encounters here come from the interplay between antiquity, water, and cultivation: Halicarnassus at first light, Bodrum Castle after public hours, a gulet approach that reveals the coast as a maritime system rather than a sequence of beaches, or a table shaped by land held and worked beyond the seasonal surface.\n\nWhat private access offers in Bodrum is a more accurate reading of the peninsula’s civilizational logic. It clarifies how archaeology, hosted sociability, and maritime movement still belong to the same world.',
       },
       {
         title: 'Experience Philosophy',
-        body: 'Our approach to Bodrum begins by refusing to read it as a Mediterranean backdrop. The peninsula is too historically dense, too spatially specific, and too culturally coded for that.\n\nInstead, we compose encounters around Halicarnassus, the Aegean table, hosted sociability, maritime rhythm, and the literary-intellectual coast that still survives beneath the seasonal surface.\n\nBodrum becomes most legible when approached as an environment of sequence and atmosphere: harbor to hillside, bay to grove, table to water, conversation to return.',
+        body: 'Our approach to Bodrum begins by refusing the destination model. The peninsula is too historically dense, too maritime, too cultivated, and too culturally coded to be read as a backdrop for leisure.\n\nInstead, we compose encounters around Halicarnassus, Aegean maritime culture, hosted table life, olive and vineyard ground, and the literary afterlife that still survives beneath the seasonal surface. The aim is not to collect views but to understand how the peninsula holds together.\n\nBodrum becomes most legible when approached as a system of sequence: monument to harbor, harbor to workshop, workshop to grove, grove to table, table to conversation, conversation to return. That is when the refined coast becomes a cultural world.',
       },
     ],
     culturalSystems: [
-      'Aegean Coastal Rituals',
-      'Peninsula Hospitality Culture',
-      'Maritime Memory',
-      'Seasonal Gathering Traditions',
-      'Terroir & Producer Networks',
+      'Halicarnassus Archaeological Memory',
+      'Aegean Maritime Culture',
+      'Peninsula Table Culture',
+      'Aegean Cultivation Traditions',
+      'Literary Bodrum',
     ],
     systemMappings: [
       {
         experienceTitle: 'Table to Farm',
-        culturalSystem: 'Terroir & Producer Networks',
+        culturalSystem: 'Aegean Cultivation Traditions',
+        secondaryCulturalSystem: 'Peninsula Table Culture',
       },
       {
         experienceTitle: 'Halicarnassus at First Light',
-        culturalSystem: 'Maritime Memory',
+        culturalSystem: 'Halicarnassus Archaeological Memory',
       },
       {
         experienceTitle: 'The Castle After Hours',
-        culturalSystem: 'Maritime Memory',
+        culturalSystem: 'Halicarnassus Archaeological Memory',
+        secondaryCulturalSystem: 'Aegean Maritime Culture',
       },
       {
         experienceTitle: 'Peninsula by Sea',
-        culturalSystem: 'Aegean Coastal Rituals',
+        culturalSystem: 'Aegean Maritime Culture',
       },
     ],
     furtherReading: [
       {
         slug: 'bodrum-beyond-the-coast-where-the-aegean-slows-down',
         title: 'Bodrum Beyond the Coast: Where the Aegean Slows Down',
+      },
+      {
+        slug: 'private-experiences-bodrum-beyond-the-marina',
+        title: 'Private Experiences in Bodrum: Beyond the Marina',
+      },
+      {
+        slug: 'bodrum-without-beach-clubs-a-different-rhythm',
+        title: 'Bodrum Without Beach Clubs: A Different Rhythm',
       },
     ],
     cta: {

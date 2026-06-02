@@ -42,22 +42,22 @@ const CULTURAL_WORLD_CONTEXT: Record<string, CulturalWorldContextDefinition> = {
   },
   bodrum: {
     definition:
-      'A cultural world where the peninsula mediates between seasonal exposure, maritime rhythm, cultivated land, and the social codes of the Aegean coast.',
+      'A Halicarnassian cultural world in which archaeology, maritime movement, cultivated land, and hosted sociability continue to shape the peninsula as a whole.',
     introParagraphs: [
-      'Bodrum is not only a resort geography. It is a peninsula whose meaning is produced by alternating intensities: harbor and hillside, cultivation and leisure, exposure and retreat. The coastline is part of the structure, but not the whole argument.',
-      'What distinguishes this world is the way social life remains tied to site. Gardens, coves, kitchens, marinas, and private shorelines all carry different codes of gathering, performance, and hospitality. Access changes not just what is seen, but how time is felt.',
-      'CREARE approaches Bodrum as a cultural world of composed atmosphere. Experiences connected to it are shaped by coastal rhythm, hosted sociability, culinary memory, and the tension between openness and private control.',
+      'Bodrum is not best understood as a summer coast. It is a peninsula system whose present remains inseparable from Halicarnassus, from the maritime routes that connected Caria to the wider Aegean, and from the cultivated ground that still structures life beyond the shoreline.',
+      'The sea matters here not as scenery but as movement: anchorages, gulets, fishing memory, sponge-diving histories, castle approaches, and the shifting relation between harbor, bay, workshop, and table. Bodrum becomes legible through passage rather than panorama.',
+      'CREARE approaches Bodrum as a Halicarnassian cultural world in which archaeology, hosted table culture, olive and vineyard landscapes, and literary afterlife coexist. The experiences connected to it are shaped by sequence, access, and the peninsula’s older social intelligence.',
     ],
     characteristics: [
-      'The peninsula is read through alternating settings: shoreline, garden, marina, kitchen, and cultivated land.',
-      'Hospitality is spatial, not abstract; each setting defines its own tempo, etiquette, and social distance.',
-      'Seasonality matters because atmosphere, light, and movement shape how the world becomes legible.',
-      'Food and gathering are not secondary themes; they are core cultural instruments of the coast.',
-      'Private access reframes Bodrum from scenic backdrop into a staged social environment.',
+      'Maritime Peninsula: shoreline, harbor, anchorage, workshop, and hillside are part of one continuous spatial system.',
+      'Archaeological Memory: Halicarnassus remains active through ruins, reused stone, castle massing, and the peninsula’s historical self-understanding.',
+      'Hosted Table Culture: food, receiving, and social rhythm structure how Bodrum is actually lived rather than merely visited.',
+      'Cultivated Landscapes: olive ground, vineyards, orchards, and producer knowledge give the peninsula depth beyond the marina surface.',
+      'Literary & Intellectual Coast: Bodrum carries an afterlife shaped by writers, artists, and reflective retreat rather than leisure alone.',
     ],
     preferredMoods: ['celebration', 'gastronomy', 'stillness'],
     preferredGeoTypes: ['signature', 'seasonal', 'private'],
-    preferredTags: ['coastal', 'culinary', 'garden', 'maritime'],
+    preferredTags: ['archaeology', 'maritime', 'table', 'cultivation', 'literary'],
   },
   cappadocia: {
     definition:
