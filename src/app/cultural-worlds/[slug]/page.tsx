@@ -548,10 +548,13 @@ export default async function CulturalWorldPage({ params }: Props) {
   const experiences = normalizeRelationArray<StrapiExperience>(destination.experiences)
     .filter((experience) => experience.slug && experience.title)
     .sort((a, b) => (a.order_index ?? Infinity) - (b.order_index ?? Infinity));
-  const relatedExperiences = buildRelatedExperiences(
+  const allRelatedExperiences = buildRelatedExperiences(
     mergedDestination,
     experiences,
     allExperiences
+  );
+  const relatedExperiences = allRelatedExperiences.filter(
+    (experience) => experience.relationType === 'primary'
   );
 
   const cmsInsights = normalizeRelationArray<StrapiInsight>(destination.insights).filter(
@@ -617,7 +620,7 @@ export default async function CulturalWorldPage({ params }: Props) {
   const culturalWorldSchema = buildCulturalWorldDetailGraph({
     destination: mergedDestination,
     slug,
-    relatedExperiences: relatedExperiences
+    relatedExperiences: allRelatedExperiences
       .filter((experience) => experience.slug && experience.title)
       .map((experience) => ({
         title: experience.title,
@@ -842,11 +845,6 @@ export default async function CulturalWorldPage({ params }: Props) {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     </div>
                     <div className="p-4 md:p-5">
-                      <p className="mb-2.5 text-white/26 font-body text-[0.54rem] tracking-[0.17em] uppercase">
-                        {experience.relationType === 'primary'
-                          ? 'Primary relation'
-                          : 'Secondary relation'}
-                      </p>
                       <h3 className="mb-2 font-display font-light text-[1.2rem] leading-snug text-white md:text-[1.3rem]">
                         {experience.title}
                       </h3>
@@ -858,9 +856,10 @@ export default async function CulturalWorldPage({ params }: Props) {
                       {experience.title &&
                       systemMappingIndex.has(experience.title.trim().toLowerCase()) ? (
                         <p className="mb-3.5 text-white/42 font-body text-[0.65rem] tracking-[0.11em] uppercase leading-relaxed">
-                          Connected Cultural System
-                          <span className="mx-2 text-white/22">→</span>
-                          {systemMappingIndex.get(experience.title.trim().toLowerCase())}
+                          <span className="block">Connected Cultural System</span>
+                          <span className="mt-1 block text-white/58 tracking-[0.09em]">
+                            {systemMappingIndex.get(experience.title.trim().toLowerCase())}
+                          </span>
                         </p>
                       ) : null}
                       <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-white/22 font-body text-[0.64rem] tracking-[0.11em] uppercase">
