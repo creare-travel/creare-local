@@ -79,24 +79,6 @@ const CULTURAL_WORLD_CONTEXT: Record<string, CulturalWorldContextDefinition> = {
     preferredTags: ['geology', 'subterranean', 'monastic', 'byzantine', 'craft'],
     secondaryExperienceSlugs: ['the-salon-of-hands', 'beylerbeyi-1869-empire-interrupted'],
   },
-  aegean: {
-    definition:
-      'A cultural world where coast, cultivation, and maritime continuity remain in constant negotiation.',
-    introParagraphs: [
-      'The Aegean is not a generic seaside region. It is a field of relationships between inlet and plateau, olive ground and harbor, settlement and passage. The coast is meaningful because it has been repeatedly worked, crossed, and provisioned.',
-      'This world is defined by continuity rather than monument alone. Maritime routes, cultivated tables, vernacular building, and seasonal return create a cultural logic in which movement and settlement depend on one another.',
-      'CREARE approaches the Aegean as a world of long continuity: land and sea read together, hospitality understood through cultivation, and atmosphere shaped by the discipline of coastal living.',
-    ],
-    characteristics: [
-      'Land and sea are reciprocal systems rather than separate themes.',
-      'Cultivation, table culture, and shoreline movement belong to the same cultural logic.',
-      'Seasonal return shapes memory, labor, and social rhythm.',
-      'Meaning is distributed across coves, farms, harbors, and domestic thresholds.',
-    ],
-    preferredMoods: ['gastronomy', 'celebration', 'stillness'],
-    preferredGeoTypes: ['seasonal', 'signature', 'private'],
-    secondaryExperienceSlugs: ['table-to-farm-bodrum'],
-  },
 };
 
 function toParagraphs(value?: unknown): string[] {

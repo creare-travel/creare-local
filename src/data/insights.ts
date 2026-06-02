@@ -1,3 +1,5 @@
+export type CanonicalCulturalWorldSlug = 'istanbul' | 'bodrum' | 'cappadocia';
+
 export interface Insight {
   slug: string;
   title: string;
@@ -6,7 +8,13 @@ export interface Insight {
   content: string;
   relatedExperiences: string[];
   relatedEssays?: string[];
-  culturalWorldSlug: string;
+  culturalWorldSlug?: CanonicalCulturalWorldSlug;
+}
+
+export function isCanonicalCulturalWorldSlug(
+  value?: string | null
+): value is CanonicalCulturalWorldSlug {
+  return value === 'istanbul' || value === 'bodrum' || value === 'cappadocia';
 }
 
 export const insights: Insight[] = [
@@ -108,7 +116,6 @@ Cappadocia is best understood at that second level. Its deepest meaning does not
     description:
       'The Aegean coast is not a destination. It is a position — a way of understanding the relationship between civilisation, sea, and time.',
     location: 'aegean',
-    culturalWorldSlug: 'aegean',
     content: `The Aegean is the oldest argument in Western culture. It is where the Greeks and the Persians met, where Homer set his poems, where the idea of the city-state was first tested against the reality of geography and ambition.
 
 It is also, today, one of the most beautiful coastlines in the world — and one of the most misunderstood.
@@ -334,7 +341,6 @@ What it actually is, is extraordinary. But it requires silence to hear it.`,
     description:
       'The Aegean coast has been receiving visitors for three thousand years. It knows the difference between a guest and a tourist. The experiences worth having here are the ones that cannot be listed.',
     location: 'aegean',
-    culturalWorldSlug: 'aegean',
     content: `There is a category of experience that does not appear on booking platforms. Not because it is secret, exactly, but because it exists within a web of relationships that predates the internet, predates the travel industry, and predates, in some cases, the concept of tourism itself. The Aegean coast has been receiving visitors for three thousand years. It has developed, over that time, a very precise understanding of the difference between a guest and a tourist. The experiences worth having here are the ones that fall into the first category.
 
 What cannot be booked is, by definition, difficult to describe. But it is possible to gesture at its shape.

@@ -588,7 +588,7 @@ export const experiences: Experience[] = [
     seoTitle: 'Table to Farm — French Artisan Table at an Off-Grid Farm, Bodrum',
     seoDescription:
       'There is only one table. On a five-acre hillside above the Aegean, a single table is set for a maximum of ten guests. Off-grid farm, local cheeses, small-production wines. Bodrum Peninsula.',
-    culturalWorld: 'Aegean',
+    culturalWorld: 'Bodrum',
     ctaLabel: 'Request Access →',
     ctaSubtext: 'Limited availability. Subject to timing and approval.',
     trustStatement:

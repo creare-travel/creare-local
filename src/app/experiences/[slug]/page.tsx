@@ -8,7 +8,7 @@ import AppImage from '@/components/ui/AppImage';
 import ExperienceViewTracker from '@/components/experiences/ExperienceViewTracker';
 import GallerySection from '@/components/experiences/GallerySection';
 import InquireCTA from '@/components/experiences/InquireCTA';
-import { insights as staticInsights } from '@/data/insights';
+import { insights as staticInsights, isCanonicalCulturalWorldSlug } from '@/data/insights';
 import { buildCloudinaryUrl } from '@/lib/cloudinary';
 import { buildMetadataAlternates, buildTwitterCard, SITE_NAME } from '@/lib/seo';
 import { buildExperienceDetailGraph } from '@/lib/schema-builder';
@@ -413,10 +413,13 @@ function buildStaticReverseLinkedInsights(currentExperienceSlug: string): Strapi
       slug: insight.slug,
       title: insight.title,
       excerpt: insight.description,
-      destination: {
-        slug: insight.culturalWorldSlug,
-        name: toTitleCase(insight.location),
-      },
+      destination:
+        insight.culturalWorldSlug && isCanonicalCulturalWorldSlug(insight.culturalWorldSlug)
+          ? {
+              slug: insight.culturalWorldSlug,
+              name: toTitleCase(insight.location),
+            }
+          : null,
     }));
 }
 

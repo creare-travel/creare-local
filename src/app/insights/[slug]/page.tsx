@@ -14,7 +14,7 @@ import {
 } from '@/lib/seo';
 import { buildCanonicalUrl, buildInsightDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
-import { getInsightBySlug, type Insight } from '@/data/insights';
+import { getInsightBySlug, isCanonicalCulturalWorldSlug, type Insight } from '@/data/insights';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 
 interface Props {
@@ -235,6 +235,16 @@ function buildStaticInsight(slug: string): ResolvedInsight | null {
   const insight = getInsightBySlug(slug);
   if (!insight) return null;
 
+  const staticDestination =
+    insight.location &&
+    insight.culturalWorldSlug &&
+    isCanonicalCulturalWorldSlug(insight.culturalWorldSlug)
+      ? {
+          slug: insight.culturalWorldSlug,
+          name: insight.location.charAt(0).toUpperCase() + insight.location.slice(1),
+        }
+      : null;
+
   return {
     id: 0,
     source: 'static',
@@ -244,18 +254,18 @@ function buildStaticInsight(slug: string): ResolvedInsight | null {
     content: insight.content,
     relatedEssays: insight.relatedEssays,
     experiences: [],
-    destination: insight.location
-      ? {
-          slug: insight.culturalWorldSlug,
-          name: insight.location.charAt(0).toUpperCase() + insight.location.slice(1),
-        }
-      : null,
+    destination: staticDestination,
   };
 }
 
 async function resolveInsight(slug: string): Promise<ResolvedInsight | null> {
   const strapiInsight = await fetchInsight(slug);
   const staticInsight = buildStaticInsight(slug);
+
+  const normalizedStrapiDestination =
+    strapiInsight?.destination?.slug && isCanonicalCulturalWorldSlug(strapiInsight.destination.slug)
+      ? strapiInsight.destination
+      : null;
 
   if (strapiInsight) {
     const strapiExperiences = normalizeRelationArray<StrapiExperience>(
@@ -277,7 +287,7 @@ async function resolveInsight(slug: string): Promise<ResolvedInsight | null> {
       slug: strapiInsight.slug || staticInsight?.slug,
       excerpt: strapiInsight.excerpt || staticInsight?.excerpt,
       content: strapiInsight.content || staticInsight?.content,
-      destination: strapiInsight.destination || staticInsight?.destination || null,
+      destination: normalizedStrapiDestination || staticInsight?.destination || null,
       experiences:
         strapiExperiences.length > 0 ? strapiExperiences : (staticInsight?.experiences ?? []),
       source: 'strapi',

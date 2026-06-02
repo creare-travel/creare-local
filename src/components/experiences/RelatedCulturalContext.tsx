@@ -45,12 +45,6 @@ const CULTURAL_WORLD_CONTEXTS: Record<
         "This experience takes place in a historic palace on the Asian shore — a building that holds the memory of Ottoman imperial life and the continuous transformation of Istanbul's relationship with power, beauty, and cultural memory.",
     },
   },
-  aegean: {
-    paragraphs: {
-      'table-to-farm-bodrum':
-        'This experience exists within the cultural world of the Aegean, where the relationship between land and sea has shaped human civilization for three thousand years. The farm sits at the intersection of that ancient relationship — rooted in the soil, open to the water, part of a continuous lineage of cultivation and care.',
-    },
-  },
   bodrum: {
     url: '/cultural-worlds/bodrum',
     paragraphs: {
