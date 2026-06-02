@@ -632,6 +632,7 @@ export default async function CulturalWorldPage({ params }: Props) {
       })),
     relatedInsights: insights.map((insight) => ({
       title: insight.title,
+      slug: canonicalInsightSlug(insight.slug),
       url: insight.slug
         ? buildCanonicalUrl(`/insights/${canonicalInsightSlug(insight.slug)}`)
         : undefined,

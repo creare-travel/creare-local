@@ -1,10 +1,23 @@
 import type { SchemaNode } from './types';
-import { BRAND_ID, ORGANIZATION_ID, SITE_URL, WEBSITE_ID } from './utils';
+import { BRAND_ID, ORGANIZATION_ID, SITE_URL, WEBSITE_ID, culturalWorldIds } from './utils';
 
 const LOGO_URL = `${SITE_URL}/assets/images/app_logo.png`;
 
 export function buildOrganizationReference(): SchemaNode {
   return { '@id': ORGANIZATION_ID };
+}
+
+function buildCoreCulturalWorldReferences(): SchemaNode[] {
+  return [
+    { slug: 'istanbul', name: 'Istanbul' },
+    { slug: 'bodrum', name: 'Bodrum' },
+    { slug: 'cappadocia', name: 'Cappadocia' },
+  ].map((world) => ({
+    '@type': 'Place',
+    '@id': culturalWorldIds(world.slug).place,
+    name: world.name,
+    url: culturalWorldIds(world.slug).canonical,
+  }));
 }
 
 export function buildOrganizationSchema(): SchemaNode {
@@ -45,6 +58,7 @@ export function buildOrganizationSchema(): SchemaNode {
       },
     },
     serviceType: 'Private Cultural Experience Design',
+    knowsAbout: buildCoreCulturalWorldReferences(),
   };
 }
 

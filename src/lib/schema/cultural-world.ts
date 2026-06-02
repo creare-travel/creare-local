@@ -1,9 +1,16 @@
 import { buildBreadcrumbListSchema } from './breadcrumbs';
 import { buildImageObjectSchema } from './image';
 import { buildCollectionPageSchema, buildItemListSchema } from './listing';
+import { buildOrganizationReference } from './organization';
 import { buildPlaceSchema } from './place';
 import type { ListingItemInput, SchemaNode, StrapiDestination } from './types';
-import { buildCanonicalUrl, culturalWorldIds, extractParagraphs } from './utils';
+import {
+  buildCanonicalUrl,
+  culturalWorldIds,
+  experienceIds,
+  extractParagraphs,
+  insightIds,
+} from './utils';
 import { buildWebPageSchema } from './webpage';
 
 interface CulturalSectionInput {
@@ -24,7 +31,7 @@ interface CulturalWorldDetailInput {
   destination: StrapiDestination;
   slug: string;
   relatedExperiences: ListingItemInput[];
-  relatedInsights?: Array<{ title?: string; url?: string }>;
+  relatedInsights?: Array<{ title?: string; slug?: string; url?: string }>;
   sections?: CulturalSectionInput[];
 }
 
@@ -149,35 +156,56 @@ export function buildCulturalWorldDetailGraph(input: CulturalWorldDetailInput): 
     '@id': reference['@id'],
   }));
 
-  const collectionPage = buildCollectionPageSchema({
-    id: ids.collection,
-    url: ids.canonical,
-    name: `${title} Collection`,
-    description,
-    breadcrumbId: ids.breadcrumbs,
-    mainEntityId: itemList ? ids.itemList : ids.place,
-  });
+  const collectionPage = {
+    ...buildCollectionPageSchema({
+      id: ids.collection,
+      url: ids.canonical,
+      name: `${title} Collection`,
+      description,
+      breadcrumbId: ids.breadcrumbs,
+      mainEntityId: itemList ? ids.itemList : ids.place,
+    }),
+    publisher: buildOrganizationReference(),
+  };
 
-  const webpage = buildWebPageSchema({
-    id: ids.webpage,
-    url: ids.canonical,
-    name: title,
-    description,
-    image: imageObject ? { '@id': `${ids.canonical}#image` } : undefined,
-    breadcrumbId: ids.breadcrumbs,
-    mainEntity: { '@id': ids.place },
-    about: culturalReferenceLinks.length > 0 ? culturalReferenceLinks : undefined,
-  });
-
-  const mentions = input.relatedInsights?.length
+  const relatedInsightMentions = input.relatedInsights?.length
     ? input.relatedInsights
-        .filter((item) => item.title && item.url)
+        .filter((item) => item.title && item.url && item.slug)
         .map((item) => ({
-          '@type': 'CreativeWork',
-          name: item.title,
+          '@type': 'Article',
+          '@id': insightIds(item.slug as string).article,
           url: item.url,
+          name: item.title,
         }))
-    : undefined;
+    : [];
+
+  const relatedExperienceMentions = input.relatedExperiences
+    .filter((item) => item.url && item.title && item.slug)
+    .map((item) => ({
+      '@type': 'Service',
+      '@id': experienceIds(item.slug as string).service,
+      url: item.url,
+      name: item.title,
+      description: item.description,
+      provider: buildOrganizationReference(),
+    }));
+
+  const mentions = [...relatedInsightMentions, ...relatedExperienceMentions];
+
+  const webpage = {
+    ...buildWebPageSchema({
+      id: ids.webpage,
+      url: ids.canonical,
+      name: title,
+      description,
+      image: imageObject ? { '@id': `${ids.canonical}#image` } : undefined,
+      breadcrumbId: ids.breadcrumbs,
+      mainEntity: { '@id': ids.place },
+      about: culturalReferenceLinks.length > 0 ? culturalReferenceLinks : undefined,
+      mentions: mentions.length > 0 ? mentions : undefined,
+    }),
+    publisher: buildOrganizationReference(),
+  };
 
   return [
     breadcrumb,
@@ -185,10 +213,7 @@ export function buildCulturalWorldDetailGraph(input: CulturalWorldDetailInput): 
     place,
     itemList,
     collectionPage,
-    {
-      ...webpage,
-      mentions,
-    },
+    webpage,
     ...culturalReferences,
   ].filter(Boolean) as SchemaNode[];
 }
