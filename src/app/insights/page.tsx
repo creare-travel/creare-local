@@ -95,6 +95,61 @@ interface NormalizedInsight {
   destinationName: string | null;
 }
 
+type InsightSectionKey = 'featured' | 'cultural-world' | 'editorial' | 'archive';
+
+const FEATURED_ESSAY_SLUGS = [
+  'private-experiences-istanbul-what-access-really-means',
+  'private-life-of-istanbul',
+  'cappadocia-without-balloons-a-different-kind-of-silence',
+  'bodrum-beyond-the-coast-where-the-aegean-slows-down',
+] as const;
+
+const CULTURAL_WORLD_ESSAY_SLUGS = [
+  'private-experiences-bodrum-beyond-the-marina',
+  'cappadocia-at-first-light',
+  'cappadocia-without-tours-moving-outside-the-routes',
+  'bodrum-without-beach-clubs-a-different-rhythm',
+  'istanbul-without-the-crowds-where-the-city-still-breathes',
+  'private-experiences-cappadocia-silence-space-access',
+] as const;
+
+const EDITORIAL_ESSAY_SLUGS = [
+  'what-makes-an-experience-truly-private',
+  'what-exclusive-travel-actually-means',
+  'why-most-luxury-travel-is-actually-mass-tourism',
+  'the-aegean-as-a-cultural-argument',
+] as const;
+
+const SECTION_INTROS: Record<
+  InsightSectionKey,
+  { eyebrow: string; title: string; description: string }
+> = {
+  featured: {
+    eyebrow: 'Featured Essays',
+    title: 'The clearest arguments in the library.',
+    description:
+      'These pieces define CREARE most directly: place intelligence, private cultural access, and the difference between surface travel and meaningful encounter.',
+  },
+  'cultural-world': {
+    eyebrow: 'Cultural World Essays',
+    title: 'Place-specific readings of Istanbul, Bodrum, and Cappadocia.',
+    description:
+      'These essays belong to the worlds themselves. They clarify how geography, memory, ritual, and access combine into a coherent cultural logic.',
+  },
+  editorial: {
+    eyebrow: 'Editorial Essays',
+    title: 'Broader arguments around privacy, rarity, and cultural attention.',
+    description:
+      'These texts extend beyond one destination and sharpen CREARE’s editorial position on access, permission, and the social architecture of meaningful travel.',
+  },
+  archive: {
+    eyebrow: 'Archive',
+    title: 'Earlier pieces and supporting readings.',
+    description:
+      'Useful context, preserved as part of the editorial record, but not the first layer through which the library should be read.',
+  },
+};
+
 function resolveFirstInsightCoverImage(item: StrapiInsight): {
   url?: string;
   alternativeText?: string;
@@ -194,8 +249,66 @@ async function fetchStrapiInsights(): Promise<NormalizedInsight[] | null> {
   }
 }
 
-function InsightsList({
+function buildStaticInsights(): NormalizedInsight[] {
+  return insights.map((insight) => ({
+    slug: insight.slug,
+    title: insight.title,
+    excerpt: insight.description,
+    coverImageUrl: undefined,
+    coverImage: undefined,
+    destinationName: insight.location
+      ? insight.location.charAt(0).toUpperCase() + insight.location.slice(1)
+      : null,
+  }));
+}
+
+function mergeInsights(
+  staticItems: NormalizedInsight[],
+  strapiItems: NormalizedInsight[] | null
+): NormalizedInsight[] {
+  const bySlug = new Map(staticItems.map((item) => [item.slug, item]));
+
+  strapiItems?.forEach((item) => {
+    const existing = bySlug.get(item.slug);
+    bySlug.set(item.slug, {
+      ...(existing ?? item),
+      ...item,
+      excerpt: item.excerpt || existing?.excerpt || '',
+      destinationName: item.destinationName ?? existing?.destinationName ?? null,
+      coverImageUrl: item.coverImageUrl ?? existing?.coverImageUrl,
+      coverImage: item.coverImage ?? existing?.coverImage,
+    });
+  });
+
+  return staticItems.map((item) => bySlug.get(item.slug) ?? item);
+}
+
+function partitionInsights(items: NormalizedInsight[]) {
+  const featuredSet = new Set<string>(FEATURED_ESSAY_SLUGS);
+  const culturalWorldSet = new Set<string>(CULTURAL_WORLD_ESSAY_SLUGS);
+  const editorialSet = new Set<string>(EDITORIAL_ESSAY_SLUGS);
+
+  const pickByOrder = (slugs: readonly string[]) =>
+    slugs
+      .map((slug) => items.find((item) => item.slug === slug))
+      .filter((item): item is NormalizedInsight => Boolean(item));
+
+  const featured = pickByOrder(FEATURED_ESSAY_SLUGS);
+  const culturalWorld = pickByOrder(CULTURAL_WORLD_ESSAY_SLUGS);
+  const editorial = pickByOrder(EDITORIAL_ESSAY_SLUGS);
+  const archive = items.filter(
+    (item) =>
+      !featuredSet.has(item.slug) &&
+      !culturalWorldSet.has(item.slug) &&
+      !editorialSet.has(item.slug)
+  );
+
+  return { featured, culturalWorld, editorial, archive };
+}
+
+function CompactInsightsList({
   items,
+  showImages = false,
 }: {
   items: {
     slug: string;
@@ -204,10 +317,11 @@ function InsightsList({
     coverImageUrl?: string;
     destinationName?: string | null;
   }[];
+  showImages?: boolean;
 }) {
   if (!items.length) return null;
   return (
-    <ol className="space-y-10" aria-label="Insights articles">
+    <ol className="space-y-8" aria-label="Insights articles">
       {items.map((insight, index) => (
         <li key={insight.slug}>
           <Link
@@ -215,7 +329,7 @@ function InsightsList({
             className="group block"
             aria-label={`Read: ${insight.title}`}
           >
-            {insight.coverImageUrl && (
+            {showImages && insight.coverImageUrl && (
               <div className="relative w-full aspect-[16/9] mb-4 overflow-hidden">
                 <AppImage
                   src={insight.coverImageUrl}
@@ -253,25 +367,127 @@ function InsightsList({
   );
 }
 
+function SectionHeading({ section }: { section: InsightSectionKey }) {
+  const config = SECTION_INTROS[section];
+
+  return (
+    <div className="mb-10 max-w-2xl">
+      <p className="font-body text-[0.72rem] uppercase tracking-[0.18em] text-white/26 mb-4">
+        {config.eyebrow}
+      </p>
+      <h2 className="font-display text-2xl sm:text-3xl font-light leading-snug text-white mb-4">
+        {config.title}
+      </h2>
+      <p className="font-body text-sm leading-relaxed text-white/50">{config.description}</p>
+    </div>
+  );
+}
+
+function FeaturedEssays({ items }: { items: NormalizedInsight[] }) {
+  if (!items.length) return null;
+
+  const [lead, ...supporting] = items;
+
+  return (
+    <section aria-labelledby="featured-essays" className="mb-20">
+      <div className="mb-10 max-w-2xl">
+        <p className="font-body text-[0.72rem] uppercase tracking-[0.18em] text-white/26 mb-4">
+          Featured Essays
+        </p>
+        <h2
+          id="featured-essays"
+          className="font-display text-3xl sm:text-4xl font-light leading-snug text-white mb-4"
+        >
+          The clearest arguments in the library.
+        </h2>
+        <p className="font-body text-sm leading-relaxed text-white/50">
+          These essays are the front door to the knowledge system: the most complete expressions of
+          how CREARE reads place, privacy, and cultural permission.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.5fr)_minmax(18rem,0.9fr)] gap-12 xl:gap-16">
+        <Link
+          href={`/insights/${lead.slug}`}
+          className="group block border border-white/6 bg-white/[0.02] p-4 sm:p-5"
+          aria-label={`Read: ${lead.title}`}
+        >
+          {lead.coverImageUrl && (
+            <div className="relative w-full aspect-[16/9] overflow-hidden mb-6">
+              <AppImage
+                src={lead.coverImageUrl}
+                alt={lead.title}
+                fill
+                priority
+                atmosphere="dark"
+                deliveryProfile="card"
+                className="motion-media-drift object-cover"
+                sizes="(max-width: 1279px) 100vw, 60vw"
+              />
+            </div>
+          )}
+          {lead.destinationName && (
+            <p className="font-body text-xs tracking-[0.16em] uppercase text-white/26 mb-3">
+              {lead.destinationName}
+            </p>
+          )}
+          <h3 className="font-display text-2xl sm:text-[2rem] font-light text-white leading-snug mb-4 group-hover:text-white/78 transition-colors duration-300">
+            {lead.title}
+          </h3>
+          {lead.excerpt && (
+            <p className="max-w-2xl font-body text-sm sm:text-[0.95rem] leading-relaxed text-white/56 mb-5">
+              {lead.excerpt}
+            </p>
+          )}
+          <span className="font-body text-xs tracking-[0.14em] uppercase text-white/34 group-hover:text-white/62 transition-colors duration-300">
+            Read Essay →
+          </span>
+        </Link>
+
+        {supporting.length > 0 ? (
+          <div className="border-t border-white/6 xl:border-t-0 xl:border-l xl:pl-8 xl:border-white/6 pt-8 xl:pt-0">
+            <ol className="space-y-8" aria-label="Supporting featured essays">
+              {supporting.map((item) => (
+                <li key={item.slug}>
+                  <Link
+                    href={`/insights/${item.slug}`}
+                    className="group block"
+                    aria-label={`Read: ${item.title}`}
+                  >
+                    {item.destinationName && (
+                      <p className="font-body text-[0.68rem] tracking-[0.16em] uppercase text-white/24 mb-2">
+                        {item.destinationName}
+                      </p>
+                    )}
+                    <h3 className="font-display text-lg sm:text-xl font-light text-white leading-snug mb-2 group-hover:text-white/76 transition-colors duration-300">
+                      {item.title}
+                    </h3>
+                    {item.excerpt && (
+                      <p className="font-body text-sm leading-relaxed text-white/46 mb-3">
+                        {item.excerpt}
+                      </p>
+                    )}
+                    <span className="font-body text-[0.68rem] tracking-[0.14em] uppercase text-white/28 group-hover:text-white/58 transition-colors duration-300">
+                      Read →
+                    </span>
+                  </Link>
+                  <div className="border-t border-white/5 mt-8" />
+                </li>
+              ))}
+            </ol>
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 export default async function InsightsPage() {
   const strapiInsights = await fetchStrapiInsights();
 
-  // Determine which data source to use
-  // 1. Strapi data (if available)
-  // 2. Static fallback data
-  // 3. Render nothing if both empty
-  const staticFallback = insights.map((insight) => ({
-    slug: insight.slug,
-    title: insight.title,
-    excerpt: insight.description,
-    coverImageUrl: undefined,
-    coverImage: undefined,
-    destinationName: insight.location
-      ? insight.location.charAt(0).toUpperCase() + insight.location.slice(1)
-      : null,
-  }));
-
-  const displayItems = strapiInsights ?? (staticFallback.length ? staticFallback : null);
+  const staticInsights = buildStaticInsights();
+  const displayItems = mergeInsights(staticInsights, strapiInsights);
+  const sections = partitionInsights(displayItems);
   const insightsSchema = buildInsightListingGraph({
     pageId: `${buildCanonicalUrl('/insights')}#collection`,
     itemListId: `${buildCanonicalUrl('/insights')}#itemlist`,
@@ -283,40 +499,39 @@ export default async function InsightsPage() {
       { name: 'Home', url: buildCanonicalUrl('/') },
       { name: 'Insights', url: buildCanonicalUrl('/insights') },
     ],
-    items:
-      displayItems?.map((insight) => ({
-        title: insight.title,
-        slug: insight.slug,
-        url: buildCanonicalUrl(`/insights/${insight.slug}`),
-        description: insight.excerpt,
-        image: insight.coverImage,
-      })) ?? [],
+    items: displayItems.map((insight) => ({
+      title: insight.title,
+      slug: insight.slug,
+      url: buildCanonicalUrl(`/insights/${insight.slug}`),
+      description: insight.excerpt,
+      image: insight.coverImage,
+    })),
   });
 
   return (
     <main className="min-h-screen bg-black text-white pt-24 pb-24">
       <JsonLd id="insights-list-jsonld" schema={insightsSchema} />
-      <div className="max-w-2xl mx-auto px-6 sm:px-10">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
         {/* Header */}
-        <div className="mb-16">
+        <div className="mb-18 max-w-3xl">
           <p className="font-body text-xs tracking-[0.16em] uppercase text-white/32 mb-6">
             Insights
           </p>
-          <h1 className="font-display text-3xl sm:text-4xl font-light tracking-wide text-white leading-snug mb-6">
-            On Culture, Access, and the Art of the Private Encounter
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-light tracking-wide text-white leading-[1.08] mb-6">
+            An editorial knowledge system for culture, access, and the private encounter
           </h1>
-          <p className="font-body text-sm leading-relaxed text-white/60 max-w-lg">
-            These are not travel guides. They are arguments — for depth over surface, for
-            relationship over transaction, for the kind of access that cannot be listed or
-            purchased.
+          <p className="font-body text-sm sm:text-base leading-relaxed text-white/60 max-w-2xl">
+            These are not travel guides. They are essays that build context before itinerary:
+            arguments for depth over surface, relationship over transaction, and cultural worlds
+            that become legible only through attention, trust, and time.
           </p>
         </div>
 
         <section
           aria-label="Editorial framing"
-          className="mb-14 border-l border-white/8 pl-6 sm:pl-8"
+          className="mb-16 border-l border-white/8 pl-6 sm:pl-8"
         >
-          <div className="max-w-xl space-y-5">
+          <div className="max-w-3xl space-y-5">
             <p className="font-body text-[0.72rem] uppercase tracking-[0.18em] text-white/26">
               A Knowledge Layer
             </p>
@@ -334,10 +549,30 @@ export default async function InsightsPage() {
         </section>
 
         {/* Divider */}
-        <div className="border-t border-white/6 mb-14" />
+        <div className="border-t border-white/6 mb-16" />
 
-        {/* Article list */}
-        {displayItems ? <InsightsList items={displayItems} /> : null}
+        <FeaturedEssays items={sections.featured} />
+
+        {sections.culturalWorld.length > 0 && (
+          <section aria-labelledby="cultural-world-essays" className="mb-20">
+            <SectionHeading section="cultural-world" />
+            <CompactInsightsList items={sections.culturalWorld} showImages />
+          </section>
+        )}
+
+        {sections.editorial.length > 0 && (
+          <section aria-labelledby="editorial-essays" className="mb-20">
+            <SectionHeading section="editorial" />
+            <CompactInsightsList items={sections.editorial} />
+          </section>
+        )}
+
+        {sections.archive.length > 0 && (
+          <section aria-labelledby="archive-essays">
+            <SectionHeading section="archive" />
+            <CompactInsightsList items={sections.archive} />
+          </section>
+        )}
       </div>
     </main>
   );
