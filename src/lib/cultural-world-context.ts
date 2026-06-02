@@ -61,21 +61,22 @@ const CULTURAL_WORLD_CONTEXT: Record<string, CulturalWorldContextDefinition> = {
   },
   cappadocia: {
     definition:
-      'A cultural world composed through carved stone, subterranean space, volcanic memory, and a slower choreography of movement.',
+      'A geological civilization in which volcanic time, subterranean settlement, monastic withdrawal, and carved habitation still determine how the region is read.',
     introParagraphs: [
-      'Cappadocia is not defined by spectacle alone. Its real structure lies in carved interiors, concealed chambers, softened horizons, and the geological memory that shapes every path through the terrain.',
-      'This is a world where enclosure matters as much as openness. Valleys, cave rooms, thresholds cut into rock, and shifting viewpoints produce a spatial intelligence built on patience, silence, and altered scale.',
-      'CREARE reads Cappadocia as a cultural world of material time. Experiences connected to it should emphasize stillness, surface, ritual movement, and forms of attention that emerge when landscape is entered rather than observed from a distance.',
+      'Cappadocia is not best understood as a scenic destination. It is a volcanic plateau whose settlement history, religious life, and material culture were shaped directly by tuff, erosion, enclosure, and the long discipline of adapting human life to geological conditions.',
+      'This world is organized by verticality and concealment: valleys cut by erosion, rock-cut thresholds, cave churches, hidden chambers, and underground cities that transformed geology into refuge, worship, storage, and settlement. Meaning emerges here through inhabitation rather than viewpoint alone.',
+      'CREARE approaches Cappadocia as a civilization carved into stone. Experiences connected to it are shaped by deep time, monastic withdrawal, subterranean systems, Anatolian continuity, and the slower forms of attention required by a landscape that was never meant to be consumed at speed.',
     ],
     characteristics: [
-      'Stone is not backdrop but structure, shaping movement, acoustics, shelter, and memory.',
-      'The world is experienced through carved thresholds, interior voids, and gradual revelation rather than spectacle alone.',
-      'Silence and pacing are part of the cultural logic, not simply atmospheric effects.',
-      'Geological duration gives the landscape a sense of deep time that reorients human scale.',
-      'Meaning accumulates through inhabitation, not overview.',
+      'Volcanic Landscape Civilization: geology is the primary medium of settlement, worship, storage, movement, and memory.',
+      'Underground Settlement Networks: Derinkuyu, Kaymaklı, and related systems define Cappadocia as a region of concealed urban intelligence rather than open spectacle.',
+      'Monastic Anatolian Heritage: retreat, liturgy, fresco cycles, and carved sanctuaries remain central to the region’s cultural logic.',
+      'Byzantine Continuity: cave churches, devotional space, and sacred architecture keep late antique and Byzantine inheritance materially present.',
+      'Anatolian Craft Memory: clay, ceramic making, wine, food preservation, and domestic adaptation connect the plateau’s material culture to lived continuity.',
     ],
     preferredMoods: ['stillness', 'performance'],
     preferredGeoTypes: ['private', 'seasonal', 'signature'],
+    preferredTags: ['geology', 'subterranean', 'monastic', 'byzantine', 'craft'],
     secondaryExperienceSlugs: ['the-salon-of-hands', 'beylerbeyi-1869-empire-interrupted'],
   },
   aegean: {

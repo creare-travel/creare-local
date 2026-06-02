@@ -206,58 +206,70 @@ export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
     slug: 'cappadocia',
     title: 'Cappadocia',
     shortDescription:
-      'A cultural world of carved stone, subterranean life, rock monasteries, and volcanic craft traditions paced by geological time.',
-    heroStatement: 'A landscape of carved stone, subterranean life, and volcanic memory.',
+      'A geological civilization of volcanic stone, subterranean settlement, monastic retreat, Byzantine continuity, and Anatolian craft memory paced by deep time.',
+    heroStatement:
+      'A civilization carved into volcanic stone, where geology became settlement, refuge, worship, and continuity.',
     metaTitle: 'Cappadocia — Cultural World — Creare',
     metaDescription:
-      'A cultural world of carved stone, subterranean settlements, rock monasteries, volcanic craft traditions, and encounters shaped by silence, scale, and geological time.',
+      'A geological civilization of volcanic tuff, underground settlement networks, monastic Anatolian heritage, Byzantine continuity, and craft traditions shaped by deep time.',
     sections: [
       {
         title: 'Cultural Identity',
-        body: 'Cappadocia is one of those rare places where geology and civilisation are inseparable. Stone is not backdrop here; it is the medium through which shelter, worship, storage, movement, and memory were made.\n\nUnderground cities, carved monasteries, cave churches, and inhabited interiors all testify to a culture of adaptation shaped by pressure, patience, and long duration.\n\nThe result is not simply an extraordinary landscape. It is a world in which the human relationship to scale, enclosure, and time has been materially inscribed into the terrain itself.',
+        body: 'Cappadocia is one of the rare places where geology did not merely influence civilization but materially formed it. Volcanic eruptions from Erciyes and Hasan Dağı laid down the tuff from which valleys, chambers, sanctuaries, and settlements were later carved. Stone is not backdrop here; it is the medium through which shelter, worship, storage, movement, and memory were made.\n\nUnderground cities, rock-cut monasteries, cave churches, domestic interiors, and fortified heights such as Uçhisar all testify to a culture of adaptation shaped by pressure, patience, and long duration. Human life on the plateau was organized through enclosure, concealment, carved thresholds, and the disciplined reading of terrain.\n\nThe result is not simply an extraordinary landscape. It is a civilization inscribed into geology, in which settlement patterns, devotional life, and everyday inhabitation remain materially legible in the stone itself.',
       },
       {
         title: 'Hidden Layers',
-        body: 'What most visitors recognise in Cappadocia is only the outer surface. Beyond the familiar viewpoints lies a deeper register of inaccessible churches, partially mapped underground systems, carved thresholds, and local knowledge held by archaeologists, historians, and craft families.\n\nThe region rewards those willing to move from spectacle into inhabitation. Valleys become legible differently when entered on foot, interiors become meaningful when read with a specialist, and subterranean space changes the whole scale of experience.\n\nIts hidden layers are not only physical. They are also temporal and interpretive.',
+        body: 'What most visitors recognize in Cappadocia is the visible surface of a much deeper system. Beyond the familiar routes lies a region of partially mapped underground networks, inaccessible cave churches, hidden monastic rooms, carved service chambers, and local knowledge still held by archaeologists, historians, and craft families.\n\nDerinkuyu and Kaymaklı are only the most legible entrances into a wider subterranean intelligence. The region’s underground settlements, ventilation systems, defensive thresholds, and storage logics reframe Cappadocia as a world of concealed urbanism rather than scenic emptiness.\n\nIts hidden layers are not only physical. They are also temporal and interpretive. Valleys become legible differently when entered on foot, churches change meaning when read as liturgical environments rather than attractions, and stone interiors reveal a civilization built around persistence rather than display.',
       },
       {
         title: 'Gastronomy & Rituals',
-        body: "Cappadocia's food and wine culture belong to the logic of the plateau: preservation, clay, volcanic soil, seasonal endurance, and cultivation under constraint.\n\nCeramic cooking is not a novelty here. It is part of a longer material intelligence linking river clay, vessel-making, storage, and table ritual. Likewise, the wine tradition is not incidental to the region's identity but one of its oldest continuities.\n\nMeaningful encounters emerge when these traditions are approached through those who still hold them in practice rather than as rustic performance.",
+        body: 'Cappadocia’s food and wine culture belong to the logic of the plateau: preservation, volcanic soil, seasonal endurance, river clay, and cultivation under material constraint. These are not rustic accessories to the landscape. They are among the oldest continuities in how the region has lived.\n\nCeramic cooking is part of a deeper Anatolian craft memory linking the Kızılırmak, vessel-making, storage, and table ritual. Likewise, wine belongs to the region’s identity as an old plateau civilization, not a lifestyle add-on. Cellars cut into stone, protected interiors, and continuity of cultivation all connect food directly to geology.\n\nMeaningful encounters emerge when these traditions are approached through those who still hold them in practice: potters, growers, producers, and families for whom adaptation to the plateau remains a lived intelligence rather than a performance of locality.',
       },
       {
         title: 'Private Access Potential',
-        body: 'Private access in Cappadocia depends on a different kind of permission than on the coast or in the city. It sits at the intersection of archaeological protocol, institutional trust, and local custodianship.\n\nThat may mean entry into a rock-cut church outside normal visiting conditions, movement through less visible subterranean spaces, or invitation into a working craft or vineyard environment that remains outside the public tourism layer.\n\nWhat matters is not novelty alone. It is the ability to encounter the region at a scale and pace closer to how it was actually inhabited.',
+        body: 'Private access in Cappadocia depends on a different kind of permission than on the coast or in the city. It sits at the intersection of archaeological protocol, institutional trust, religious and historical sensitivity, and local custodianship.\n\nThat may mean entry into a rock-cut church outside normal visiting conditions, movement through less visible subterranean passages, or invitation into a working craft, domestic, or vineyard environment that remains outside the public tourism layer. In Cappadocia, access is rarely about exclusivity alone. It is about scale, silence, and the conditions needed to read a place accurately.\n\nWhat matters is not novelty for its own sake. It is the ability to encounter the plateau closer to how it was actually inhabited: carved into, withdrawn into, cultivated through, and understood over time.',
       },
       {
         title: 'Experience Philosophy',
-        body: 'Cappadocia asks to be read through geological time. The landscape is visually immediate, but its deeper meaning appears more slowly: through silence, thresholds, carved interiors, altered scale, and the discipline of moving without haste.\n\nOur approach therefore shifts attention away from surface spectacle and toward inhabitation. A composed encounter here might begin in stillness before dawn, continue underground or within stone, and end at a table where volcanic soil, craft memory, and family continuity meet.\n\nThis is not a place for itinerary thinking. It is a place for patience, structure, and revelation by degrees.',
+        body: 'Cappadocia asks to be read through geological time rather than scenic appetite. Its visible forms are immediate, but their meaning appears more slowly: through silence, thresholds, erosion, carved interiors, altered scale, and the discipline of moving without haste.\n\nOur approach therefore shifts attention away from spectacle and toward inhabitation. A composed encounter here might begin in the pre-dawn stillness of a valley, continue underground or within a carved sacred interior, and end at a table where volcanic soil, craft memory, and family continuity remain active in the present.\n\nThis is not a place for itinerary thinking. It is a place for patience, descent, altered perspective, and revelation by degrees. Cappadocia becomes most legible when treated not as a beautiful place to visit, but as a civilization that learned to live inside geology.',
       },
     ],
     culturalSystems: [
-      'Volcanic Landscape Memory',
-      'Monastic Silence Traditions',
-      'Underground Civilizations',
-      'Geological Time',
-      'Cave Habitat Culture',
+      'Volcanic Landscape Civilization',
+      'Underground Settlement Networks',
+      'Monastic Anatolian Heritage',
+      'Byzantine Continuity',
+      'Anatolian Craft Memory',
     ],
     systemMappings: [
       {
         experienceTitle: 'Valley Before Dawn',
-        culturalSystem: 'Volcanic Landscape Memory',
+        culturalSystem: 'Volcanic Landscape Civilization',
+        secondaryCulturalSystem: 'Byzantine Continuity',
       },
       {
         experienceTitle: 'Underground, Unexcavated',
-        culturalSystem: 'Underground Civilizations',
+        culturalSystem: 'Underground Settlement Networks',
+        secondaryCulturalSystem: 'Volcanic Landscape Civilization',
       },
       {
         experienceTitle: 'Volcanic Terroir',
-        culturalSystem: 'Geological Time',
+        culturalSystem: 'Anatolian Craft Memory',
+        secondaryCulturalSystem: 'Volcanic Landscape Civilization',
       },
     ],
     furtherReading: [
       {
         slug: 'cappadocia-without-balloons-a-different-kind-of-silence',
         title: 'Cappadocia Without Balloons: A Different Kind of Silence',
+      },
+      {
+        slug: 'private-experiences-cappadocia-silence-space-access',
+        title: 'Private Experiences in Cappadocia: Silence, Space, and Access',
+      },
+      {
+        slug: 'cappadocia-without-tours-moving-outside-the-routes',
+        title: 'Cappadocia Without Tours: Moving Outside the Routes',
       },
     ],
     cta: {
