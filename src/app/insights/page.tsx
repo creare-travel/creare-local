@@ -96,6 +96,7 @@ interface NormalizedInsight {
 }
 
 type InsightSectionKey = 'featured' | 'cultural-world' | 'editorial' | 'archive';
+type CulturalWorldGroupKey = 'bodrum' | 'cappadocia' | 'istanbul';
 
 const FEATURED_ESSAY_SLUGS = [
   'private-experiences-istanbul-what-access-really-means',
@@ -132,7 +133,7 @@ const SECTION_INTROS: Record<
   },
   'cultural-world': {
     eyebrow: 'Cultural World Essays',
-    title: 'Place-specific readings of Istanbul, Bodrum, and Cappadocia.',
+    title: 'Destination-based readings of Istanbul, Bodrum, and Cappadocia.',
     description:
       'These essays belong to the worlds themselves. They clarify how geography, memory, ritual, and access combine into a coherent cultural logic.',
   },
@@ -143,11 +144,19 @@ const SECTION_INTROS: Record<
       'These texts extend beyond one destination and sharpen CREARE’s editorial position on access, permission, and the social architecture of meaningful travel.',
   },
   archive: {
-    eyebrow: 'Archive',
-    title: 'Earlier pieces and supporting readings.',
+    eyebrow: 'Further Reading',
+    title: 'Additional essays within the same knowledge system.',
     description:
-      'Useful context, preserved as part of the editorial record, but not the first layer through which the library should be read.',
+      'These pieces extend the editorial conversation and remain fully part of the library, even when they sit outside the first reading path.',
   },
+};
+
+const CULTURAL_WORLD_GROUP_ORDER: CulturalWorldGroupKey[] = ['bodrum', 'cappadocia', 'istanbul'];
+
+const CULTURAL_WORLD_GROUP_LABELS: Record<CulturalWorldGroupKey, string> = {
+  bodrum: 'Bodrum',
+  cappadocia: 'Cappadocia',
+  istanbul: 'Istanbul',
 };
 
 function resolveFirstInsightCoverImage(item: StrapiInsight): {
@@ -309,6 +318,7 @@ function partitionInsights(items: NormalizedInsight[]) {
 function CompactInsightsList({
   items,
   showImages = false,
+  showDestinationName = true,
 }: {
   items: {
     slug: string;
@@ -318,10 +328,11 @@ function CompactInsightsList({
     destinationName?: string | null;
   }[];
   showImages?: boolean;
+  showDestinationName?: boolean;
 }) {
   if (!items.length) return null;
   return (
-    <ol className="space-y-8" aria-label="Insights articles">
+    <ol className="space-y-7 sm:space-y-8" aria-label="Insights articles">
       {items.map((insight, index) => (
         <li key={insight.slug}>
           <Link
@@ -330,7 +341,7 @@ function CompactInsightsList({
             aria-label={`Read: ${insight.title}`}
           >
             {showImages && insight.coverImageUrl && (
-              <div className="relative w-full aspect-[16/9] mb-4 overflow-hidden">
+              <div className="relative w-full aspect-[16/10] mb-4 overflow-hidden">
                 <AppImage
                   src={insight.coverImageUrl}
                   alt={insight.title}
@@ -343,7 +354,7 @@ function CompactInsightsList({
                 />
               </div>
             )}
-            {insight.destinationName && (
+            {showDestinationName && insight.destinationName && (
               <p className="font-body text-xs tracking-[0.14em] uppercase text-white/26 mb-2">
                 {insight.destinationName}
               </p>
@@ -352,7 +363,7 @@ function CompactInsightsList({
               {insight.title}
             </h2>
             {insight.excerpt && (
-              <p className="font-body text-sm text-white/50 leading-relaxed mb-3">
+              <p className="font-body text-sm text-white/48 leading-relaxed mb-3">
                 {insight.excerpt}
               </p>
             )}
@@ -360,7 +371,7 @@ function CompactInsightsList({
               Read →
             </span>
           </Link>
-          <div className="border-t border-white/4 mt-12" />
+          <div className="border-t border-white/4 mt-10 sm:mt-11" />
         </li>
       ))}
     </ol>
@@ -371,7 +382,7 @@ function SectionHeading({ section }: { section: InsightSectionKey }) {
   const config = SECTION_INTROS[section];
 
   return (
-    <div className="mb-10 max-w-2xl">
+    <div className="mb-12 max-w-2xl lg:mb-14">
       <p className="font-body text-[0.72rem] uppercase tracking-[0.18em] text-white/26 mb-4">
         {config.eyebrow}
       </p>
@@ -383,14 +394,59 @@ function SectionHeading({ section }: { section: InsightSectionKey }) {
   );
 }
 
+function groupCulturalWorldEssays(items: NormalizedInsight[]) {
+  const grouped = new Map<CulturalWorldGroupKey, NormalizedInsight[]>(
+    CULTURAL_WORLD_GROUP_ORDER.map((key) => [key, []])
+  );
+
+  items.forEach((item) => {
+    const key = item.destinationName?.toLowerCase() as CulturalWorldGroupKey | undefined;
+    if (!key || !grouped.has(key)) return;
+    grouped.get(key)?.push(item);
+  });
+
+  return CULTURAL_WORLD_GROUP_ORDER.map((key) => ({
+    key,
+    label: CULTURAL_WORLD_GROUP_LABELS[key],
+    items: grouped.get(key) ?? [],
+  })).filter((group) => group.items.length > 0);
+}
+
+function CulturalWorldEssayGroups({ items }: { items: NormalizedInsight[] }) {
+  const groups = groupCulturalWorldEssays(items);
+  if (!groups.length) return null;
+
+  return (
+    <div className="space-y-16 lg:space-y-20">
+      {groups.map((group, index) => (
+        <section
+          key={group.key}
+          aria-labelledby={`cultural-world-group-${group.key}`}
+          className={index > 0 ? 'pt-1' : undefined}
+        >
+          <div className="mb-6 sm:mb-7">
+            <p
+              id={`cultural-world-group-${group.key}`}
+              className="font-body text-[0.66rem] uppercase tracking-[0.24em] text-white/24"
+            >
+              {group.label}
+            </p>
+          </div>
+          <CompactInsightsList items={group.items} showDestinationName={false} />
+        </section>
+      ))}
+    </div>
+  );
+}
+
 function FeaturedEssays({ items }: { items: NormalizedInsight[] }) {
   if (!items.length) return null;
 
   const [lead, ...supporting] = items;
 
   return (
-    <section aria-labelledby="featured-essays" className="mb-20">
-      <div className="mb-10 max-w-2xl">
+    <section aria-labelledby="featured-essays" className="mb-28 lg:mb-32">
+      <div className="mb-12 max-w-2xl lg:mb-14">
         <p className="font-body text-[0.72rem] uppercase tracking-[0.18em] text-white/26 mb-4">
           Featured Essays
         </p>
@@ -406,14 +462,14 @@ function FeaturedEssays({ items }: { items: NormalizedInsight[] }) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.5fr)_minmax(18rem,0.9fr)] gap-12 xl:gap-16">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.15fr)_minmax(19rem,0.95fr)] gap-12 xl:gap-14">
         <Link
           href={`/insights/${lead.slug}`}
-          className="group block border border-white/6 bg-white/[0.02] p-4 sm:p-5"
+          className="group block border border-white/6 bg-white/[0.02] p-3 sm:p-4"
           aria-label={`Read: ${lead.title}`}
         >
           {lead.coverImageUrl && (
-            <div className="relative w-full aspect-[16/9] overflow-hidden mb-6">
+            <div className="relative w-full aspect-[16/10] overflow-hidden mb-5">
               <AppImage
                 src={lead.coverImageUrl}
                 alt={lead.title}
@@ -431,11 +487,11 @@ function FeaturedEssays({ items }: { items: NormalizedInsight[] }) {
               {lead.destinationName}
             </p>
           )}
-          <h3 className="font-display text-2xl sm:text-[2rem] font-light text-white leading-snug mb-4 group-hover:text-white/78 transition-colors duration-300">
+          <h3 className="font-display text-[1.65rem] sm:text-[1.8rem] font-light text-white leading-snug mb-4 group-hover:text-white/78 transition-colors duration-300">
             {lead.title}
           </h3>
           {lead.excerpt && (
-            <p className="max-w-2xl font-body text-sm sm:text-[0.95rem] leading-relaxed text-white/56 mb-5">
+            <p className="max-w-2xl font-body text-sm leading-relaxed text-white/54 mb-5">
               {lead.excerpt}
             </p>
           )}
@@ -445,7 +501,7 @@ function FeaturedEssays({ items }: { items: NormalizedInsight[] }) {
         </Link>
 
         {supporting.length > 0 ? (
-          <div className="border-t border-white/6 xl:border-t-0 xl:border-l xl:pl-8 xl:border-white/6 pt-8 xl:pt-0">
+          <div className="border-t border-white/6 xl:border-t-0 xl:border-l xl:pl-8 xl:border-white/6 pt-8 xl:pt-1">
             <ol className="space-y-8" aria-label="Supporting featured essays">
               {supporting.map((item) => (
                 <li key={item.slug}>
@@ -513,7 +569,7 @@ export default async function InsightsPage() {
       <JsonLd id="insights-list-jsonld" schema={insightsSchema} />
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
         {/* Header */}
-        <div className="mb-18 max-w-3xl">
+        <div className="mb-20 max-w-3xl lg:mb-24">
           <p className="font-body text-xs tracking-[0.16em] uppercase text-white/32 mb-6">
             Insights
           </p>
@@ -529,7 +585,7 @@ export default async function InsightsPage() {
 
         <section
           aria-label="Editorial framing"
-          className="mb-16 border-l border-white/8 pl-6 sm:pl-8"
+          className="mb-20 border-l border-white/8 pl-6 sm:pl-8 lg:mb-24"
         >
           <div className="max-w-3xl space-y-5">
             <p className="font-body text-[0.72rem] uppercase tracking-[0.18em] text-white/26">
@@ -549,19 +605,19 @@ export default async function InsightsPage() {
         </section>
 
         {/* Divider */}
-        <div className="border-t border-white/6 mb-16" />
+        <div className="border-t border-white/6 mb-20 lg:mb-24" />
 
         <FeaturedEssays items={sections.featured} />
 
         {sections.culturalWorld.length > 0 && (
-          <section aria-labelledby="cultural-world-essays" className="mb-20">
+          <section aria-labelledby="cultural-world-essays" className="mb-28 lg:mb-32">
             <SectionHeading section="cultural-world" />
-            <CompactInsightsList items={sections.culturalWorld} showImages />
+            <CulturalWorldEssayGroups items={sections.culturalWorld} />
           </section>
         )}
 
         {sections.editorial.length > 0 && (
-          <section aria-labelledby="editorial-essays" className="mb-20">
+          <section aria-labelledby="editorial-essays" className="mb-28 lg:mb-32">
             <SectionHeading section="editorial" />
             <CompactInsightsList items={sections.editorial} />
           </section>
