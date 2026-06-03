@@ -163,33 +163,38 @@ export default function PhilosophyPage() {
           </div>
         </div>
 
-        <div className="mt-28 border-t border-white/6 pt-14">
+        <div className="mt-28">
           <p className="mb-4 font-body text-[0.7rem] uppercase tracking-[0.2em] text-white/18">
-            Continued Thinking
-          </p>
-          <p className="max-w-[36rem] font-body text-sm leading-[2] text-white/52">
-            Our insights extend this philosophy into places, atmospheres, and forms of permission
-            that cannot be reduced to a catalogue.
+            Insights
           </p>
           <Link
             href="/insights"
-            className="mt-6 inline-flex font-body text-xs uppercase tracking-[0.14em] text-white/34 transition-colors hover:text-white/70"
+            className="inline-flex font-body text-xs uppercase tracking-[0.14em] text-white/34 transition-colors hover:text-white/70"
           >
-            Enter Insights
+            Continue reading →
           </Link>
         </div>
       </section>
 
       {/* Closing */}
-      <section className="border-t border-white/6 py-28 px-8 sm:px-16 lg:px-24">
-        <div className="max-w-[660px] mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-12">
-          <p className="font-display font-light text-white leading-tight text-[clamp(1.5rem,3vw,2.5rem)]">
+      <section
+        className="border-t border-white/10 bg-black"
+        aria-label="Philosophy contact call to action"
+      >
+        <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-12 sm:px-10 sm:py-14 lg:flex-row lg:items-center lg:justify-between lg:px-16 lg:py-16">
+          <h2
+            className="font-display font-light leading-tight text-white"
+            style={{ fontSize: 'clamp(1.45rem, 2.2vw, 2rem)' }}
+          >
             If this resonates,
             <br />
-            <span className="text-white/40">we should talk.</span>
-          </p>
-          <Link href="/contact" className="btn-ghost flex-shrink-0">
-            Begin the Conversation
+            we should talk.
+          </h2>
+          <Link
+            href="/contact"
+            className="inline-flex min-h-11 items-center justify-center self-start border border-white/16 px-7 py-3 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/32 hover:text-white"
+          >
+            Contact CREARE →
           </Link>
         </div>
       </section>
