@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import HeroSection from '@/app/home/components/HeroSection';
 import CollectionsSection from '@/app/home/components/CollectionsSection';
 import JsonLd from '@/components/JsonLd';
@@ -45,6 +46,25 @@ export default function HomePage() {
       <JsonLd id="homepage-webpage-jsonld" schema={homepageSchema} />
       <HeroSection />
       <CollectionsSection />
+      <section
+        className="border-t border-white/10 bg-black"
+        aria-label="Homepage contact call to action"
+      >
+        <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-12 sm:px-10 sm:py-14 lg:flex-row lg:items-center lg:justify-between lg:px-16 lg:py-16">
+          <h2
+            className="font-display font-light leading-tight text-white"
+            style={{ fontSize: 'clamp(1.45rem, 2.2vw, 2rem)' }}
+          >
+            Begin the conversation.
+          </h2>
+          <Link
+            href="/contact"
+            className="inline-flex min-h-11 items-center justify-center self-start border border-white/16 px-7 py-3 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/32 hover:text-white"
+          >
+            Contact CREARE →
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

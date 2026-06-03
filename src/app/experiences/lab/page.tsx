@@ -375,7 +375,7 @@ export default async function LabPage() {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-20 lg:gap-x-14 lg:gap-y-24">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-20 lg:gap-x-14 lg:gap-y-16">
                 {labExperiences.map((exp) => {
                   const rawUrl =
                     exp.cover_image?.formats?.medium?.url ??
@@ -390,7 +390,7 @@ export default async function LabPage() {
 
                   const card = (
                     <>
-                      <div className="relative w-full overflow-hidden rounded-2xl aspect-[4/3] mb-5">
+                      <div className="relative w-full overflow-hidden rounded-2xl aspect-[4/3] mb-5 lg:mb-1 lg:aspect-[61/50]">
                         {coverUrl ? (
                           <AppImage
                             src={coverUrl}

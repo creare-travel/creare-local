@@ -416,7 +416,7 @@ export default async function BlackPage() {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-20 lg:gap-x-14 lg:gap-y-24">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-20 lg:gap-x-14 lg:gap-y-16">
                 {blackExperiences.map((exp) => {
                   const rawUrl =
                     exp.cover_image?.formats?.medium?.url ??
@@ -431,7 +431,7 @@ export default async function BlackPage() {
 
                   const card = (
                     <>
-                      <div className="relative mb-6 aspect-[4/3] w-full overflow-hidden rounded-[16px] bg-neutral-900/[0.07]">
+                      <div className="relative mb-6 aspect-[4/3] w-full overflow-hidden rounded-[16px] bg-neutral-900/[0.07] lg:mb-2 lg:aspect-[61/50]">
                         {coverUrl ? (
                           <Image
                             src={coverUrl}

@@ -5,6 +5,7 @@ import AppImage from '@/components/ui/AppImage';
 import JsonLd from '@/components/JsonLd';
 import { buildCulturalWorldCollectionGraph } from '@/lib/schema-builder';
 import { filterCanonicalCulturalWorlds } from '@/lib/canonical-gates';
+import { CULTURAL_WORLD_CONTENT } from '@/data/cultural-worlds';
 import { buildMetadataAlternates } from '@/lib/seo';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
@@ -48,6 +49,47 @@ interface StrapiDestination {
   } | null;
 }
 
+const LOCAL_FALLBACK_DESTINATIONS: StrapiDestination[] = [
+  {
+    id: 9001,
+    name: CULTURAL_WORLD_CONTENT.istanbul.title,
+    slug: CULTURAL_WORLD_CONTENT.istanbul.slug,
+    highlight: CULTURAL_WORLD_CONTENT.istanbul.shortDescription,
+    short_description: CULTURAL_WORLD_CONTENT.istanbul.shortDescription,
+    order: 1,
+    cover_image: {
+      url: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200',
+      alternativeText: 'Istanbul skyline at dusk with domes and minarets above the Bosphorus',
+    },
+  },
+  {
+    id: 9002,
+    name: CULTURAL_WORLD_CONTENT.cappadocia.title,
+    slug: CULTURAL_WORLD_CONTENT.cappadocia.slug,
+    highlight: CULTURAL_WORLD_CONTENT.cappadocia.shortDescription,
+    short_description: CULTURAL_WORLD_CONTENT.cappadocia.shortDescription,
+    order: 2,
+    cover_image: {
+      url: 'https://images.unsplash.com/photo-1660925113440-50358842e0d8',
+      alternativeText:
+        'Cappadocia landscape with volcanic rock formations under soft evening light',
+    },
+  },
+  {
+    id: 9003,
+    name: CULTURAL_WORLD_CONTENT.bodrum.title,
+    slug: CULTURAL_WORLD_CONTENT.bodrum.slug,
+    highlight: CULTURAL_WORLD_CONTENT.bodrum.shortDescription,
+    short_description: CULTURAL_WORLD_CONTENT.bodrum.shortDescription,
+    order: 3,
+    cover_image: {
+      url: 'https://images.unsplash.com/photo-1613419772278-eb01548b4b88',
+      alternativeText:
+        'Bodrum coastline and harbor at blue hour with lights reflected across the water',
+    },
+  },
+];
+
 function flattenDestination(raw: Record<string, unknown>): StrapiDestination {
   if (raw?.attributes && typeof raw.attributes === 'object') {
     return { id: Number(raw.id), ...(raw.attributes as object) } as StrapiDestination;
@@ -57,25 +99,30 @@ function flattenDestination(raw: Record<string, unknown>): StrapiDestination {
 
 async function fetchActiveDestinations(): Promise<StrapiDestination[]> {
   const path = '/api/destinations?filters[visibility_status][$eqi]=active&populate=*';
-  try {
-    const json = await fetchStrapi(path);
-    const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
+  const json = await fetchStrapi(path);
+  const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
+  const preferredOrder = ['istanbul', 'cappadocia'];
 
-    return filterCanonicalCulturalWorlds(items.map((item) => flattenDestination(item))).sort(
-      (a, b) => {
-        const aOrder = a.order ?? Infinity;
-        const bOrder = b.order ?? Infinity;
-        return aOrder - bOrder;
+  return filterCanonicalCulturalWorlds(items.map((item) => flattenDestination(item))).sort(
+    (a, b) => {
+      const aSlug = a.slug?.toLowerCase() ?? '';
+      const bSlug = b.slug?.toLowerCase() ?? '';
+      const aPreferredIndex = preferredOrder.indexOf(aSlug);
+      const bPreferredIndex = preferredOrder.indexOf(bSlug);
+
+      if (aPreferredIndex !== -1 || bPreferredIndex !== -1) {
+        if (aPreferredIndex === -1) return 1;
+        if (bPreferredIndex === -1) return -1;
+        if (aPreferredIndex !== bPreferredIndex) {
+          return aPreferredIndex - bPreferredIndex;
+        }
       }
-    );
-  } catch (error) {
-    console.error('Failed to fetch active cultural worlds destinations.', {
-      route: '/cultural-worlds',
-      strapiPath: path,
-      error,
-    });
-    return [];
-  }
+
+      const aOrder = a.order ?? Infinity;
+      const bOrder = b.order ?? Infinity;
+      return aOrder - bOrder;
+    }
+  );
 }
 
 function getDestinationImageUrl(destination: StrapiDestination): string {
@@ -89,7 +136,26 @@ function getDestinationImageUrl(destination: StrapiDestination): string {
 }
 
 export default async function CulturalWorldsPage() {
-  const destinations = await fetchActiveDestinations();
+  let destinations: StrapiDestination[] = [];
+
+  try {
+    destinations = await fetchActiveDestinations();
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        '[cultural-worlds] CMS fetch failed in development. Using canonical local fallback data for visual QA.',
+        {
+          route: '/cultural-worlds',
+          fallbackSlugs: LOCAL_FALLBACK_DESTINATIONS.map((destination) => destination.slug),
+          error,
+        }
+      );
+      destinations = LOCAL_FALLBACK_DESTINATIONS;
+    } else {
+      destinations = [];
+    }
+  }
+
   const culturalWorldSchema = buildCulturalWorldCollectionGraph({
     items: destinations.map((destination) => ({
       ...destination,
@@ -110,7 +176,7 @@ export default async function CulturalWorldsPage() {
         }
       `}</style>
       {/* Hero */}
-      <section className="max-w-7xl mx-auto px-6 pt-44 pb-20 sm:px-10 lg:px-16">
+      <section className="max-w-7xl mx-auto px-6 pt-44 pb-16 sm:px-10 lg:px-16">
         <p
           className="mb-8 font-body uppercase"
           style={{
@@ -124,7 +190,7 @@ export default async function CulturalWorldsPage() {
         <h1
           className="font-display font-light text-white"
           style={{
-            fontSize: 'clamp(2.8rem, 6.5vw, 6.2rem)',
+            fontSize: 'clamp(2.8rem, 5.8vw, 5.5rem)',
             lineHeight: 1.06,
             letterSpacing: '-0.015em',
           }}
@@ -151,9 +217,9 @@ export default async function CulturalWorldsPage() {
       </section>
 
       {/* World Cards */}
-      <section className="max-w-7xl mx-auto px-6 pb-24 sm:px-10 lg:px-16">
+      <section className="mx-auto max-w-6xl px-6 pb-24 sm:px-10 lg:px-16">
         {destinations.length > 0 ? (
-          <div className="grid grid-cols-1 gap-x-7 gap-y-10 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2">
             {destinations.map((destination, index) => {
               const href = destination.slug ? `/cultural-worlds/${destination.slug}` : null;
               const title = destination.name ?? 'Destination';
@@ -166,7 +232,7 @@ export default async function CulturalWorldsPage() {
                 destination.cover_image?.alternativeText ?? `${title} cultural world`;
 
               const card = (
-                <div className="relative aspect-[4/5] overflow-hidden">
+                <div className="relative aspect-[5/6] overflow-hidden">
                   <AppImage
                     src={imageUrl}
                     alt={imageAlt}
@@ -258,19 +324,20 @@ export default async function CulturalWorldsPage() {
         )}
       </section>
 
-      <section className="bg-[#0d0d0b]" aria-label="Contact handoff">
-        <div className="mx-auto max-w-7xl px-6 pb-10 pt-24 sm:px-10 lg:px-16">
-          <div className="flex flex-col gap-8 border-b border-white/[0.08] pb-10 md:flex-row md:items-center md:justify-between md:gap-12 md:pb-12">
-            <p className="font-display text-[clamp(1.7rem,3vw,2.3rem)] font-light text-white">
-              Begin the conversation.
-            </p>
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center self-start border border-white/[0.18] px-10 py-4 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/[0.3] hover:text-white md:self-center"
-            >
-              CONTACT CREARE →
-            </Link>
-          </div>
+      <section className="border-t border-white/10 bg-black" aria-label="Contact handoff">
+        <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-12 sm:px-10 sm:py-14 lg:flex-row lg:items-center lg:justify-between lg:px-16 lg:py-16">
+          <p
+            className="font-display font-light leading-tight text-white"
+            style={{ fontSize: 'clamp(1.45rem, 2.2vw, 2rem)' }}
+          >
+            Begin the conversation.
+          </p>
+          <Link
+            href="/contact"
+            className="inline-flex min-h-11 items-center justify-center self-start border border-white/16 px-7 py-3 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/32 hover:text-white"
+          >
+            CONTACT CREARE →
+          </Link>
         </div>
       </section>
     </main>

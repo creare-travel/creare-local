@@ -143,7 +143,7 @@ function renderExperienceCard(exp: StrapiExperience, options?: { compact?: boole
 
   const card = (
     <>
-      <div className="relative mb-6 aspect-[4/3] w-full overflow-hidden rounded-[16px]">
+      <div className="relative mb-6 w-full overflow-hidden rounded-[16px] aspect-[4/3] lg:mb-2 lg:aspect-[61/50]">
         {coverUrl ? (
           <AppImage
             src={coverUrl}
@@ -485,7 +485,7 @@ export default async function SignatureExperiencesPage() {
           aria-label="Selected Signature Experiences"
         >
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="grid grid-cols-1 gap-x-8 gap-y-16 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-20">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-16 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-16">
               {selectedSignatureExperiences.map((exp) => renderExperienceCard(exp))}
             </div>
           </div>
@@ -511,7 +511,7 @@ export default async function SignatureExperiencesPage() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 gap-x-10 gap-y-20 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-24">
+            <div className="grid grid-cols-1 gap-x-10 gap-y-20 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-16">
               {historicalExperiences.map((exp) => renderExperienceCard(exp, { compact: true }))}
             </div>
           </div>
@@ -539,7 +539,7 @@ export default async function SignatureExperiencesPage() {
             </div>
 
             {/* Corporate grid */}
-            <div className="grid grid-cols-1 gap-x-10 gap-y-20 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-24">
+            <div className="grid grid-cols-1 gap-x-10 gap-y-20 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-16">
               {corporateExperiences.map((exp) => renderExperienceCard(exp, { compact: true }))}
             </div>
           </div>
@@ -565,7 +565,7 @@ export default async function SignatureExperiencesPage() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 gap-x-10 gap-y-20 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-24">
+            <div className="grid grid-cols-1 gap-x-10 gap-y-20 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-14 lg:gap-y-16">
               {culinaryExperiences.map((exp) => renderExperienceCard(exp, { compact: true }))}
             </div>
           </div>

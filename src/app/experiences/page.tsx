@@ -153,7 +153,13 @@ export default async function ExperiencesPage() {
             className="object-cover"
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to top, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.56) 36%, rgba(0,0,0,0.18) 100%)',
+            }}
+          />
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-20 pt-36 sm:px-10 lg:px-16">
@@ -214,7 +220,7 @@ export default async function ExperiencesPage() {
                 className="group block"
                 aria-label={`Explore ${feature.label}`}
               >
-                <div className="relative aspect-[3/4] overflow-hidden">
+                <div className="relative aspect-[3/4] overflow-hidden lg:aspect-[7/10]">
                   <Image
                     src={feature.image}
                     alt={feature.alt}
@@ -223,7 +229,7 @@ export default async function ExperiencesPage() {
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/24 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 p-8">
+                  <div className="absolute inset-x-0 bottom-0 p-8 lg:pb-14">
                     <p className="mb-3 font-body text-[0.58rem] uppercase tracking-[0.28em] text-white/34">
                       {feature.label}
                     </p>
