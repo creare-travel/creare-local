@@ -5,15 +5,24 @@ import AppImage from '@/components/ui/AppImage';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { trackCtaClick } from '@/lib/analytics/tracking';
+import { buildCloudinaryUrl } from '@/lib/cloudinary';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 
-const HERO_BLUR_DATA_URL = buildCinematicBlurDataUrl(
-  'https://img.rocket.new/generatedImages/rocket_gen_img_1a084ee29-1772851440502.png',
-  { atmosphere: 'dark', profile: 'hero' }
-);
+const HOMEPAGE_HERO_IMAGE = buildCloudinaryUrl('creare-hero-image.jpg', {
+  format: 'auto',
+  quality: 'auto',
+  dpr: 'auto',
+  crop: 'limit',
+});
+const HOMEPAGE_HERO_ALT =
+  'Library of Celsus and the Gate of Augustus at sunset with warm architectural light';
 
 export default function HeroSection() {
   const pathname = usePathname();
+  const heroBlurDataUrl = buildCinematicBlurDataUrl(HOMEPAGE_HERO_IMAGE, {
+    atmosphere: 'dark',
+    profile: 'hero',
+  });
 
   return (
     <section
@@ -22,13 +31,13 @@ export default function HeroSection() {
     >
       <div className="absolute inset-0 z-0">
         <AppImage
-          src="https://img.rocket.new/generatedImages/rocket_gen_img_1a084ee29-1772851440502.png"
-          alt="Italian monastery colonnade corridor with arched stone columns and terracotta floor"
+          src={HOMEPAGE_HERO_IMAGE}
+          alt={HOMEPAGE_HERO_ALT}
           fill
           priority
-          deliveryProfile="hero"
-          blurDataURL={HERO_BLUR_DATA_URL}
+          blurDataURL={heroBlurDataUrl}
           atmosphere="dark"
+          unoptimized
           className="hero-img-zoom h-full w-full object-cover"
           sizes="100vw"
         />
