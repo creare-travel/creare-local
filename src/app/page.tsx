@@ -46,6 +46,22 @@ export default function HomePage() {
       <JsonLd id="homepage-webpage-jsonld" schema={homepageSchema} />
       <HeroSection />
       <CollectionsSection />
+      <section className="bg-neutral-50" aria-label="Homepage experience system discovery">
+        <div className="mx-auto max-w-7xl px-6 pb-24 sm:px-10 sm:pb-28 lg:px-16 lg:pb-32">
+          <p
+            className="mb-4 max-w-md font-display font-light leading-relaxed text-neutral-900/82"
+            style={{ fontSize: 'clamp(1rem, 1.4vw, 1.2rem)' }}
+          >
+            Interested in understanding the system?
+          </p>
+          <Link
+            href="/experiences"
+            className="inline-flex font-body text-xs uppercase tracking-[0.14em] text-neutral-500 transition-colors hover:text-neutral-900"
+          >
+            How We Approach Experience →
+          </Link>
+        </div>
+      </section>
       <section
         className="border-t border-white/10 bg-black"
         aria-label="Homepage contact call to action"
