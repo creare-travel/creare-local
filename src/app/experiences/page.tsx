@@ -164,7 +164,7 @@ export default async function ExperiencesPage() {
 
         <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-20 pt-36 sm:px-10 lg:px-16">
           <p className="mb-6 font-body text-[0.6rem] uppercase tracking-[0.32em] text-white/32">
-            CREARE Experience Architecture
+            Three Ways to Enter
           </p>
           <h1
             className="max-w-4xl font-display font-light leading-[1.05] text-white"
@@ -173,9 +173,8 @@ export default async function ExperiencesPage() {
             Experiences
           </h1>
           <p className="mt-8 max-w-2xl font-body text-sm leading-relaxed text-white/58 sm:text-[0.95rem]">
-            CREARE does not treat experience as a single product type. The system is structured
-            through three distinct paths: curated cultural encounters, co-created commissions, and
-            discreet access reserved for the right context.
+            CREARE approaches experience through three distinct paths: composed cultural encounters,
+            commissions shaped around the guest, and discreet access reserved for the right context.
           </p>
         </div>
       </section>
@@ -184,28 +183,26 @@ export default async function ExperiencesPage() {
         <div className="grid gap-10 border-t border-white/10 pt-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
           <div>
             <p className="mb-6 font-body text-[0.6rem] uppercase tracking-[0.28em] text-white/32">
-              The Parent Collection
+              The Collection
             </p>
             <p
               className="max-w-2xl font-display font-light leading-relaxed text-white/88"
               style={{ fontSize: 'clamp(1.2rem, 2vw, 1.6rem)' }}
             >
               Each path reflects a different relationship between guest, place, and access.
-              Signature begins with a composed encounter. LAB begins with a brief. BLACK begins
-              where publication ends.
+              Signature begins with a composed encounter. LAB begins with a conversation. BLACK
+              begins where publication ends.
             </p>
           </div>
 
           <div className="space-y-5">
             <p className="font-body text-sm leading-relaxed text-white/56">
-              This page is the parent taxonomy node for the CREARE experience system. It exists to
-              clarify the logic of the collection rather than flatten it into a single commercial
-              category.
+              This collection clarifies the different ways CREARE works, without reducing every
+              encounter to the same form.
             </p>
             <p className="font-body text-sm leading-relaxed text-white/40">
-              The distinction matters for Google, for AI retrieval systems, and for clients trying
-              to understand whether they are choosing a finished encounter, shaping a new one, or
-              entering a more private tier of access.
+              It helps guests understand whether they are entering a finished encounter, shaping one
+              around themselves, or moving within a more private tier of access.
             </p>
           </div>
         </div>

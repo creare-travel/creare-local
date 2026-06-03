@@ -156,10 +156,10 @@ export default async function LabPage() {
             </h1>
             <div className="flex flex-col gap-0 mb-12 max-w-sm">
               <p className="font-body font-light text-neutral-700 text-sm leading-loose">
-                LAB™ is not a catalogue. It is a process.
+                LAB™ is not a catalogue. It is a commission.
               </p>
               <p className="font-body font-light text-neutral-600 text-sm leading-loose">
-                Built around your brief. Shaped through collaboration.
+                Built around your intentions. Shaped in conversation.
               </p>
               <p className="font-body font-light text-neutral-500 text-sm leading-loose">
                 No predefined paths. Only what needs to exist.
@@ -222,12 +222,12 @@ export default async function LabPage() {
                 className="font-display font-light text-neutral-800 leading-relaxed"
                 style={{ fontSize: 'clamp(1.15rem, 2.2vw, 1.5rem)' }}
               >
-                LAB™ is not a catalogue. It is a process — open, collaborative and driven by your
-                brief. We compose from the ground up, combining cultural intelligence with creative
-                intention to produce experiences that have never existed before.
+                LAB™ is not a catalogue. It begins with intent, then gathers form through place,
+                access, and cultural attention. We compose from the ground up to create encounters
+                that do not exist until they are made for the right guest.
               </p>
               <p className="font-body font-light text-neutral-500 text-sm leading-relaxed mt-6">
-                Our LAB™ process has been applied across the cultural worlds of{' '}
+                This way of working moves across the cultural worlds of{' '}
                 <Link
                   href="/cultural-worlds/istanbul"
                   className="underline underline-offset-2 hover:text-neutral-700 transition-colors"
@@ -248,7 +248,7 @@ export default async function LabPage() {
                 >
                   Cappadocia
                 </Link>{' '}
-                — each composition shaped by the specific character of its place.
+                — each composition shaped by the character of its place.
               </p>
             </div>
           </div>
@@ -302,7 +302,7 @@ export default async function LabPage() {
         </section>
 
         {/* ── COLLABORATIONS — Split ── */}
-        <section className="bg-[#EDEAE4] py-20 md:py-28" aria-label="Collaborations">
+        <section className="bg-[#EDEAE4] py-20 md:py-28" aria-label="For Brands">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
               <div>
@@ -313,7 +313,7 @@ export default async function LabPage() {
                   className="font-display font-light text-neutral-900 leading-tight mb-10"
                   style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}
                 >
-                  Collaborations
+                  For brands
                 </h2>
                 <p className="font-body text-sm text-neutral-600 leading-relaxed mb-6">
                   LAB™ works with brands to compose cultural experiences built around a shared
@@ -321,8 +321,9 @@ export default async function LabPage() {
                   client encounters.
                 </p>
                 <p className="font-body text-sm text-neutral-500 leading-relaxed mb-12">
-                  Each collaboration is shaped with your team. We bring the cultural context,
-                  creative direction and compositional intelligence. You bring the narrative.
+                  Each commission is shaped in step with your team. CREARE brings the cultural
+                  context, creative direction, and compositional intelligence. You bring the
+                  narrative.
                 </p>
                 <Link
                   href={buildExperienceInquiryHref('lab')}
@@ -461,7 +462,7 @@ export default async function LabPage() {
         )}
 
         {/* ── PROCESS — 4 Steps ── */}
-        <section className="bg-[#EDEAE4] py-28 md:py-44" aria-label="LAB Process">
+        <section className="bg-[#EDEAE4] py-28 md:py-44" aria-label="How LAB Unfolds">
           <div className="max-w-5xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="text-center mb-24">
               <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-4">
@@ -471,7 +472,7 @@ export default async function LabPage() {
                 className="font-display font-light text-neutral-900"
                 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}
               >
-                The LAB™ Process
+                How LAB Unfolds
               </h2>
             </div>
 
@@ -481,12 +482,12 @@ export default async function LabPage() {
                 {
                   step: '01',
                   label: 'INTENT',
-                  body: 'We begin with your brief. Context and intention are understood before any composition begins.',
+                  body: 'We begin with intention. Context and desire are understood before any composition begins.',
                 },
                 {
                   step: '02',
                   label: 'DESIGN',
-                  body: 'Concepts emerge through dialogue — narrative, spatial and experiential dimensions shaped together.',
+                  body: 'Ideas emerge through conversation — narrative, spatial, and experiential dimensions taking form with clarity.',
                 },
                 {
                   step: '03',
@@ -496,7 +497,7 @@ export default async function LabPage() {
                 {
                   step: '04',
                   label: 'EXECUTION',
-                  body: 'Delivery is managed end-to-end. Full visibility at every stage. Nothing left to chance.',
+                  body: 'Every detail is carried through with care. Full attention at every stage. Nothing left to chance.',
                 },
               ].map((item, index, arr) => (
                 <div key={item.label} className="relative flex flex-col md:flex-row">
@@ -534,13 +535,13 @@ export default async function LabPage() {
               className="font-display font-light text-neutral-900 leading-snug mb-6"
               style={{ fontSize: 'clamp(1.3rem, 2.5vw, 1.9rem)' }}
             >
-              Behind every seamless experience is a carefully built structure.
+              Behind every seamless experience is careful attention.
             </p>
             <p
               className="font-display font-light text-neutral-600 leading-snug mb-16"
               style={{ fontSize: 'clamp(1rem, 2vw, 1.4rem)' }}
             >
-              And behind that structure — a process shaped with you.
+              And behind that attention — a composition shaped around you.
             </p>
 
             <Link
@@ -551,7 +552,7 @@ export default async function LabPage() {
             </Link>
 
             <p className="font-body text-[0.55rem] tracking-[0.3em] text-neutral-400 uppercase">
-              STRUCTURED COLLABORATION. CONTROLLED EXECUTION.
+              QUIET PRECISION. DISCREET EXECUTION.
             </p>
           </div>
         </section>

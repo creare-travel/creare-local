@@ -130,25 +130,25 @@ const SECTION_INTROS: Record<
 > = {
   featured: {
     eyebrow: 'Featured Essays',
-    title: 'The clearest arguments in the library.',
+    title: 'The essays that speak most directly.',
     description:
       'These pieces define CREARE most directly: place intelligence, private cultural access, and the difference between surface travel and meaningful encounter.',
   },
   'cultural-world': {
     eyebrow: 'Cultural World Essays',
-    title: 'Destination-based readings of Istanbul, Bodrum, and Cappadocia.',
+    title: 'Istanbul, Bodrum, and Cappadocia, read closely.',
     description:
       'These essays belong to the worlds themselves. They clarify how geography, memory, ritual, and access combine into a coherent cultural logic.',
   },
   editorial: {
     eyebrow: 'Editorial Essays',
-    title: 'Broader arguments around privacy, rarity, and cultural attention.',
+    title: 'Essays on privacy, rarity, and cultural attention.',
     description:
       'These texts extend beyond one destination and sharpen CREARE’s editorial position on access, permission, and the social architecture of meaningful travel.',
   },
   archive: {
     eyebrow: 'Further Reading',
-    title: 'Additional essays within the same knowledge system.',
+    title: 'Further essays in the collection.',
     description:
       'These pieces extend the editorial conversation and remain fully part of the library, even when they sit outside the first reading path.',
   },
@@ -458,7 +458,7 @@ function FeaturedEssays({ items }: { items: NormalizedInsight[] }) {
           id="featured-essays"
           className="font-display text-3xl sm:text-4xl font-light leading-snug text-white"
         >
-          The clearest arguments in the library.
+          The essays that speak most directly.
         </h2>
       </div>
 
@@ -574,12 +574,12 @@ export default async function InsightsPage() {
             Insights
           </p>
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-light tracking-wide text-white leading-[1.08] mb-6">
-            An editorial knowledge system for culture, access, and the private encounter
+            Essays on culture, access, and the private encounter
           </h1>
           <p className="font-body text-sm sm:text-base leading-relaxed text-white/60 max-w-2xl">
             These are not travel guides. They are essays that build context before itinerary:
-            arguments for depth over surface, relationship over transaction, and cultural worlds
-            that become legible only through attention, trust, and time.
+            written for depth over surface, relationship over transaction, and cultural worlds that
+            reveal themselves through attention, trust, and time.
           </p>
         </div>
 
