@@ -391,10 +391,9 @@ function SectionHeading({ section }: { section: InsightSectionKey }) {
       <p className="font-body text-[0.72rem] uppercase tracking-[0.18em] text-white/26 mb-3">
         {config.eyebrow}
       </p>
-      <h2 className="font-display text-2xl sm:text-3xl font-light leading-snug text-white mb-3">
+      <h2 className="font-display text-2xl sm:text-3xl font-light leading-snug text-white">
         {config.title}
       </h2>
-      <p className="font-body text-sm leading-relaxed text-white/50">{config.description}</p>
     </div>
   );
 }
@@ -457,14 +456,10 @@ function FeaturedEssays({ items }: { items: NormalizedInsight[] }) {
         </p>
         <h2
           id="featured-essays"
-          className="font-display text-3xl sm:text-4xl font-light leading-snug text-white mb-3"
+          className="font-display text-3xl sm:text-4xl font-light leading-snug text-white"
         >
           The clearest arguments in the library.
         </h2>
-        <p className="font-body text-sm leading-relaxed text-white/50">
-          These essays are the front door to the knowledge system: the most complete expressions of
-          how CREARE reads place, privacy, and cultural permission.
-        </p>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.1fr)_minmax(19rem,0.97fr)] gap-9 xl:gap-12">
@@ -587,27 +582,6 @@ export default async function InsightsPage() {
             that become legible only through attention, trust, and time.
           </p>
         </div>
-
-        <section
-          aria-label="Editorial framing"
-          className="mb-16 border-l border-white/8 pl-6 sm:pl-8 lg:mb-18"
-        >
-          <div className="max-w-3xl space-y-5">
-            <p className="font-body text-[0.72rem] uppercase tracking-[0.18em] text-white/26">
-              A Knowledge Layer
-            </p>
-            <p className="font-body text-sm leading-relaxed text-white/56">
-              CREARE publishes selectively. These texts exist to make visible the thinking behind
-              our work: context before itinerary, permission before access, atmosphere before
-              display. They are part of the same cultural intelligence that shapes our experiences.
-            </p>
-            <p className="font-body text-sm leading-relaxed text-white/44">
-              Some pieces are about place. Others are about pace, discretion, or the social
-              architecture around entry. Together they form an editorial record of how we read a
-              cultural world before we invite anyone into it.
-            </p>
-          </div>
-        </section>
 
         {/* Divider */}
         <div className="border-t border-white/6 mb-16 lg:mb-18" />
