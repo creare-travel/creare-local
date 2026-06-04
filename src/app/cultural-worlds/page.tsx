@@ -1,8 +1,10 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import AppImage from '@/components/ui/AppImage';
 import JsonLd from '@/components/JsonLd';
+import CulturalWorldsDiscoveryRail from './CulturalWorldsDiscoveryRail';
 import { buildCulturalWorldCollectionGraph } from '@/lib/schema-builder';
 import { filterCanonicalCulturalWorlds } from '@/lib/canonical-gates';
 import { CULTURAL_WORLD_CONTENT } from '@/data/cultural-worlds';
@@ -49,6 +51,8 @@ interface StrapiDestination {
   } | null;
 }
 
+const CULTURAL_WORLDS_PLACEHOLDER_IMAGE = '/assets/images/creare-image-placeholder.jpg';
+
 const LOCAL_FALLBACK_DESTINATIONS: StrapiDestination[] = [
   {
     id: 9001,
@@ -58,8 +62,8 @@ const LOCAL_FALLBACK_DESTINATIONS: StrapiDestination[] = [
     short_description: CULTURAL_WORLD_CONTENT.istanbul.shortDescription,
     order: 1,
     cover_image: {
-      url: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200',
-      alternativeText: 'Istanbul skyline at dusk with domes and minarets above the Bosphorus',
+      url: 'https://res.cloudinary.com/djr97wm0n/image/upload/c_fill,g_custom,w_900,h_1200,q_auto,f_auto/v1780603200/creare-cultural-world-istanbul-image.jpg',
+      alternativeText: 'Historic street leading toward Galata Tower in Istanbul, Türkiye.',
     },
   },
   {
@@ -70,9 +74,8 @@ const LOCAL_FALLBACK_DESTINATIONS: StrapiDestination[] = [
     short_description: CULTURAL_WORLD_CONTENT.cappadocia.shortDescription,
     order: 2,
     cover_image: {
-      url: 'https://images.unsplash.com/photo-1660925113440-50358842e0d8',
-      alternativeText:
-        'Cappadocia landscape with volcanic rock formations under soft evening light',
+      url: 'https://res.cloudinary.com/djr97wm0n/image/upload/v1780601981/creare-cultural-world-cappadocia-image.jpg',
+      alternativeText: 'Cappadocia landscape with volcanic forms and layered terrain',
     },
   },
   {
@@ -83,12 +86,14 @@ const LOCAL_FALLBACK_DESTINATIONS: StrapiDestination[] = [
     short_description: CULTURAL_WORLD_CONTENT.bodrum.shortDescription,
     order: 3,
     cover_image: {
-      url: 'https://images.unsplash.com/photo-1613419772278-eb01548b4b88',
-      alternativeText:
-        'Bodrum coastline and harbor at blue hour with lights reflected across the water',
+      url: 'https://res.cloudinary.com/djr97wm0n/image/upload/c_fill,g_custom,w_900,h_1200,q_auto,f_auto/v1780602721/creare-cultural-world-bodrum-image.jpg',
+      alternativeText: 'Bodrum Castle overlooking the marina and Aegean coastline in Türkiye.',
     },
   },
 ];
+
+const CULTURAL_WORLDS_HERO_IMAGE =
+  'https://res.cloudinary.com/djr97wm0n/image/upload/v1780596665/creare-cultural-world-hero-image.jpg';
 
 function flattenDestination(raw: Record<string, unknown>): StrapiDestination {
   if (raw?.attributes && typeof raw.attributes === 'object') {
@@ -132,7 +137,15 @@ function getDestinationImageUrl(destination: StrapiDestination): string {
     destination.cover_image?.formats?.small?.url ??
     destination.cover_image?.url;
 
-  return rawUrl ? mediaUrl(rawUrl) : '/assets/images/creare-image-placeholder.jpg';
+  if (!rawUrl) {
+    return CULTURAL_WORLDS_PLACEHOLDER_IMAGE;
+  }
+
+  if (rawUrl.startsWith('/assets/')) {
+    return rawUrl;
+  }
+
+  return mediaUrl(rawUrl);
 }
 
 export default async function CulturalWorldsPage() {
@@ -165,7 +178,6 @@ export default async function CulturalWorldsPage() {
         'Private cultural access composed around place, narrative, and depth.',
     })),
   });
-
   return (
     <main className="min-h-screen bg-[#0d0d0b]">
       <JsonLd id="cultural-worlds-jsonld" schema={culturalWorldSchema} />
@@ -174,146 +186,193 @@ export default async function CulturalWorldsPage() {
         header button[aria-label='Close navigation menu'] svg path {
           stroke: currentColor !important;
         }
+
+        .atlas-scroll {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+
+        .atlas-scroll::-webkit-scrollbar {
+          display: none;
+        }
       `}</style>
-      {/* Hero */}
-      <section className="max-w-7xl mx-auto px-6 pt-44 pb-16 sm:px-10 lg:px-16">
-        <p
-          className="mb-8 font-body uppercase"
-          style={{
-            fontSize: '0.6rem',
-            letterSpacing: '0.38em',
-            color: 'rgba(255,255,255,0.20)',
-          }}
-        >
-          Creare — Cultural Atlas
-        </p>
-        <h1
-          className="font-display font-light text-white"
-          style={{
-            fontSize: 'clamp(2.8rem, 5.8vw, 5.5rem)',
-            lineHeight: 1.06,
-            letterSpacing: '-0.015em',
-          }}
-        >
-          Cultural Worlds
-        </h1>
-        <div
-          className="mb-8 mt-8 h-px w-16"
-          style={{ backgroundColor: 'rgba(255,255,255,0.14)' }}
-        />
-        <p
-          className="font-body font-light"
-          style={{
-            fontSize: 'clamp(0.88rem, 1.4vw, 1.02rem)',
-            lineHeight: 1.9,
-            letterSpacing: '0.01em',
-            maxWidth: '46ch',
-            color: 'rgba(255,255,255,0.42)',
-          }}
-        >
-          Each destination holds layers of history, ritual, and meaning. We know them intimately —
-          their hidden corners, their cultural custodians, their extraordinary moments.
-        </p>
+      <section className="relative flex min-h-[72vh] items-end overflow-hidden">
+        <div className="absolute inset-0">
+          <Image
+            src={CULTURAL_WORLDS_HERO_IMAGE}
+            alt="Ancient stone architecture and layered heritage landscape under cinematic light"
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.58) 34%, rgba(0,0,0,0.2) 100%)',
+            }}
+          />
+        </div>
+
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-20 pt-36 sm:px-10 lg:px-16">
+          <p className="mb-6 font-body text-[0.6rem] uppercase tracking-[0.32em] text-white/32">
+            Creare — Cultural Atlas
+          </p>
+          <h1
+            className="max-w-4xl font-display font-light leading-[1.05] text-white"
+            style={{ fontSize: 'clamp(2.8rem, 6vw, 5.8rem)' }}
+          >
+            Cultural Worlds
+          </h1>
+          <p className="mt-8 max-w-2xl font-body text-sm leading-relaxed text-white/58 sm:text-[0.95rem]">
+            A geography of layered places, read through memory, custodianship, and the conditions
+            that make real cultural access meaningful.
+          </p>
+        </div>
       </section>
 
-      {/* World Cards */}
-      <section className="mx-auto max-w-6xl px-6 pb-24 sm:px-10 lg:px-16">
+      <section className="mx-auto max-w-7xl px-6 py-20 sm:px-10 md:py-24 lg:px-16">
         {destinations.length > 0 ? (
-          <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2">
-            {destinations.map((destination, index) => {
-              const href = destination.slug ? `/cultural-worlds/${destination.slug}` : null;
-              const title = destination.name ?? 'Destination';
-              const tagline =
-                destination.highlight ??
-                destination.short_description ??
-                'Private cultural access composed around place, narrative, and depth.';
-              const imageUrl = getDestinationImageUrl(destination);
-              const imageAlt =
-                destination.cover_image?.alternativeText ?? `${title} cultural world`;
-
-              const card = (
-                <div className="relative aspect-[5/6] overflow-hidden">
-                  <AppImage
-                    src={imageUrl}
-                    alt={imageAlt}
-                    fill
-                    deliveryProfile="cardPortrait"
-                    className="motion-media-drift object-cover"
-                    priority={index === 0}
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        'linear-gradient(to top, rgba(10,9,7,0.78) 0%, rgba(10,9,7,0.26) 44%, rgba(10,9,7,0.06) 100%)',
-                    }}
-                  />
-                  <div
-                    className="absolute inset-0 mix-blend-multiply"
-                    style={{ backgroundColor: 'rgba(22,18,12,0.16)' }}
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 p-8">
-                    <div
-                      className="mb-5 h-px"
-                      style={{ width: '1.8rem', backgroundColor: 'rgba(255,255,255,0.22)' }}
-                    />
-                    <h2
-                      className="font-display font-light text-white"
-                      style={{
-                        fontSize: 'clamp(1.4rem, 2.6vw, 2rem)',
-                        lineHeight: 1.1,
-                        letterSpacing: '-0.01em',
-                        marginBottom: '0.55rem',
-                      }}
-                    >
-                      {title}
-                    </h2>
-                    <p
-                      className="font-body font-light"
-                      style={{
-                        fontSize: 'clamp(0.72rem, 1.1vw, 0.82rem)',
-                        lineHeight: 1.75,
-                        letterSpacing: '0.01em',
-                        color: 'rgba(255,255,255,0.50)',
-                        maxWidth: '28ch',
-                      }}
-                    >
-                      {tagline}
+          <>
+            <CulturalWorldsDiscoveryRail
+              heading={
+                <>
+                  <p className="mb-3 font-body text-[0.6rem] uppercase tracking-[0.28em] text-white/30">
+                    Explore Cultural Worlds
+                  </p>
+                  <h2 className="font-display text-3xl font-light text-white">
+                    A geography of access, memory, and encounter.
+                  </h2>
+                </>
+              }
+            >
+              <article
+                data-rail-card="true"
+                className="group block min-w-[82vw] snap-start sm:min-w-[31rem] lg:min-w-[calc((100%-3rem)/3.35)]"
+              >
+                <div className="relative flex aspect-[5/6] flex-col justify-between overflow-hidden border border-white/10 bg-white/[0.02] p-8 pb-10">
+                  <div>
+                    <p className="mb-6 font-body text-[0.6rem] uppercase tracking-[0.28em] text-white/32">
+                      The Atlas
                     </p>
-                    {href && (
-                      <span
-                        className="motion-link mt-6 inline-block font-body uppercase group-hover:text-white/60"
-                        style={{
-                          fontSize: '0.6rem',
-                          letterSpacing: '0.28em',
-                          color: 'rgba(255,255,255,0.28)',
-                        }}
-                      >
-                        Enter
-                      </span>
-                    )}
+                    <h3
+                      className="max-w-[12ch] font-display font-light leading-[1.12] text-white"
+                      style={{ fontSize: 'clamp(1.7rem, 2.7vw, 2.35rem)' }}
+                    >
+                      Each destination holds layers of history, ritual, and meaning.
+                    </h3>
                   </div>
                 </div>
-              );
+              </article>
 
-              return href ? (
-                <Link
-                  key={destination.id}
-                  href={href}
-                  className="group block"
-                  aria-label={`Explore ${title}`}
-                >
-                  {card}
-                </Link>
-              ) : (
-                <div key={destination.id} className="group block" aria-label={title}>
-                  {card}
-                </div>
-              );
-            })}
-          </div>
+              {destinations.map((destination, index) => {
+                const href = destination.slug ? `/cultural-worlds/${destination.slug}` : null;
+                const title = destination.name ?? 'Destination';
+                const tagline =
+                  destination.slug === 'istanbul'
+                    ? 'A city shaped by thresholds, water, and layered time.'
+                    : destination.slug === 'cappadocia'
+                      ? 'A landscape shaped by silence, stone, and movement.'
+                      : destination.slug === 'bodrum'
+                        ? 'A coastal world shaped by rhythm, light, and the sea.'
+                        : (destination.highlight ??
+                          destination.short_description ??
+                          'Private cultural access composed around place, narrative, and depth.');
+                const imageUrl = getDestinationImageUrl(destination);
+                const imageAlt =
+                  destination.cover_image?.alternativeText ?? `${title} cultural world`;
+
+                const card = (
+                  <div className="relative aspect-[5/6] overflow-hidden">
+                    <AppImage
+                      src={imageUrl}
+                      alt={imageAlt}
+                      fill
+                      deliveryProfile="cardPortrait"
+                      className="motion-media-drift object-cover"
+                      priority={index === 0}
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        background:
+                          'linear-gradient(to top, rgba(10,9,7,0.78) 0%, rgba(10,9,7,0.26) 44%, rgba(10,9,7,0.06) 100%)',
+                      }}
+                    />
+                    <div
+                      className="absolute inset-0 mix-blend-multiply"
+                      style={{ backgroundColor: 'rgba(22,18,12,0.16)' }}
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 p-8">
+                      <div className="flex min-h-[12.75rem] flex-col justify-end">
+                        <div
+                          className="mb-5 h-px"
+                          style={{ width: '1.8rem', backgroundColor: 'rgba(255,255,255,0.22)' }}
+                        />
+                        <h2
+                          className="font-display font-light text-white"
+                          style={{
+                            fontSize: 'clamp(1.4rem, 2.6vw, 2rem)',
+                            lineHeight: 1.1,
+                            letterSpacing: '-0.01em',
+                            marginBottom: '0.55rem',
+                          }}
+                        >
+                          {title}
+                        </h2>
+                        <p
+                          className="font-body font-light"
+                          style={{
+                            fontSize: 'clamp(0.72rem, 1.1vw, 0.82rem)',
+                            lineHeight: 1.75,
+                            letterSpacing: '0.01em',
+                            color: 'rgba(255,255,255,0.50)',
+                            maxWidth: '28ch',
+                          }}
+                        >
+                          {tagline}
+                        </p>
+                      </div>
+                      {href && (
+                        <span
+                          className="motion-link mt-6 inline-flex items-center border border-white/14 bg-white/[0.04] px-3 py-1.5 font-body uppercase text-white/58 backdrop-blur-[2px] transition-colors duration-300 group-hover:border-white/24 group-hover:bg-white/[0.06] group-hover:text-white/72"
+                          style={{
+                            fontSize: '0.6rem',
+                            letterSpacing: '0.28em',
+                          }}
+                        >
+                          Enter
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+
+                const shellClassName =
+                  'group block min-w-[82vw] snap-start sm:min-w-[31rem] lg:min-w-[calc((100%-3rem)/3.35)]';
+
+                return href ? (
+                  <article key={destination.id} data-rail-card="true" className={shellClassName}>
+                    <Link href={href} aria-label={`Explore ${title}`}>
+                      {card}
+                    </Link>
+                  </article>
+                ) : (
+                  <article
+                    key={destination.id}
+                    data-rail-card="true"
+                    className={shellClassName}
+                    aria-label={title}
+                  >
+                    {card}
+                  </article>
+                );
+              })}
+            </CulturalWorldsDiscoveryRail>
+          </>
         ) : (
           <div className="py-12">
             <p className="text-white/40 font-body text-sm leading-relaxed max-w-md">
