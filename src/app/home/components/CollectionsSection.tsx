@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
-import { buildCloudinaryUrl } from '@/lib/cloudinary';
 
 interface CollectionFeature {
   label: string;
@@ -20,9 +19,8 @@ const collectionFeatures: CollectionFeature[] = [
     title: 'Curated cultural experiences.',
     description: 'Designed, tested, and ready to be lived.',
     href: '/experiences/signature',
-    image: buildCloudinaryUrl('creare/homepage/collections/signature/main', {
-      profile: 'hero',
-    }),
+    image:
+      'https://res.cloudinary.com/djr97wm0n/image/upload/dpr_auto/cs_srgb/q_auto:best/creare-signature-image.jpg',
     alt: 'Ancient stone courtyard of a historic Ottoman palace with ornate architectural details and warm afternoon light',
     imageRight: true,
   },
