@@ -37,7 +37,8 @@ const collectionFeatures: CollectionFeature[] = [
     title: 'Not publicly available.',
     description: 'Private access to places, collections, and moments.',
     href: '/experiences/black',
-    image: '/assets/images/black_limited_access_key.png',
+    image:
+      'https://res.cloudinary.com/djr97wm0n/image/upload/v1780566766/creare-black-private-access-key.jpg',
     alt: 'Single antique key resting on a pure black matte surface with dramatic side lighting — symbol of limited exclusive access',
     imageRight: true,
     subduedCta: true,
