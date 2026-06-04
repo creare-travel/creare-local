@@ -149,8 +149,8 @@ export default async function ExperiencesPage() {
       <section className="relative flex min-h-[72vh] items-end overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1537323822027-a25caf00a917"
-            alt="Winding coastal road passing through a mountainous landscape at golden hour"
+            src="https://res.cloudinary.com/djr97wm0n/image/upload/v1780578392/creare-experiences-hero-image.jpg"
+            alt="Expansive landscape with Mount Ararat rising beyond a remote journey at golden light"
             fill
             priority
             className="object-cover"
