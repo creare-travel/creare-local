@@ -52,6 +52,20 @@ interface StrapiDestination {
 }
 
 const CULTURAL_WORLDS_PLACEHOLDER_IMAGE = '/assets/images/creare-image-placeholder.jpg';
+const CULTURAL_WORLD_RAIL_IMAGE_OVERRIDES: Record<string, string> = {
+  istanbul:
+    'https://res.cloudinary.com/djr97wm0n/image/upload/v1780603200/creare-cultural-world-istanbul-image.jpg',
+  cappadocia:
+    'https://res.cloudinary.com/djr97wm0n/image/upload/v1780603019/creare-cultural-world-cappadocia-image.jpg',
+  bodrum:
+    'https://res.cloudinary.com/djr97wm0n/image/upload/v1780602986/creare-cultural-world-bodrum-image.jpg',
+};
+
+const CULTURAL_WORLD_RAIL_ALT_OVERRIDES: Record<string, string> = {
+  istanbul: 'Historic street leading toward Galata Tower in Istanbul, Türkiye.',
+  cappadocia: 'Cappadocia landscape with volcanic forms and layered terrain',
+  bodrum: 'Bodrum Castle overlooking the marina and Aegean coastline in Türkiye.',
+};
 
 const LOCAL_FALLBACK_DESTINATIONS: StrapiDestination[] = [
   {
@@ -62,7 +76,7 @@ const LOCAL_FALLBACK_DESTINATIONS: StrapiDestination[] = [
     short_description: CULTURAL_WORLD_CONTENT.istanbul.shortDescription,
     order: 1,
     cover_image: {
-      url: 'https://res.cloudinary.com/djr97wm0n/image/upload/c_fill,g_custom,w_900,h_1200,q_auto,f_auto/v1780603200/creare-cultural-world-istanbul-image.jpg',
+      url: CULTURAL_WORLD_RAIL_IMAGE_OVERRIDES.istanbul,
       alternativeText: 'Historic street leading toward Galata Tower in Istanbul, Türkiye.',
     },
   },
@@ -74,7 +88,7 @@ const LOCAL_FALLBACK_DESTINATIONS: StrapiDestination[] = [
     short_description: CULTURAL_WORLD_CONTENT.cappadocia.shortDescription,
     order: 2,
     cover_image: {
-      url: 'https://res.cloudinary.com/djr97wm0n/image/upload/v1780601981/creare-cultural-world-cappadocia-image.jpg',
+      url: CULTURAL_WORLD_RAIL_IMAGE_OVERRIDES.cappadocia,
       alternativeText: 'Cappadocia landscape with volcanic forms and layered terrain',
     },
   },
@@ -86,7 +100,7 @@ const LOCAL_FALLBACK_DESTINATIONS: StrapiDestination[] = [
     short_description: CULTURAL_WORLD_CONTENT.bodrum.shortDescription,
     order: 3,
     cover_image: {
-      url: 'https://res.cloudinary.com/djr97wm0n/image/upload/c_fill,g_custom,w_900,h_1200,q_auto,f_auto/v1780602721/creare-cultural-world-bodrum-image.jpg',
+      url: CULTURAL_WORLD_RAIL_IMAGE_OVERRIDES.bodrum,
       alternativeText: 'Bodrum Castle overlooking the marina and Aegean coastline in Türkiye.',
     },
   },
@@ -131,6 +145,12 @@ async function fetchActiveDestinations(): Promise<StrapiDestination[]> {
 }
 
 function getDestinationImageUrl(destination: StrapiDestination): string {
+  const slug = destination.slug?.toLowerCase() ?? '';
+  const overrideUrl = slug ? CULTURAL_WORLD_RAIL_IMAGE_OVERRIDES[slug] : undefined;
+  if (overrideUrl) {
+    return overrideUrl;
+  }
+
   const rawUrl =
     destination.cover_image?.formats?.large?.url ??
     destination.cover_image?.formats?.medium?.url ??
@@ -281,7 +301,11 @@ export default async function CulturalWorldsPage() {
                           'Private cultural access composed around place, narrative, and depth.');
                 const imageUrl = getDestinationImageUrl(destination);
                 const imageAlt =
-                  destination.cover_image?.alternativeText ?? `${title} cultural world`;
+                  (destination.slug
+                    ? CULTURAL_WORLD_RAIL_ALT_OVERRIDES[destination.slug.toLowerCase()]
+                    : undefined) ??
+                  destination.cover_image?.alternativeText ??
+                  `${title} cultural world`;
 
                 const card = (
                   <div className="relative aspect-[5/6] overflow-hidden">
