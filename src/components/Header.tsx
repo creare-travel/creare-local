@@ -52,6 +52,7 @@ export default function Header() {
 
   const navLinks = [
     { label: 'Cultural Worlds', href: '/cultural-worlds' },
+    { label: 'Experiences', href: '/experiences' },
     { label: 'Insights', href: '/insights' },
     { label: 'Philosophy', href: '/philosophy' },
     { label: 'Contact', href: '/contact' },

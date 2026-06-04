@@ -28,6 +28,20 @@ export default function Footer() {
           aria-label="Footer navigation"
         >
           <Link
+            href="/cultural-worlds"
+            className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
+            aria-label="Cultural Worlds"
+          >
+            CULTURAL WORLDS
+          </Link>
+          <Link
+            href="/experiences"
+            className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
+            aria-label="Experiences"
+          >
+            EXPERIENCES
+          </Link>
+          <Link
             href="/philosophy"
             className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
             aria-label="Our Philosophy"
