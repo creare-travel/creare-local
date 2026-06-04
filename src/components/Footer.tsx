@@ -42,18 +42,18 @@ export default function Footer() {
             EXPERIENCES
           </Link>
           <Link
-            href="/philosophy"
-            className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label="Our Philosophy"
-          >
-            OUR PHILOSOPHY
-          </Link>
-          <Link
             href="/insights"
             className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
             aria-label="Insights"
           >
             INSIGHTS
+          </Link>
+          <Link
+            href="/philosophy"
+            className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
+            aria-label="Philosophy"
+          >
+            PHILOSOPHY
           </Link>
           <Link
             href="/contact"
