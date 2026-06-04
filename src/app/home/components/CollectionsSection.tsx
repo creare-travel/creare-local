@@ -29,7 +29,7 @@ const collectionFeatures: CollectionFeature[] = [
     title: 'Built with you.',
     description: 'Custom cultural experiences, developed from scratch.',
     href: '/experiences/lab',
-    image: '/assets/images/lab_tailor_made_hand.png',
+    image: 'https://res.cloudinary.com/djr97wm0n/image/upload/v1780534781/creare-lab-image.jpg',
     alt: 'Craftsman hand holding a fine pencil drawing precise architectural lines on white drafting paper — tailor-made from scratch',
   },
   {
