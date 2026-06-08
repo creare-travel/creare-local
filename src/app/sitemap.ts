@@ -182,7 +182,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Core
     { url: `${BASE_URL}/`, lastModified: LAST_MODIFIED, changeFrequency: 'weekly', priority: 1.0 },
 
-    // Experiences — canonical routes only (BLACK excluded: invitation-only, noindex)
+    // Experiences — canonical collection routes
     {
       url: `${BASE_URL}/experiences`,
       lastModified: LAST_MODIFIED,
@@ -197,6 +197,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${BASE_URL}/experiences/signature`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/experiences/black`,
       lastModified: LAST_MODIFIED,
       changeFrequency: 'weekly',
       priority: 0.85,

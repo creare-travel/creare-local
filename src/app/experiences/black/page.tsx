@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description:
     'Invitation-only. Rare access. Discreet execution. CREARE BLACK™ is reserved for those for whom exclusivity is not a preference — it is a requirement.',
   alternates: buildMetadataAlternates('/experiences/black'),
-  robots: { index: false, follow: false },
+  robots: { index: true, follow: true },
   openGraph: {
     title: 'CREARE BLACK™ — Private Access',
     description: 'Invitation-only. Rare access. Discreet execution.',
