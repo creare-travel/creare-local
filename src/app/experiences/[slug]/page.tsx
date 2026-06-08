@@ -730,9 +730,9 @@ function StrapiExperiencePage({
         <section className="py-16 bg-white" aria-label="Experience overview">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="max-w-2xl">
-              <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-6">
+              <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-6">
                 Overview
-              </p>
+              </h2>
               <p
                 className="font-display font-light text-neutral-800 leading-relaxed"
                 style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)' }}
@@ -765,9 +765,9 @@ function StrapiExperiencePage({
         <section className="py-16 md:py-20 bg-white" aria-label="What defines this experience">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="max-w-3xl border-t border-neutral-200 pt-10">
-              <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
-                What Defines This Experience
-              </p>
+              <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
+                {`What Defines ${item.title}`}
+              </h2>
               <div className="grid gap-10 md:grid-cols-2 md:gap-12">
                 {wowMoment && (
                   <div>
@@ -800,9 +800,9 @@ function StrapiExperiencePage({
         <section className="py-20 md:py-28 bg-white" aria-label="Experience description">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="max-w-2xl">
-              <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
+              <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
                 The Experience
-              </p>
+              </h2>
               <div className="prose-neutral">
                 {typeof item.description === 'string' ? (
                   <p className="font-body text-sm text-neutral-700 leading-relaxed">
@@ -822,9 +822,9 @@ function StrapiExperiencePage({
         <section className="py-20 md:py-24 bg-neutral-50" aria-label="Program">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="max-w-2xl">
-              <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
+              <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
                 The Programme
-              </p>
+              </h2>
               <ol className="space-y-6">
                 {programItems.map((step, i) => (
                   <li key={i} className="flex gap-5">
@@ -845,9 +845,9 @@ function StrapiExperiencePage({
         <section className="py-20 md:py-24 bg-white" aria-label="Who this is for">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="max-w-2xl">
-              <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
+              <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
                 Who This Is For
-              </p>
+              </h2>
               <ul className="space-y-4">
                 {audienceItems.map((line, i) => (
                   <li key={i} className="flex items-start gap-4">
@@ -873,9 +873,9 @@ function StrapiExperiencePage({
             <div className="border-t border-neutral-200 pt-10">
               {cmsRelatedExperiences.length > 0 && (
                 <div className={relatedInsights.length > 0 ? 'mb-16 md:mb-20' : ''}>
-                  <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
+                  <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
                     Adjacent Experiences
-                  </p>
+                  </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10">
                     {cmsRelatedExperiences.map((experience, index) => {
                       const imageUrl = getExperienceImageUrl(experience);
@@ -925,9 +925,9 @@ function StrapiExperiencePage({
 
               {relatedInsights.length > 0 && (
                 <div className="max-w-3xl">
-                  <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
+                  <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
                     Further Cultural Reading
-                  </p>
+                  </h2>
                   <div className="space-y-6">
                     {relatedInsights.map((insight) => (
                       <Link
