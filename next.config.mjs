@@ -1,5 +1,67 @@
 import { imageHosts } from './image-hosts.config.mjs';
 
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
+function originFromUrl(urlString) {
+  if (!urlString) return null;
+
+  try {
+    return new URL(urlString).origin;
+  } catch {
+    return null;
+  }
+}
+
+const configuredStrapiOrigin = originFromUrl(process.env.NEXT_PUBLIC_STRAPI_URL);
+
+const connectSrc = [
+  "'self'",
+  'https://www.google-analytics.com',
+  'https://www.googletagmanager.com',
+  configuredStrapiOrigin,
+  ...(isDevelopment
+    ? ['http://localhost:1337', 'http://127.0.0.1:1337', 'ws://localhost:*', 'ws://127.0.0.1:*']
+    : []),
+].filter(Boolean);
+
+const scriptSrc = [
+  "'self'",
+  "'unsafe-inline'",
+  'https://www.googletagmanager.com',
+  'https://www.google-analytics.com',
+  ...(isDevelopment ? ["'unsafe-eval'"] : []),
+];
+
+const imageSrc = [
+  "'self'",
+  'data:',
+  'blob:',
+  'https://www.google-analytics.com',
+  'https://www.googletagmanager.com',
+  'https://images.unsplash.com',
+  'https://images.pexels.com',
+  'https://images.pixabay.com',
+  'https://img.rocket.new',
+  'https://res.cloudinary.com',
+  'https://*.strapi.io',
+  configuredStrapiOrigin,
+  ...(isDevelopment ? ['http://localhost:1337', 'http://127.0.0.1:1337'] : []),
+].filter(Boolean);
+
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  `script-src ${scriptSrc.join(' ')}`,
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self' data: https:",
+  `img-src ${imageSrc.join(' ')}`,
+  `connect-src ${connectSrc.join(' ')}`,
+  "frame-src 'self' https://www.googletagmanager.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join('; ');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   productionBrowserSourceMaps: true,
@@ -74,6 +136,32 @@ const nextConfig = {
         source: '/destinations/:path*',
         destination: '/cultural-worlds/:path*',
         permanent: true,
+      },
+    ];
+  },
+
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: contentSecurityPolicy.replace(/\s{2,}/g, ' ').trim(),
+          },
+        ],
       },
     ];
   },
