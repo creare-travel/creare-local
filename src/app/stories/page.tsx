@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: 'Stories — Creare',
+  title: 'Stories',
   description: 'Cultural narratives and experience stories from the world of Creare.',
   robots: { index: false, follow: true },
 };

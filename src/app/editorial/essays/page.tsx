@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: 'Essays — Creare Editorial',
+  title: 'Essays — Editorial',
   description: 'Long-form thinking on culture, place, and the nature of experience.',
   robots: { index: false, follow: true },
 };

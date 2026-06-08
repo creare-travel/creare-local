@@ -440,9 +440,9 @@ export default function ContactPageClient() {
         className="w-full flex flex-col items-center pb-24 pt-8"
         aria-label="Global execution capability"
       >
-        <p className="text-white font-body text-[10px] tracking-[0.3em] uppercase mb-4">
+        <h2 className="text-white font-body text-[10px] tracking-[0.3em] uppercase mb-4">
           GLOBAL EXECUTION CAPABILITY
-        </p>
+        </h2>
         <div className="w-[200px] h-px bg-white/30" />
 
         <p className="text-white font-body text-center leading-relaxed mt-14 mb-12 px-6 text-lg max-w-[800px]">

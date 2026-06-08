@@ -75,9 +75,9 @@ export default function CookiesPage() {
           <span className="text-xs text-gray-400" aria-hidden="true">
             /
           </span>
-          <span className="text-xs tracking-widest text-black uppercase" aria-current="page">
+          <h1 className="text-xs tracking-widest text-black uppercase" aria-current="page">
             COOKIES
-          </span>
+          </h1>
         </nav>
 
         {/* Cookie Sections */}

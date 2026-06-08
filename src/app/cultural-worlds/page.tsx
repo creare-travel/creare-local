@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 const SITE_URL = 'https://crearetravel.com';
 
 export const metadata: Metadata = {
-  title: 'Cultural Worlds — Creare',
+  title: 'Cultural Worlds',
   description:
     'Each destination is a world unto itself. Creare provides private cultural access to the deepest layers of extraordinary places shaped by history, ritual, and meaning.',
   alternates: buildMetadataAlternates('/cultural-worlds'),

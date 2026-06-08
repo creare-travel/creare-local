@@ -8,7 +8,6 @@ import {
   canonicalUrl,
   buildOpenGraph,
   buildTwitterCard,
-  SITE_NAME,
   DEFAULT_OG_IMAGE,
   DEFAULT_OG_IMAGE_ALT,
 } from '@/lib/seo';
@@ -133,6 +132,10 @@ function normalizeMediaItem<T>(value: unknown): T | null {
 }
 
 const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
+
+function stripBrandSuffix(title?: string | null): string | undefined {
+  return title?.replace(/\s+—\s+Creare$/i, '').trim() || undefined;
+}
 const MAX_RELATED_ESSAYS = 4;
 const LEGACY_ISTANBUL_INSIGHT_SLUG = 'the-private-life-of-istanbul';
 const CANONICAL_ISTANBUL_INSIGHT_SLUG = 'private-life-of-istanbul';
@@ -356,14 +359,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const insight = await resolveInsight(canonicalSlug);
 
   if (!insight) {
-    return { title: `Not Found — ${SITE_NAME}` };
+    return { title: 'Not Found' };
   }
 
   // SEO fallbacks: seo_title || title, seo_description || excerpt
-  const title =
-    insight.seo_title || insight.title
-      ? `${insight.seo_title || insight.title} — ${SITE_NAME}`
-      : `Not Found — ${SITE_NAME}`;
+  const title = stripBrandSuffix(insight.seo_title || insight.title) || 'Not Found';
   const description = insight.seo_description || insight.excerpt || '';
 
   return {

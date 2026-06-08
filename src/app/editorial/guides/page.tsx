@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: 'Guides — Creare Editorial',
+  title: 'Guides — Editorial',
   description:
     'Practical luxury. How to move through a city, a culture, a moment — with intention.',
   robots: { index: false, follow: true },

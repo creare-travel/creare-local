@@ -1104,6 +1104,10 @@ interface PageProps {
 
 export const dynamic = 'force-dynamic';
 
+function stripBrandSuffix(title?: string | null): string | undefined {
+  return title?.replace(/\s+—\s+CREARE$/i, '').trim() || undefined;
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -1114,22 +1118,29 @@ export async function generateMetadata({
   const result = await resolveExperienceDetailBySlug(slugValue);
 
   if (result.status === 'error') {
-    return { title: 'Experience Unavailable — CREARE' };
+    return {
+      title: 'Experience Unavailable',
+      robots: { index: false, follow: false },
+    };
   }
 
   if (result.status === 'not_found') {
-    return { title: 'Experience Not Found — CREARE' };
+    return {
+      title: 'Experience Not Found',
+      robots: { index: false, follow: false },
+    };
   }
 
   const strapiItem = result.item;
   const canonicalSlug = result.canonicalSlug;
 
   const ogTitle = strapiItem.seo_title ?? `${strapiItem.title} — CREARE`;
+  const pageTitle = stripBrandSuffix(strapiItem.seo_title) || strapiItem.title;
   const ogDescription = getExperienceDescription(strapiItem);
   const coverUrl = getGovernedExperienceImageUrl(strapiItem, canonicalSlug);
 
   return {
-    title: ogTitle,
+    title: pageTitle,
     description: ogDescription,
     alternates: buildMetadataAlternates(`/experiences/${canonicalSlug}`),
     robots: { index: true, follow: true },
@@ -1171,7 +1182,7 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
   const result = await resolveExperienceDetailBySlug(slugValue);
 
   if (result.status === 'error') {
-    return <div style={{ padding: 40 }}>Experience temporarily unavailable</div>;
+    notFound();
   }
 
   if (result.status === 'not_found') {

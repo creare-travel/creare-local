@@ -8,7 +8,6 @@ import {
   buildMetadataAlternates,
   buildOpenGraph,
   buildTwitterCard,
-  SITE_NAME,
   DEFAULT_OG_IMAGE,
   DEFAULT_OG_IMAGE_ALT,
 } from '@/lib/seo';
@@ -20,7 +19,7 @@ export const dynamic = 'force-dynamic';
 const canonicalInsightSlug = (slug: string | undefined): string | undefined =>
   slug === 'the-private-life-of-istanbul' ? 'private-life-of-istanbul' : slug;
 
-const insightsTitle = `Insights — ${SITE_NAME}`;
+const insightsTitle = 'Insights';
 const insightsDescription =
   'Editorial perspectives on private cultural encounters across Turkey — Istanbul, Bodrum, Cappadocia, and the Aegean coast.';
 

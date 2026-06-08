@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: 'Editorial — Creare',
+  title: 'Editorial',
   description:
     'Essays and guides from the world of Creare. Long-form writing on culture, travel, and the art of experience.',
   robots: { index: false, follow: true },

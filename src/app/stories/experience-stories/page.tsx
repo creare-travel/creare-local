@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: 'Experience Stories — Creare Stories',
+  title: 'Experience Stories — Stories',
   description: 'First-person accounts of Creare encounters.',
   robots: { index: false, follow: true },
 };

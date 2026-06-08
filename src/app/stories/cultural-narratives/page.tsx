@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: 'Cultural Narratives — Creare Stories',
+  title: 'Cultural Narratives — Stories',
   description: 'The stories behind the places. History, ritual, and meaning.',
   robots: { index: false, follow: true },
 };

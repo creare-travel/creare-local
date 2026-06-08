@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Thank You — CREARE',
+  title: 'Thank You',
   description: 'Your inquiry has been received. We will be in touch shortly.',
   robots: { index: false, follow: false },
 };

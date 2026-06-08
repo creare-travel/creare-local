@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { buildMetadataAlternates } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'Aegean — Cultural World — Creare',
+  title: 'Aegean — Cultural World',
   description:
     'The Aegean is where civilisation, coastline, and continuity meet. Private cultural access shaped by the sea, archaeology, and the table.',
   alternates: buildMetadataAlternates('/cultural-worlds/aegean'),

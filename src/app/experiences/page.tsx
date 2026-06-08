@@ -11,10 +11,9 @@ import {
   buildTwitterCard,
   DEFAULT_OG_IMAGE,
   DEFAULT_OG_IMAGE_ALT,
-  SITE_NAME,
 } from '@/lib/seo';
 
-const experiencesTitle = `Experiences — ${SITE_NAME}`;
+const experiencesTitle = 'Experiences';
 const experiencesDescription =
   'CREARE structures its experience system through three distinct paths: Signature for curated cultural encounters, LAB for co-created commissions, and BLACK for discreet invitation-only access.';
 

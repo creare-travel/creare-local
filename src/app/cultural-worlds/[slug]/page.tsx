@@ -21,6 +21,10 @@ const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
 const canonicalInsightSlug = (slug?: string) =>
   slug === 'the-private-life-of-istanbul' ? 'private-life-of-istanbul' : slug;
 
+function stripBrandSuffix(title?: string | null): string | undefined {
+  return title?.replace(/\s+—\s+Creare$/i, '').trim() || undefined;
+}
+
 interface Props {
   params: Promise<{ slug: string }>;
 }
@@ -195,6 +199,31 @@ function normalizeTags(value: unknown): string[] {
   }
 
   return [];
+}
+
+function buildFallbackDestinationFromLocalContent(
+  localContent: ReturnType<typeof getCulturalWorldContent>
+): StrapiDestination | null {
+  if (!localContent) return null;
+
+  const localHeroImage = buildLocalHeroImage(localContent.heroImage, localContent.heroImageAlt);
+
+  return {
+    id: -1,
+    slug: localContent.slug,
+    name: localContent.title,
+    visibility_status: 'active',
+    highlight: localContent.shortDescription,
+    short_description: localContent.shortDescription,
+    intro_text: localContent.heroStatement,
+    meta_title: localContent.metaTitle,
+    meta_description: localContent.metaDescription,
+    cover_image: localHeroImage,
+    sections: [],
+    experiences: [],
+    secondary_experiences: [],
+    insights: [],
+  };
 }
 
 async function fetchAllExperiences(): Promise<StrapiExperience[]> {
@@ -492,17 +521,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   if (!isCanonicalCulturalWorldSlug(slug)) {
     return {
-      title: 'Not Found — Cultural World — Creare',
+      title: 'Not Found — Cultural World',
       description: FALLBACK_DESCRIPTION,
       robots: { index: false, follow: false },
     };
   }
-  const destination = await fetchDestination(slug);
   const localContent = getCulturalWorldContent(slug);
+  const destination = await fetchDestination(slug);
+  const fallbackDestination = buildFallbackDestinationFromLocalContent(localContent);
 
-  if (!destination || destination.visibility_status?.toLowerCase() !== 'active') {
+  if (destination && destination.visibility_status?.toLowerCase() !== 'active') {
     return {
-      title: 'Not Found — Cultural World — Creare',
+      title: 'Not Found — Cultural World',
+      description: FALLBACK_DESCRIPTION,
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const resolvedDestination = destination ?? fallbackDestination;
+
+  if (!resolvedDestination) {
+    return {
+      title: 'Not Found — Cultural World',
       description: FALLBACK_DESCRIPTION,
       robots: { index: false, follow: false },
     };
@@ -510,13 +550,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title:
-      localContent?.metaTitle ||
-      destination.meta_title ||
-      `${destination.name || localContent?.title || 'Destination'} — Cultural World — Creare`,
+      stripBrandSuffix(localContent?.metaTitle) ||
+      stripBrandSuffix(resolvedDestination.meta_title) ||
+      `${resolvedDestination.name || localContent?.title || 'Destination'} — Cultural World`,
     description:
       localContent?.metaDescription ||
-      destination.meta_description ||
-      destination.highlight ||
+      resolvedDestination.meta_description ||
+      resolvedDestination.highlight ||
       localContent?.shortDescription ||
       FALLBACK_DESCRIPTION,
     alternates: buildMetadataAlternates(`/cultural-worlds/${slug}`),
@@ -529,29 +569,39 @@ export default async function CulturalWorldPage({ params }: Props) {
   if (!isCanonicalCulturalWorldSlug(slug)) {
     notFound();
   }
+  const localContent = getCulturalWorldContent(slug);
   const [destination, allExperiences] = await Promise.all([
     fetchDestination(slug),
     fetchAllExperiences(),
   ]);
+  const fallbackDestination = buildFallbackDestinationFromLocalContent(localContent);
 
-  if (!destination || destination.visibility_status?.toLowerCase() !== 'active') {
+  if (destination && destination.visibility_status?.toLowerCase() !== 'active') {
     notFound();
   }
 
-  const localContent = getCulturalWorldContent(slug);
-  const localHeroImage = buildLocalHeroImage(localContent?.heroImage, localContent?.heroImageAlt);
+  if (!destination && !fallbackDestination) {
+    notFound();
+  }
+
+  const resolvedDestination = destination ?? fallbackDestination;
+
+  if (!resolvedDestination) {
+    notFound();
+  }
+
   const mergedDestination: StrapiDestination = {
-    ...destination,
-    name: destination.name || localContent?.title,
-    highlight: localContent?.shortDescription || destination.highlight,
-    short_description: localContent?.shortDescription || destination.short_description,
-    intro_text: localContent?.heroStatement || destination.intro_text,
-    meta_title: localContent?.metaTitle || destination.meta_title,
-    meta_description: localContent?.metaDescription || destination.meta_description,
-    cover_image: destination.cover_image ?? localHeroImage ?? null,
+    ...resolvedDestination,
+    name: resolvedDestination.name || localContent?.title,
+    highlight: localContent?.shortDescription || resolvedDestination.highlight,
+    short_description: localContent?.shortDescription || resolvedDestination.short_description,
+    intro_text: localContent?.heroStatement || resolvedDestination.intro_text,
+    meta_title: localContent?.metaTitle || resolvedDestination.meta_title,
+    meta_description: localContent?.metaDescription || resolvedDestination.meta_description,
+    cover_image: resolvedDestination.cover_image ?? null,
   };
 
-  const cmsSections = normalizeRelationArray<StrapiSection>(destination.sections)
+  const cmsSections = normalizeRelationArray<StrapiSection>(resolvedDestination.sections)
     .filter((section) => section.title || section.body)
     .sort((a, b) => (a.section_number ?? Infinity) - (b.section_number ?? Infinity));
   const fallbackSections = (localContent?.sections ?? []).map((section, index) => ({
@@ -565,7 +615,7 @@ export default async function CulturalWorldPage({ params }: Props) {
   );
 
   const experiences = filterPublicExperiences(
-    normalizeRelationArray<StrapiExperience>(destination.experiences)
+    normalizeRelationArray<StrapiExperience>(resolvedDestination.experiences)
   )
     .filter((experience) => experience.slug && experience.title)
     .sort((a, b) => (a.order_index ?? Infinity) - (b.order_index ?? Infinity));
@@ -579,7 +629,7 @@ export default async function CulturalWorldPage({ params }: Props) {
   );
 
   const cmsInsights = filterPublicInsights(
-    normalizeRelationArray<StrapiInsight>(destination.insights)
+    normalizeRelationArray<StrapiInsight>(resolvedDestination.insights)
   ).filter((insight) => insight.slug && insight.title);
   const fallbackInsights = (localContent?.furtherReading ?? []).map((insight, index) => ({
     id: -(index + 1),
@@ -726,7 +776,7 @@ export default async function CulturalWorldPage({ params }: Props) {
           </li>
           <li>
             <span className="text-white/60 font-body text-xs tracking-[0.15em] uppercase">
-              {destination.name || 'Destination'}
+              {mergedDestination.name || 'Destination'}
             </span>
           </li>
         </ol>
@@ -777,7 +827,7 @@ export default async function CulturalWorldPage({ params }: Props) {
               <ul className="space-y-6">
                 {context.characteristics.map((characteristic, index) => (
                   <li
-                    key={`${destination.slug || 'world'}-characteristic-${index}`}
+                    key={`${mergedDestination.slug || 'world'}-characteristic-${index}`}
                     className="flex gap-4 text-white/65 font-body font-light text-base leading-relaxed"
                   >
                     <span className="mt-2 block h-1.5 w-1.5 rounded-full bg-white/35 shrink-0" />

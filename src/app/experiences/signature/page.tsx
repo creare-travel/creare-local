@@ -196,8 +196,15 @@ function renderExperienceCard(exp: StrapiExperience, options?: { compact?: boole
 }
 
 function buildStaticPerformanceFallback(): StrapiExperience[] {
+  const unavailablePerformanceSlugs = new Set([
+    'golden-horn-regatta',
+    'princes-islands-regatta',
+    'driven-by-performance',
+  ]);
+
   return staticExperiences
     .filter((experience) => experience.category === 'PERFORMANCE')
+    .filter((experience) => !unavailablePerformanceSlugs.has(experience.slug))
     .map((experience, index) => ({
       id: 1000 + index,
       title: experience.title,
