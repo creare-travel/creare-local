@@ -17,7 +17,8 @@ const collectionFeatures: CollectionFeature[] = [
   {
     label: 'SIGNATURE™',
     title: 'Curated cultural experiences.',
-    description: 'Designed, tested, and ready to be lived.',
+    description:
+      'Designed, tested, and ready to be lived. Signature brings together place intelligence, cultural context, and a clear authored structure so that each encounter feels composed rather than assembled.',
     href: '/experiences/signature',
     image:
       'https://res.cloudinary.com/djr97wm0n/image/upload/dpr_auto/cs_srgb/q_auto:best/creare-signature-image.jpg',
@@ -27,7 +28,8 @@ const collectionFeatures: CollectionFeature[] = [
   {
     label: 'LAB™',
     title: 'Built with you.',
-    description: 'Custom cultural experiences, developed from scratch.',
+    description:
+      'Custom cultural experiences, developed from scratch. LAB begins with conversation, then builds through research, local knowledge, and creative direction until the right form of access becomes possible.',
     href: '/experiences/lab',
     image: 'https://res.cloudinary.com/djr97wm0n/image/upload/v1780534781/creare-lab-image.jpg',
     alt: 'Craftsman hand holding a fine pencil drawing precise architectural lines on white drafting paper — tailor-made from scratch',
@@ -35,7 +37,8 @@ const collectionFeatures: CollectionFeature[] = [
   {
     label: 'BLACK™',
     title: 'Not publicly available.',
-    description: 'Private access to places, collections, and moments.',
+    description:
+      'Private access to places, collections, and moments. BLACK is reserved for arrangements that depend on trust, discretion, and relationships not intended for open circulation or standard inquiry paths.',
     href: '/experiences/black',
     image:
       'https://res.cloudinary.com/djr97wm0n/image/upload/v1780566766/creare-black-private-access-key.jpg',

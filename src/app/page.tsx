@@ -58,7 +58,10 @@ export default function HomePage() {
             CREARE is not built around packaged travel, but around cultural access, narrative
             intelligence, and the careful composition of encounter. Signature, LAB, and BLACK define
             three ways of working: curated cultural experiences, bespoke commissions, and discreet
-            private access shaped by context, trust, and the deeper logic of place.
+            private access shaped by context, trust, and the deeper logic of place. The aim is not
+            to move through places efficiently, but to understand what gives them meaning: the
+            custodians who preserve them, the local knowledge that makes them legible, and the
+            conditions under which an encounter becomes more than arrival.
           </p>
           <Link
             href="/experiences"
