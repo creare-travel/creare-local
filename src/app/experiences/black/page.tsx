@@ -248,6 +248,24 @@ export default async function BlackPage() {
                 >
                   What we arrange is not found. What we curate is not listed.
                 </p>
+                <p
+                  className="mx-auto max-w-2xl font-body text-sm leading-relaxed"
+                  style={{ color: '#7a7268' }}
+                >
+                  BLACK is built on relationships that take time to earn and judgment that cannot be
+                  standardized. Access begins not with status, but with context: who is arriving,
+                  why the encounter matters, and whether the conditions exist for participation to
+                  be responsible, welcome, and discreet.
+                </p>
+                <p
+                  className="mx-auto max-w-2xl font-body text-sm leading-relaxed"
+                  style={{ color: '#7a7268' }}
+                >
+                  The point is not private viewing for its own sake. It is to create environments in
+                  which uncommon encounters can happen without distortion, where cultural
+                  custodians, collectors, hosts, and private institutions can engage on terms that
+                  preserve trust as much as access.
+                </p>
               </div>
             </div>
 
@@ -360,15 +378,15 @@ export default async function BlackPage() {
                 {[
                   {
                     label: 'Referral and Qualification',
-                    body: 'Access is granted through trusted referrals and qualification review.',
+                    body: 'Access is granted through trusted referrals and qualification review, ensuring that introduction, intent, and setting are aligned before any private arrangement is considered.',
                   },
                   {
                     label: 'Private Consultation',
-                    body: 'We design experiences aligned with your interests and expectations.',
+                    body: 'We design experiences through private consultation, shaping each brief around context, cultural fit, and the kind of participation a place or host can meaningfully support.',
                   },
                   {
                     label: 'Confidential Execution',
-                    body: 'Every detail is arranged discreetly, with full privacy and control.',
+                    body: 'Every detail is arranged discreetly, with privacy, timing, and stewardship treated as part of the encounter itself rather than as operational afterthoughts.',
                   },
                 ].map((item) => (
                   <div key={item.label} className="flex flex-col items-center">
@@ -541,7 +559,10 @@ export default async function BlackPage() {
                   Istanbul
                 </Link>{' '}
                 and the <span className="underline underline-offset-2">Aegean</span> — in spaces
-                that are never listed and encounters that are never described.
+                that are never listed and encounters that are never described. What matters is not
+                secrecy as spectacle, but the conditions that allow a place to be encountered with
+                care: the right host, the right hour, the right frame of understanding, and the
+                trust required for something uncommon to take place without performance.
               </p>
             </div>
 
