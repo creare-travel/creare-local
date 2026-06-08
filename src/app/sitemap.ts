@@ -4,6 +4,7 @@ import {
   filterPublicExperiences,
   filterPublicInsights,
 } from '@/lib/canonical-gates';
+import { insights as localInsights } from '@/data/insights';
 import { fetchStrapi } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -167,7 +168,33 @@ async function fetchCanonicalInsightUrls() {
       strapiPath: path,
       error,
     });
-    return [];
+    const seen = new Set<string>();
+
+    return filterPublicInsights(
+      localInsights.map((insight, index) => ({
+        id: index + 1,
+        slug: insight.slug,
+        title: insight.title,
+        visibility_status: 'published',
+        publishedAt: '2026-01-01T00:00:00.000Z',
+      }))
+    )
+      .map((item) => ({
+        ...item,
+        slug: LEGACY_INSIGHT_SLUG_MAP[item.slug ?? ''] ?? item.slug,
+      }))
+      .filter((item) => item.slug)
+      .filter((item) => {
+        if (!item.slug || seen.has(item.slug)) return false;
+        seen.add(item.slug);
+        return true;
+      })
+      .map((item) => ({
+        url: `${BASE_URL}/insights/${item.slug}`,
+        lastModified: LAST_MODIFIED,
+        changeFrequency: 'monthly' as const,
+        priority: 0.75,
+      }));
   }
 }
 
@@ -236,6 +263,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: LAST_MODIFIED,
       changeFrequency: 'monthly',
       priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/privacy`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
+      url: `${BASE_URL}/terms`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
+      url: `${BASE_URL}/cookies`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: 'monthly',
+      priority: 0.4,
     },
   ];
 }
