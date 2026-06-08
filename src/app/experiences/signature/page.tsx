@@ -431,12 +431,12 @@ export default async function SignatureExperiencesPage() {
 
           {/* Simplified 3-line intro — editorial, broken rhythm */}
           <div className="max-w-xl mx-auto text-center">
-            <p
+            <h2
               className="font-display font-light text-neutral-800 leading-[1.9]"
               style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)' }}
             >
               Each encounter is composed around culture, place and narrative.
-            </p>
+            </h2>
             <p
               className="font-display font-light text-neutral-800 leading-[1.9] mt-1"
               style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)' }}
@@ -464,6 +464,33 @@ export default async function SignatureExperiencesPage() {
                 Cappadocia
               </Link>
               , and the <span className="underline underline-offset-2">Aegean</span>.
+            </p>
+            <p
+              className="mx-auto mt-8 max-w-2xl font-body text-sm leading-relaxed text-neutral-600"
+              style={{ fontSize: 'clamp(0.9rem, 1.2vw, 0.98rem)' }}
+            >
+              Signature is CREARE&apos;s authored layer: cultural experiences shaped in advance, yet
+              grounded in the living intelligence of place. Each one is built through local
+              knowledge, tested relationships, and a clear understanding of what allows a moment to
+              carry meaning beyond access alone.
+            </p>
+            <p
+              className="mx-auto mt-5 max-w-2xl font-body text-sm leading-relaxed text-neutral-600"
+              style={{ fontSize: 'clamp(0.9rem, 1.2vw, 0.98rem)' }}
+            >
+              The aim is not to accumulate stops, but to establish continuity between setting, host,
+              narrative, and guest. Culture is approached here not as performance or backdrop, but
+              as a living system shaped by custodianship, memory, and the people who continue to
+              carry a place forward from within.
+            </p>
+            <p
+              className="mx-auto mt-5 max-w-2xl font-body text-sm leading-relaxed text-neutral-600"
+              style={{ fontSize: 'clamp(0.9rem, 1.2vw, 0.98rem)' }}
+            >
+              That is what makes a Signature experience distinct. It offers a composed path into a
+              cultural world already understood in depth, so that encounter can begin from
+              recognition rather than sightseeing, and access can emerge through context instead of
+              display.
             </p>
           </div>
         </div>
