@@ -154,7 +154,10 @@ export default function ContactPageClient() {
         </h1>
         <p className="text-white/60 font-body text-base mb-4">We respond personally.</p>
         <p className="text-white/35 font-body text-sm leading-relaxed max-w-[500px]">
-          For strategic engagements, private commissions, and confidential collaborations.
+          For strategic engagements, private commissions, and confidential collaborations. We
+          respond personally to international guest requests, partner-led introductions, and
+          culturally specific planning briefs, with each inquiry reviewed in confidence before any
+          proposal, coordination, or access design begins.
         </p>
       </section>
 
@@ -199,7 +202,9 @@ export default function ContactPageClient() {
                 </p>
                 <p className="text-white font-body text-base mb-3">direct@crearetravel.com</p>
                 <p className="text-white/35 font-body text-xs leading-relaxed">
-                  For private requests, structured proposals, and strategic collaborations.
+                  For private requests, structured proposals, and strategic collaborations. Early
+                  conversations help establish pace, feasibility, and the level of coordination
+                  required across hosts, cultural partners, and on-the-ground logistics.
                 </p>
               </div>
 
@@ -447,7 +452,9 @@ export default function ContactPageClient() {
 
         <p className="text-white font-body text-center leading-relaxed mt-14 mb-12 px-6 text-lg max-w-[800px]">
           Cross-border experience delivery • Brand &amp; institutional collaborations • Multi-market
-          coordination • High-security engagements
+          coordination • High-security engagements, with planning shaped around discretion, clear
+          communication, and the practical realities of executing complex requests across different
+          cultural and operational environments.
         </p>
 
         <div className="text-center mb-8">
@@ -460,7 +467,9 @@ export default function ContactPageClient() {
         </div>
 
         <p className="text-white/40 font-body text-sm text-center mb-12">
-          Experience scope and timelines are discussed confidentially.
+          Experience scope, timelines, and response expectations are discussed confidentially, so
+          each engagement can move from inquiry to planning with the right level of clarity,
+          privacy, and local coordination.
         </p>
 
         <div className="w-[200px] h-px bg-white/20" />

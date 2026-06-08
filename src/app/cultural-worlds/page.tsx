@@ -247,7 +247,9 @@ export default async function CulturalWorldsPage() {
           </h1>
           <p className="mt-8 max-w-2xl font-body text-sm leading-relaxed text-white/58 sm:text-[0.95rem]">
             A geography of layered places, read through memory, custodianship, and the conditions
-            that make real cultural access meaningful.
+            that make real cultural access meaningful. CREARE approaches place not as a destination
+            list, but as a cultural world: a living continuity of geography, craft, ritual, local
+            knowledge, and social memory that shapes how access can be offered and understood.
           </p>
         </div>
       </section>
@@ -287,7 +289,10 @@ export default async function CulturalWorldsPage() {
                       It gathers geography, memory, local knowledge, and the forms of access that
                       make a place legible beyond arrival. Each world is approached as a living
                       cultural system, shaped by custodianship, continuity, and the conditions that
-                      allow encounter to become meaningful.
+                      allow encounter to become meaningful. Istanbul, Bodrum, and Cappadocia differ
+                      in terrain, tempo, and cultural expression, yet each becomes clearer when read
+                      through the people, practices, and inherited knowledge that sustain life there
+                      beyond sightseeing.
                     </p>
                   </div>
                 </div>
