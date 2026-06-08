@@ -54,6 +54,12 @@ export default function HomePage() {
           >
             Interested in understanding the system?
           </p>
+          <p className="mb-6 max-w-2xl font-body text-sm leading-relaxed text-neutral-700/78">
+            CREARE is not built around packaged travel, but around cultural access, narrative
+            intelligence, and the careful composition of encounter. Signature, LAB, and BLACK define
+            three ways of working: curated cultural experiences, bespoke commissions, and discreet
+            private access shaped by context, trust, and the deeper logic of place.
+          </p>
           <Link
             href="/experiences"
             className="inline-flex font-body text-xs uppercase tracking-[0.14em] text-neutral-500 transition-colors hover:text-neutral-900"
