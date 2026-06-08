@@ -282,6 +282,13 @@ export default async function CulturalWorldsPage() {
                     >
                       Each destination holds layers of history, ritual, and meaning.
                     </h3>
+                    <p className="mt-8 max-w-[26ch] font-body text-sm leading-relaxed text-white/58">
+                      A Cultural World is not a destination category, but a deeper reading of place.
+                      It gathers geography, memory, local knowledge, and the forms of access that
+                      make a place legible beyond arrival. Each world is approached as a living
+                      cultural system, shaped by custodianship, continuity, and the conditions that
+                      allow encounter to become meaningful.
+                    </p>
                   </div>
                 </div>
               </article>
