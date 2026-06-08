@@ -2,6 +2,46 @@ import React from 'react';
 import Link from 'next/link';
 
 export default function Footer() {
+  const socialIcons = (
+    <>
+      <span aria-label="CREARE Instagram profile coming soon" className="text-white/55" role="img">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+          <circle cx="12" cy="12" r="4" />
+          <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
+        </svg>
+      </span>
+
+      <span aria-label="CREARE LinkedIn profile coming soon" className="text-white/55" role="img">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+          <rect x="2" y="9" width="4" height="12" />
+          <circle cx="4" cy="4" r="2" />
+        </svg>
+      </span>
+    </>
+  );
+
   return (
     <footer className="bg-black" aria-label="Site footer">
       {/* Main footer row */}
@@ -63,53 +103,7 @@ export default function Footer() {
             CONTACT
           </Link>
 
-          <div className="flex items-center gap-6 pt-1">
-            {/* Instagram icon */}
-            <a
-              href="#"
-              aria-label="Follow CREARE on Instagram"
-              className="text-white/55 transition-colors duration-700 hover:text-white/90"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                <circle cx="12" cy="12" r="4" />
-                <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
-              </svg>
-            </a>
-
-            {/* LinkedIn icon */}
-            <a
-              href="#"
-              aria-label="Follow CREARE on LinkedIn"
-              className="text-white/55 transition-colors duration-700 hover:text-white/90"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                <rect x="2" y="9" width="4" height="12" />
-                <circle cx="4" cy="4" r="2" />
-              </svg>
-            </a>
-          </div>
+          <div className="flex items-center gap-6 pt-1">{socialIcons}</div>
         </nav>
       </div>
       {/* Bottom bar */}

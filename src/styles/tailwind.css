@@ -3,34 +3,10 @@
 @tailwind utilities;
 
 /* ─────────────────────────────────────────────────────────────────
-   TT Hoves — loaded from /public/fonts/tt-hoves/
-   Place TTHoves-Regular.woff2, TTHoves-Medium.woff2, TTHoves-Bold.woff2
-   in /public/fonts/tt-hoves/ to activate the custom font.
-   Until then, the system font stack is used as fallback.
+   TT Hoves
+   The hosted font files are not currently present under /public/fonts/tt-hoves/.
+   Keep the fallback font stack active until the licensed .woff2 files are added.
 ───────────────────────────────────────────────────────────────── */
-@font-face {
-  font-family: 'TT Hoves';
-  src: url('/fonts/tt-hoves/TTHoves-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'TT Hoves';
-  src: url('/fonts/tt-hoves/TTHoves-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'TT Hoves';
-  src: url('/fonts/tt-hoves/TTHoves-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
 
 /* ─────────────────────────────────────────────────────────────────
    Design System CSS Variables

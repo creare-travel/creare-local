@@ -15,7 +15,7 @@ import {
   buildOrganizationSchema,
   buildWebSiteSchema,
 } from '@/lib/schema-builder';
-import { buildMetadataAlternates, DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT } from '@/lib/seo';
+import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT } from '@/lib/seo';
 
 const isMaintenanceMode = process.env.NEXT_PUBLIC_SITE_MODE === 'maintenance';
 
@@ -35,7 +35,6 @@ export const metadata: Metadata = {
   description: isMaintenanceMode
     ? 'CREARE is finalizing a private portfolio of experiences designed for a limited circle of clients.'
     : 'Creare curates private cultural encounters across Turkey and beyond — monastery access, atelier visits, and extraordinary moments for discerning clients.',
-  alternates: buildMetadataAlternates('/'),
   robots: {
     index: !isMaintenanceMode,
     follow: !isMaintenanceMode,
