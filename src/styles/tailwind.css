@@ -415,3 +415,10 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+@media (max-width: 1023px) {
+  header[data-header-state='hero'] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}

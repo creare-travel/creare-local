@@ -92,6 +92,7 @@ export default function Header() {
 
   return (
     <header
+      data-header-state={headerState}
       className={`fixed left-0 right-0 top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] ${
         lightSurface ? 'border-black/[0.05]' : 'border-white/[0.025]'
       }`}
