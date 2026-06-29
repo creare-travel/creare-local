@@ -11,8 +11,9 @@ const HOMEPAGE_HERO_IMAGE = buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
 });
 const HOMEPAGE_HERO_ALT =
   'Library of Celsus and the Gate of Augustus at sunset with warm architectural light';
-const HOMEPAGE_HERO_MOBILE_WIDTHS = [640, 828] as const;
 const HOMEPAGE_HERO_DESKTOP_WIDTHS = [1080, 1440, 1920] as const;
+const HOMEPAGE_HERO_MOBILE_COMPACT_WIDTH = 475;
+const HOMEPAGE_HERO_MOBILE_TALL_WIDTH = 524;
 
 export default function HeroSection() {
   const heroBlurDataUrl = buildCinematicBlurDataUrl(HOMEPAGE_HERO_IMAGE, {
@@ -26,16 +27,24 @@ export default function HeroSection() {
     format: 'auto',
     dpr: 'auto',
   });
-  const heroMobileSrcSet = HOMEPAGE_HERO_MOBILE_WIDTHS.map(
-    (width) =>
-      `${buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
-        profile: 'hero',
-        width,
-        quality: 'auto:eco',
-        format: 'auto',
-        dpr: 'auto',
-      })} ${width}w`
-  ).join(', ');
+  const heroMobileCompactSrc = buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
+    profile: 'hero',
+    width: HOMEPAGE_HERO_MOBILE_COMPACT_WIDTH,
+    quality: 'auto:good',
+    format: 'auto',
+    gravity: 'center',
+    aspectRatio: '9:16',
+    dpr: 'auto',
+  });
+  const heroMobileTallSrc = buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
+    profile: 'hero',
+    width: HOMEPAGE_HERO_MOBILE_TALL_WIDTH,
+    quality: 'auto:good',
+    format: 'auto',
+    gravity: 'center',
+    aspectRatio: '9:16',
+    dpr: 'auto',
+  });
   const heroDesktopSrcSet = HOMEPAGE_HERO_DESKTOP_WIDTHS.map(
     (width) =>
       `${buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
@@ -59,7 +68,14 @@ export default function HeroSection() {
           aria-hidden="true"
         />
         <picture>
-          <source media="(max-width: 1023px)" srcSet={heroMobileSrcSet} sizes="100vw" />
+          <source
+            media="(max-width: 409px) and (orientation: portrait)"
+            srcSet={heroMobileCompactSrc}
+          />
+          <source
+            media="(min-width: 410px) and (max-width: 767px) and (orientation: portrait)"
+            srcSet={heroMobileTallSrc}
+          />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={heroSrc}
