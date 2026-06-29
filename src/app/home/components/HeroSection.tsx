@@ -1,28 +1,40 @@
-'use client';
-
-import React from 'react';
-import AppImage from '@/components/ui/AppImage';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { trackCtaClick } from '@/lib/analytics/tracking';
 import { buildCloudinaryUrl } from '@/lib/cloudinary';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
+import HomeHeroInquiryLink from '@/app/home/components/HomeHeroInquiryLink';
 
-const HOMEPAGE_HERO_IMAGE = buildCloudinaryUrl('creare-hero-image.jpg', {
+const HOMEPAGE_HERO_PUBLIC_ID = 'creare-hero-image.jpg';
+const HOMEPAGE_HERO_IMAGE = buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
+  profile: 'hero',
   format: 'auto',
-  quality: 'auto',
+  quality: 'auto:good',
   dpr: 'auto',
-  crop: 'limit',
 });
 const HOMEPAGE_HERO_ALT =
   'Library of Celsus and the Gate of Augustus at sunset with warm architectural light';
+const HOMEPAGE_HERO_WIDTHS = [640, 828, 1080, 1440, 1920] as const;
 
 export default function HeroSection() {
-  const pathname = usePathname();
   const heroBlurDataUrl = buildCinematicBlurDataUrl(HOMEPAGE_HERO_IMAGE, {
     atmosphere: 'dark',
     profile: 'hero',
   });
+  const heroSrc = buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
+    profile: 'hero',
+    width: 1440,
+    quality: 'auto:good',
+    format: 'auto',
+    dpr: 'auto',
+  });
+  const heroSrcSet = HOMEPAGE_HERO_WIDTHS.map(
+    (width) =>
+      `${buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
+        profile: 'hero',
+        width,
+        quality: 'auto:good',
+        format: 'auto',
+        dpr: 'auto',
+      })} ${width}w`
+  ).join(', ');
 
   return (
     <section
@@ -30,16 +42,21 @@ export default function HeroSection() {
       aria-label="Hero — Experiences Composed as Art"
     >
       <div className="absolute inset-0 z-0">
-        <AppImage
-          src={HOMEPAGE_HERO_IMAGE}
-          alt={HOMEPAGE_HERO_ALT}
-          fill
-          priority
-          blurDataURL={heroBlurDataUrl}
-          atmosphere="dark"
-          unoptimized
-          className="hero-img-zoom h-full w-full object-cover"
+        <div
+          className="absolute inset-0 bg-cover bg-center blur-2xl"
+          style={{ backgroundImage: `url("${heroBlurDataUrl}")` }}
+          aria-hidden="true"
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={heroSrc}
+          srcSet={heroSrcSet}
           sizes="100vw"
+          alt={HOMEPAGE_HERO_ALT}
+          fetchPriority="high"
+          loading="eager"
+          decoding="async"
+          className="hero-img-zoom h-full w-full object-cover"
         />
 
         <div
@@ -55,7 +72,7 @@ export default function HeroSection() {
 
       <div className="relative z-30 mx-auto flex w-full max-w-7xl items-end px-6 pb-20 pt-28 sm:px-10 sm:pb-16 sm:pt-32 md:pb-20 lg:px-16">
         <div className="max-w-[21.5rem] sm:max-w-xl">
-          <p className="hero-label mb-8 font-body text-[0.56rem] font-light uppercase tracking-[0.34em] text-white/34 sm:mb-7 sm:text-[0.58rem] sm:tracking-[0.38em]">
+          <p className="hero-label mb-8 font-body text-[0.56rem] font-light uppercase tracking-[0.34em] text-white/48 sm:mb-7 sm:text-[0.58rem] sm:tracking-[0.38em]">
             Curated Cultural Experiences
           </p>
 
@@ -70,24 +87,7 @@ export default function HeroSection() {
             Composed as Art.
           </p>
 
-          <Link
-            href="/contact"
-            onClick={() =>
-              trackCtaClick({
-                label: 'INQUIRE PRIVATELY',
-                page_path: pathname,
-                source: 'home_hero',
-                cta_position: 'hero',
-              })
-            }
-            className="hero-cta group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.62rem] uppercase tracking-[0.24em] text-white/60 hover:text-white/90 sm:tracking-[0.3em]"
-            aria-label="Inquire privately about CREARE experiences"
-          >
-            <span className="relative inline-block">
-              Inquire Privately →
-              <span className="absolute -bottom-px left-0 h-px w-0 bg-white/50 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
-            </span>
-          </Link>
+          <HomeHeroInquiryLink />
         </div>
       </div>
     </section>

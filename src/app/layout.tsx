@@ -83,12 +83,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
   return (
     <html lang="en">
-      <head>
-        {/* Preconnect to external image CDNs for faster LCP */}
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://images.unsplash.com" />
-        <link rel="preconnect" href="https://img.rocket.new" />
-      </head>
+      <head />
       <body className="bg-black text-white antialiased">
         {isGtmEnabled() ? (
           <noscript>

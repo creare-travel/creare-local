@@ -52,7 +52,7 @@ export default function CollectionsSection() {
   return (
     <div className="w-full bg-neutral-50">
       <div className="mx-auto max-w-7xl px-6 pt-16 sm:px-10 sm:pt-18 lg:px-16 lg:pt-20">
-        <p className="font-body text-[0.66rem] font-medium uppercase tracking-[0.18em] text-neutral-400">
+        <p className="font-body text-[0.66rem] font-medium uppercase tracking-[0.18em] text-neutral-600">
           Three ways CREARE composes an encounter.
         </p>
       </div>
@@ -62,7 +62,7 @@ export default function CollectionsSection() {
       >
         <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-20 xl:gap-28">
           <div className="mb-2 lg:mb-0 lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
-            <p className="mb-5 font-body text-[0.58rem] font-bold uppercase tracking-[0.26em] text-neutral-400 sm:mb-6 sm:text-[0.6rem] sm:tracking-[0.3em]">
+            <p className="mb-5 font-body text-[0.58rem] font-bold uppercase tracking-[0.26em] text-neutral-500 sm:mb-6 sm:text-[0.6rem] sm:tracking-[0.3em]">
               {collectionFeatures[0].label}
             </p>
             <p className="mb-8 font-display text-[clamp(1.55rem,7.3vw,2.4rem)] font-light leading-[1.18] tracking-[-0.015em] text-neutral-900 sm:mb-10 sm:text-[clamp(1.7rem,2.8vw,2.4rem)] sm:leading-[1.1] sm:tracking-tight">
@@ -117,7 +117,7 @@ export default function CollectionsSection() {
             </div>
           </div>
           <div className="lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
-            <p className="mb-5 font-body text-[0.58rem] font-bold uppercase tracking-[0.26em] text-neutral-400 sm:mb-6 sm:text-[0.6rem] sm:tracking-[0.3em]">
+            <p className="mb-5 font-body text-[0.58rem] font-bold uppercase tracking-[0.26em] text-neutral-500 sm:mb-6 sm:text-[0.6rem] sm:tracking-[0.3em]">
               {collectionFeatures[1].label}
             </p>
             <p className="mb-8 font-display text-[clamp(1.55rem,7.3vw,2.4rem)] font-light leading-[1.18] tracking-[-0.015em] text-neutral-900 sm:mb-10 sm:text-[clamp(1.7rem,2.8vw,2.4rem)] sm:leading-[1.1] sm:tracking-tight">
@@ -146,7 +146,7 @@ export default function CollectionsSection() {
       >
         <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-20 xl:gap-28">
           <div className="mb-2 lg:mb-0 lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
-            <p className="mb-5 font-body text-[0.58rem] font-bold uppercase tracking-[0.26em] text-neutral-400 sm:mb-6 sm:text-[0.6rem] sm:tracking-[0.3em]">
+            <p className="mb-5 font-body text-[0.58rem] font-bold uppercase tracking-[0.26em] text-neutral-500 sm:mb-6 sm:text-[0.6rem] sm:tracking-[0.3em]">
               {collectionFeatures[2].label}
             </p>
             <p className="mb-8 font-display text-[clamp(1.55rem,7.3vw,2.4rem)] font-light leading-[1.18] tracking-[-0.015em] text-neutral-900 sm:mb-10 sm:text-[clamp(1.7rem,2.8vw,2.4rem)] sm:leading-[1.1] sm:tracking-tight">
