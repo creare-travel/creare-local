@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
+import { ArrowLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
-import Icon from '@/components/ui/AppIcon';
 
 export default function NotFound() {
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function NotFound() {
             onClick={handleGoBack}
             className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200"
           >
-            <Icon name="ArrowLeftIcon" size={16} />
+            <ArrowLeftIcon width={16} height={16} aria-hidden="true" />
             Go Back
           </button>
 
@@ -44,7 +44,7 @@ export default function NotFound() {
             onClick={handleGoHome}
             className="inline-flex items-center justify-center gap-2 border border-border bg-background text-foreground px-6 py-3 rounded-lg font-medium hover:bg-accent hover:text-accent-foreground transition-colors duration-200"
           >
-            <Icon name="HomeIcon" size={16} />
+            <HomeIcon width={16} height={16} aria-hidden="true" />
             Back to Home
           </button>
         </div>
