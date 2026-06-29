@@ -56,7 +56,7 @@ export default function HeroSection() {
           fetchPriority="high"
           loading="eager"
           decoding="async"
-          className="hero-img-zoom h-full w-full object-cover"
+          className="hero-img-zoom homepage-hero-img h-full w-full object-cover"
         />
 
         <div
