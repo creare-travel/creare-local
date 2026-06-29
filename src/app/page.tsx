@@ -48,12 +48,6 @@ export default function HomePage() {
       <CollectionsSection />
       <section className="bg-neutral-50" aria-label="Homepage experience system discovery">
         <div className="mx-auto max-w-7xl px-6 pb-24 sm:px-10 sm:pb-28 lg:px-16 lg:pb-32">
-          <p
-            className="mb-4 max-w-md font-display font-light leading-relaxed text-neutral-900"
-            style={{ fontSize: 'clamp(1rem, 1.4vw, 1.2rem)' }}
-          >
-            Interested in understanding the system?
-          </p>
           <p className="mb-6 max-w-2xl font-body text-sm leading-relaxed text-neutral-700">
             CREARE is not built around packaged travel, but around cultural access, narrative
             intelligence, and the careful composition of encounter. Signature, LAB, and BLACK define
