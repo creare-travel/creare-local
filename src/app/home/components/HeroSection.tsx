@@ -11,7 +11,8 @@ const HOMEPAGE_HERO_IMAGE = buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
 });
 const HOMEPAGE_HERO_ALT =
   'Library of Celsus and the Gate of Augustus at sunset with warm architectural light';
-const HOMEPAGE_HERO_WIDTHS = [640, 828, 1080, 1440, 1920] as const;
+const HOMEPAGE_HERO_MOBILE_WIDTHS = [640, 828] as const;
+const HOMEPAGE_HERO_DESKTOP_WIDTHS = [1080, 1440, 1920] as const;
 
 export default function HeroSection() {
   const heroBlurDataUrl = buildCinematicBlurDataUrl(HOMEPAGE_HERO_IMAGE, {
@@ -25,7 +26,17 @@ export default function HeroSection() {
     format: 'auto',
     dpr: 'auto',
   });
-  const heroSrcSet = HOMEPAGE_HERO_WIDTHS.map(
+  const heroMobileSrcSet = HOMEPAGE_HERO_MOBILE_WIDTHS.map(
+    (width) =>
+      `${buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
+        profile: 'hero',
+        width,
+        quality: 'auto:eco',
+        format: 'auto',
+        dpr: 'auto',
+      })} ${width}w`
+  ).join(', ');
+  const heroDesktopSrcSet = HOMEPAGE_HERO_DESKTOP_WIDTHS.map(
     (width) =>
       `${buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
         profile: 'hero',
@@ -47,17 +58,20 @@ export default function HeroSection() {
           style={{ backgroundImage: `url("${heroBlurDataUrl}")` }}
           aria-hidden="true"
         />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={heroSrc}
-          srcSet={heroSrcSet}
-          sizes="100vw"
-          alt={HOMEPAGE_HERO_ALT}
-          fetchPriority="high"
-          loading="eager"
-          decoding="async"
-          className="hero-img-zoom h-full w-full object-cover"
-        />
+        <picture>
+          <source media="(max-width: 1023px)" srcSet={heroMobileSrcSet} sizes="100vw" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroSrc}
+            srcSet={heroDesktopSrcSet}
+            sizes="100vw"
+            alt={HOMEPAGE_HERO_ALT}
+            fetchPriority="high"
+            loading="eager"
+            decoding="async"
+            className="hero-img-zoom h-full w-full object-cover"
+          />
+        </picture>
 
         <div
           className="absolute inset-0 z-10 bg-gradient-to-t from-black/84 via-black/48 to-black/16"
