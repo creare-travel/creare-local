@@ -417,10 +417,6 @@ body {
 }
 
 @media (max-width: 1023px) {
-  .homepage-hero-img.hero-img-zoom {
-    animation: none;
-  }
-
   header[data-header-state='hero'] {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
