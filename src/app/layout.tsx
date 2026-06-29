@@ -5,7 +5,6 @@ import { Suspense } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GoogleTagManager from '@/components/GoogleTagManager';
-import RevealObserver from '@/components/RevealObserver';
 import UnderConstruction from '@/components/UnderConstruction';
 import { LanguageProvider } from '@/context/LanguageContext';
 import JsonLd from '@/components/JsonLd';
@@ -104,7 +103,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <UnderConstruction />
           ) : (
             <>
-              <RevealObserver />
               <Header />
               {children}
               <Footer />
