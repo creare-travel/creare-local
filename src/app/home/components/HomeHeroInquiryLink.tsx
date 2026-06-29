@@ -10,6 +10,7 @@ export default function HomeHeroInquiryLink() {
   return (
     <Link
       href="/contact"
+      prefetch={false}
       onClick={() =>
         trackCtaClick({
           label: 'INQUIRE PRIVATELY',
