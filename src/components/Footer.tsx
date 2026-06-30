@@ -108,7 +108,7 @@ export default function Footer() {
       </div>
       {/* Bottom bar */}
       <div className="max-w-7xl mx-auto flex flex-col items-start justify-between gap-5 border-t border-white/10 px-6 py-6 sm:px-10 sm:py-5 lg:flex-row lg:items-center lg:gap-0 lg:px-16">
-        <span className="font-body text-[0.62rem] tracking-[0.1em] text-white/30">
+        <span className="font-body text-[0.62rem] tracking-[0.1em] text-white/50">
           © 2026 CREARE
         </span>
         <nav className="flex flex-wrap items-center gap-x-6 gap-y-3" aria-label="Legal links">
@@ -120,7 +120,7 @@ export default function Footer() {
             <Link
               key={item?.label}
               href={item?.href}
-              className="font-body text-[0.62rem] tracking-[0.1em] text-white/25 transition-colors duration-700 hover:text-white/55"
+              className="font-body text-[0.62rem] tracking-[0.1em] text-white/60 transition-colors duration-700 hover:text-white focus-visible:text-white"
               aria-label={item?.label}
             >
               {item?.label}
