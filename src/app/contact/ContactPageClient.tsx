@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import OutboundLink from '@/components/analytics/OutboundLink';
+import { buildCloudinaryUrl } from '@/lib/cloudinary';
 import {
   trackFormStart,
   trackFormSubmit,
@@ -248,8 +249,15 @@ export default function ContactPageClient() {
               {/* Building Photo */}
               <div className="w-full aspect-[4/3] overflow-hidden">
                 <Image
-                  src="https://img.rocket.new/generatedImages/rocket_gen_img_14db2e3c4-1775598257869.png"
-                  alt="Ferko Signature Plaza — modern glass skyscraper towers in Şişli, Istanbul, black and white"
+                  src={buildCloudinaryUrl('creare-contact-ferko-signature-plaza.jpg', {
+                    format: 'auto',
+                    quality: 'auto:good',
+                    crop: 'fill',
+                    gravity: 'auto',
+                    aspectRatio: '4:3',
+                    width: 1200,
+                  })}
+                  alt="Ferko Signature Plaza in Şişli, Istanbul, home of CREARE Travel Consultancy Limited Co."
                   width={600}
                   height={450}
                   className="w-full h-full object-cover grayscale"
