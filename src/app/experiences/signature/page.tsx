@@ -6,7 +6,10 @@ import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
-import { experiences as staticExperiences } from '@/lib/experiences';
+import {
+  experiences as staticExperiences,
+  getPublicLocalExperienceFallbacks,
+} from '@/lib/experiences';
 import { buildMetadataAlternates } from '@/lib/seo';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
@@ -220,6 +223,31 @@ function buildStaticPerformanceFallback(): StrapiExperience[] {
     }));
 }
 
+function buildStaticSignatureFallback(): StrapiExperience[] {
+  return getPublicLocalExperienceFallbacks()
+    .filter((experience) => experience.slug === 'istanbul-through-the-lens')
+    .filter((experience) => experience.category === 'SIGNATURE')
+    .map((experience, index) => ({
+      id: 2000 + index,
+      title: experience.title,
+      slug: experience.slug,
+      location_label: experience.location,
+      category: 'signature',
+      geo_experience_type: experience.category,
+      destination: experience.culturalWorld
+        ? {
+            id: 5000 + index,
+            name: experience.culturalWorld,
+            slug: experience.culturalWorld.toLowerCase(),
+          }
+        : undefined,
+      cover_image: {
+        url: experience.heroImage,
+        alternativeText: experience.heroImageAlt,
+      },
+    }));
+}
+
 // ── Strapi fetch helpers ──────────────────────────────────────────────────────
 async function fetchStrapiDestinations(): Promise<StrapiDestination[]> {
   try {
@@ -272,6 +300,16 @@ export default async function SignatureExperiencesPage() {
       )
     );
   });
+  const staticSignatureFallback = buildStaticSignatureFallback();
+  const signatureExperienceMap = new Map<string, StrapiExperience>();
+
+  for (const experience of [...selectedSignatureExperiences, ...staticSignatureFallback]) {
+    if (experience.slug && !signatureExperienceMap.has(experience.slug)) {
+      signatureExperienceMap.set(experience.slug, experience);
+    }
+  }
+
+  const visibleSelectedSignatureExperiences = Array.from(signatureExperienceMap.values());
   const historicalExperiences = strapiSignatureExperiences.filter(
     (exp) => normalizeValue(exp.series) === SIGNATURE_SERIES.historical
   );
@@ -284,7 +322,7 @@ export default async function SignatureExperiencesPage() {
   const corporateExperiences =
     cmsCorporateExperiences.length > 0 ? cmsCorporateExperiences : buildStaticPerformanceFallback();
   const visibleExperienceCards = [
-    ...selectedSignatureExperiences,
+    ...visibleSelectedSignatureExperiences,
     ...historicalExperiences,
     ...corporateExperiences,
     ...culinaryExperiences,
@@ -513,14 +551,14 @@ export default async function SignatureExperiencesPage() {
       </div>
 
       {/* ── SELECTED SIGNATURE EXPERIENCES ── */}
-      {selectedSignatureExperiences.length > 0 && (
+      {visibleSelectedSignatureExperiences.length > 0 && (
         <section
           className="bg-[#EDEAE4] pb-36 md:pb-48"
           aria-label="Selected Signature Experiences"
         >
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="grid grid-cols-1 gap-x-8 gap-y-16 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-16">
-              {selectedSignatureExperiences.map((exp) => renderExperienceCard(exp))}
+              {visibleSelectedSignatureExperiences.map((exp) => renderExperienceCard(exp))}
             </div>
           </div>
         </section>

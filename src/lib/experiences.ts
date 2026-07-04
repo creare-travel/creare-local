@@ -24,6 +24,16 @@ export interface Experience {
   trustStatement?: string;
 }
 
+export const PUBLIC_LOCAL_EXPERIENCE_FALLBACK_SLUGS = [
+  'floating-salon-d-opera',
+  'beylerbeyi-1869',
+  'imperial-flavors',
+  'istanbul-through-the-lens',
+  'curated-art-salon',
+  'silk-road-istanbul',
+  'table-to-farm-bodrum',
+] as const;
+
 export const experiences: Experience[] = [
   {
     title: "Floating Salon d'Opera™",
@@ -606,4 +616,9 @@ export function getRelatedExperiences(slugs: string[]): Experience[] {
 
 export function getExperiencesByCategory(category: string): Experience[] {
   return experiences.filter((e) => e.category === category);
+}
+
+export function getPublicLocalExperienceFallbacks(): Experience[] {
+  const allowedSlugs = new Set<string>(PUBLIC_LOCAL_EXPERIENCE_FALLBACK_SLUGS);
+  return experiences.filter((experience) => allowedSlugs.has(experience.slug));
 }

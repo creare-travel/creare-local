@@ -344,6 +344,18 @@ function extractParagraphs(field: StrapiRichTextNode[] | string | undefined): st
   return paragraphs;
 }
 
+function extractNodeText(node: StrapiRichTextNode): string {
+  if (node.type === 'text') {
+    return node.text ?? '';
+  }
+
+  return (node.children ?? []).map(extractNodeText).join('');
+}
+
+function normalizeProgramStep(step: string): string {
+  return step.replace(/^\s*\d{1,2}\s*[—-]\s*/, '').trim();
+}
+
 function getExperienceLocation(item: StrapiExperienceDetail) {
   return item.destination?.name || item.location_label || null;
 }
@@ -494,6 +506,9 @@ function buildStaticReverseLinkedInsights(currentExperienceSlug: string): Strapi
 function renderRichText(nodes: StrapiRichTextNode[]): React.ReactNode {
   return nodes.map((node, i) => {
     if (node.type === 'paragraph') {
+      const text = extractNodeText(node).trim();
+      if (!text) return null;
+
       return (
         <p key={i} className="font-body text-sm text-neutral-700 leading-relaxed mb-5">
           {node.children ? renderRichText(node.children) : null}
@@ -501,6 +516,9 @@ function renderRichText(nodes: StrapiRichTextNode[]): React.ReactNode {
       );
     }
     if (node.type === 'heading') {
+      const text = extractNodeText(node).trim();
+      if (!text) return null;
+
       return (
         <h3 key={i} className="font-display font-light text-neutral-800 text-xl mb-4 mt-8">
           {node.children ? renderRichText(node.children) : null}
@@ -515,6 +533,9 @@ function renderRichText(nodes: StrapiRichTextNode[]): React.ReactNode {
       );
     }
     if (node.type === 'list-item') {
+      const text = extractNodeText(node).trim();
+      if (!text) return null;
+
       return (
         <li key={i} className="font-body text-sm text-neutral-700 leading-relaxed list-disc">
           {node.children ? renderRichText(node.children) : null}
@@ -547,7 +568,7 @@ function StrapiExperiencePage({
   const coverUrl = getGovernedExperienceImageUrl(item, canonicalSlug);
   const coverAlt = item.cover_image?.alternativeText ?? item.title;
   const locationDisplay = getExperienceLocation(item);
-  const programItems = extractParagraphs(item.program);
+  const programItems = extractParagraphs(item.program).map(normalizeProgramStep).filter(Boolean);
   const audienceItems = extractParagraphs(item.audience);
   const cmsRelatedExperiences = normalizeRelationArray<StrapiExperienceDetail>(
     item.related_experiences

@@ -6,6 +6,7 @@ import {
   isPublicInsightRecord,
 } from '@/lib/canonical-gates';
 import { insights as localInsights } from '@/data/insights';
+import { getPublicLocalExperienceFallbacks } from '@/lib/experiences';
 import { fetchStrapi } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -134,16 +135,38 @@ async function fetchCanonicalExperienceUrls() {
     const json = await fetchStrapi(path);
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
 
-    return filterPublicExperiences(items.map((item) => flattenRecord<SitemapExperience>(item)))
+    const strapiEntries = filterPublicExperiences(
+      items.map((item) => flattenRecord<SitemapExperience>(item))
+    )
       .filter((item) => item.slug)
       .filter((item) => item.category?.toLowerCase() !== 'black')
-      .map((item) =>
-        createEntry(`/experiences/${item.slug}`, {
+      .map((item) => ({
+        slug: item.slug as string,
+        entry: createEntry(`/experiences/${item.slug}`, {
           lastModified: resolveLastModified(item.updatedAt, item.publishedAt),
           changeFrequency: 'monthly',
           priority: 0.8,
-        })
-      )
+        }),
+      }));
+
+    const localFallbackEntries = getPublicLocalExperienceFallbacks().map((experience) => ({
+      slug: experience.slug,
+      entry: createEntry(`/experiences/${experience.slug}`, {
+        changeFrequency: 'monthly',
+        priority: 0.8,
+      }),
+    }));
+
+    const mergedEntries = [...strapiEntries, ...localFallbackEntries];
+    const seen = new Set<string>();
+
+    return mergedEntries
+      .filter(({ slug }) => {
+        if (seen.has(slug)) return false;
+        seen.add(slug);
+        return true;
+      })
+      .map(({ entry }) => entry)
       .sort((a, b) => a.url.localeCompare(b.url));
   } catch (error) {
     console.error('Failed to build dynamic experience sitemap entries.', {
@@ -151,7 +174,15 @@ async function fetchCanonicalExperienceUrls() {
       strapiPath: path,
       error,
     });
-    return [];
+
+    return getPublicLocalExperienceFallbacks()
+      .map((experience) =>
+        createEntry(`/experiences/${experience.slug}`, {
+          changeFrequency: 'monthly',
+          priority: 0.8,
+        })
+      )
+      .sort((a, b) => a.url.localeCompare(b.url));
   }
 }
 
