@@ -113,6 +113,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/sitemap',
+        destination: '/sitemap.xml',
+        permanent: true,
+      },
+      {
         source: '/destinations',
         destination: '/cultural-worlds',
         permanent: true,
