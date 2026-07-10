@@ -7,19 +7,19 @@ import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { buildExperienceInquiryHref } from '@/lib/inquiry';
 import { buildMetadataAlternates } from '@/lib/seo';
-import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
+import { fetchPublicStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'BLACK™ — Private Access',
+  title: 'BLACK™ — Özel Erişim',
   description:
-    'Invitation-only. Rare access. Quietly arranged. CREARE BLACK™ is reserved for circumstances where discretion, trust, and context must come first.',
+    'Davetle. Nadir erişim. Sessizce kurgulanır. CREARE BLACK™, mahremiyetin, güvenin ve bağlamın önce gelmesi gereken durumlar için ayrılmıştır.',
   alternates: buildMetadataAlternates('/experiences/black'),
   robots: { index: true, follow: true },
   openGraph: {
-    title: 'CREARE BLACK™ — Private Access',
-    description: 'Invitation-only. Rare access. Quietly arranged.',
+    title: 'CREARE BLACK™ — Özel Erişim',
+    description: 'Davetle. Nadir erişim. Sessizce kurgulanır.',
     url: 'https://crearetravel.com/experiences/black',
   },
 };
@@ -74,12 +74,12 @@ function formatIntensity(value?: string | null) {
   if (!normalized) return '';
 
   const intensityMap: Record<string, string> = {
-    low: 'Low Intensity',
-    medium: 'Medium Intensity',
-    high: 'High Intensity',
+    low: 'Düşük Yoğunluk',
+    medium: 'Orta Yoğunluk',
+    high: 'Yüksek Yoğunluk',
   };
 
-  return intensityMap[normalized] ?? `${toTitleCase(value)} Intensity`;
+  return intensityMap[normalized] ?? `${toTitleCase(value)} Yoğunluk`;
 }
 
 function getGeoMetadataLine(exp: StrapiExperience) {
@@ -94,7 +94,9 @@ function getGeoMetadataLine(exp: StrapiExperience) {
 
 async function fetchBlackExperiences(): Promise<StrapiExperience[]> {
   try {
-    const json = await fetchStrapi('/api/experiences?filters[category][$eqi]=black&populate=*');
+    const json = await fetchPublicStrapi(
+      '/api/experiences?filters[category][$eqi]=black&populate=*'
+    );
     const items: StrapiExperience[] = Array.isArray(json?.data) ? json.data : [];
     return filterPublicExperiences(items);
   } catch (error) {
@@ -111,13 +113,13 @@ export default async function BlackPage() {
     itemListId: ids.itemList,
     breadcrumbId: ids.breadcrumbs,
     path: ids.canonical,
-    title: 'BLACK Experiences',
+    title: 'BLACK Deneyimleri',
     description:
-      'Invitation-only private access, rare encounters, and discreet cultural compositions for select clients.',
+      'Davete dayalı özel erişim, nadir karşılaşmalar ve seçili misafirler için sessizce kurulan kültürel kompozisyonlar.',
     breadcrumbs: [
-      { name: 'Home', url: buildCanonicalUrl('/') },
-      { name: 'Experiences', url: buildCanonicalUrl('/experiences') },
-      { name: 'BLACK Experiences', url: ids.canonical },
+      { name: 'Ana Sayfa', url: buildCanonicalUrl('/') },
+      { name: 'Deneyimler', url: buildCanonicalUrl('/experiences') },
+      { name: 'BLACK Deneyimleri', url: ids.canonical },
     ],
     items: blackExperiences.map((exp) => ({
       title: exp.title,
@@ -171,7 +173,7 @@ export default async function BlackPage() {
           <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
             {/* Micro-line above title */}
             <p className="mb-10 font-body text-[0.58rem] uppercase tracking-[0.42em] text-white/22">
-              By invitation.
+              Davetle.
             </p>
 
             <h1 className="mb-10 font-display text-[clamp(3.2rem,7vw,6.5rem)] font-light leading-[1.08] tracking-[-0.01em] text-white">
@@ -179,9 +181,9 @@ export default async function BlackPage() {
             </h1>
 
             <p className="mb-20 font-display text-[clamp(0.72rem,1.2vw,0.9rem)] font-light leading-[1.9] text-white/38">
-              Beyond the expected.
+              Beklenenin ötesinde.
               <br />
-              Where privilege is carefully composed.
+              Ayrıcalığın dikkatle kurgulandığı yerde.
             </p>
 
             <Link
@@ -191,7 +193,7 @@ export default async function BlackPage() {
                 minWidth: '19rem',
               }}
             >
-              Inquire Privately
+              Özel Olarak İletişime Geç
             </Link>
           </div>
         </section>
@@ -208,7 +210,7 @@ export default async function BlackPage() {
                     className="font-body text-[0.6rem] uppercase tracking-[0.22em] transition-colors"
                     style={{ color: '#b0aa9f' }}
                   >
-                    ← HOME
+                    ← ANA SAYFA
                   </Link>
                 </li>
                 <li aria-hidden="true">
@@ -234,37 +236,37 @@ export default async function BlackPage() {
                   className="font-display text-[clamp(0.95rem,1.6vw,1.15rem)] font-light italic leading-loose"
                   style={{ color: '#5c5750' }}
                 >
-                  Not publicly listed. Access is not open.
+                  Kamusal olarak listelenmez. Erişim açık değildir.
                 </p>
                 <p
                   className="font-display text-[clamp(0.9rem,1.5vw,1.05rem)] font-light"
                   style={{ color: '#5c5750' }}
                 >
-                  Selected work remains unseen.
+                  Seçilmiş işler görünür kılınmaz.
                 </p>
                 <p
                   className="font-display text-[clamp(0.9rem,1.5vw,1.05rem)] font-light"
                   style={{ color: '#5c5750' }}
                 >
-                  What we arrange is not found. What we curate is not listed.
+                  Düzenlediğimiz şey bulunmaz. Kürate ettiğimiz şey listelenmez.
                 </p>
                 <p
                   className="mx-auto max-w-2xl font-body text-sm leading-relaxed"
                   style={{ color: '#7a7268' }}
                 >
-                  BLACK is built on relationships that take time to earn and judgment that cannot be
-                  reduced to a formula. Access begins not with status, but with context: who is
-                  arriving, why the encounter matters, and whether the conditions exist for
-                  participation to be responsible, welcome, and discreet.
+                  BLACK, zaman içinde kazanılan ilişkilere ve formüle indirgenemeyecek bir
+                  muhakemeye dayanır. Erişim statüyle değil bağlamla başlar: kimin geldiği,
+                  karşılaşmanın neden önemli olduğu ve katılımın sorumlu, uygun ve mahrem biçimde
+                  gerçekleşmesi için koşulların var olup olmadığı.
                 </p>
                 <p
                   className="mx-auto max-w-2xl font-body text-sm leading-relaxed"
                   style={{ color: '#7a7268' }}
                 >
-                  The point is not private viewing for its own sake. It is to create environments in
-                  which uncommon encounters can happen without distortion, where cultural
-                  custodians, collectors, hosts, and private institutions can engage on terms that
-                  preserve trust as much as access.
+                  Amaç mahremiyeti kendi başına bir gösteriye dönüştürmek değildir. Amaç, sıra dışı
+                  karşılaşmaların bozulmadan gerçekleşebileceği; kültürel emanetçilerin,
+                  koleksiyonerlerin, ev sahiplerinin ve özel kurumların güveni erişim kadar koruyan
+                  şartlarda bir araya gelebileceği ortamlar kurmaktır.
                 </p>
               </div>
             </div>
@@ -275,7 +277,7 @@ export default async function BlackPage() {
                 aria-hidden="true"
                 style={{ color: '#9e9890' }}
               >
-                Not everything is meant to be accessed.
+                Her şey erişime açılmak için var değildir.
               </p>
               <hr
                 className="mt-16 border-t md:mt-20"
@@ -294,19 +296,19 @@ export default async function BlackPage() {
                   className="font-display text-[clamp(1.18rem,2.15vw,1.72rem)] font-light tracking-[0.01em]"
                   style={{ color: '#5c5650' }}
                 >
-                  BLACK™ Experience Dimensions
+                  BLACK™ Erişim Boyutları
                 </h2>
               </div>
 
               {/* 2×3 Grid — reduced border contrast, increased spacing, lower opacity */}
               <div className="mx-auto grid max-w-[40rem] grid-cols-1 gap-0 sm:grid-cols-2 md:grid-cols-3 lg:max-w-[42rem]">
                 {[
-                  'Private Venues',
-                  'After-Hours Access',
-                  'Curator-Led Experiences',
-                  'Closed Collections',
-                  'Invitation-Only Events',
-                  'Bespoke Cultural Programming',
+                  'Özel Mekânlar',
+                  'Saatler Dışı Erişim',
+                  'Küratör Eşliğinde Karşılaşmalar',
+                  'Kapalı Koleksiyonlar',
+                  'Davete Dayalı Buluşmalar',
+                  'Kişiye Özel Kültürel Kurgular',
                 ].map((item, i) => (
                   <div
                     key={item}
@@ -329,31 +331,28 @@ export default async function BlackPage() {
         </section>
 
         {/* ── ACCESS PRINCIPLES ── */}
-        <section className="bg-[#EAEAE5]" aria-label="Access Principles">
+        <section className="bg-[#EAEAE5]" aria-label="Erişim ilkeleri">
           <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-4xl flex-col px-6 py-16 text-center sm:px-10 md:min-h-screen md:py-20 lg:px-16">
             <div className="flex flex-1 flex-col justify-center">
               <h2
                 className="mb-24 font-display text-[clamp(1.2rem,2.2vw,1.75rem)] font-light tracking-[0.01em]"
                 style={{ color: '#4a4540' }}
               >
-                Access Principles
+                Erişim İlkeleri
               </h2>
 
               <div className="space-y-14">
-                {[
-                  'Referral-based access',
-                  'Private conversation',
-                  'Quiet arrangement',
-                  'Confidential delivery',
-                ].map((principle) => (
-                  <p
-                    key={principle}
-                    className="font-display text-[clamp(0.88rem,1.4vw,1.02rem)] font-light leading-[1.85]"
-                    style={{ color: '#6b6560' }}
-                  >
-                    {principle}
-                  </p>
-                ))}
+                {['Referansla erişim', 'Özel görüşme', 'Sessiz düzenleme', 'Gizli teslim'].map(
+                  (principle) => (
+                    <p
+                      key={principle}
+                      className="font-display text-[clamp(0.88rem,1.4vw,1.02rem)] font-light leading-[1.85]"
+                      style={{ color: '#6b6560' }}
+                    >
+                      {principle}
+                    </p>
+                  )
+                )}
               </div>
             </div>
 
@@ -362,7 +361,7 @@ export default async function BlackPage() {
         </section>
 
         {/* ── HOW BLACK™ WORKS ── */}
-        <section className="bg-[#EAEAE5]" aria-label="How BLACK™ Works">
+        <section className="bg-[#EAEAE5]" aria-label="BLACK™ nasıl işler">
           <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-4xl flex-col px-6 py-16 sm:px-10 md:min-h-screen md:py-20 lg:px-16">
             <div className="flex flex-1 flex-col justify-center">
               <div className="text-center mb-20">
@@ -370,23 +369,23 @@ export default async function BlackPage() {
                   className="font-display text-[clamp(1.2rem,2.2vw,1.75rem)] font-light tracking-[0.01em]"
                   style={{ color: '#4a4540' }}
                 >
-                  How BLACK™ Works
+                  BLACK™ Nasıl İşler
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 gap-16 text-center md:grid-cols-3 lg:gap-20">
                 {[
                   {
-                    label: 'Referral and Alignment',
-                    body: 'Access is granted through trusted referrals and careful review, ensuring that introduction, intent, and setting are aligned before any private arrangement is considered.',
+                    label: 'Referans ve Uyum',
+                    body: 'Erişim; güvenilir referanslar ve dikkatli bir değerlendirme üzerinden verilir. Böylece herhangi bir özel düzenleme düşünülmeden önce tanıştırma, niyet ve bağlamın uyumu teyit edilir.',
                   },
                   {
-                    label: 'Private Conversation',
-                    body: 'We shape each encounter through private conversation, grounding it in context, cultural fit, and the kind of participation a place or host can meaningfully support.',
+                    label: 'Özel Görüşme',
+                    body: 'Her karşılaşmayı özel bir görüşmeyle şekillendiririz; bağlam, kültürel uyum ve bir yerin ya da ev sahibinin anlamlı biçimde destekleyebileceği katılım düzeyi bu aşamada netleşir.',
                   },
                   {
-                    label: 'Confidential Arrangement',
-                    body: 'Every detail is arranged discreetly, with privacy, timing, and stewardship treated as part of the encounter itself rather than as incidental support.',
+                    label: 'Gizli Düzenleme',
+                    body: 'Her ayrıntı mahrem biçimde düzenlenir; gizlilik, zamanlama ve emanetçilik karşılaşmanın dışsal desteği değil, bizzat kendi yapısının parçası olarak ele alınır.',
                   },
                 ].map((item) => (
                   <div key={item.label} className="flex flex-col items-center">
@@ -424,13 +423,13 @@ export default async function BlackPage() {
                   className="mb-4 font-body text-[0.58rem] uppercase tracking-[0.22em]"
                   style={{ color: '#9e9890' }}
                 >
-                  FROM THE COLLECTION
+                  KOLEKSİYONDAN
                 </p>
                 <h2
                   className="font-display font-light"
                   style={{ fontSize: 'clamp(1.4rem,2.5vw,2rem)', color: '#4a4540' }}
                 >
-                  BLACK Experiences
+                  BLACK Deneyimleri
                 </h2>
               </div>
 
@@ -514,7 +513,7 @@ export default async function BlackPage() {
                       key={exp.id}
                       href={href}
                       className="group block"
-                      aria-label={`View ${exp.title}`}
+                      aria-label={`${exp.title} deneyimini görüntüle`}
                     >
                       {card}
                     </Link>
@@ -530,7 +529,7 @@ export default async function BlackPage() {
         )}
 
         {/* ── FINAL MANIFESTO + CTA ── */}
-        <section className="bg-[#EAEAE5]" aria-label="Request Private Access">
+        <section className="bg-[#EAEAE5]" aria-label="Özel erişim talebi">
           <div className="mx-auto flex min-h-[72vh] max-w-3xl flex-col justify-center px-6 py-20 text-center sm:px-10 md:min-h-[78vh] md:py-24 lg:px-16">
             {/* Refined manifesto */}
             <div className="space-y-6 mb-24">
@@ -538,19 +537,19 @@ export default async function BlackPage() {
                 className="font-display text-[clamp(1.3rem,2.5vw,1.9rem)] font-light"
                 style={{ color: '#3e3a35' }}
               >
-                BLACK™ is not marketed. It is not advertised.
+                BLACK™ pazarlanmaz. Reklamı yapılmaz.
               </p>
               <p
                 className="font-display text-[clamp(1rem,1.8vw,1.4rem)] font-light"
                 style={{ color: '#5c5750' }}
               >
-                It is extended — selectively.
+                Yalnızca seçerek uzatılır.
               </p>
               <p
                 className="mt-4 font-body text-sm font-light leading-relaxed"
                 style={{ color: '#8c8478' }}
               >
-                BLACK™ operates across the cultural worlds of{' '}
+                BLACK™{' '}
                 <Link
                   href="/cultural-worlds/istanbul"
                   className="underline underline-offset-2 transition-colors hover:opacity-80"
@@ -558,11 +557,12 @@ export default async function BlackPage() {
                 >
                   Istanbul
                 </Link>{' '}
-                and the <span className="underline underline-offset-2">Aegean</span> — in spaces
-                that are never listed and encounters that are never described. What matters is not
-                secrecy as spectacle, but the conditions that allow a place to be encountered with
-                care: the right host, the right hour, the right frame of understanding, and the
-                trust required for something uncommon to take place without performance.
+                ile <span className="underline underline-offset-2">Ege</span> kültürel dünyalarında
+                çalışır; asla listelenmeyen mekânlarda ve ayrıntıları açık edilmeyen
+                karşılaşmalarda. Önemli olan sırrı bir gösteriye dönüştürmek değil; bir yerle özenli
+                biçimde karşılaşmayı mümkün kılan koşullardır: doğru ev sahibi, doğru saat, doğru
+                anlama çerçevesi ve alışılmadık bir şeyin sahneye dönüşmeden gerçekleşmesini
+                sağlayan güven.
               </p>
             </div>
 
@@ -572,7 +572,7 @@ export default async function BlackPage() {
               className="group/btn relative inline-flex overflow-hidden border border-neutral-700/40 px-12 py-5 font-body text-[0.62rem] uppercase tracking-[0.32em] text-neutral-800 transition-colors duration-300 hover:text-white/80"
             >
               <span className="absolute inset-0 translate-y-full bg-neutral-800 transition-transform duration-300 group-hover/btn:translate-y-0" />
-              <span className="relative z-10">Request Private Access</span>
+              <span className="relative z-10">Özel Erişim Talep Et</span>
             </Link>
           </div>
         </section>
@@ -581,13 +581,13 @@ export default async function BlackPage() {
           <div className="mx-auto max-w-7xl px-6 pb-10 pt-24 sm:px-10 lg:px-16">
             <div className="flex flex-col gap-8 border-b border-white/[0.08] pb-10 md:flex-row md:items-center md:justify-between md:gap-12 md:pb-12">
               <p className="font-display text-[clamp(1.7rem,3vw,2.3rem)] font-light text-white">
-                Begin the conversation.
+                Görüşmeyi başlatın.
               </p>
               <Link
                 href="/contact"
                 className="inline-flex items-center justify-center self-start border border-white/[0.18] px-10 py-4 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/[0.3] hover:text-white md:self-center"
               >
-                CONTACT CREARE →
+                CREARE İLE İLETİŞİME GEÇİN →
               </Link>
             </div>
           </div>

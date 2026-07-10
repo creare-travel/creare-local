@@ -29,17 +29,17 @@ export default function CulturalWorldsIndexSection() {
       <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24 lg:px-16 lg:py-28">
         <div className="mb-12 max-w-2xl">
           <p className="mb-5 font-body text-[0.66rem] font-medium uppercase tracking-[0.18em] text-white/48">
-            Cultural Worlds
+            Kültürel Dünyalar
           </p>
           <p
             className="mb-6 font-display font-light leading-[1.2] text-white"
             style={{ fontSize: 'clamp(1.65rem, 3vw, 2.35rem)' }}
           >
-            The geography through which CREARE reads place.
+            CREARE&apos;nin bir yeri okuduğu coğrafya.
           </p>
           <p className="max-w-xl font-body text-sm leading-relaxed text-white/68">
-            Each cultural world is approached as a living continuity of memory, ritual, craft,
-            landscape, and human experience.
+            Her kültürel dünya; hafıza, ritüel, zanaat, peyzaj ve insan deneyiminin yaşayan bir
+            sürekliliği olarak ele alınır.
           </p>
         </div>
 
@@ -63,7 +63,7 @@ export default function CulturalWorldsIndexSection() {
                   </p>
                 </div>
                 <span className="shrink-0 font-body text-[0.62rem] uppercase tracking-[0.18em] text-white/46 transition-colors duration-300 group-hover:text-white/60">
-                  Enter
+                  Gir
                 </span>
               </Link>
             ) : (
@@ -83,7 +83,7 @@ export default function CulturalWorldsIndexSection() {
                   </p>
                 </div>
                 <span className="shrink-0 font-body text-[0.62rem] uppercase tracking-[0.18em] text-white/36">
-                  {world.status}
+                  Gelişiyor
                 </span>
               </div>
             )

@@ -16,9 +16,9 @@ interface CollectionFeature {
 const collectionFeatures: CollectionFeature[] = [
   {
     label: 'SIGNATURE™',
-    title: 'Curated cultural experiences.',
+    title: 'Küratörlü kültürel deneyimler.',
     description:
-      'Designed, tested, and ready to be lived. Signature brings together place intelligence, cultural context, and a clear authored structure so that each encounter feels composed rather than assembled.',
+      'Tasarlanmış, sınanmış ve yaşanmaya hazır. Signature; yer zekâsını, kültürel bağlamı ve açık bir editoryal yapıyı bir araya getirir; böylece her karşılaşma bir araya getirilmiş değil, kurgulanmış hissedilir.',
     href: '/experiences/signature',
     image:
       'https://res.cloudinary.com/djr97wm0n/image/upload/dpr_auto/cs_srgb/q_auto:best/creare-signature-image.jpg',
@@ -27,18 +27,18 @@ const collectionFeatures: CollectionFeature[] = [
   },
   {
     label: 'LAB™',
-    title: 'Built with you.',
+    title: 'Sizinle birlikte kurulur.',
     description:
-      'Custom cultural experiences, developed from scratch. LAB begins with conversation, then builds through research, local knowledge, and creative direction until the right form of access becomes possible.',
+      'Sıfırdan geliştirilen kişiye özel kültürel deneyimler. LAB bir sohbetle başlar; ardından araştırma, yerel bilgi ve yaratıcı yönelimle ilerler, doğru erişim biçimi mümkün olana kadar gelişir.',
     href: '/experiences/lab',
     image: 'https://res.cloudinary.com/djr97wm0n/image/upload/v1780534781/creare-lab-image.jpg',
     alt: 'Craftsman hand holding a fine pencil drawing precise architectural lines on white drafting paper — tailor-made from scratch',
   },
   {
     label: 'BLACK™',
-    title: 'Not publicly available.',
+    title: 'Kamusal olarak sunulmaz.',
     description:
-      'Private access to places, collections, and moments. BLACK is reserved for arrangements that depend on trust, discretion, and relationships not intended for open circulation or standard inquiry paths.',
+      'Mekânlara, koleksiyonlara ve anlara özel erişim. BLACK; güvene, mahremiyete ve açık dolaşıma ya da standart talep yollarına uygun olmayan ilişkilere dayanan düzenlemeler için ayrılmıştır.',
     href: '/experiences/black',
     image:
       'https://res.cloudinary.com/djr97wm0n/image/upload/v1780566766/creare-black-private-access-key.jpg',
@@ -53,7 +53,7 @@ export default function CollectionsSection() {
     <div className="w-full bg-neutral-50">
       <div className="mx-auto max-w-7xl px-6 pt-16 sm:px-10 sm:pt-18 lg:px-16 lg:pt-20">
         <p className="font-body text-[0.66rem] font-medium uppercase tracking-[0.18em] text-neutral-600">
-          Three ways CREARE composes an encounter.
+          CREARE&apos;nin bir karşılaşmayı kurduğu üç yol.
         </p>
       </div>
       <section
@@ -74,10 +74,10 @@ export default function CollectionsSection() {
             <Link
               href={collectionFeatures[0].href}
               className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
-              aria-label="Explore SIGNATURE experiences"
+              aria-label="SIGNATURE deneyimlerini keşfet"
             >
               <span className="relative inline-block">
-                Explore →
+                Keşfet →
                 <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
               </span>
             </Link>
@@ -129,10 +129,10 @@ export default function CollectionsSection() {
             <Link
               href={collectionFeatures[1].href}
               className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
-              aria-label="Discover LAB experience design"
+              aria-label="LAB deneyim tasarımını keşfet"
             >
               <span className="relative inline-block">
-                Discover →
+                Keşfet →
                 <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
               </span>
             </Link>
@@ -158,10 +158,10 @@ export default function CollectionsSection() {
             <Link
               href={collectionFeatures[2].href}
               className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
-              aria-label="Request private access to BLACK experiences"
+              aria-label="BLACK deneyimleri için özel erişim talep et"
             >
               <span className="relative inline-block">
-                Request Private Access →
+                Özel Erişim Talep Et →
                 <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
               </span>
             </Link>

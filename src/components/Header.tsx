@@ -51,11 +51,11 @@ export default function Header() {
   }, [pathname]);
 
   const navLinks = [
-    { label: 'Cultural Worlds', href: '/cultural-worlds' },
-    { label: 'Experiences', href: '/experiences' },
-    { label: 'Insights', href: '/insights' },
-    { label: 'Philosophy', href: '/philosophy' },
-    { label: 'Contact', href: '/contact' },
+    { label: 'Kültürel Dünyalar', href: '/cultural-worlds' },
+    { label: 'Deneyimler', href: '/experiences' },
+    { label: 'İçgörüler', href: '/insights' },
+    { label: 'Yaklaşım', href: '/philosophy' },
+    { label: 'İletişim', href: '/contact' },
   ];
 
   const lightSurface = headerState === 'light';
@@ -105,7 +105,7 @@ export default function Header() {
         <Link
           href="/"
           className="group flex flex-shrink-0 items-center"
-          aria-label="CREARE — Return to homepage"
+          aria-label="CREARE — Ana sayfaya dön"
         >
           <span
             className={`font-body text-sm font-semibold uppercase tracking-[0.24em] transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] ${
@@ -121,7 +121,7 @@ export default function Header() {
             <Link
               key={item?.label}
               href={item?.href}
-              prefetch={item?.href === '/contact' && item?.label === 'Contact' ? false : undefined}
+              prefetch={item?.href === '/contact' && item?.label === 'İletişim' ? false : undefined}
               className={`group/nav relative font-body text-[0.7rem] font-medium uppercase tracking-[0.2em] motion-link ${navTone} ${navHoverTone}`}
               aria-label={item?.label}
             >
@@ -139,7 +139,7 @@ export default function Header() {
             lightSurface ? 'hover:text-[#1f1b18]' : 'hover:text-white'
           } ${mobileTone}`}
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-label={mobileOpen ? 'Gezinme menüsünü kapat' : 'Gezinme menüsünü aç'}
           aria-expanded={mobileOpen}
         >
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
@@ -173,7 +173,7 @@ export default function Header() {
           <button
             type="button"
             className={`fixed inset-0 z-0 transition-[background-color,backdrop-filter,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] lg:hidden ${mobileOverlayTone}`}
-            aria-label="Close navigation menu overlay"
+            aria-label="Gezinme menüsü katmanını kapat"
             onClick={() => setMobileOpen(false)}
           />
           <div
@@ -187,7 +187,7 @@ export default function Header() {
               borderTopColor: mobileMenuBorder,
             }}
             role="navigation"
-            aria-label="Mobile navigation"
+            aria-label="Mobil gezinme"
           >
             {navLinks?.map((item) => (
               <Link

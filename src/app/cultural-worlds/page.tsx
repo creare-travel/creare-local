@@ -8,23 +8,23 @@ import CulturalWorldsDiscoveryRail from './CulturalWorldsDiscoveryRail';
 import { buildCulturalWorldCollectionGraph } from '@/lib/schema-builder';
 import { filterCanonicalCulturalWorlds } from '@/lib/canonical-gates';
 import { CULTURAL_WORLD_CONTENT } from '@/data/cultural-worlds';
+import { logPublicContentIssue, shouldUsePublicStaticEnglishFallbacks } from '@/lib/public-content';
 import { buildMetadataAlternates } from '@/lib/seo';
-import { fetchStrapi, mediaUrl } from '@/lib/strapi';
+import { fetchPublicStrapi, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = 'https://crearetravel.com';
 
 export const metadata: Metadata = {
-  title: 'Cultural Worlds',
+  title: 'Kültürel Dünyalar',
   description:
-    'Each destination is a world unto itself. Creare provides private cultural access to the deepest layers of extraordinary places shaped by history, ritual, and meaning.',
+    'Her yer kendi başına bir dünyadır. CREARE, tarih, ritüel ve anlamla şekillenmiş yerlerin daha derin katmanlarına özel kültürel erişim sunar.',
   alternates: buildMetadataAlternates('/cultural-worlds'),
   robots: { index: true, follow: true },
   openGraph: {
-    title: 'Cultural Worlds — Creare',
-    description:
-      'Private cultural access to extraordinary destinations shaped by history, ritual, and meaning.',
+    title: 'Kültürel Dünyalar — Creare',
+    description: 'Tarih, ritüel ve anlamla şekillenmiş yerlere özel kültürel erişim.',
     url: `${SITE_URL}/cultural-worlds`,
     siteName: 'Creare',
     type: 'website',
@@ -118,7 +118,7 @@ function flattenDestination(raw: Record<string, unknown>): StrapiDestination {
 
 async function fetchActiveDestinations(): Promise<StrapiDestination[]> {
   const path = '/api/destinations?filters[visibility_status][$eqi]=active&populate=*';
-  const json = await fetchStrapi(path);
+  const json = await fetchPublicStrapi(path);
   const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
   const preferredOrder = ['istanbul', 'cappadocia'];
 
@@ -175,15 +175,12 @@ export default async function CulturalWorldsPage() {
     destinations = await fetchActiveDestinations();
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn(
-        '[cultural-worlds] CMS fetch failed in development. Using canonical local fallback data for visual QA.',
-        {
-          route: '/cultural-worlds',
-          fallbackSlugs: LOCAL_FALLBACK_DESTINATIONS.map((destination) => destination.slug),
-          error,
-        }
-      );
-      destinations = LOCAL_FALLBACK_DESTINATIONS;
+      logPublicContentIssue('Cultural worlds listing unavailable in public locale.', {
+        route: '/cultural-worlds',
+        fallbackSlugs: LOCAL_FALLBACK_DESTINATIONS.map((destination) => destination.slug),
+        error,
+      });
+      destinations = shouldUsePublicStaticEnglishFallbacks() ? LOCAL_FALLBACK_DESTINATIONS : [];
     } else {
       destinations = [];
     }
@@ -237,19 +234,18 @@ export default async function CulturalWorldsPage() {
 
         <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-20 pt-36 sm:px-10 lg:px-16">
           <p className="mb-6 font-body text-[0.6rem] uppercase tracking-[0.32em] text-white/32">
-            Creare — Cultural Atlas
+            Creare — Kültürel Atlas
           </p>
           <h1
             className="max-w-4xl font-display font-light leading-[1.05] text-white"
             style={{ fontSize: 'clamp(2.8rem, 6vw, 5.8rem)' }}
           >
-            Cultural Worlds
+            Kültürel Dünyalar
           </h1>
           <p className="mt-8 max-w-2xl font-body text-sm leading-relaxed text-white/58 sm:text-[0.95rem]">
-            A geography of layered places, read through memory, custodianship, and the conditions
-            that make real cultural access meaningful. CREARE approaches place not as a destination
-            list, but as a cultural world: a living continuity of geography, craft, ritual, local
-            knowledge, and social memory that shapes how access can be offered and understood.
+            Hafıza, emanetçilik ve gerçek kültürel erişimi anlamlı kılan koşullar üzerinden okunan
+            katmanlı yerler coğrafyası. CREARE bir yeri destinasyon listesi olarak değil; coğrafya,
+            zanaat, ritüel, yerel bilgi ve toplumsal hafızanın yaşayan sürekliliği olarak ele alır.
           </p>
         </div>
       </section>
@@ -261,10 +257,10 @@ export default async function CulturalWorldsPage() {
               heading={
                 <>
                   <p className="mb-3 font-body text-[0.6rem] uppercase tracking-[0.28em] text-white/30">
-                    Explore Cultural Worlds
+                    Kültürel Dünyaları Keşfet
                   </p>
                   <h2 className="font-display text-3xl font-light text-white">
-                    A geography of access, memory, and encounter.
+                    Erişim, hafıza ve karşılaşma coğrafyası.
                   </h2>
                 </>
               }
@@ -276,13 +272,13 @@ export default async function CulturalWorldsPage() {
                 <div className="relative flex aspect-[5/6] flex-col justify-between overflow-hidden border border-white/10 bg-white/[0.02] p-8 pb-10">
                   <div>
                     <p className="mb-6 font-body text-[0.6rem] uppercase tracking-[0.28em] text-white/32">
-                      The Atlas
+                      Atlas
                     </p>
                     <h3
                       className="max-w-[12ch] font-display font-light leading-[1.12] text-white"
                       style={{ fontSize: 'clamp(1.7rem, 2.7vw, 2.35rem)' }}
                     >
-                      Each destination holds layers of history, ritual, and meaning.
+                      Her yer, tarih, ritüel ve anlam katmanları taşır.
                     </h3>
                     <p className="mt-8 max-w-[26ch] font-body text-sm leading-relaxed text-white/58">
                       A Cultural World is not a destination category, but a deeper reading of place.
@@ -380,7 +376,7 @@ export default async function CulturalWorldsPage() {
                             letterSpacing: '0.28em',
                           }}
                         >
-                          Enter
+                          Gir
                         </span>
                       )}
                     </div>
@@ -392,7 +388,7 @@ export default async function CulturalWorldsPage() {
 
                 return href ? (
                   <article key={destination.id} data-rail-card="true" className={shellClassName}>
-                    <Link href={href} aria-label={`Explore ${title}`}>
+                    <Link href={href} aria-label={`${title} kültürel dünyasını keşfet`}>
                       {card}
                     </Link>
                   </article>
@@ -412,8 +408,8 @@ export default async function CulturalWorldsPage() {
         ) : (
           <div className="py-12">
             <p className="text-white/40 font-body text-sm leading-relaxed max-w-md">
-              Cultural worlds will appear here as soon as active destinations are published in the
-              CMS.
+              Aktif destinasyonlar CMS içinde yayınlanır yayınlanmaz kültürel dünyalar burada
+              görünecektir.
             </p>
           </div>
         )}
@@ -425,13 +421,13 @@ export default async function CulturalWorldsPage() {
             className="font-display font-light leading-tight text-white"
             style={{ fontSize: 'clamp(1.45rem, 2.2vw, 2rem)' }}
           >
-            Begin the conversation.
+            Görüşmeyi başlatın.
           </p>
           <Link
             href="/contact"
             className="inline-flex min-h-11 items-center justify-center self-start border border-white/16 px-7 py-3 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/32 hover:text-white"
           >
-            CONTACT CREARE →
+            CREARE İLE İLETİŞİME GEÇİN →
           </Link>
         </div>
       </section>

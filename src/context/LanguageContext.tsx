@@ -1,5 +1,6 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { PUBLIC_SITE_LANG, PUBLIC_UI_LOCALE } from '@/lib/public-content';
 
 export type Locale = 'en' | 'tr' | 'ru' | 'zh';
 
@@ -40,12 +41,12 @@ function getNestedValue(obj: TranslationDict, key: string): string {
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('en');
+  const [locale, setLocaleState] = useState<Locale>(PUBLIC_UI_LOCALE as Locale);
   const [translations, setTranslations] = useState<TranslationDict>({});
 
   useEffect(() => {
     const stored = localStorage.getItem('creare_locale') as Locale | null;
-    if (stored && ['en', 'tr', 'ru', 'zh'].includes(stored)) {
+    if (stored === PUBLIC_UI_LOCALE) {
       setLocaleState(stored);
     }
   }, []);
@@ -57,9 +58,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, [locale]);
 
   const setLocale = useCallback((newLocale: Locale) => {
-    setLocaleState(newLocale);
-    localStorage.setItem('creare_locale', newLocale);
-    document.documentElement.lang = newLocale;
+    const nextLocale = newLocale === 'tr' ? newLocale : (PUBLIC_UI_LOCALE as Locale);
+    setLocaleState(nextLocale);
+    localStorage.setItem('creare_locale', nextLocale);
+    document.documentElement.lang = PUBLIC_SITE_LANG;
+    document.documentElement.dir = 'ltr';
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = PUBLIC_SITE_LANG;
     document.documentElement.dir = 'ltr';
   }, []);
 

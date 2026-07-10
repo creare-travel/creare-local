@@ -18,9 +18,9 @@ interface CTASectionProps {
 }
 
 export default function CTASection({
-  heading = 'Begin Your Inquiry',
-  subtext = 'Every CREARE experience begins with a conversation. Tell us what you are looking for.',
-  buttonLabel = 'PRIVATE INQUIRY',
+  heading = 'Görüşmeyi Başlatın',
+  subtext = 'Her CREARE deneyimi bir sohbetle başlar. Aradığınızı bizimle paylaşın.',
+  buttonLabel = 'ÖZEL TALEP',
   buttonHref = '/contact',
   dark = false,
   experienceSlug = undefined,
@@ -52,7 +52,7 @@ export default function CTASection({
   };
 
   return (
-    <section className={`${bg} py-24 md:py-32`} aria-label="Call to action">
+    <section className={`${bg} py-24 md:py-32`} aria-label="Eylem çağrısı">
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
         <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-6">
           CREARE
@@ -67,7 +67,7 @@ export default function CTASection({
           {subtext}
         </p>
         <p className="font-body text-[0.6rem] tracking-[0.2em] text-neutral-400/70 uppercase mb-6">
-          Access is limited and curated.
+          Erişim sınırlı ve kürasyonludur.
         </p>
         <Link
           href={resolvedHref}
@@ -80,15 +80,15 @@ export default function CTASection({
         {experienceTitle && (
           <div className="mt-5">
             <OutboundLink
-              href={`https://wa.me/+905412203000?text=I'm interested in ${encodeURIComponent(experienceTitle)}`}
+              href={`https://wa.me/+905412203000?text=${encodeURIComponent(`${experienceTitle} ile ilgileniyorum.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className={`motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase ${dark ? 'text-white/40 hover:text-white/70' : 'text-neutral-400 hover:text-neutral-600'}`}
-              aria-label="Contact via WhatsApp"
+              aria-label="WhatsApp üzerinden iletişime geç"
               trackingLabel="experience_whatsapp_contact"
               trackingSource="experience_cta_section"
             >
-              Contact via WhatsApp
+              WhatsApp ile İletişim
             </OutboundLink>
           </div>
         )}

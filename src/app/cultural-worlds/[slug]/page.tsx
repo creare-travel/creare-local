@@ -12,9 +12,10 @@ import {
   isCanonicalCulturalWorldSlug,
 } from '@/lib/canonical-gates';
 import { getCulturalWorldContext } from '@/lib/cultural-world-context';
+import { logPublicContentIssue, shouldUsePublicStaticEnglishFallbacks } from '@/lib/public-content';
 import { buildMetadataAlternates } from '@/lib/seo';
 import { buildCanonicalUrl, buildCulturalWorldDetailGraph } from '@/lib/schema-builder';
-import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
+import { fetchPublicStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 const FALLBACK_DESCRIPTION =
   'A cultural world approached through place, related experiences, and further reading.';
 const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
@@ -238,7 +239,7 @@ async function fetchAllExperiences(): Promise<StrapiExperience[]> {
   const path = `/api/experiences?${params.toString()}`;
 
   try {
-    const json = await fetchStrapi(path);
+    const json = await fetchPublicStrapi(path);
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
 
     return items
@@ -253,7 +254,7 @@ async function fetchAllExperiences(): Promise<StrapiExperience[]> {
       .filter((experience) => experience.slug && experience.title)
       .filter((experience) => filterPublicExperiences([experience]).length > 0);
   } catch (error) {
-    console.error('Failed to fetch experiences for cultural world related mapping.', {
+    logPublicContentIssue('Related experiences unavailable for cultural world.', {
       route: '/cultural-worlds/[slug]',
       strapiPath: path,
       error,
@@ -477,7 +478,7 @@ async function fetchDestination(slug: string): Promise<StrapiDestination | null>
   const path = `/api/destinations?${params.toString()}`;
 
   try {
-    const json = await fetchStrapi(path);
+    const json = await fetchPublicStrapi(path);
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
     if (!items.length) return null;
 
@@ -508,7 +509,7 @@ async function fetchDestination(slug: string): Promise<StrapiDestination | null>
       insights: normalizeRelationArray<StrapiInsight>(destination.insights),
     };
   } catch (error) {
-    console.error('Failed to fetch cultural world detail.', {
+    logPublicContentIssue('Cultural world detail unavailable in public locale.', {
       route: `/cultural-worlds/${slug}`,
       strapiPath: path,
       error,
@@ -521,18 +522,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   if (!isCanonicalCulturalWorldSlug(slug)) {
     return {
-      title: 'Not Found — Cultural World',
+      title: 'Bulunamadı — Kültürel Dünya',
       description: FALLBACK_DESCRIPTION,
       robots: { index: false, follow: false },
     };
   }
-  const localContent = getCulturalWorldContent(slug);
+  const localContent = shouldUsePublicStaticEnglishFallbacks()
+    ? getCulturalWorldContent(slug)
+    : null;
   const destination = await fetchDestination(slug);
   const fallbackDestination = buildFallbackDestinationFromLocalContent(localContent);
 
   if (destination && destination.visibility_status?.toLowerCase() !== 'active') {
     return {
-      title: 'Not Found — Cultural World',
+      title: 'Bulunamadı — Kültürel Dünya',
       description: FALLBACK_DESCRIPTION,
       robots: { index: false, follow: false },
     };
@@ -542,7 +545,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!resolvedDestination) {
     return {
-      title: 'Not Found — Cultural World',
+      title: 'Bulunamadı — Kültürel Dünya',
       description: FALLBACK_DESCRIPTION,
       robots: { index: false, follow: false },
     };
@@ -569,7 +572,9 @@ export default async function CulturalWorldPage({ params }: Props) {
   if (!isCanonicalCulturalWorldSlug(slug)) {
     notFound();
   }
-  const localContent = getCulturalWorldContent(slug);
+  const localContent = shouldUsePublicStaticEnglishFallbacks()
+    ? getCulturalWorldContent(slug)
+    : null;
   const [destination, allExperiences] = await Promise.all([
     fetchDestination(slug),
     fetchAllExperiences(),
@@ -734,7 +739,7 @@ export default async function CulturalWorldPage({ params }: Props) {
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-24 w-full">
           <p className="hero-label text-white/50 font-body text-[0.6rem] tracking-[0.35em] uppercase mb-6">
-            Cultural Worlds
+            Kültürel Dünyalar
           </p>
           <h1
             className="hero-title-lg font-display font-light text-white leading-[0.95] tracking-tight"
@@ -757,7 +762,7 @@ export default async function CulturalWorldPage({ params }: Props) {
               href="/"
               className="text-white/30 font-body text-xs tracking-[0.15em] uppercase hover:text-white/60 transition-colors"
             >
-              Home
+              Ana Sayfa
             </Link>
           </li>
           <li aria-hidden="true">
@@ -768,7 +773,7 @@ export default async function CulturalWorldPage({ params }: Props) {
               href="/cultural-worlds"
               className="text-white/30 font-body text-xs tracking-[0.15em] uppercase hover:text-white/60 transition-colors"
             >
-              Cultural Worlds
+              Kültürel Dünyalar
             </Link>
           </li>
           <li aria-hidden="true">
@@ -788,7 +793,7 @@ export default async function CulturalWorldPage({ params }: Props) {
       >
         <div className="max-w-2xl">
           <p className="text-white/25 font-body text-[0.6rem] tracking-[0.35em] uppercase mb-8">
-            Context
+            Bağlam
           </p>
           <h2
             id="context-intro"
@@ -815,14 +820,14 @@ export default async function CulturalWorldPage({ params }: Props) {
           >
             <div className="max-w-3xl">
               <p className="text-white/22 font-body text-[0.58rem] tracking-[0.24em] uppercase mb-7">
-                Core Characteristics
+                Temel Nitelikler
               </p>
               <h2
                 id="core-characteristics"
                 className="font-display font-light text-white leading-tight mb-10"
                 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}
               >
-                What defines this world.
+                Bu dünyayı ne tanımlar.
               </h2>
               <ul className="space-y-6">
                 {context.characteristics.map((characteristic, index) => (
@@ -848,14 +853,14 @@ export default async function CulturalWorldPage({ params }: Props) {
           >
             <div className="max-w-3xl">
               <p className="text-white/22 font-body text-[0.58rem] tracking-[0.24em] uppercase mb-7">
-                Cultural Threads
+                Kültürel İzler
               </p>
               <h2
                 id="cultural-systems"
                 className="font-display font-light text-white leading-tight mb-10"
                 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}
               >
-                The continuities that shape this world.
+                Bu dünyayı şekillendiren süreklilikler.
               </h2>
               <ul className="space-y-6">
                 {localContent.culturalSystems.map((system, index) => (
@@ -881,21 +886,21 @@ export default async function CulturalWorldPage({ params }: Props) {
           >
             <div className="max-w-3xl mb-14">
               <p className="text-white/22 font-body text-[0.58rem] tracking-[0.24em] uppercase mb-7">
-                Related Experiences
+                İlgili Deneyimler
               </p>
               <h2
                 id="related-experiences"
                 className="font-display font-light text-white leading-tight mb-8"
                 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}
               >
-                Encounters that belong to this cultural world.
+                Bu kültürel dünyaya ait karşılaşmalar.
               </h2>
             </div>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 xl:gap-5">
               {relatedExperiences.map((experience, index) => {
                 const imageUrl = resolveImageUrl(experience.cover_image);
                 const imageAlt =
-                  experience.cover_image?.alternativeText ?? experience.title ?? 'Experience image';
+                  experience.cover_image?.alternativeText ?? experience.title ?? 'Deneyim görseli';
 
                 return (
                   <Link
@@ -928,7 +933,7 @@ export default async function CulturalWorldPage({ params }: Props) {
                       {experience.title &&
                       systemMappingIndex.has(experience.title.trim().toLowerCase()) ? (
                         <p className="mb-3.5 text-white/42 font-body text-[0.65rem] tracking-[0.11em] uppercase leading-relaxed">
-                          <span className="block">Connected Cultural Thread</span>
+                          <span className="block">Bağlı Kültürel İzlek</span>
                           <span className="mt-1 block text-white/58 tracking-[0.09em]">
                             {systemMappingIndex.get(experience.title.trim().toLowerCase())}
                           </span>
@@ -940,7 +945,7 @@ export default async function CulturalWorldPage({ params }: Props) {
                           <span>{experience.geo_experience_type}</span>
                         ) : null}
                         <span className="text-white/40 transition-colors group-hover:text-white/70">
-                          → View Experience
+                          → Deneyimi Gör
                         </span>
                       </div>
                     </div>
@@ -955,11 +960,11 @@ export default async function CulturalWorldPage({ params }: Props) {
       {insights.length > 0 && (
         <section
           className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pt-16 pb-0"
-          aria-label="Related insights"
+          aria-label="İlgili içgörüler"
         >
           <div className="max-w-3xl">
             <p className="text-white/26 font-body text-[0.58rem] tracking-[0.16em] uppercase mb-2">
-              Related Insights
+              İlgili İçgörüler
             </p>
             <div className="space-y-4">
               {insights.map((insight) => (
@@ -984,31 +989,31 @@ export default async function CulturalWorldPage({ params }: Props) {
       >
         <div className="border border-white/10 p-12 md:p-16 max-w-2xl">
           <p className="text-white/30 font-body text-[0.6rem] tracking-[0.25em] uppercase mb-6">
-            {localContent?.cta.eyebrow || 'By introduction only'}
+            {localContent?.cta.eyebrow || 'Yalnızca tanıştırma ile'}
           </p>
           <p
             className="font-display font-light text-white/80 leading-relaxed mb-2"
             style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)' }}
           >
-            {localContent?.cta.title || 'Access is limited.'}
+            {localContent?.cta.title || 'Erişim sınırlıdır.'}
           </p>
           <p
             className="font-display font-light text-white/50 leading-relaxed mb-3"
             style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)' }}
           >
             {localContent?.cta.subtitle ||
-              'Each cultural world is composed through a small number of encounters each season.'}
+              'Her kültürel dünya, her sezon az sayıda karşılaşma üzerinden kurgulanır.'}
           </p>
           <p className="text-white/30 font-body font-light text-sm leading-relaxed mb-10">
             {localContent?.cta.note ||
-              'Availability is shaped by access, timing, and cultural permission.'}
+              'Uygunluk; erişim, zamanlama ve kültürel izin koşullarıyla şekillenir.'}
           </p>
           <Link
             href="/contact"
             className="motion-button-editorial inline-block border border-white/20 px-8 py-4 font-body text-[0.65rem] uppercase tracking-[0.3em] text-white/70 hover:border-white/50 hover:text-white"
-            aria-label={`Begin a private conversation about ${mergedDestination.name || 'this destination'}`}
+            aria-label={`${mergedDestination.name || 'bu destinasyon'} hakkında özel bir görüşme başlat`}
           >
-            Begin a Private Conversation →
+            Özel Bir Görüşme Başlat →
           </Link>
         </div>
       </section>

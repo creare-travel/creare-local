@@ -4,7 +4,7 @@ import Link from 'next/link';
 export default function Footer() {
   const socialIcons = (
     <>
-      <span aria-label="CREARE Instagram profile coming soon" className="text-white/55" role="img">
+      <span aria-label="CREARE Instagram profili yakında" className="text-white/55" role="img">
         <svg
           width="18"
           height="18"
@@ -22,7 +22,7 @@ export default function Footer() {
         </svg>
       </span>
 
-      <span aria-label="CREARE LinkedIn profile coming soon" className="text-white/55" role="img">
+      <span aria-label="CREARE LinkedIn profili yakında" className="text-white/55" role="img">
         <svg
           width="18"
           height="18"
@@ -43,64 +43,64 @@ export default function Footer() {
   );
 
   return (
-    <footer className="bg-black" aria-label="Site footer">
+    <footer className="bg-black" aria-label="Site altbilgisi">
       {/* Main footer row */}
       <div className="max-w-7xl mx-auto flex flex-col gap-14 px-6 pb-14 pt-20 sm:px-10 sm:pb-12 sm:pt-18 lg:flex-row lg:items-end lg:justify-between lg:gap-0 lg:px-16">
         {/* Left: Brand + tagline */}
         <div className="max-w-[17rem]">
-          <Link href="/" aria-label="CREARE — Return to homepage">
+          <Link href="/" aria-label="CREARE — Ana sayfaya dön">
             <span className="font-body font-semibold text-[0.75rem] tracking-[0.22em] text-white uppercase">
               CREARE<sup className="text-[0.5rem] align-super tracking-normal">™</sup>
             </span>
           </Link>
           <p className="mt-5 max-w-[260px] font-display text-[0.82rem] font-light leading-[1.9] text-white/52 sm:text-[0.78rem] sm:leading-loose">
-            Creative intelligence.
+            Kültürel zekâ.
             <br />
-            Strategic execution.
+            Düşünülmüş uygulama.
             <br />
-            Refined experiences.
+            Özenle kurgulanmış deneyimler.
           </p>
         </div>
 
         {/* Right: Nav links + social icons */}
         <nav
           className="flex flex-col items-start gap-8 sm:gap-9 lg:flex-row lg:items-center lg:gap-8"
-          aria-label="Footer navigation"
+          aria-label="Altbilgi gezinmesi"
         >
           <Link
             href="/cultural-worlds"
             className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label="Cultural Worlds"
+            aria-label="Kültürel Dünyalar"
           >
-            CULTURAL WORLDS
+            KÜLTÜREL DÜNYALAR
           </Link>
           <Link
             href="/experiences"
             className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label="Experiences"
+            aria-label="Deneyimler"
           >
-            EXPERIENCES
+            DENEYİMLER
           </Link>
           <Link
             href="/insights"
             className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label="Insights"
+            aria-label="İçgörüler"
           >
-            INSIGHTS
+            İÇGÖRÜLER
           </Link>
           <Link
             href="/philosophy"
             className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label="Philosophy"
+            aria-label="Yaklaşım"
           >
-            PHILOSOPHY
+            YAKLAŞIM
           </Link>
           <Link
             href="/contact"
             className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label="Contact CREARE"
+            aria-label="CREARE ile iletişim"
           >
-            CONTACT
+            İLETİŞİM
           </Link>
 
           <div className="flex items-center gap-6 pt-1">{socialIcons}</div>
@@ -111,11 +111,11 @@ export default function Footer() {
         <span className="font-body text-[0.62rem] tracking-[0.1em] text-white/50">
           © 2026 CREARE
         </span>
-        <nav className="flex flex-wrap items-center gap-x-6 gap-y-3" aria-label="Legal links">
+        <nav className="flex flex-wrap items-center gap-x-6 gap-y-3" aria-label="Yasal bağlantılar">
           {[
-            { label: 'Privacy', href: '/privacy' },
-            { label: 'Cookies', href: '/cookies' },
-            { label: 'Terms', href: '/terms' },
+            { label: 'Gizlilik', href: '/privacy' },
+            { label: 'Çerezler', href: '/cookies' },
+            { label: 'Koşullar', href: '/terms' },
           ]?.map((item) => (
             <Link
               key={item?.label}

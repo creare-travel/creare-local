@@ -13,7 +13,7 @@ interface InquireCTAProps {
 
 export default function InquireCTA({
   experienceSlug,
-  label = 'INQUIRE PRIVATELY',
+  label = 'ÖZEL OLARAK İLETİŞİME GEÇ',
   className = '',
 }: InquireCTAProps) {
   const pathname = usePathname();

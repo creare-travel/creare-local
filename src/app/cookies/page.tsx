@@ -4,8 +4,9 @@ import type { Metadata } from 'next';
 import { buildMetadataAlternates } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'Cookie Policy',
-  description: 'CREARE cookie policy — how we use cookies and similar tracking technologies.',
+  title: 'Çerez Politikası',
+  description:
+    'CREARE çerez politikası — çerezleri ve benzer izleme teknolojilerini nasıl kullandığımızı açıklar.',
   alternates: buildMetadataAlternates('/cookies'),
 };
 
@@ -18,44 +19,43 @@ interface PolicySection {
 const cookieSections: PolicySection[] = [
   {
     number: 1,
-    heading: 'What Are Cookies',
-    body: 'Cookies are small text files that are placed on your device when you visit our website. They help us provide you with a better experience by remembering your preferences and understanding how you interact with our services.',
+    heading: 'Çerez Nedir',
+    body: 'Çerezler, web sitemizi ziyaret ettiğinizde cihazınıza yerleştirilen küçük metin dosyalarıdır. Tercihlerinizi hatırlayarak ve hizmetlerimizle nasıl etkileşim kurduğunuzu anlayarak size daha iyi bir deneyim sunmamıza yardımcı olurlar.',
   },
   {
     number: 2,
-    heading: 'How We Use Cookies',
-    body: 'CREARE uses cookies to understand how visitors navigate our website, to remember your language preferences, and to analyze website traffic. We use both session cookies (which expire when you close your browser) and persistent cookies (which remain on your device until deleted or expired).',
+    heading: 'Çerezleri Nasıl Kullanırız',
+    body: 'CREARE, ziyaretçilerin web sitemizde nasıl gezindiğini anlamak, dil tercihlerinizi hatırlamak ve site trafiğini analiz etmek için çerezleri kullanır. Hem oturum çerezleri (tarayıcınızı kapattığınızda sona erer) hem de kalıcı çerezler (silinene veya süresi dolana kadar cihazınızda kalır) kullanırız.',
   },
   {
     number: 3,
-    heading: 'Types of Cookies We Use',
+    heading: 'Kullandığımız Çerez Türleri',
     body: (
       <>
         <span className="block mb-3">
-          <strong>Essential Cookies:</strong> These cookies are necessary for the website to
-          function properly. They enable core functionality such as security and network management.
+          <strong>Zorunlu Çerezler:</strong> Bu çerezler web sitesinin düzgün çalışması için
+          gereklidir. Güvenlik ve ağ yönetimi gibi temel işlevleri mümkün kılar.
         </span>
         <span className="block mb-3">
-          <strong>Analytics Cookies:</strong> We use these cookies to understand how visitors
-          interact with our website, helping us improve our services and user experience.
+          <strong>Analitik Çerezler:</strong> Bu çerezleri, ziyaretçilerin web sitemizle nasıl
+          etkileşim kurduğunu anlamak ve hizmetlerimizi geliştirmek için kullanırız.
         </span>
         <span className="block">
-          <strong>Preference Cookies:</strong> These cookies allow our website to remember
-          information that changes the way the site behaves or looks, such as your preferred
-          language.
+          <strong>Tercih Çerezleri:</strong> Bu çerezler, tercih ettiğiniz dil gibi sitenin
+          davranışını veya görünümünü etkileyen bilgileri hatırlamasını sağlar.
         </span>
       </>
     ),
   },
   {
     number: 4,
-    heading: 'Managing Cookies',
-    body: 'You can control and manage cookies in various ways. Please note that removing or blocking cookies may impact your user experience and some functionality may no longer be available. Most browsers automatically accept cookies, but you can usually modify your browser settings to decline cookies if you prefer.',
+    heading: 'Çerez Yönetimi',
+    body: 'Çerezleri çeşitli yollarla kontrol edip yönetebilirsiniz. Çerezleri kaldırmanın veya engellemenin kullanıcı deneyiminizi etkileyebileceğini ve bazı işlevlerin kullanılamaz hale gelebileceğini lütfen unutmayın. Çoğu tarayıcı çerezleri otomatik kabul eder; ancak dilerseniz tarayıcı ayarlarınızı değiştirerek bunları reddedebilirsiniz.',
   },
   {
     number: 5,
-    heading: 'Changes to This Policy',
-    body: 'We may update this Cookie Policy from time to time to reflect changes in technology, legislation, or our business operations. We encourage you to review this page periodically for the latest information on our cookie practices.',
+    heading: 'Bu Politikadaki Değişiklikler',
+    body: "Bu Çerez Politikası'nı teknoloji, mevzuat veya işleyişimizdeki değişiklikleri yansıtacak şekilde zaman zaman güncelleyebiliriz. En güncel bilgi için bu sayfayı düzenli olarak gözden geçirmenizi öneririz.",
   },
 ];
 
@@ -64,19 +64,19 @@ export default function CookiesPage() {
     <main className="min-h-screen bg-white">
       <div className="px-6 sm:px-10 lg:px-16 pt-28 pb-24 max-w-4xl mx-auto">
         {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 mb-12">
+        <nav aria-label="İçerik yolu" className="flex items-center gap-2 mb-12">
           <Link
             href="/"
             className="flex items-center gap-1 text-xs tracking-widest text-gray-500 hover:text-black transition-colors uppercase"
           >
             <span aria-hidden="true">←</span>
-            <span>HOME</span>
+            <span>ANA SAYFA</span>
           </Link>
           <span className="text-xs text-gray-400" aria-hidden="true">
             /
           </span>
           <h1 className="text-xs tracking-widest text-black uppercase" aria-current="page">
-            COOKIES
+            ÇEREZLER
           </h1>
         </nav>
 
@@ -95,7 +95,7 @@ export default function CookiesPage() {
         </div>
 
         {/* Last Updated */}
-        <p className="mt-16 text-xs text-gray-500 tracking-wide">Last Updated: March 4, 2026</p>
+        <p className="mt-16 text-xs text-gray-500 tracking-wide">Son Güncelleme: 4 Mart 2026</p>
       </div>
     </main>
   );

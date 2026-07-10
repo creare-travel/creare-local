@@ -57,13 +57,17 @@ const ExperienceCard = memo(function ExperienceCard({ experience }: ExperienceCa
 
       {/* CTA */}
       <span className="motion-copy-fade font-body text-[0.6rem] tracking-[0.28em] text-neutral-900 uppercase">
-        EXPLORE →
+        KEŞFET →
       </span>
     </>
   );
 
   return href ? (
-    <Link href={href} className="group block" aria-label={`View ${experience.title}`}>
+    <Link
+      href={href}
+      className="group block"
+      aria-label={`${experience.title} deneyimini görüntüle`}
+    >
       {card}
     </Link>
   ) : (

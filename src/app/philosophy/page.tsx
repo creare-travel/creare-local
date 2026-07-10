@@ -9,15 +9,15 @@ const SITE_URL = 'https://crearetravel.com';
 const OG_IMAGE = `${SITE_URL}/og/default.jpg`;
 
 export const metadata: Metadata = {
-  title: 'Philosophy',
+  title: 'Yaklaşım',
   description:
-    'The Creare philosophy. Why we exist, how we think, and what we believe about the nature of experience.',
+    'CREARE yaklaşımı: neden varız, nasıl düşünüyoruz ve deneyimin doğasına dair neye inanıyoruz.',
   alternates: buildMetadataAlternates('/philosophy'),
   robots: { index: true, follow: true },
   openGraph: {
-    title: 'Philosophy — Creare',
+    title: 'Yaklaşım — Creare',
     description:
-      'The Creare philosophy. Why we exist, how we think, and what we believe about the nature of experience.',
+      'CREARE yaklaşımı: neden varız, nasıl düşünüyoruz ve deneyimin doğasına dair neye inanıyoruz.',
     url: `${SITE_URL}/philosophy`,
     siteName: 'Creare',
     type: 'website',
@@ -26,15 +26,15 @@ export const metadata: Metadata = {
         url: OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: 'Creare Philosophy — Experiences Composed as Art',
+        alt: 'Creare Yaklaşımı — Deneyimler Bir Sanat Eseri Gibi Tasarlanır',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Philosophy — Creare',
+    title: 'Yaklaşım — Creare',
     description:
-      'The Creare philosophy. Why we exist, how we think, and what we believe about the nature of experience.',
+      'CREARE yaklaşımı: neden varız, nasıl düşünüyoruz ve deneyimin doğasına dair neye inanıyoruz.',
     images: [OG_IMAGE],
   },
 };
@@ -49,16 +49,16 @@ export default function PhilosophyPage() {
       <section className="flex min-h-[86vh] items-center px-8 sm:min-h-[92vh] sm:px-16 lg:min-h-screen lg:px-24">
         <div className="max-w-[680px]">
           <p className="mb-12 font-body text-[0.7rem] uppercase tracking-[0.22em] text-white/15">
-            Creare / Philosophy
+            Creare / Yaklaşım
           </p>
           <h1 className="font-display font-light leading-[1.18] text-white text-[clamp(2rem,4.6vw,4.4rem)]">
-            We believe that the most
+            İnanıyoruz ki en
             <br />
-            extraordinary experiences
+            olağanüstü deneyimler
             <br />
-            cannot be purchased.
+            satın alınamaz.
             <br />
-            <span className="text-white/60">They can only be composed.</span>
+            <span className="text-white/60">Yalnızca kurgulanabilir.</span>
           </h1>
         </div>
       </section>
@@ -72,18 +72,20 @@ export default function PhilosophyPage() {
               01
             </p>
             <h2 className="font-display font-light text-white text-3xl md:text-4xl mb-12">
-              Against the Itinerary
+              Rota Mantığının Karşısında
             </h2>
             <div className="flex flex-col gap-8 text-white/60 font-body font-light text-base leading-[2]">
               <p>
-                The industry has spent decades perfecting the itinerary — a pre-packaged sequence of
-                sights, meals, and transfers.
+                Sektör onlarca yılını; görülecek yerler, öğünler ve transferlerden oluşan önceden
+                paketlenmiş rotayı kusursuzlaştırmaya harcadı.
               </p>
-              <p>It moves people through places without ever letting them arrive.</p>
-              <p>We are not in that business.</p>
               <p>
-                Creare creates the conditions for genuine encounter — between a person and a place,
-                a guest and a cultural world, a moment and its full meaning.
+                İnsanları yerlerin içinden geçirir; ama onların gerçekten varmasına izin vermez.
+              </p>
+              <p>Biz o işte değiliz.</p>
+              <p>
+                CREARE; bir kişi ile bir yer, bir misafir ile bir kültürel dünya, bir an ile onun
+                tüm anlamı arasında gerçek karşılaşmanın koşullarını kurar.
               </p>
             </div>
           </div>
@@ -94,20 +96,20 @@ export default function PhilosophyPage() {
               02
             </p>
             <h2 className="font-display font-light text-white text-3xl md:text-4xl mb-12">
-              The Composition
+              Kompozisyon
             </h2>
             <div className="flex flex-col gap-8 text-white/60 font-body font-light text-base leading-[2]">
-              <p>We use the word &ldquo;compose&rdquo; deliberately.</p>
-              <p>A composer creates emotion — not sequences.</p>
-              <p>They understand silence and sound, anticipation and arrival.</p>
-              <p>We work the same way.</p>
+              <p>&ldquo;Kurgulamak&rdquo; kelimesini bilinçli olarak kullanıyoruz.</p>
+              <p>Bir besteci sıralar değil, duygu yaratır.</p>
+              <p>Suskunluğu ve sesi, beklentiyi ve varışı anlar.</p>
+              <p>Biz de aynı şekilde çalışırız.</p>
               <p className="leading-[2.4]">
-                The best experience is not the most expensive, nor the most exclusive —<br />
-                it is the one that arrives at the right moment,
+                En iyi deneyim ne en pahalı olandır ne de en kapalı olan —<br />
+                doğru anda gelen,
                 <br />
-                in the right form,
+                doğru biçimde kurulan,
                 <br />
-                for the right person.
+                doğru kişiye ulaşandır.
               </p>
             </div>
           </div>
@@ -118,19 +120,19 @@ export default function PhilosophyPage() {
               03
             </p>
             <h2 className="font-display font-light text-white text-3xl md:text-4xl mb-12">
-              Access as Responsibility
+              Sorumluluk Olarak Erişim
             </h2>
             <div className="flex flex-col gap-8 text-white/60 font-body font-light text-base leading-[2]">
-              <p>Access is not a commodity. It is a trust.</p>
+              <p>Erişim bir meta değildir. Bir güvendir.</p>
               <p>
-                Extended to us by those who open their doors —{' '}
-                <span className="text-white/80 italic">not for exposure, but for alignment.</span>
+                Kapılarını açanlar tarafından bize uzatılır —{' '}
+                <span className="text-white/80 italic">görünürlük için değil, uyum için.</span>
               </p>
-              <p>We take that trust seriously.</p>
+              <p>Bu güveni ciddiyetle taşırız.</p>
               <p>
-                Every experience is designed to leave a place better than we found it —<br />
-                to deepen the relationship between people and culture,{' '}
-                <span className="block mt-4">never to extract from it.</span>
+                Her deneyim, bir yeri bulduğumuzdan daha iyi bırakacak şekilde tasarlanır —<br />
+                insanla kültür arasındaki ilişkiyi derinleştirmek için,{' '}
+                <span className="block mt-4">ondan bir şey çekip almak için değil.</span>
               </p>
             </div>
           </div>
@@ -141,23 +143,23 @@ export default function PhilosophyPage() {
               04
             </p>
             <h2 className="font-display font-light text-white text-3xl md:text-4xl mb-12">
-              The Client
+              Misafir
             </h2>
             <div className="flex flex-col gap-8 text-white/60 font-body font-light text-base leading-[2]">
-              <p>We work with a small number of clients each year.</p>
-              <p>Genuine composition requires attention — and attention cannot be scaled.</p>
-              <p>Our clients have seen the world.</p>
-              <p>They are ready to encounter it differently.</p>
+              <p>Her yıl sınırlı sayıda misafirle çalışırız.</p>
+              <p>Gerçek kompozisyon dikkat ister; dikkat ise ölçeklenemez.</p>
+              <p>Misafirlerimiz dünyayı görmüştür.</p>
+              <p>Onunla başka türlü karşılaşmaya hazırdırlar.</p>
               <p className="leading-[2.4]">
-                Curious.
+                Meraklı.
                 <br />
-                Discerning.
+                Seçici.
                 <br />
-                Open to being surprised.
+                Şaşırmaya açık.
               </p>
               <p>
-                They understand that the best experiences begin with a conversation —{' '}
-                <span className="block mt-4 text-white/40">not a catalogue.</span>
+                En iyi deneyimlerin bir katalogla değil, bir sohbetle başladığını bilirler —{' '}
+                <span className="block mt-4 text-white/40">katalogla değil.</span>
               </p>
             </div>
           </div>
@@ -165,36 +167,33 @@ export default function PhilosophyPage() {
 
         <div className="mt-28">
           <p className="mb-4 font-body text-[0.7rem] uppercase tracking-[0.2em] text-white/18">
-            Insights
+            İçgörüler
           </p>
           <Link
             href="/insights"
             className="inline-flex font-body text-xs uppercase tracking-[0.14em] text-white/34 transition-colors hover:text-white/70"
           >
-            Continue reading →
+            Okumaya Devam Et →
           </Link>
         </div>
       </section>
 
       {/* Closing */}
-      <section
-        className="border-t border-white/10 bg-black"
-        aria-label="Philosophy contact call to action"
-      >
+      <section className="border-t border-white/10 bg-black" aria-label="Yaklaşım iletişim çağrısı">
         <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-12 sm:px-10 sm:py-14 lg:flex-row lg:items-center lg:justify-between lg:px-16 lg:py-16">
           <h2
             className="font-display font-light leading-tight text-white"
             style={{ fontSize: 'clamp(1.45rem, 2.2vw, 2rem)' }}
           >
-            If this resonates,
+            Bu yaklaşım size
             <br />
-            we should talk.
+            yakındıysa, konuşalım.
           </h2>
           <Link
             href="/contact"
             className="inline-flex min-h-11 items-center justify-center self-start border border-white/16 px-7 py-3 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/32 hover:text-white"
           >
-            Begin a Conversation →
+            Bir Görüşme Başlatın →
           </Link>
         </div>
       </section>

@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {
     if (err instanceof SyntaxError) {
-      return NextResponse.json({ success: false, error: 'Invalid request.' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Geçersiz istek.' }, { status: 400 });
     }
 
     const error = err as Error;
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Contact form is temporarily unavailable. Please try again later.',
+          error: 'İletişim formu geçici olarak kullanılamıyor. Lütfen daha sonra tekrar deneyin.',
         },
         { status: 503 }
       );
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: false, error: 'An error occurred. Please try again.' },
+      { success: false, error: 'Bir hata oluştu. Lütfen tekrar deneyin.' },
       { status: 500 }
     );
   }

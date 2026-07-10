@@ -15,6 +15,7 @@ import {
   buildWebSiteSchema,
 } from '@/lib/schema-builder';
 import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT } from '@/lib/seo';
+import { PUBLIC_SITE_LANG } from '@/lib/public-content';
 
 const isMaintenanceMode = process.env.NEXT_PUBLIC_SITE_MODE === 'maintenance';
 
@@ -28,12 +29,12 @@ export const metadata: Metadata = {
   title: {
     default: isMaintenanceMode
       ? 'CREARE — Under Construction'
-      : 'Creare — Experiences Composed as Art',
+      : 'Creare — Kültürel Karşılaşmalar Bir Sanat Eseri Gibi Tasarlanır',
     template: '%s — Creare',
   },
   description: isMaintenanceMode
     ? 'CREARE is finalizing a private portfolio of experiences designed for a limited circle of clients.'
-    : 'Creare curates private cultural encounters across Turkey and beyond — monastery access, atelier visits, and extraordinary moments for discerning clients.',
+    : 'Creare, Türkiye ve ötesinde özel kültürel karşılaşmaları erişim, anlatı ve kürasyon aracılığıyla tasarlar.',
   robots: {
     index: !isMaintenanceMode,
     follow: !isMaintenanceMode,
@@ -51,10 +52,10 @@ export const metadata: Metadata = {
     siteName: 'Creare',
     title: isMaintenanceMode
       ? 'CREARE — Under Construction'
-      : 'Creare — Experiences Composed as Art',
+      : 'Creare — Kültürel Karşılaşmalar Bir Sanat Eseri Gibi Tasarlanır',
     description: isMaintenanceMode
       ? 'CREARE is finalizing a private portfolio of experiences designed for a limited circle of clients.'
-      : 'Private cultural access. Thoughtfully designed encounters.',
+      : 'Özel kültürel erişim. Dikkatle tasarlanmış karşılaşmalar.',
     url: 'https://crearetravel.com',
     images: [
       {
@@ -69,10 +70,10 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: isMaintenanceMode
       ? 'CREARE — Under Construction'
-      : 'Creare — Experiences Composed as Art',
+      : 'Creare — Kültürel Karşılaşmalar Bir Sanat Eseri Gibi Tasarlanır',
     description: isMaintenanceMode
       ? 'CREARE is finalizing a private portfolio of experiences designed for a limited circle of clients.'
-      : 'Private cultural access. Thoughtfully designed encounters.',
+      : 'Özel kültürel erişim. Dikkatle tasarlanmış karşılaşmalar.',
     images: [DEFAULT_OG_IMAGE],
   },
 };
@@ -81,7 +82,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   const globalSchemaGraph = [buildOrganizationSchema(), buildBrandSchema(), buildWebSiteSchema()];
 
   return (
-    <html lang="en">
+    <html lang={PUBLIC_SITE_LANG}>
       <head />
       <body className="bg-black text-white antialiased">
         {isGtmEnabled() ? (

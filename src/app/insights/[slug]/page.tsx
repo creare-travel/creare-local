@@ -12,10 +12,11 @@ import {
   DEFAULT_OG_IMAGE_ALT,
 } from '@/lib/seo';
 import { buildCanonicalUrl, buildInsightDetailGraph } from '@/lib/schema-builder';
-import { fetchStrapi, mediaUrl } from '@/lib/strapi';
+import { fetchPublicStrapi, mediaUrl } from '@/lib/strapi';
 import { filterPublicExperiences, isPublicInsightRecord } from '@/lib/canonical-gates';
 import { getInsightBySlug, isCanonicalCulturalWorldSlug, type Insight } from '@/data/insights';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
+import { logPublicContentIssue, shouldUsePublicStaticEnglishFallbacks } from '@/lib/public-content';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -152,7 +153,7 @@ async function fetchInsight(slug: string): Promise<StrapiInsight | null> {
   const path = `/api/insights?${params.toString()}`;
 
   try {
-    const json = await fetchStrapi(path);
+    const json = await fetchPublicStrapi(path);
     const items = json?.data;
     if (!items || items.length === 0) return null;
     const raw = items[0];
@@ -178,7 +179,7 @@ async function fetchInsight(slug: string): Promise<StrapiInsight | null> {
       ),
     };
   } catch (error) {
-    console.error('Failed to fetch insight detail from Strapi.', {
+    logPublicContentIssue('Insight detail unavailable in public locale.', {
       route: `/insights/${slug}`,
       strapiPath: path,
       error,
@@ -207,7 +208,7 @@ async function fetchExperiencesBySlugs(slugs: string[]): Promise<StrapiExperienc
   params.set('pagination[pageSize]', String(uniqueSlugs.length));
 
   try {
-    const json = await fetchStrapi(`/api/experiences?${params.toString()}`);
+    const json = await fetchPublicStrapi(`/api/experiences?${params.toString()}`);
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
     const entries: [string, StrapiExperience][] = filterPublicExperiences(
       items.map((item) => flattenItem<StrapiExperience>(item))
@@ -234,7 +235,7 @@ async function fetchExperiencesBySlugs(slugs: string[]): Promise<StrapiExperienc
       .map((slug) => bySlug.get(slug))
       .filter((experience): experience is StrapiExperience => Boolean(experience));
   } catch (error) {
-    console.error('Failed to fetch fallback related experiences from Strapi.', {
+    logPublicContentIssue('Fallback related experiences unavailable for insight.', {
       route: '/insights/[slug]',
       slugs: uniqueSlugs,
       error,
@@ -272,7 +273,7 @@ function buildStaticInsight(slug: string): ResolvedInsight | null {
 
 async function resolveInsight(slug: string): Promise<ResolvedInsight | null> {
   const strapiInsight = await fetchInsight(slug);
-  const staticInsight = buildStaticInsight(slug);
+  const staticInsight = shouldUsePublicStaticEnglishFallbacks() ? buildStaticInsight(slug) : null;
 
   const normalizedStrapiDestination =
     strapiInsight?.destination?.slug && isCanonicalCulturalWorldSlug(strapiInsight.destination.slug)
@@ -307,9 +308,9 @@ async function resolveInsight(slug: string): Promise<ResolvedInsight | null> {
   }
 
   if (staticInsight) {
-    const staticExperiences = await fetchExperiencesBySlugs(
-      getInsightBySlug(slug)?.relatedExperiences ?? []
-    );
+    const staticExperiences = shouldUsePublicStaticEnglishFallbacks()
+      ? await fetchExperiencesBySlugs(getInsightBySlug(slug)?.relatedExperiences ?? [])
+      : [];
 
     return {
       ...staticInsight,
@@ -359,11 +360,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const insight = await resolveInsight(canonicalSlug);
 
   if (!insight) {
-    return { title: 'Not Found' };
+    return { title: 'Bulunamadı' };
   }
 
   // SEO fallbacks: seo_title || title, seo_description || excerpt
-  const title = stripBrandSuffix(insight.seo_title || insight.title) || 'Not Found';
+  const title = stripBrandSuffix(insight.seo_title || insight.title) || 'Bulunamadı';
   const description = insight.seo_description || insight.excerpt || '';
 
   return {
@@ -547,7 +548,7 @@ function RelatedExperienceCard({
       )}
 
       <span className="motion-copy-fade font-body text-[0.6rem] tracking-[0.2em] text-white/52 uppercase">
-        EXPLORE →
+        KEŞFET →
       </span>
     </>
   );
@@ -567,10 +568,10 @@ function RelatedEssayList({ essays }: { essays: RelatedEssayReference[] }) {
   if (!essays.length) return null;
 
   return (
-    <section className="max-w-3xl mx-auto px-6 sm:px-10 mt-20" aria-label="Related essays">
+    <section className="max-w-3xl mx-auto px-6 sm:px-10 mt-20" aria-label="İlgili yazılar">
       <div className="border-t border-white/6 pt-12">
         <p className="font-body text-xs tracking-[0.16em] uppercase text-white/24 mb-8">
-          Related Essays
+          İlgili Yazılar
         </p>
         <div className="space-y-6">
           {essays.map((essay) => (
@@ -578,7 +579,7 @@ function RelatedEssayList({ essays }: { essays: RelatedEssayReference[] }) {
               key={essay.slug}
               href={`/insights/${essay.slug}`}
               className="group block border-b border-white/6 pb-6 last:border-b-0 last:pb-0"
-              aria-label={`Read related essay: ${essay.title}`}
+              aria-label={`İlgili yazıyı aç: ${essay.title}`}
             >
               <p className="font-body text-[0.58rem] tracking-[0.18em] text-white/24 uppercase mb-2">
                 {essay.location.charAt(0).toUpperCase() + essay.location.slice(1)}
@@ -590,7 +591,7 @@ function RelatedEssayList({ essays }: { essays: RelatedEssayReference[] }) {
                 {essay.excerpt}
               </p>
               <span className="motion-link font-body text-[0.68rem] tracking-[0.14em] uppercase text-white/28 group-hover:text-white/58 transition-colors duration-300">
-                Read →
+                Oku →
               </span>
             </Link>
           ))}
@@ -620,7 +621,7 @@ export default async function InsightArticlePage({ params }: Props) {
 
   // Image: fallback to owned placeholder if cover_image is missing
   const coverImageUrl = resolveImageUrl(insight.cover_image?.url);
-  const coverImageAlt = insight.cover_image?.alternativeText || insight.title || 'Insight cover';
+  const coverImageAlt = insight.cover_image?.alternativeText || insight.title || 'İçgörü kapağı';
   const coverBlurDataUrl = buildCinematicBlurDataUrl(coverImageUrl, {
     atmosphere: 'dark',
     profile: 'hero',
@@ -644,8 +645,8 @@ export default async function InsightArticlePage({ params }: Props) {
     breadcrumbId: `${canonicalUrl(`/insights/${insight.slug}`)}#breadcrumbs`,
     path: canonicalUrl(`/insights/${insight.slug}`),
     breadcrumbs: [
-      { name: 'Home', url: buildCanonicalUrl('/') },
-      { name: 'Insights', url: buildCanonicalUrl('/insights') },
+      { name: 'Ana Sayfa', url: buildCanonicalUrl('/') },
+      { name: 'İçgörüler', url: buildCanonicalUrl('/insights') },
       {
         name: insight.title,
         url: canonicalUrl(`/insights/${insight.slug}`),
@@ -700,7 +701,7 @@ export default async function InsightArticlePage({ params }: Props) {
             href="/insights"
             className="font-body text-xs tracking-[0.14em] uppercase text-white/28 hover:text-white/60 transition-colors duration-300"
           >
-            ← Insights
+            ← İçgörüler
           </Link>
         </nav>
 
@@ -752,7 +753,7 @@ export default async function InsightArticlePage({ params }: Props) {
         <section className="max-w-5xl mx-auto px-6 sm:px-10 mt-24">
           <div className="border-t border-white/6 pt-18">
             <p className="font-body text-xs tracking-[0.16em] uppercase text-white/24 mb-10">
-              Related Experiences
+              İlgili Deneyimler
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
               {relatedExperiences.map((exp, index) => (
@@ -767,14 +768,14 @@ export default async function InsightArticlePage({ params }: Props) {
       <div className="max-w-2xl mx-auto px-6 sm:px-10 mt-20">
         <div className="border-t border-white/6 pt-10">
           <p className="font-body text-xs text-white/30 leading-relaxed mb-4">
-            Access is not listed. It is composed.
+            Erişim listelenmez. Kurgulanır.
           </p>
           <Link
             href="/contact"
             className="font-body text-xs tracking-[0.14em] uppercase text-white/52 hover:text-white transition-colors duration-300"
-            aria-label="Inquire privately about a CREARE experience"
+            aria-label="Bir CREARE deneyimi hakkında özel olarak iletişime geç"
           >
-            Inquire Privately →
+            Özel Olarak İletişime Geç →
           </Link>
         </div>
       </div>

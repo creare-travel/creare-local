@@ -8,19 +8,19 @@ import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { buildExperienceInquiryHref } from '@/lib/inquiry';
 import { buildMetadataAlternates } from '@/lib/seo';
-import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
+import { fetchPublicStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'LAB™ — Experimental Experiences',
+  title: 'LAB™ — Tasarlanmış Komisyonlar',
   description:
-    'Co-created, dynamic and exploratory. CREARE LAB™ is where cultural experiences begin in conversation — open-ended, experimental, and shaped around your inquiry.',
+    'Birlikte şekillenen, dinamik ve keşif odaklı. CREARE LAB™ kültürel deneyimlerin sohbetle başladığı yerdir.',
   alternates: buildMetadataAlternates('/experiences/lab'),
   robots: { index: true, follow: true },
   openGraph: {
-    title: 'CREARE LAB™ — Experimental Experiences',
-    description: 'Co-created, dynamic and exploratory. Shaped around your inquiry.',
+    title: 'CREARE LAB™ — Tasarlanmış Komisyonlar',
+    description: 'Birlikte şekillenen, dinamik ve keşif odaklı. Talebiniz etrafında biçimlenir.',
     url: 'https://crearetravel.com/experiences/lab',
   },
 };
@@ -75,12 +75,12 @@ function formatIntensity(value?: string | null) {
   if (!normalized) return '';
 
   const intensityMap: Record<string, string> = {
-    low: 'Low Intensity',
-    medium: 'Medium Intensity',
-    high: 'High Intensity',
+    low: 'Düşük Yoğunluk',
+    medium: 'Orta Yoğunluk',
+    high: 'Yüksek Yoğunluk',
   };
 
-  return intensityMap[normalized] ?? `${toTitleCase(value)} Intensity`;
+  return intensityMap[normalized] ?? `${toTitleCase(value)} Yoğunluk`;
 }
 
 function getGeoMetadataLine(exp: StrapiExperience) {
@@ -95,7 +95,7 @@ function getGeoMetadataLine(exp: StrapiExperience) {
 
 async function fetchLabExperiences(): Promise<StrapiExperience[]> {
   try {
-    const json = await fetchStrapi('/api/experiences?filters[category][$eqi]=lab&populate=*');
+    const json = await fetchPublicStrapi('/api/experiences?filters[category][$eqi]=lab&populate=*');
     const items: StrapiExperience[] = Array.isArray(json?.data) ? json.data : [];
     return filterPublicExperiences(items);
   } catch (error) {
@@ -112,13 +112,13 @@ export default async function LabPage() {
     itemListId: ids.itemList,
     breadcrumbId: ids.breadcrumbs,
     path: ids.canonical,
-    title: 'LAB Experiences',
+    title: 'LAB Deneyimleri',
     description:
-      'Co-created, dynamic and exploratory. CREARE LAB is where cultural experiences are designed from scratch around a brief.',
+      'Birlikte şekillenen, dinamik ve keşif odaklı. CREARE LAB, kültürel deneyimlerin niyet etrafında sıfırdan tasarlandığı alandır.',
     breadcrumbs: [
-      { name: 'Home', url: buildCanonicalUrl('/') },
-      { name: 'Experiences', url: buildCanonicalUrl('/experiences') },
-      { name: 'LAB Experiences', url: ids.canonical },
+      { name: 'Ana Sayfa', url: buildCanonicalUrl('/') },
+      { name: 'Deneyimler', url: buildCanonicalUrl('/experiences') },
+      { name: 'LAB Deneyimleri', url: ids.canonical },
     ],
     items: labExperiences.map((exp) => ({
       title: exp.title,
@@ -149,20 +149,21 @@ export default async function LabPage() {
               className="font-display font-light text-neutral-900 leading-tight mb-10"
               style={{ fontSize: 'clamp(2.2rem, 4vw, 3.8rem)' }}
             >
-              Every experience
+              Her deneyim
               <br />
-              begins with
-              <br />a question.
+              bir soruyla
+              <br />
+              başlar.
             </h1>
             <div className="flex flex-col gap-0 mb-12 max-w-sm">
               <p className="font-body font-light text-neutral-700 text-sm leading-loose">
-                LAB™ is not a catalogue. It is a commission.
+                LAB™ bir katalog değildir. Bir komisyondur.
               </p>
               <p className="font-body font-light text-neutral-600 text-sm leading-loose">
-                Built around your intentions. Shaped in conversation.
+                Niyetiniz etrafında kurulur. Sohbet içinde şekillenir.
               </p>
               <p className="font-body font-light text-neutral-500 text-sm leading-loose">
-                No predefined paths. Only what needs to exist.
+                Hazır rotalar yoktur. Yalnızca var olması gereken şey.
               </p>
             </div>
             <div className="flex flex-col items-start gap-6">
@@ -170,11 +171,11 @@ export default async function LabPage() {
                 href={buildExperienceInquiryHref('lab')}
                 className="font-body text-[0.65rem] tracking-[0.3em] text-neutral-900 uppercase border border-neutral-900 px-8 py-4 hover:bg-neutral-900 hover:text-white transition-all duration-300"
               >
-                BEGIN A CONVERSATION
+                BİR GÖRÜŞME BAŞLATIN
               </Link>
               <div className="flex flex-col items-center gap-2 mt-4">
                 <span className="font-body text-[0.55rem] tracking-[0.3em] text-neutral-400 uppercase">
-                  DISCOVER ↓
+                  KEŞFET ↓
                 </span>
               </div>
             </div>
@@ -203,7 +204,7 @@ export default async function LabPage() {
                     href="/"
                     className="font-body text-[0.6rem] tracking-[0.22em] text-neutral-500 uppercase hover:text-neutral-800 transition-colors"
                   >
-                    ← HOME
+                    ← ANA SAYFA
                   </Link>
                 </li>
                 <li aria-hidden="true">
@@ -222,17 +223,17 @@ export default async function LabPage() {
                 className="font-display font-light text-neutral-800 leading-relaxed"
                 style={{ fontSize: 'clamp(1.15rem, 2.2vw, 1.5rem)' }}
               >
-                LAB™ is not a catalogue. It begins with intent, then gathers form through place,
-                access, and cultural attention. We compose from the ground up to create encounters
-                that do not exist until they are made for the right guest.
+                LAB™ bir katalog değildir. Niyetle başlar; sonra yer, erişim ve kültürel dikkat
+                aracılığıyla biçim kazanır. Doğru misafir için kurulana kadar var olmayan
+                karşılaşmaları sıfırdan kurgularız.
               </p>
               <p className="font-body font-light text-neutral-500 text-sm leading-relaxed mt-6">
-                This way of working moves across the cultural worlds of{' '}
+                Bu çalışma biçimi{' '}
                 <Link
                   href="/cultural-worlds/istanbul"
                   className="underline underline-offset-2 hover:text-neutral-700 transition-colors"
                 >
-                  Istanbul
+                  İstanbul
                 </Link>
                 ,{' '}
                 <Link
@@ -246,42 +247,43 @@ export default async function LabPage() {
                   href="/cultural-worlds/cappadocia"
                   className="underline underline-offset-2 hover:text-neutral-700 transition-colors"
                 >
-                  Cappadocia
+                  Kapadokya
                 </Link>{' '}
-                — each composition shaped by the character of its place.
+                kültürel dünyaları arasında ilerler; her kompozisyon kendi yerinin karakteriyle
+                şekillenir.
               </p>
             </div>
           </div>
         </section>
 
         {/* ── OUR APPROACH — 3 Columns ── */}
-        <section className="bg-white py-24 md:py-36" aria-label="Our Approach">
+        <section className="bg-white py-24 md:py-36" aria-label="Yaklaşımımız">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="text-center mb-20">
               <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-4">
-                PHILOSOPHY
+                YAKLAŞIM
               </p>
               <h2
                 className="font-display font-light text-neutral-900"
                 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}
               >
-                Our Approach
+                Çalışma Biçimimiz
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-24">
               {[
                 {
-                  label: 'Clarity',
-                  body: 'Understanding before shaping.',
+                  label: 'Açıklık',
+                  body: 'Biçim vermeden önce anlamak.',
                 },
                 {
-                  label: 'Structure',
-                  body: 'Giving form to the intangible.',
+                  label: 'Yapı',
+                  body: 'Soyut olana biçim kazandırmak.',
                 },
                 {
-                  label: 'Control',
-                  body: 'Precision without rigidity.',
+                  label: 'Kontrol',
+                  body: 'Katılığa düşmeden hassasiyet.',
                 },
               ].map((item) => (
                 <div key={item.label} className="flex flex-col">
@@ -307,29 +309,28 @@ export default async function LabPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
               <div>
                 <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-6">
-                  CREARE LAB™ FOR BRANDS
+                  MARKALAR İÇİN CREARE LAB™
                 </p>
                 <h2
                   className="font-display font-light text-neutral-900 leading-tight mb-10"
                   style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}
                 >
-                  For brands
+                  Markalar için
                 </h2>
                 <p className="font-body text-sm text-neutral-600 leading-relaxed mb-6">
-                  LAB™ works with brands to compose cultural experiences built around a shared
-                  intention — from leadership retreats to product launches, from team immersions to
-                  client encounters.
+                  LAB™ markalarla, ortak bir niyet etrafında kurulan kültürel deneyimler tasarlamak
+                  için çalışır; liderlik buluşmalarından ürün lansmanlarına, ekip immersiyonlarından
+                  misafir karşılaşmalarına kadar.
                 </p>
                 <p className="font-body text-sm text-neutral-500 leading-relaxed mb-12">
-                  Each commission is shaped in step with your team. CREARE brings the cultural
-                  context, creative direction, and compositional intelligence. You bring the
-                  narrative.
+                  Her komisyon ekibinizle birlikte şekillenir. CREARE kültürel bağlamı, yaratıcı
+                  yönü ve kompozisyon zekâsını getirir. Siz anlatıyı getirirsiniz.
                 </p>
                 <Link
                   href={buildExperienceInquiryHref('lab')}
                   className="font-body text-[0.65rem] tracking-[0.3em] text-neutral-900 uppercase border-b border-neutral-400 pb-1 hover:border-neutral-900 transition-colors duration-300"
                 >
-                  START A CONVERSATION →
+                  BİR GÖRÜŞME BAŞLATIN →
                 </Link>
               </div>
 
@@ -353,7 +354,7 @@ export default async function LabPage() {
               className="font-display font-light text-neutral-500 tracking-widest"
               style={{ fontSize: 'clamp(0.9rem, 1.5vw, 1.1rem)', letterSpacing: '0.18em' }}
             >
-              Nothing is selected. Everything is composed.
+              Hiçbir şey hazır seçilmez. Her şey özenle kurgulanır.
             </p>
           </div>
         </section>
@@ -366,13 +367,13 @@ export default async function LabPage() {
             <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
               <div className="text-center mb-20">
                 <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-4">
-                  FROM THE COLLECTION
+                  KOLEKSİYONDAN
                 </p>
                 <h2
                   className="font-display font-light text-neutral-900"
                   style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}
                 >
-                  LAB Experiences
+                  LAB Deneyimleri
                 </h2>
               </div>
 
@@ -446,7 +447,7 @@ export default async function LabPage() {
                       key={exp.id}
                       href={href}
                       className="group block"
-                      aria-label={`View ${exp.title}`}
+                      aria-label={`${exp.title} deneyimini görüntüle`}
                     >
                       {card}
                     </Link>
@@ -462,17 +463,17 @@ export default async function LabPage() {
         )}
 
         {/* ── PROCESS — 4 Steps ── */}
-        <section className="bg-[#EDEAE4] py-28 md:py-44" aria-label="How LAB Unfolds">
+        <section className="bg-[#EDEAE4] py-28 md:py-44" aria-label="LAB nasıl ilerler">
           <div className="max-w-5xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="text-center mb-24">
               <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-4">
-                THE JOURNEY
+                AKIŞ
               </p>
               <h2
                 className="font-display font-light text-neutral-900"
                 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}
               >
-                How LAB Unfolds
+                LAB Nasıl İlerler
               </h2>
             </div>
 
@@ -481,23 +482,23 @@ export default async function LabPage() {
               {[
                 {
                   step: '01',
-                  label: 'INTENT',
-                  body: 'We begin with intention. Context and desire are understood before any composition begins.',
+                  label: 'NİYET',
+                  body: 'Niyetle başlarız. Herhangi bir kompozisyon başlamadan önce bağlam ve arzu anlaşılır.',
                 },
                 {
                   step: '02',
-                  label: 'DESIGN',
-                  body: 'Ideas emerge through conversation — narrative, spatial, and experiential dimensions taking form with clarity.',
+                  label: 'TASARIM',
+                  body: 'Fikirler sohbet içinde belirir; anlatı, mekân ve deneyim katmanları açıklıkla biçim kazanır.',
                 },
                 {
                   step: '03',
-                  label: 'COMPOSITION',
-                  body: 'Every material element is assembled with precision — partners, environments, sequences and sensory detail.',
+                  label: 'KOMPOZİSYON',
+                  body: 'Her maddi unsur hassasiyetle bir araya getirilir; ortaklar, ortamlar, akışlar ve duyusal ayrıntılar.',
                 },
                 {
                   step: '04',
-                  label: 'EXECUTION',
-                  body: 'Every detail is carried through with care. Full attention at every stage. Nothing left to chance.',
+                  label: 'UYGULAMA',
+                  body: 'Her ayrıntı özenle hayata geçirilir. Her aşamada tam dikkat vardır. Hiçbir şey şansa bırakılmaz.',
                 },
               ].map((item, index, arr) => (
                 <div key={item.label} className="relative flex flex-col md:flex-row">
@@ -529,30 +530,30 @@ export default async function LabPage() {
         </section>
 
         {/* ── CLOSING CTA ── */}
-        <section className="bg-[#EDEAE4] py-28 md:py-40" aria-label="Start a conversation">
+        <section className="bg-[#EDEAE4] py-28 md:py-40" aria-label="Bir görüşme başlat">
           <div className="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
             <p
               className="font-display font-light text-neutral-900 leading-snug mb-6"
               style={{ fontSize: 'clamp(1.3rem, 2.5vw, 1.9rem)' }}
             >
-              Behind every seamless experience is careful attention.
+              Kusursuz görünen her deneyimin ardında dikkatli bir emek vardır.
             </p>
             <p
               className="font-display font-light text-neutral-600 leading-snug mb-16"
               style={{ fontSize: 'clamp(1rem, 2vw, 1.4rem)' }}
             >
-              And behind that attention — a composition shaped around you.
+              Ve o emeğin ardında, sizin etrafınızda şekillenen bir kompozisyon bulunur.
             </p>
 
             <Link
               href={buildExperienceInquiryHref('lab')}
               className="inline-block font-body text-[0.65rem] tracking-[0.3em] text-white uppercase bg-neutral-900 px-10 py-5 hover:bg-neutral-700 transition-colors duration-300 mb-10"
             >
-              START A CONVERSATION
+              BİR GÖRÜŞME BAŞLATIN
             </Link>
 
             <p className="font-body text-[0.55rem] tracking-[0.3em] text-neutral-400 uppercase">
-              QUIET PRECISION. QUIETLY ARRANGED.
+              SESSİZ HASSASİYET. SESSİZCE KURGULANIR.
             </p>
           </div>
         </section>

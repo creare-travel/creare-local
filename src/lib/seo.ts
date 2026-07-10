@@ -11,7 +11,7 @@ export const SITE_NAME = 'Creare';
  * Place a real 1200×630 JPG at /public/og/default.jpg for production.
  */
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og/default.jpg`;
-export const DEFAULT_OG_IMAGE_ALT = 'Creare — Private Cultural Experiences Composed as Art';
+export const DEFAULT_OG_IMAGE_ALT = 'Creare — Sanat gibi tasarlanmış özel kültürel deneyimler';
 
 // Active hreflang foundation for current production. Future locales can be
 // added here once locale-specific routes are actually live.
@@ -20,10 +20,10 @@ export const ACTIVE_HREFLANGS = ['en'] as const;
 export const DEFAULT_METADATA = {
   metadataBase: new URL(SITE_URL),
   siteName: SITE_NAME,
-  defaultTitle: 'Creare — Experiences Composed as Art',
+  defaultTitle: 'Creare — Deneyimler Bir Sanat Eseri Gibi Tasarlanır',
   titleTemplate: '%s — Creare',
   defaultDescription:
-    'Creare curates private cultural encounters across Turkey and beyond — monastery access, atelier visits, and extraordinary moments for discerning clients.',
+    'Creare, Türkiye ve ötesinde özel kültürel karşılaşmaları erişim, anlatı ve dikkatli kompozisyon üzerinden kurgular.',
 };
 
 /**

@@ -4,9 +4,9 @@ import type { Metadata } from 'next';
 import { buildMetadataAlternates } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy',
+  title: 'Gizlilik Politikası',
   description:
-    'CREARE privacy policy — how we collect, use, and protect your personal information.',
+    'CREARE gizlilik politikası — kişisel bilgilerinizi nasıl topladığımızı, kullandığımızı ve koruduğumuzu açıklar.',
   alternates: buildMetadataAlternates('/privacy'),
 };
 
@@ -19,33 +19,33 @@ interface PolicySection {
 const policySections: PolicySection[] = [
   {
     number: 1,
-    heading: 'Information We Collect',
-    body: 'CREARE collects information that you provide directly to us when you inquire about our services, register for events, or communicate with our team. This may include your name, email address, phone number, company name, and any other information you choose to provide.',
+    heading: 'Topladığımız Bilgiler',
+    body: 'CREARE, hizmetlerimiz hakkında bilgi talep ettiğinizde, etkinliklere kayıt olduğunuzda veya ekibimizle iletişime geçtiğinizde bize doğrudan sunduğunuz bilgileri toplar. Buna adınız, e-posta adresiniz, telefon numaranız, şirket adınız ve paylaşmayı tercih ettiğiniz diğer bilgiler dahil olabilir.',
   },
   {
     number: 2,
-    heading: 'How We Use Your Information',
-    body: 'We use the information we collect to provide, maintain, and improve our services, to communicate with you about your inquiries and our offerings, and to understand how our services are used. We do not sell or share your personal information with third parties for their marketing purposes.',
+    heading: 'Bilgilerinizi Nasıl Kullanırız',
+    body: 'Topladığımız bilgileri hizmetlerimizi sunmak, sürdürmek ve geliştirmek; talepleriniz ve sunduklarımız hakkında sizinle iletişim kurmak; ayrıca hizmetlerimizin nasıl kullanıldığını anlamak için kullanırız. Kişisel bilgilerinizi pazarlama amaçlarıyla üçüncü taraflara satmayız veya paylaşmayız.',
   },
   {
     number: 3,
-    heading: 'Data Security',
-    body: 'We implement appropriate technical and organizational measures to protect the security of your personal information. However, please note that no method of transmission over the internet or method of electronic storage is completely secure.',
+    heading: 'Veri Güvenliği',
+    body: 'Kişisel bilgilerinizin güvenliğini korumak için uygun teknik ve organizasyonel önlemler uygularız. Bununla birlikte, internet üzerinden hiçbir aktarım yöntemi veya elektronik saklama yöntemi tamamen güvenli değildir.',
   },
   {
     number: 4,
-    heading: 'Your Rights',
-    body: 'You have the right to access, update, or delete your personal information at any time. If you wish to exercise these rights, please contact us directly. We will respond to your request within a reasonable timeframe.',
+    heading: 'Haklarınız',
+    body: 'Kişisel bilgilerinize erişme, bunları güncelleme veya silme hakkına her zaman sahipsiniz. Bu hakları kullanmak isterseniz lütfen doğrudan bizimle iletişime geçin. Talebinize makul bir süre içinde yanıt veririz.',
   },
   {
     number: 5,
-    heading: 'Changes to This Policy',
-    body: 'We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date.',
+    heading: 'Bu Politikadaki Değişiklikler',
+    body: 'Bu Gizlilik Politikası\'nı zaman zaman güncelleyebiliriz. Herhangi bir değişikliği, yeni politikayı bu sayfada yayımlayarak ve "Son Güncelleme" tarihini yenileyerek bildiririz.',
   },
   {
     number: 6,
-    heading: 'Contact',
-    body: 'If you have any questions about this Privacy Policy, please contact CREARE through our contact page or by email. We are committed to resolving any concerns you may have about your privacy.',
+    heading: 'İletişim',
+    body: 'Bu Gizlilik Politikası hakkında sorularınız varsa lütfen CREARE ile iletişim sayfamız veya e-posta yoluyla bağlantı kurun. Gizliliğinizle ilgili tüm endişeleri dikkatle ele almaya kararlıyız.',
   },
 ];
 
@@ -54,19 +54,19 @@ export default function PrivacyPage() {
     <main className="min-h-screen bg-white">
       <div className="px-6 sm:px-10 lg:px-16 pt-28 pb-24 max-w-4xl mx-auto">
         {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 mb-12">
+        <nav aria-label="İçerik yolu" className="flex items-center gap-2 mb-12">
           <Link
             href="/"
             className="flex items-center gap-1 text-xs tracking-widest text-gray-500 hover:text-black transition-colors uppercase"
           >
             <span aria-hidden="true">←</span>
-            <span>HOME</span>
+            <span>ANA SAYFA</span>
           </Link>
           <span className="text-xs text-gray-400" aria-hidden="true">
             /
           </span>
           <h1 className="text-xs tracking-widest text-black uppercase" aria-current="page">
-            PRIVACY
+            GİZLİLİK
           </h1>
         </nav>
 
@@ -83,7 +83,7 @@ export default function PrivacyPage() {
         </div>
 
         {/* Last Updated */}
-        <p className="mt-16 text-xs text-gray-500 tracking-wide">Last Updated: March 4, 2026</p>
+        <p className="mt-16 text-xs text-gray-500 tracking-wide">Son Güncelleme: 4 Mart 2026</p>
       </div>
     </main>
   );

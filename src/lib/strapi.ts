@@ -1,3 +1,5 @@
+import { PUBLIC_CONTENT_LOCALE } from './public-content';
+
 const DEFAULT_DEV_STRAPI_BASE = 'http://localhost:1337';
 const IS_DEVELOPMENT = process.env.NODE_ENV !== 'production';
 
@@ -22,6 +24,23 @@ export function strapiUrl(path: string) {
 export function mediaUrl(url?: string) {
   if (!url) return '';
   return strapiUrl(url);
+}
+
+export function withStrapiLocale(path: string, locale = PUBLIC_CONTENT_LOCALE) {
+  if (/^https?:\/\//.test(path) || !locale) return path;
+
+  const [pathname, hash = ''] = path.split('#');
+  const [basePath, queryString = ''] = pathname.split('?');
+  const params = new URLSearchParams(queryString);
+
+  if (!params.has('locale')) {
+    params.set('locale', locale);
+  }
+
+  const serialized = params.toString();
+  const hashSuffix = hash ? `#${hash}` : '';
+
+  return serialized ? `${basePath}?${serialized}${hashSuffix}` : `${basePath}${hashSuffix}`;
 }
 
 export function isLocalAssetUrl(url?: string) {
@@ -56,4 +75,8 @@ export async function fetchStrapi(path: string) {
     console.error('STRAPI FETCH FAILED:', { path, url, error });
     throw error;
   }
+}
+
+export async function fetchPublicStrapi(path: string) {
+  return fetchStrapi(withStrapiLocale(path));
 }

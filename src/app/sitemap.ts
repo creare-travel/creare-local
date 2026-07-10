@@ -7,7 +7,7 @@ import {
 } from '@/lib/canonical-gates';
 import { insights as localInsights } from '@/data/insights';
 import { getPublicLocalExperienceFallbacks } from '@/lib/experiences';
-import { fetchStrapi } from '@/lib/strapi';
+import { fetchPublicStrapi } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
 
@@ -89,7 +89,7 @@ async function fetchActiveCulturalWorldUrls() {
     '/api/destinations?fields[0]=slug&fields[1]=name&fields[2]=visibility_status&fields[3]=publishedAt&fields[4]=updatedAt&pagination[pageSize]=100';
 
   try {
-    const json = await fetchStrapi(path);
+    const json = await fetchPublicStrapi(path);
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
 
     return filterCanonicalCulturalWorlds(
@@ -132,7 +132,7 @@ async function fetchCanonicalExperienceUrls() {
     '/api/experiences?fields[0]=slug&fields[1]=category&fields[2]=title&fields[3]=visibility_status&fields[4]=publishedAt&fields[5]=updatedAt&pagination[pageSize]=100';
 
   try {
-    const json = await fetchStrapi(path);
+    const json = await fetchPublicStrapi(path);
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
 
     const strapiEntries = filterPublicExperiences(
@@ -202,7 +202,7 @@ async function fetchCanonicalInsightUrls() {
   let strapiInsights: SitemapInsight[] = [];
 
   try {
-    const json = await fetchStrapi(path);
+    const json = await fetchPublicStrapi(path);
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
     strapiInsights = filterPublicInsights(items.map((item) => flattenRecord<SitemapInsight>(item)));
   } catch (error) {

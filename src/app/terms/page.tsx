@@ -4,9 +4,9 @@ import type { Metadata } from 'next';
 import { buildMetadataAlternates } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'Terms of Use',
+  title: 'Kullanım Koşulları',
   description:
-    'CREARE terms of use — the terms and conditions governing use of our website and private engagements.',
+    'CREARE kullanım koşulları — web sitemizin ve özel çalışmalarımızın kullanımını düzenleyen şartları açıklar.',
   alternates: buildMetadataAlternates('/terms'),
 };
 
@@ -19,43 +19,43 @@ interface PolicySection {
 const termsSections: PolicySection[] = [
   {
     number: 1,
-    heading: 'Acceptance of Terms',
-    body: 'By accessing and using the CREARE website and engagement channels, you accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to these terms, please do not use the website or proceed with an engagement request.',
+    heading: 'Koşulların Kabulü',
+    body: 'CREARE web sitesine ve iletişim kanallarına erişerek bu sözleşmenin şartlarını kabul etmiş olursunuz. Bu koşulları kabul etmiyorsanız lütfen web sitesini kullanmayın ve herhangi bir çalışma talebiyle ilerlemeyin.',
   },
   {
     number: 2,
-    heading: 'Use of Engagements',
-    body: 'CREARE provides private cultural experiences, access planning, and related services to select clients. Engagements are considered on an invitation or inquiry basis. We reserve the right to decline or discontinue any engagement request or service relationship at any time.',
+    heading: 'Çalışmaların Kullanımı',
+    body: 'CREARE seçili misafirlere özel kültürel deneyimler, erişim planlaması ve ilgili hizmetler sunar. Çalışmalar davet veya talep temelinde değerlendirilir. Herhangi bir talebi veya hizmet ilişkisini dilediğimiz zaman reddetme ya da sonlandırma hakkımız saklıdır.',
   },
   {
     number: 3,
-    heading: 'Intellectual Property',
-    body: 'All content on this website, including text, graphics, logos, images, and software, is the property of CREARE and is protected by international copyright and trademark laws. You may not reproduce, distribute, or create derivative works from our content without explicit written permission.',
+    heading: 'Fikri Mülkiyet',
+    body: "Bu web sitesindeki metin, grafik, logo, görsel ve yazılım dahil tüm içerik CREARE'nin mülkiyetindedir ve ilgili telif ile marka mevzuatı kapsamında korunur. Açık yazılı izin olmadan içeriklerimizi çoğaltamaz, dağıtamaz veya türev işler üretemezsiniz.",
   },
   {
     number: 4,
-    heading: 'Confidentiality',
-    body: 'CREARE operates with the highest standards of discretion. All client information, inquiries, engagement details, and access-related information are treated as strictly confidential. We expect the same level of discretion from our clients regarding our proprietary methods and business practices.',
+    heading: 'Gizlilik',
+    body: 'CREARE en yüksek mahremiyet standartlarıyla çalışır. Tüm misafir bilgileri, talepler, çalışma detayları ve erişimle ilgili bilgiler sıkı gizlilik içinde ele alınır. Müşterilerimizden de yöntemlerimiz ve iş yapış biçimimiz konusunda aynı ölçüde özen bekleriz.',
   },
   {
     number: 5,
-    heading: 'Limitation of Liability',
-    body: 'CREARE shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use or inability to use the website or our engagement services. Our total liability to you for any claim arising from your use of the website or our engagement services shall not exceed the amount you paid for those services.',
+    heading: 'Sorumluluğun Sınırlandırılması',
+    body: 'CREARE, web sitesini veya hizmetlerini kullanmanızdan ya da kullanamamanızdan doğan dolaylı, arızi, özel, sonuçsal veya cezai nitelikteki zararlardan sorumlu tutulamaz. Bu web sitesi veya hizmetlerimizden doğan herhangi bir talepte toplam sorumluluğumuz, söz konusu hizmetler için ödediğiniz tutarı aşmaz.',
   },
   {
     number: 6,
-    heading: 'Modifications to Terms',
-    body: 'We reserve the right to modify these terms at any time. Changes will be effective immediately upon posting to this page. Your continued use of the website or our engagement services after any such changes constitutes your acceptance of the new terms.',
+    heading: 'Koşullardaki Değişiklikler',
+    body: 'Bu koşulları dilediğimiz zaman değiştirme hakkımız saklıdır. Değişiklikler bu sayfada yayımlandığı anda yürürlüğe girer. Değişikliklerden sonra web sitesini veya hizmetlerimizi kullanmaya devam etmeniz yeni koşulları kabul ettiğiniz anlamına gelir.',
   },
   {
     number: 7,
-    heading: 'Governing Law',
-    body: 'These terms shall be governed by and construed in accordance with applicable international laws. Any disputes arising from these terms or your use of the website or our engagement services shall be resolved through binding arbitration in accordance with international arbitration rules.',
+    heading: 'Uygulanacak Hukuk',
+    body: 'Bu koşullar ilgili mevzuata göre yorumlanır ve uygulanır. Bu koşullardan veya web sitesi ile hizmetlerimizin kullanımından doğan uyuşmazlıklar, uygulanabilir hukuk ve ilgili çözüm usulleri çerçevesinde ele alınır.',
   },
   {
     number: 8,
-    heading: 'Contact Information',
-    body: 'For any questions regarding these Terms of Use, please contact CREARE through our official contact channels. We are committed to addressing your concerns promptly and professionally.',
+    heading: 'İletişim Bilgileri',
+    body: 'Bu Kullanım Koşulları hakkında sorularınız için lütfen CREARE ile resmi iletişim kanallarımız üzerinden bağlantı kurun. Tüm soruları dikkatli ve profesyonel biçimde ele almaya kararlıyız.',
   },
 ];
 
@@ -64,19 +64,19 @@ export default function TermsPage() {
     <main className="min-h-screen bg-white">
       <div className="px-6 sm:px-10 lg:px-16 pt-28 pb-24 max-w-4xl mx-auto">
         {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 mb-12">
+        <nav aria-label="İçerik yolu" className="flex items-center gap-2 mb-12">
           <Link
             href="/"
             className="flex items-center gap-1 text-xs tracking-widest text-gray-500 hover:text-black transition-colors uppercase"
           >
             <span aria-hidden="true">←</span>
-            <span>HOME</span>
+            <span>ANA SAYFA</span>
           </Link>
           <span className="text-xs text-gray-400" aria-hidden="true">
             /
           </span>
           <h1 className="text-xs tracking-widest text-black uppercase" aria-current="page">
-            TERMS
+            KOŞULLAR
           </h1>
         </nav>
 
@@ -93,7 +93,7 @@ export default function TermsPage() {
         </div>
 
         {/* Last Updated */}
-        <p className="mt-16 text-xs text-gray-500 tracking-wide">Last Updated: March 4, 2026</p>
+        <p className="mt-16 text-xs text-gray-500 tracking-wide">Son Güncelleme: 4 Mart 2026</p>
       </div>
     </main>
   );

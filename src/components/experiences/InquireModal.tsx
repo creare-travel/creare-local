@@ -95,12 +95,12 @@ export default function InquireModal({
       });
 
       if (!res.ok) {
-        throw new Error('Submission failed. Please try again.');
+        throw new Error('Gönderim başarısız oldu. Lütfen tekrar deneyin.');
       }
 
       setSuccess(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.');
+      setError(err instanceof Error ? err.message : 'Bir sorun oluştu.');
     } finally {
       setSubmitting(false);
     }
@@ -115,16 +115,16 @@ export default function InquireModal({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
       role="dialog"
       aria-modal="true"
-      aria-label="Inquire Privately"
+      aria-label="Özel olarak iletişime geç"
     >
       <div className="relative w-full max-w-md bg-[#0a0a0a] text-white">
         {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-5 right-5 font-body text-[0.6rem] tracking-[0.25em] text-white/30 uppercase hover:text-white/70 transition-colors duration-200"
-          aria-label="Close modal"
+          aria-label="Pencereyi kapat"
         >
-          Close
+          Kapat
         </button>
 
         <div className="px-10 py-12">
@@ -136,10 +136,10 @@ export default function InquireModal({
             className="font-display font-light text-white leading-tight mb-2"
             style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)' }}
           >
-            Inquire Privately
+            Özel Olarak İletişime Geç
           </h2>
           <p className="font-body text-[0.7rem] text-white/40 leading-relaxed mb-10">
-            Your inquiry is handled with complete discretion.
+            Talebiniz tam bir mahremiyetle ele alınır.
           </p>
 
           {/* Hidden slug */}
@@ -148,7 +148,7 @@ export default function InquireModal({
           {success ? (
             <div className="py-8 text-center">
               <p className="font-body text-sm tracking-[0.15em] text-white/80 uppercase">
-                We will contact you shortly
+                Kısa süre içinde sizinle iletişime geçeceğiz
               </p>
             </div>
           ) : (
@@ -159,7 +159,7 @@ export default function InquireModal({
                   htmlFor="inquire-name"
                   className="block font-body text-[0.55rem] tracking-[0.28em] text-white/40 uppercase mb-2"
                 >
-                  Name
+                  Ad Soyad
                 </label>
                 <input
                   id="inquire-name"
@@ -168,7 +168,7 @@ export default function InquireModal({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full bg-transparent border-b border-white/15 text-white font-body text-sm py-2 focus:outline-none focus:border-white/50 transition-colors duration-200 placeholder:text-white/20"
-                  placeholder="Your full name"
+                  placeholder="Adınız ve soyadınız"
                   autoComplete="name"
                 />
               </div>
@@ -179,7 +179,7 @@ export default function InquireModal({
                   htmlFor="inquire-email"
                   className="block font-body text-[0.55rem] tracking-[0.28em] text-white/40 uppercase mb-2"
                 >
-                  Email
+                  E-posta
                 </label>
                 <input
                   id="inquire-email"
@@ -199,7 +199,7 @@ export default function InquireModal({
                   htmlFor="inquire-message"
                   className="block font-body text-[0.55rem] tracking-[0.28em] text-white/40 uppercase mb-2"
                 >
-                  Message
+                  Mesaj
                 </label>
                 <textarea
                   id="inquire-message"
@@ -208,7 +208,7 @@ export default function InquireModal({
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   className="w-full bg-transparent border-b border-white/15 text-white font-body text-sm py-2 focus:outline-none focus:border-white/50 transition-colors duration-200 placeholder:text-white/20 resize-none"
-                  placeholder="Tell us what you are looking for…"
+                  placeholder="Nasıl bir karşılaşma aradığınızı paylaşın…"
                 />
               </div>
 
@@ -224,7 +224,7 @@ export default function InquireModal({
                   disabled={submitting}
                   className="w-full font-body text-[0.65rem] tracking-[0.3em] uppercase py-4 border border-white/25 text-white hover:bg-white hover:text-black transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  {submitting ? 'Sending…' : 'Request Access'}
+                  {submitting ? 'Gönderiliyor…' : 'Erişim Talep Et'}
                 </button>
               </div>
             </form>

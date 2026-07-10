@@ -2,8 +2,7 @@ import { ImageResponse } from 'next/og';
 import { isPublicExperienceRecord } from '@/lib/canonical-gates';
 import { buildCloudinaryUrl } from '@/lib/cloudinary';
 import { DEFAULT_OG_IMAGE } from '@/lib/seo';
-import { fetchStrapi, mediaUrl } from '@/lib/strapi';
-import { getExperienceBySlug } from '@/lib/experiences';
+import { fetchPublicStrapi, mediaUrl } from '@/lib/strapi';
 
 export const runtime = 'edge';
 export const alt = 'Creare Experience';
@@ -122,7 +121,7 @@ async function fetchExperienceOgRecordBySlug(
   });
 
   try {
-    const json = await fetchStrapi(`/api/experiences?${params.toString()}`);
+    const json = await fetchPublicStrapi(`/api/experiences?${params.toString()}`);
     const items = Array.isArray(json?.data) ? json.data : [];
     const rawItem = items[0];
 
@@ -161,18 +160,11 @@ interface Props {
 
 export default async function ExperienceOgImage({ params }: Props) {
   const { slug } = await params;
-  const [strapiExperience, legacyExperience] = await Promise.all([
-    resolveExperienceOgRecord(slug),
-    Promise.resolve(getExperienceBySlug(slug)),
-  ]);
-
-  const title = strapiExperience?.title ?? legacyExperience?.title ?? 'Private Experience';
+  const strapiExperience = await resolveExperienceOgRecord(slug);
+  const title = strapiExperience?.title ?? 'Özel Deneyim';
   const location =
-    strapiExperience?.destination?.name ??
-    strapiExperience?.location_label ??
-    legacyExperience?.location ??
-    'Turkey';
-  const category = strapiExperience?.category ?? legacyExperience?.category ?? 'SIGNATURE';
+    strapiExperience?.destination?.name ?? strapiExperience?.location_label ?? 'Türkiye';
+  const category = strapiExperience?.category ?? 'SIGNATURE';
   const heroImage =
     getStrapiExperienceImageUrl(strapiExperience) ??
     getGovernedCloudinaryExperienceImageUrl(strapiExperience?.slug ?? slug) ??
