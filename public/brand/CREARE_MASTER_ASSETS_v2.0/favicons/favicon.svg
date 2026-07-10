@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  
+  
+    <rect width="64" height="64" fill="#0A0A0A"/>
+    <rect x="0.5" y="0.5" width="63" height="63" fill="none" stroke="#D4CFC5"/>
+    <path
+      d="M14 6C10.134 6 7 9.134 7 13C7 16.866 10.134 20 14 20"
+      stroke="#F5F3EF"
+      stroke-width="1.5"
+      stroke-linecap="square"
+    />
+  
+</svg>

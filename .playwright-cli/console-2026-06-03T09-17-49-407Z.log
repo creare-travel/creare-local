@@ -1,0 +1,2 @@
+[     266ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:3000/fonts/tt-hoves/TTHoves-Regular.woff2:0
+[  814744ms] [ERROR] Failed to load resource: net::ERR_TIMED_OUT @ https://p.clarity.ms/collect:0

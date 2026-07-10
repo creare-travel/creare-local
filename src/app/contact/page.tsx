@@ -10,12 +10,12 @@ const OG_IMAGE = `${SITE_URL}/og/default.jpg`;
 export const metadata: Metadata = {
   title: 'Contact — Private Inquiries',
   description:
-    'For strategic engagements, private commissions, and confidential collaborations. CREARE responds personally to all inquiries.',
+    'For private commissions, confidential collaborations, and considered inquiries. CREARE responds personally to every message.',
   alternates: buildMetadataAlternates('/contact'),
   robots: { index: true, follow: true },
   openGraph: {
     title: 'Contact — Private Inquiries — Creare',
-    description: 'For strategic engagements, private commissions, and confidential collaborations.',
+    description: 'For private commissions, confidential collaborations, and considered inquiries.',
     url: `${SITE_URL}/contact`,
     siteName: 'Creare',
     type: 'website',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Contact — Private Inquiries — Creare',
-    description: 'For strategic engagements, private commissions, and confidential collaborations.',
+    description: 'For private commissions, confidential collaborations, and considered inquiries.',
     images: [OG_IMAGE],
   },
 };
@@ -35,7 +35,7 @@ export default function ContactPage() {
   const contactSchema = buildContactPageGraph({
     title: 'Contact — Private Inquiries',
     description:
-      'For strategic engagements, private commissions, and confidential collaborations. CREARE responds personally to all inquiries.',
+      'For private commissions, confidential collaborations, and considered inquiries. CREARE responds personally to every message.',
     path: '/contact',
     email: 'direct@crearetravel.com',
     telephone: '+90-541-220-3000',

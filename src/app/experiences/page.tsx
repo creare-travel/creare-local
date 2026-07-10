@@ -15,7 +15,7 @@ import {
 
 const experiencesTitle = 'Experiences';
 const experiencesDescription =
-  'CREARE structures its experience system through three distinct paths: Signature for curated cultural encounters, LAB for co-created commissions, and BLACK for discreet invitation-only access.';
+  'CREARE approaches experience through three distinct paths: Signature for curated cultural encounters, LAB for co-created commissions, and BLACK for discreet invitation-only access.';
 
 export const metadata: Metadata = {
   title: experiencesTitle,
@@ -256,7 +256,7 @@ export default async function ExperiencesPage() {
         <section className="mx-auto max-w-7xl px-6 pb-32 sm:px-10 lg:px-16">
           <div className="border-t border-white/10 pt-14">
             <p className="mb-3 font-body text-[0.6rem] uppercase tracking-[0.28em] text-white/30">
-              Published Experience Detail Pages
+              Further Encounters
             </p>
             <h2 className="mb-10 font-display text-3xl font-light text-white">
               From the Collection

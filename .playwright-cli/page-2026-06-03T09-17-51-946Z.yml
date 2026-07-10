@@ -1,0 +1,109 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - navigation "Main navigation" [ref=e3]:
+      - link "CREARE — Return to homepage" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: CREARE
+      - generic [ref=e6]:
+        - link "Cultural Worlds" [ref=e7] [cursor=pointer]:
+          - /url: /cultural-worlds
+          - text: Cultural Worlds
+        - link "Insights" [ref=e8] [cursor=pointer]:
+          - /url: /insights
+          - text: Insights
+        - link "Philosophy" [ref=e9] [cursor=pointer]:
+          - /url: /philosophy
+          - text: Philosophy
+        - link "Contact" [ref=e10] [cursor=pointer]:
+          - /url: /contact
+          - text: Contact
+        - button "Select language" [ref=e12] [cursor=pointer]:
+          - text: EN
+          - img [ref=e13]
+  - main [ref=e15]:
+    - generic [ref=e16]:
+      - img "Winding coastal road passing through a mountainous landscape at golden hour" [ref=e18]
+      - generic [ref=e20]:
+        - paragraph [ref=e21]: CREARE Experience Architecture
+        - heading "Experiences" [level=1] [ref=e22]
+        - paragraph [ref=e23]: "CREARE does not treat experience as a single product type. The system is structured through three distinct paths: curated cultural encounters, co-created commissions, and discreet access reserved for the right context."
+    - generic [ref=e25]:
+      - generic [ref=e26]:
+        - paragraph [ref=e27]: The Parent Collection
+        - paragraph [ref=e28]: Each path reflects a different relationship between guest, place, and access. Signature begins with a composed encounter. LAB begins with a brief. BLACK begins where publication ends.
+      - generic [ref=e29]:
+        - paragraph [ref=e30]: This page is the parent taxonomy node for the CREARE experience system. It exists to clarify the logic of the collection rather than flatten it into a single commercial category.
+        - paragraph [ref=e31]: The distinction matters for Google, for AI retrieval systems, and for clients trying to understand whether they are choosing a finished encounter, shaping a new one, or entering a more private tier of access.
+    - generic [ref=e33]:
+      - article [ref=e34]:
+        - link "Explore Signature" [ref=e35] [cursor=pointer]:
+          - /url: /experiences/signature
+          - generic [ref=e36]:
+            - img "Golden light over ancient stone ruins and sculpted landscape" [ref=e37]
+            - generic [ref=e39]:
+              - paragraph [ref=e40]: Signature
+              - heading "Curated cultural experiences." [level=2] [ref=e41]
+              - paragraph [ref=e42]: Composed, tested, and ready to be lived. Signature experiences are CREARE encounters already resolved into a clear cultural form.
+              - generic [ref=e43]: Enter →
+        - paragraph [ref=e44]: For guests seeking editorial precision and cultural clarity.
+      - article [ref=e45]:
+        - link "Explore LAB" [ref=e46] [cursor=pointer]:
+          - /url: /experiences/lab
+          - generic [ref=e47]:
+            - img "Abstract architectural composition in black and white with sculptural geometry" [ref=e48]
+            - generic [ref=e50]:
+              - paragraph [ref=e51]: LAB
+              - heading "Co-created from the brief." [level=2] [ref=e52]
+              - paragraph [ref=e53]: LAB is the custom design layer. The experience is not selected from a catalogue; it is developed through conversation, context, and intent.
+              - generic [ref=e54]: Enter →
+        - paragraph [ref=e55]: For guests who need a cultural composition built specifically for them.
+      - article [ref=e56]:
+        - link "Explore BLACK" [ref=e57] [cursor=pointer]:
+          - /url: /experiences/black
+          - generic [ref=e58]:
+            - img "Dark dramatic landscape under a starlit night sky" [ref=e59]
+            - generic [ref=e61]:
+              - paragraph [ref=e62]: BLACK
+              - heading "Discreet invitation-only access." [level=2] [ref=e63]
+              - paragraph [ref=e64]: BLACK is reserved for private arrangements that rely on trust, discretion, and relationships not intended for open circulation.
+              - generic [ref=e65]: Enter →
+        - paragraph [ref=e66]: For situations where access itself must remain controlled.
+  - contentinfo "Site footer" [ref=e67]:
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - link "CREARE — Return to homepage" [ref=e70] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e71]:
+            - text: CREARE
+            - superscript [ref=e72]: ™
+        - paragraph [ref=e73]:
+          - text: Creative intelligence.
+          - text: Strategic execution.
+          - text: Refined experiences.
+      - navigation "Footer navigation" [ref=e74]:
+        - link "Our Philosophy" [ref=e75] [cursor=pointer]:
+          - /url: /philosophy
+          - text: OUR PHILOSOPHY
+        - link "Insights" [ref=e76] [cursor=pointer]:
+          - /url: /insights
+          - text: INSIGHTS
+        - link "Contact CREARE" [ref=e77] [cursor=pointer]:
+          - /url: /contact
+          - text: CONTACT
+        - generic [ref=e78]:
+          - link "Follow CREARE on Instagram" [ref=e79] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e80]
+          - link "Follow CREARE on LinkedIn" [ref=e84] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e85]
+    - generic [ref=e89]:
+      - generic [ref=e90]: © 2026 CREARE
+      - navigation "Legal links" [ref=e91]:
+        - link "Privacy" [ref=e92] [cursor=pointer]:
+          - /url: /privacy
+        - link "Cookies" [ref=e93] [cursor=pointer]:
+          - /url: /cookies
+        - link "Terms" [ref=e94] [cursor=pointer]:
+          - /url: /terms
+  - alert [ref=e95]

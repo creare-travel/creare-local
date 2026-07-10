@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="90" viewBox="0 0 1200 90" fill="none">
+  
+  
+    <line x1="0" y1="30" x2="1200" y2="30" stroke="#D4CFC5" stroke-width="1"/>
+    <text x="0" y="58" fill="#0A0A0A" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-size="18px" font-weight="300" letter-spacing="0.195em" text-anchor="start" dominant-baseline="hanging">CREARE</text>
+    <text x="1200" y="58" fill="#8B867E" fill-opacity="0.55" font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" font-size="10px" font-weight="400" letter-spacing="0.18em" text-anchor="end" dominant-baseline="hanging">PAGE 01</text>
+  
+</svg>

@@ -44,8 +44,8 @@ const policySections: PolicySection[] = [
   },
   {
     number: 6,
-    heading: 'Contact Us',
-    body: 'If you have any questions about this Privacy Policy, please contact us through our contact page or by email. We are committed to resolving any concerns you may have about your privacy.',
+    heading: 'Contact',
+    body: 'If you have any questions about this Privacy Policy, please contact CREARE through our contact page or by email. We are committed to resolving any concerns you may have about your privacy.',
   },
 ];
 

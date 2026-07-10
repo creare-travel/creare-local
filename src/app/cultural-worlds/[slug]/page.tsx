@@ -16,7 +16,7 @@ import { buildMetadataAlternates } from '@/lib/seo';
 import { buildCanonicalUrl, buildCulturalWorldDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 const FALLBACK_DESCRIPTION =
-  'A cultural world composed through editorial destination content, related experiences, and further reading.';
+  'A cultural world approached through place, related experiences, and further reading.';
 const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
 const canonicalInsightSlug = (slug?: string) =>
   slug === 'the-private-life-of-istanbul' ? 'private-life-of-istanbul' : slug;
@@ -848,14 +848,14 @@ export default async function CulturalWorldPage({ params }: Props) {
           >
             <div className="max-w-3xl">
               <p className="text-white/22 font-body text-[0.58rem] tracking-[0.24em] uppercase mb-7">
-                Cultural Systems
+                Cultural Threads
               </p>
               <h2
                 id="cultural-systems"
                 className="font-display font-light text-white leading-tight mb-10"
                 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}
               >
-                The cultural systems that structure this world.
+                The continuities that shape this world.
               </h2>
               <ul className="space-y-6">
                 {localContent.culturalSystems.map((system, index) => (
@@ -928,7 +928,7 @@ export default async function CulturalWorldPage({ params }: Props) {
                       {experience.title &&
                       systemMappingIndex.has(experience.title.trim().toLowerCase()) ? (
                         <p className="mb-3.5 text-white/42 font-body text-[0.65rem] tracking-[0.11em] uppercase leading-relaxed">
-                          <span className="block">Connected Cultural System</span>
+                          <span className="block">Connected Cultural Thread</span>
                           <span className="mt-1 block text-white/58 tracking-[0.09em]">
                             {systemMappingIndex.get(experience.title.trim().toLowerCase())}
                           </span>

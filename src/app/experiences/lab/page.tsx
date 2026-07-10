@@ -15,12 +15,12 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'LAB™ — Experimental Experiences',
   description:
-    'Co-created, dynamic and exploratory. CREARE LAB™ is where cultural experiences are designed from scratch — open-ended, experimental, and built around your brief.',
+    'Co-created, dynamic and exploratory. CREARE LAB™ is where cultural experiences begin in conversation — open-ended, experimental, and shaped around your inquiry.',
   alternates: buildMetadataAlternates('/experiences/lab'),
   robots: { index: true, follow: true },
   openGraph: {
     title: 'CREARE LAB™ — Experimental Experiences',
-    description: 'Co-created, dynamic and exploratory. Built around your brief.',
+    description: 'Co-created, dynamic and exploratory. Shaped around your inquiry.',
     url: 'https://crearetravel.com/experiences/lab',
   },
 };
@@ -170,7 +170,7 @@ export default async function LabPage() {
                 href={buildExperienceInquiryHref('lab')}
                 className="font-body text-[0.65rem] tracking-[0.3em] text-neutral-900 uppercase border border-neutral-900 px-8 py-4 hover:bg-neutral-900 hover:text-white transition-all duration-300"
               >
-                DESIGN YOUR EXPERIENCE
+                BEGIN A CONVERSATION
               </Link>
               <div className="flex flex-col items-center gap-2 mt-4">
                 <span className="font-body text-[0.55rem] tracking-[0.3em] text-neutral-400 uppercase">
@@ -552,7 +552,7 @@ export default async function LabPage() {
             </Link>
 
             <p className="font-body text-[0.55rem] tracking-[0.3em] text-neutral-400 uppercase">
-              QUIET PRECISION. DISCREET EXECUTION.
+              QUIET PRECISION. QUIETLY ARRANGED.
             </p>
           </div>
         </section>

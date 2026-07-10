@@ -1,0 +1,5 @@
+[    1828ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://127.0.0.1:3001/_next/static/css/aef784bbc2e6d053.css:0
+[    1853ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://127.0.0.1:3001/_next/static/chunks/1517-df52522e52d94b0d.js:0
+[    1853ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://127.0.0.1:3001/_next/static/chunks/8173-3c878c94fa078e25.js:0
+[    1853ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://127.0.0.1:3001/_next/static/chunks/app/layout-ec90299514c6d9ae.js:0
+[    1853ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://127.0.0.1:3001/_next/static/chunks/7970-1f8ef75c756dd3e2.js:0

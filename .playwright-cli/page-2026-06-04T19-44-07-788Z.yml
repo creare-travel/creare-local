@@ -1,0 +1,125 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - navigation "Main navigation" [ref=e3]:
+      - link "CREARE — Return to homepage" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: CREARE
+      - generic [ref=e6]:
+        - link "Cultural Worlds" [ref=e7] [cursor=pointer]:
+          - /url: /cultural-worlds
+          - text: Cultural Worlds
+        - link "Experiences" [ref=e8] [cursor=pointer]:
+          - /url: /experiences
+          - text: Experiences
+        - link "Insights" [ref=e9] [cursor=pointer]:
+          - /url: /insights
+          - text: Insights
+        - link "Philosophy" [ref=e10] [cursor=pointer]:
+          - /url: /philosophy
+          - text: Philosophy
+        - link "Contact" [ref=e11] [cursor=pointer]:
+          - /url: /contact
+          - text: Contact
+        - button "Select language" [ref=e13] [cursor=pointer]:
+          - text: EN
+          - img [ref=e14]
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - img "Ancient stone architecture and layered heritage landscape under cinematic light" [ref=e19]
+      - generic [ref=e21]:
+        - paragraph [ref=e22]: Creare — Cultural Atlas
+        - heading "Cultural Worlds" [level=1] [ref=e23]
+        - paragraph [ref=e24]: A geography of layered places, read through memory, custodianship, and the conditions that make real cultural access meaningful.
+    - generic [ref=e26]:
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - paragraph [ref=e29]: Explore Cultural Worlds
+          - heading "A geography of access, memory, and encounter." [level=2] [ref=e30]
+        - generic [ref=e31]:
+          - button "Scroll cultural worlds left" [disabled]:
+            - img
+          - button "Scroll cultural worlds right" [disabled] [ref=e32]:
+            - img [ref=e33]
+      - generic [ref=e36]:
+        - article [ref=e37]:
+          - generic [ref=e38]:
+            - generic [ref=e39]:
+              - paragraph [ref=e40]: The Atlas
+              - heading "Each destination holds layers of history, ritual, and meaning." [level=3] [ref=e41]
+            - paragraph [ref=e44]: "We know them intimately: their hidden corners, their cultural custodians, and the extraordinary moments that reveal how a place actually lives."
+        - article [ref=e45]:
+          - link "Explore Istanbul" [ref=e46] [cursor=pointer]:
+            - /url: /cultural-worlds/istanbul
+            - generic [ref=e47]:
+              - img "Istanbul skyline at dusk with domes and minarets above the Bosphorus" [ref=e48]
+              - generic [ref=e51]:
+                - heading "Istanbul" [level=2] [ref=e53]
+                - paragraph [ref=e54]: A layered cultural world of water, thresholds, imperial memory, and private interiors still shaped by living custodianship.
+                - generic [ref=e55]: Enter
+        - article [ref=e56]:
+          - link "Explore Cappadocia" [ref=e57] [cursor=pointer]:
+            - /url: /cultural-worlds/cappadocia
+            - generic [ref=e58]:
+              - img "Cappadocia landscape with volcanic forms and layered terrain" [ref=e59]
+              - generic [ref=e62]:
+                - heading "Cappadocia" [level=2] [ref=e64]
+                - paragraph [ref=e65]: A geological civilization of volcanic stone, subterranean settlement, monastic retreat, Byzantine continuity, and Anatolian craft memory paced by deep time.
+                - generic [ref=e66]: Enter
+        - article [ref=e67]:
+          - link "Explore Bodrum" [ref=e68] [cursor=pointer]:
+            - /url: /cultural-worlds/bodrum
+            - generic [ref=e69]:
+              - img "Bodrum placeholder image for local visual QA" [ref=e70]
+              - generic [ref=e73]:
+                - heading "Bodrum" [level=2] [ref=e75]
+                - paragraph [ref=e76]: A Halicarnassian cultural world shaped by archaeological memory, maritime movement, cultivated landscapes, hosted tables, and the literary afterlife of the peninsula.
+                - generic [ref=e77]: Enter
+    - region "Contact handoff" [ref=e78]:
+      - generic [ref=e79]:
+        - paragraph [ref=e80]: Begin the conversation.
+        - link "CONTACT CREARE →" [ref=e81] [cursor=pointer]:
+          - /url: /contact
+  - contentinfo "Site footer" [ref=e82]:
+    - generic [ref=e83]:
+      - generic [ref=e84]:
+        - link "CREARE — Return to homepage" [ref=e85] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e86]:
+            - text: CREARE
+            - superscript [ref=e87]: ™
+        - paragraph [ref=e88]:
+          - text: Creative intelligence.
+          - text: Strategic execution.
+          - text: Refined experiences.
+      - navigation "Footer navigation" [ref=e89]:
+        - link "Cultural Worlds" [ref=e90] [cursor=pointer]:
+          - /url: /cultural-worlds
+          - text: CULTURAL WORLDS
+        - link "Experiences" [ref=e91] [cursor=pointer]:
+          - /url: /experiences
+          - text: EXPERIENCES
+        - link "Insights" [ref=e92] [cursor=pointer]:
+          - /url: /insights
+          - text: INSIGHTS
+        - link "Philosophy" [ref=e93] [cursor=pointer]:
+          - /url: /philosophy
+          - text: PHILOSOPHY
+        - link "Contact CREARE" [ref=e94] [cursor=pointer]:
+          - /url: /contact
+          - text: CONTACT
+        - generic [ref=e95]:
+          - link "Follow CREARE on Instagram" [ref=e96] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e97]
+          - link "Follow CREARE on LinkedIn" [ref=e101] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e102]
+    - generic [ref=e106]:
+      - generic [ref=e107]: © 2026 CREARE
+      - navigation "Legal links" [ref=e108]:
+        - link "Privacy" [ref=e109] [cursor=pointer]:
+          - /url: /privacy
+        - link "Cookies" [ref=e110] [cursor=pointer]:
+          - /url: /cookies
+        - link "Terms" [ref=e111] [cursor=pointer]:
+          - /url: /terms

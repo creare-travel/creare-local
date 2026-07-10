@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" fill="none">
+  <rect width="1280" height="320" fill="#0A0A0A"/>
+  <g transform="translate(92 60)">
+    <g transform="translate(0 0)">
+
+  
+  <g transform="translate(100 100)">
+    <path
+      d="M34-54C21-62 6-66-12-66c-38 0-68 30-68 68s30 68 68 68c18 0 33-4 46-13"
+      stroke="#F5F3EF"
+      stroke-width="12"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path d="M42-34V38" stroke="#F5F3EF" stroke-width="12" stroke-linecap="round" />
+    <path d="M18-52h34" stroke="#F5F3EF" stroke-width="12" stroke-linecap="round" />
+    <path d="M18 56h34" stroke="#F5F3EF" stroke-width="12" stroke-linecap="round" />
+  </g>
+</g>
+    <g transform="translate(210 30)">
+
+  
+  <text
+    x="48"
+    y="114"
+    fill="#F5F3EF"
+    font-family="'Helvetica Neue', Arial, sans-serif"
+    font-size="74"
+    font-weight="300"
+    letter-spacing="14"
+  >CREARE</text>
+</g>
+  </g>
+</svg>
