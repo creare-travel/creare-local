@@ -143,7 +143,7 @@ const SECTION_INTROS: Record<
     eyebrow: 'Editorial Essays',
     title: 'Essays on privacy, rarity, and cultural attention.',
     description:
-      'These texts extend beyond one destination and deepen CREARE’s editorial understanding of access, permission, and the social life of meaningful travel.',
+      'These texts extend beyond one destination and sharpen CREARE’s editorial position on access, permission, and the social architecture of meaningful travel.',
   },
   archive: {
     eyebrow: 'Further Reading',

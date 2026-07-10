@@ -1,1 +1,0 @@
-- [Screenshot of element](.playwright-cli/element-2026-06-04T20-21-02-706Z.png)

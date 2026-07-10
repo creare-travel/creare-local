@@ -36,7 +36,7 @@ const CULTURAL_WORLD_CONTEXTS: Record<
       'cultural-immersion-lab':
         "This experience unfolds in Balat, one of Istanbul's most layered neighbourhoods, where Byzantine, Ottoman, and contemporary cultures exist in the same streets. The neighbourhood itself becomes a text to be read, understood, and interpreted.",
       'narrative-workshop':
-        "This experience is rooted in Istanbul's role as a city of stories — a place where narrative has always been central to how the city understands itself. The narratives you will shape are grounded in the city's own complexity.",
+        "This experience is rooted in Istanbul's role as a city of stories — a place where narrative has always been central to how the city understands itself. The frameworks you will develop are grounded in the city's own narrative complexity.",
       'private-bosphorus-access':
         "This experience unfolds on the Bosphorus, the waterway that defines Istanbul's geography and identity. The strait has been the stage for empires, the boundary between continents, and the physical manifestation of the city's position at the intersection of worlds.",
       'closed-collection-viewing':

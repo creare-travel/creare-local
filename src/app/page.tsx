@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import CulturalWorldsIndexSection from '@/app/home/components/CulturalWorldsIndexSection';
 import HeroSection from '@/app/home/components/HeroSection';
 import CollectionsSection from '@/app/home/components/CollectionsSection';
-import SelectedInsightsSection from '@/app/home/components/SelectedInsightsSection';
 import JsonLd from '@/components/JsonLd';
 import { buildHomepageWebPageGraph } from '@/lib/schema-builder';
 import { buildMetadataAlternates, DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT } from '@/lib/seo';
@@ -47,7 +45,8 @@ export default function HomePage() {
     <main className="min-h-screen bg-black">
       <JsonLd id="homepage-webpage-jsonld" schema={homepageSchema} />
       <HeroSection />
-      <section className="bg-neutral-50" aria-label="Homepage experience introduction">
+      <CollectionsSection />
+      <section className="bg-neutral-50" aria-label="Homepage experience system discovery">
         <div className="mx-auto max-w-7xl px-6 pb-24 sm:px-10 sm:pb-28 lg:px-16 lg:pb-32">
           <p className="mb-6 max-w-2xl font-body text-sm leading-relaxed text-neutral-700">
             CREARE is not built around packaged travel, but around cultural access, narrative
@@ -66,9 +65,25 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
-      <CulturalWorldsIndexSection />
-      <CollectionsSection />
-      <SelectedInsightsSection />
+      <section
+        className="border-t border-white/10 bg-black"
+        aria-label="Homepage contact call to action"
+      >
+        <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-12 sm:px-10 sm:py-14 lg:flex-row lg:items-center lg:justify-between lg:px-16 lg:py-16">
+          <h2
+            className="font-display font-light leading-tight text-white"
+            style={{ fontSize: 'clamp(1.45rem, 2.2vw, 2rem)' }}
+          >
+            Begin the conversation.
+          </h2>
+          <Link
+            href="/contact"
+            className="inline-flex min-h-11 items-center justify-center self-start border border-white/16 px-7 py-3 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/32 hover:text-white"
+          >
+            Contact CREARE →
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

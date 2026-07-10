@@ -25,7 +25,7 @@ const termsSections: PolicySection[] = [
   {
     number: 2,
     heading: 'Use of Engagements',
-    body: 'CREARE provides private cultural experiences, access planning, and related services to select clients. Engagements are considered on an invitation or inquiry basis. We reserve the right to decline or discontinue any engagement request or service relationship at any time.',
+    body: 'CREARE provides experience design, private cultural access planning, and related strategic engagement services to select clients. Engagements are considered on an invitation or inquiry basis, typically following a private briefing process. We reserve the right to decline or discontinue any engagement request or service relationship at any time.',
   },
   {
     number: 3,
@@ -55,7 +55,7 @@ const termsSections: PolicySection[] = [
   {
     number: 8,
     heading: 'Contact Information',
-    body: 'For any questions regarding these Terms of Use, please contact CREARE through our official contact channels. We are committed to addressing your concerns promptly and professionally.',
+    body: 'For any questions regarding these Terms of Use, please contact us through our official contact channels. We are committed to addressing your concerns promptly and professionally.',
   },
 ];
 

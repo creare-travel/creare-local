@@ -467,14 +467,6 @@ function renderRichText(content: unknown): React.ReactNode {
   );
 }
 
-function getEditorialSectionHeading(slug: string): string | null {
-  if (slug === 'bodrum-beyond-the-marina') {
-    return 'What remains when the marina stops being the story';
-  }
-
-  return null;
-}
-
 function RelatedExperienceCard({
   experience,
   priority = false,
@@ -634,7 +626,6 @@ export default async function InsightArticlePage({ params }: Props) {
     ? insight.experiences
     : [];
   const relatedEssays = buildRelatedEssayReferences(insight.relatedEssays, insight.slug);
-  const editorialSectionHeading = getEditorialSectionHeading(insight.slug);
 
   const contentNode = renderRichText(insight.content);
   const insightSchema = buildInsightDetailGraph({
@@ -735,11 +726,6 @@ export default async function InsightArticlePage({ params }: Props) {
         {contentNode ? (
           <>
             <div className="border-t border-white/6 mb-14" />
-            {editorialSectionHeading ? (
-              <h2 className="mb-8 font-display text-2xl font-light leading-snug text-white sm:text-3xl">
-                {editorialSectionHeading}
-              </h2>
-            ) : null}
             {contentNode}
           </>
         ) : null}

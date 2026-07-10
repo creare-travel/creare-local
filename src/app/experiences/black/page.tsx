@@ -14,12 +14,12 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'BLACK™ — Private Access',
   description:
-    'Invitation-only. Rare access. Quietly arranged. CREARE BLACK™ is reserved for circumstances where discretion, trust, and context must come first.',
+    'Invitation-only. Rare access. Discreet execution. CREARE BLACK™ is reserved for those for whom exclusivity is not a preference — it is a requirement.',
   alternates: buildMetadataAlternates('/experiences/black'),
   robots: { index: true, follow: true },
   openGraph: {
     title: 'CREARE BLACK™ — Private Access',
-    description: 'Invitation-only. Rare access. Quietly arranged.',
+    description: 'Invitation-only. Rare access. Discreet execution.',
     url: 'https://crearetravel.com/experiences/black',
   },
 };
@@ -191,7 +191,7 @@ export default async function BlackPage() {
                 minWidth: '19rem',
               }}
             >
-              Inquire Privately
+              Submit Private Inquiry
             </Link>
           </div>
         </section>
@@ -253,9 +253,9 @@ export default async function BlackPage() {
                   style={{ color: '#7a7268' }}
                 >
                   BLACK is built on relationships that take time to earn and judgment that cannot be
-                  reduced to a formula. Access begins not with status, but with context: who is
-                  arriving, why the encounter matters, and whether the conditions exist for
-                  participation to be responsible, welcome, and discreet.
+                  standardized. Access begins not with status, but with context: who is arriving,
+                  why the encounter matters, and whether the conditions exist for participation to
+                  be responsible, welcome, and discreet.
                 </p>
                 <p
                   className="mx-auto max-w-2xl font-body text-sm leading-relaxed"
@@ -342,8 +342,8 @@ export default async function BlackPage() {
               <div className="space-y-14">
                 {[
                   'Referral-based access',
-                  'Private conversation',
-                  'Quiet arrangement',
+                  'Private consultation',
+                  'Discreet execution',
                   'Confidential delivery',
                 ].map((principle) => (
                   <p
@@ -377,16 +377,16 @@ export default async function BlackPage() {
               <div className="grid grid-cols-1 gap-16 text-center md:grid-cols-3 lg:gap-20">
                 {[
                   {
-                    label: 'Referral and Alignment',
-                    body: 'Access is granted through trusted referrals and careful review, ensuring that introduction, intent, and setting are aligned before any private arrangement is considered.',
+                    label: 'Referral and Qualification',
+                    body: 'Access is granted through trusted referrals and qualification review, ensuring that introduction, intent, and setting are aligned before any private arrangement is considered.',
                   },
                   {
-                    label: 'Private Conversation',
-                    body: 'We shape each encounter through private conversation, grounding it in context, cultural fit, and the kind of participation a place or host can meaningfully support.',
+                    label: 'Private Consultation',
+                    body: 'We design experiences through private consultation, shaping each brief around context, cultural fit, and the kind of participation a place or host can meaningfully support.',
                   },
                   {
-                    label: 'Confidential Arrangement',
-                    body: 'Every detail is arranged discreetly, with privacy, timing, and stewardship treated as part of the encounter itself rather than as incidental support.',
+                    label: 'Confidential Execution',
+                    body: 'Every detail is arranged discreetly, with privacy, timing, and stewardship treated as part of the encounter itself rather than as operational afterthoughts.',
                   },
                 ].map((item) => (
                   <div key={item.label} className="flex flex-col items-center">

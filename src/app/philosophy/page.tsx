@@ -194,7 +194,7 @@ export default function PhilosophyPage() {
             href="/contact"
             className="inline-flex min-h-11 items-center justify-center self-start border border-white/16 px-7 py-3 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/32 hover:text-white"
           >
-            Begin a Conversation →
+            Contact CREARE →
           </Link>
         </div>
       </section>

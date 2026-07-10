@@ -155,9 +155,10 @@ export default function ContactPageClient() {
         </h1>
         <p className="text-white/60 font-body text-base mb-4">We respond personally.</p>
         <p className="text-white/35 font-body text-sm leading-relaxed max-w-[500px]">
-          For private commissions, confidential collaborations, and considered inquiries. We respond
-          personally to international guest requests, partner introductions, and culturally specific
-          requests, with each inquiry reviewed in confidence before any arrangement begins.
+          For strategic engagements, private commissions, and confidential collaborations. We
+          respond personally to international guest requests, partner-led introductions, and
+          culturally specific planning briefs, with each inquiry reviewed in confidence before any
+          proposal, coordination, or access design begins.
         </p>
       </section>
 
@@ -202,9 +203,9 @@ export default function ContactPageClient() {
                 </p>
                 <p className="text-white font-body text-base mb-3">direct@crearetravel.com</p>
                 <p className="text-white/35 font-body text-xs leading-relaxed">
-                  For private requests, thoughtful introductions, and confidential collaborations.
-                  Early conversations help establish pace, feasibility, and the level of care
-                  required across hosts, cultural partners, and local arrangements.
+                  For private requests, structured proposals, and strategic collaborations. Early
+                  conversations help establish pace, feasibility, and the level of coordination
+                  required across hosts, cultural partners, and on-the-ground logistics.
                 </p>
               </div>
 

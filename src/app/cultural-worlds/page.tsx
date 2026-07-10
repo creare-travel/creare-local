@@ -288,11 +288,11 @@ export default async function CulturalWorldsPage() {
                       A Cultural World is not a destination category, but a deeper reading of place.
                       It gathers geography, memory, local knowledge, and the forms of access that
                       make a place legible beyond arrival. Each world is approached as a living
-                      cultural continuity, shaped by custodianship, continuity, and the conditions
-                      that allow encounter to become meaningful. Istanbul, Bodrum, and Cappadocia
-                      differ in terrain, tempo, and cultural expression, yet each becomes clearer
-                      when read through the people, practices, and inherited knowledge that sustain
-                      life there beyond sightseeing.
+                      cultural system, shaped by custodianship, continuity, and the conditions that
+                      allow encounter to become meaningful. Istanbul, Bodrum, and Cappadocia differ
+                      in terrain, tempo, and cultural expression, yet each becomes clearer when read
+                      through the people, practices, and inherited knowledge that sustain life there
+                      beyond sightseeing.
                     </p>
                   </div>
                 </div>
