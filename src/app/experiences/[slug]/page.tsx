@@ -16,14 +16,9 @@ import {
   isPublicExperienceRecord,
 } from '@/lib/canonical-gates';
 import { buildCloudinaryUrl } from '@/lib/cloudinary';
-import {
-  isTurkishPublicLaunch,
-  logPublicContentIssue,
-  shouldUsePublicStaticEnglishFallbacks,
-} from '@/lib/public-content';
 import { buildMetadataAlternates, buildTwitterCard, SITE_NAME } from '@/lib/seo';
 import { buildExperienceDetailGraph } from '@/lib/schema-builder';
-import { fetchPublicStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
+import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 
 const SITE_URL = 'https://crearetravel.com';
@@ -214,7 +209,7 @@ async function fetchExperienceNavigationItems(
     params.set('filters[category][$eqi]', category);
   }
 
-  const json = await fetchPublicStrapi(`/api/experiences?${params.toString()}`);
+  const json = await fetchStrapi(`/api/experiences?${params.toString()}`);
   const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
 
   return items
@@ -266,7 +261,7 @@ async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperien
       'populate[intensity_entity][fields][5]': 'confidence_score',
     });
 
-    const json = await fetchPublicStrapi(`/api/experiences?${params.toString()}`);
+    const json = await fetchStrapi(`/api/experiences?${params.toString()}`);
     const items: StrapiExperienceDetail[] = Array.isArray(json?.data) ? json.data : [];
     const item = items[0];
     if (!item) {
@@ -305,9 +300,7 @@ async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperien
   } catch (error) {
     const normalizedError =
       error instanceof Error ? error : new Error('Unknown Strapi experience fetch failure');
-    logPublicContentIssue(`Experience detail unavailable in public locale for slug "${slug}".`, {
-      error: normalizedError,
-    });
+    console.error(`Failed to fetch experience detail for slug "${slug}".`, normalizedError);
     return { status: 'error', error: normalizedError };
   }
 }
@@ -470,10 +463,6 @@ function toTitleCase(value: string) {
 }
 
 function buildStaticReverseLinkedInsights(currentExperienceSlug: string): StrapiRelatedInsight[] {
-  if (!shouldUsePublicStaticEnglishFallbacks()) {
-    return [];
-  }
-
   const normalizedCurrentSlug = normalizeExperienceSlugForInsightGraph(currentExperienceSlug);
   if (!normalizedCurrentSlug) return [];
 
@@ -614,10 +603,10 @@ function StrapiExperiencePage({
 
   // Build info bar items — only include if value exists
   const infoItems: { label: string; value: string }[] = [];
-  if (categoryLabel) infoItems.push({ label: 'Kategori', value: categoryLabel });
-  if (locationDisplay) infoItems.push({ label: 'Konum', value: locationDisplay });
-  if (item.duration) infoItems.push({ label: 'Süre', value: item.duration });
-  if (groupSize) infoItems.push({ label: 'Grup Büyüklüğü', value: groupSize });
+  if (categoryLabel) infoItems.push({ label: 'Category', value: categoryLabel });
+  if (locationDisplay) infoItems.push({ label: 'Location', value: locationDisplay });
+  if (item.duration) infoItems.push({ label: 'Duration', value: item.duration });
+  if (groupSize) infoItems.push({ label: 'Group Size', value: groupSize });
 
   return (
     <main className="bg-white min-h-screen">
@@ -686,7 +675,7 @@ function StrapiExperiencePage({
       )}
 
       {/* ── BREADCRUMB ── */}
-      <section className="bg-[#EDEAE4] py-5" aria-label="İçerik yolu gezinmesi">
+      <section className="bg-[#EDEAE4] py-5" aria-label="Breadcrumb navigation">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
           <nav aria-label="Breadcrumb">
             <ol className="flex items-center gap-2 list-none m-0 p-0">
@@ -695,7 +684,7 @@ function StrapiExperiencePage({
                   href="/"
                   className="font-body text-[0.65rem] tracking-[0.18em] text-neutral-400 uppercase hover:text-neutral-600 hover:underline underline-offset-2 transition-colors"
                 >
-                  Ana Sayfa
+                  Home
                 </Link>
               </li>
               <li aria-hidden="true">
@@ -708,7 +697,7 @@ function StrapiExperiencePage({
                   href="/experiences"
                   className="font-body text-[0.65rem] tracking-[0.18em] text-neutral-400 uppercase hover:text-neutral-600 hover:underline underline-offset-2 transition-colors"
                 >
-                  Deneyimler
+                  Experiences
                 </Link>
               </li>
               <li aria-hidden="true">
@@ -728,7 +717,7 @@ function StrapiExperiencePage({
 
       {/* ── INFO BAR ── */}
       {infoItems.length > 0 && (
-        <section className="py-12 bg-white" aria-label="Deneyim detayları">
+        <section className="py-12 bg-white" aria-label="Experience details">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="border-t border-b border-neutral-200 py-8">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
@@ -737,7 +726,7 @@ function StrapiExperiencePage({
                     <p className="font-body text-[0.55rem] tracking-[0.28em] text-neutral-400 uppercase mb-2">
                       {infoItem.label}
                     </p>
-                    {infoItem.label === 'Konum' && item.destination?.slug ? (
+                    {infoItem.label === 'Location' && item.destination?.slug ? (
                       <Link
                         href={`/cultural-worlds/${item.destination.slug}`}
                         className="font-body text-sm text-neutral-900 font-medium tracking-wide no-underline hover:text-neutral-500 transition-colors duration-200"
@@ -759,11 +748,11 @@ function StrapiExperiencePage({
 
       {/* ── SHORT DESCRIPTION (no cover fallback) ── */}
       {item.short_description && !coverUrl && (
-        <section className="py-16 bg-white" aria-label="Deneyim özeti">
+        <section className="py-16 bg-white" aria-label="Experience overview">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="max-w-2xl">
               <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-6">
-                Genel Bakış
+                Overview
               </h2>
               <p
                 className="font-display font-light text-neutral-800 leading-relaxed"
@@ -778,11 +767,11 @@ function StrapiExperiencePage({
 
       {/* ── INTENT LEVEL BADGE ── */}
       {item.intent_level && (
-        <section className="pb-4 bg-white" aria-label="Niyet seviyesi">
+        <section className="pb-4 bg-white" aria-label="Intent level">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="flex items-center gap-3">
               <span className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase">
-                Niyet Seviyesi
+                Intent Level
               </span>
               <span className="font-body text-[0.6rem] tracking-[0.2em] text-neutral-600 uppercase border border-neutral-200 px-3 py-1">
                 {item.intent_level}
@@ -794,17 +783,17 @@ function StrapiExperiencePage({
 
       {/* ── DEFINING EXPERIENCE SECTION ── */}
       {(wowMoment || differentiator) && (
-        <section className="py-16 md:py-20 bg-white" aria-label="Bu deneyimi tanımlayan unsurlar">
+        <section className="py-16 md:py-20 bg-white" aria-label="What defines this experience">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="max-w-3xl border-t border-neutral-200 pt-10">
               <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
-                {`${item.title} Deneyimini Ne Tanımlar`}
+                {`What Defines ${item.title}`}
               </h2>
               <div className="grid gap-10 md:grid-cols-2 md:gap-12">
                 {wowMoment && (
                   <div>
                     <p className="font-body text-[0.6rem] tracking-[0.24em] text-neutral-400 uppercase mb-3">
-                      Öne Çıkan An
+                      Wow Moment
                     </p>
                     <p className="font-display font-light text-neutral-800 leading-relaxed text-lg md:text-xl">
                       {wowMoment}
@@ -814,7 +803,7 @@ function StrapiExperiencePage({
                 {differentiator && (
                   <div>
                     <p className="font-body text-[0.6rem] tracking-[0.24em] text-neutral-400 uppercase mb-3">
-                      Ayırt Edici Unsur
+                      Differentiator
                     </p>
                     <p className="font-body text-sm text-neutral-700 leading-relaxed">
                       {differentiator}
@@ -829,11 +818,11 @@ function StrapiExperiencePage({
 
       {/* ── RICH TEXT DESCRIPTION ── */}
       {item.description && (
-        <section className="py-20 md:py-28 bg-white" aria-label="Deneyim açıklaması">
+        <section className="py-20 md:py-28 bg-white" aria-label="Experience description">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="max-w-2xl">
               <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
-                Deneyim
+                The Experience
               </h2>
               <div className="prose-neutral">
                 {typeof item.description === 'string' ? (
@@ -855,7 +844,7 @@ function StrapiExperiencePage({
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="max-w-2xl">
               <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
-                Program
+                The Programme
               </h2>
               <ol className="space-y-6">
                 {programItems.map((step, i) => (
@@ -874,11 +863,11 @@ function StrapiExperiencePage({
 
       {/* ── AUDIENCE SECTION ── */}
       {audienceItems.length > 0 && (
-        <section className="py-20 md:py-24 bg-white" aria-label="Kimler için">
+        <section className="py-20 md:py-24 bg-white" aria-label="Who this is for">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="max-w-2xl">
               <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
-                Kimler İçin
+                Who This Is For
               </h2>
               <ul className="space-y-4">
                 {audienceItems.map((line, i) => (
@@ -900,13 +889,13 @@ function StrapiExperiencePage({
       {item.gallery && item.gallery.length > 0 && <GallerySection images={item.gallery} />}
 
       {(cmsRelatedExperiences.length > 0 || relatedInsights.length > 0) && (
-        <section className="py-20 md:py-24 bg-white" aria-label="İlgili editoryal referanslar">
+        <section className="py-20 md:py-24 bg-white" aria-label="Related editorial references">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="border-t border-neutral-200 pt-10">
               {cmsRelatedExperiences.length > 0 && (
                 <div className={relatedInsights.length > 0 ? 'mb-16 md:mb-20' : ''}>
                   <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
-                    Yakın Deneyimler
+                    Adjacent Experiences
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10">
                     {cmsRelatedExperiences.map((experience, index) => {
@@ -920,7 +909,7 @@ function StrapiExperiencePage({
                           key={experience.id}
                           href={`/experiences/${experience.slug}`}
                           className="group block"
-                          aria-label={`Yakın deneyimi görüntüle: ${experience.title}`}
+                          aria-label={`View adjacent experience: ${experience.title}`}
                         >
                           {imageUrl ? (
                             <div className="relative aspect-[4/3] overflow-hidden mb-5 bg-neutral-100">
@@ -958,7 +947,7 @@ function StrapiExperiencePage({
               {relatedInsights.length > 0 && (
                 <div className="max-w-3xl">
                   <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
-                    İlgili Kültürel Okumalar
+                    Further Cultural Reading
                   </h2>
                   <div className="space-y-6">
                     {relatedInsights.map((insight) => (
@@ -966,7 +955,7 @@ function StrapiExperiencePage({
                         key={insight.id}
                         href={`/insights/${insight.slug}`}
                         className="group block border-b border-neutral-200/80 pb-6 last:border-b-0 last:pb-0"
-                        aria-label={`İlgili kültürel okumayı aç: ${insight.title}`}
+                        aria-label={`Read further cultural context: ${insight.title}`}
                       >
                         {insight.destination?.name && (
                           <p className="font-body text-[0.58rem] tracking-[0.18em] text-neutral-400 uppercase mb-2">
@@ -992,7 +981,10 @@ function StrapiExperiencePage({
       )}
 
       {(prevExperience || nextExperience) && (
-        <section className="pt-24 md:pt-32 pb-16 md:pb-20 bg-black" aria-label="Deneyim dolaşımı">
+        <section
+          className="pt-24 md:pt-32 pb-16 md:pb-20 bg-black"
+          aria-label="Experience navigation"
+        >
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="flex items-start justify-between gap-8">
               <div className="flex-1">
@@ -1003,7 +995,7 @@ function StrapiExperiencePage({
                     aria-label={`Previous experience: ${prevExperience.title}`}
                   >
                     <span className="font-body text-[0.58rem] tracking-[0.3em] text-white/40 uppercase">
-                      Önceki Deneyim
+                      Previous Experience
                     </span>
                     <span
                       className="font-display font-light text-white leading-snug tracking-tight group-hover:underline underline-offset-4 decoration-white/30"
@@ -1028,7 +1020,7 @@ function StrapiExperiencePage({
                     aria-label={`Next experience: ${nextExperience.title}`}
                   >
                     <span className="font-body text-[0.58rem] tracking-[0.3em] text-white/40 uppercase">
-                      Sonraki Deneyim
+                      Next Experience
                     </span>
                     <span
                       className="font-display font-light text-white leading-snug tracking-tight group-hover:underline underline-offset-4 decoration-white/30"
@@ -1052,33 +1044,33 @@ function StrapiExperiencePage({
         <section className="py-24 md:py-32 bg-neutral-950" aria-label="Call to action">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
             <p className="font-body text-[0.6rem] tracking-[0.35em] text-white/40 uppercase mb-6">
-              Yalnızca tanıştırma ile
+              By introduction only
             </p>
             <p
               className="font-display font-light text-white leading-tight mb-10"
               style={{ fontSize: 'clamp(1.6rem, 3vw, 2.8rem)' }}
             >
-              Erişim sınırlıdır.
+              Access is limited.
             </p>
             <p className="font-body text-[0.6rem] tracking-[0.2em] text-white/40 uppercase mb-6">
-              Erişim sınırlı ve kürasyonludur.
+              Access is limited and curated.
             </p>
             <InquireCTA
               experienceSlug={canonicalSlug}
-              label={item.cta_text || 'Özel Bir Görüşme Başlatın'}
+              label={item.cta_text || 'Begin a Private Conversation'}
               className="border border-white/30 text-white hover:bg-white hover:text-neutral-900"
             />
             <div className="mt-5">
               <OutboundLink
-                href={`https://wa.me/+905412203000?text=${encodeURIComponent(`${item.title} ile ilgileniyorum.`)}`}
+                href={`https://wa.me/+905412203000?text=I'm interested in ${encodeURIComponent(item.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase text-white/40 hover:text-white/70"
-                aria-label="WhatsApp üzerinden iletişime geç"
+                aria-label="Contact via WhatsApp"
                 trackingLabel="experience_whatsapp_contact"
                 trackingSource="experience_detail_page"
               >
-                WhatsApp ile İletişim
+                Contact via WhatsApp
               </OutboundLink>
             </div>
           </div>
@@ -1093,30 +1085,31 @@ function StrapiExperiencePage({
               className="font-display font-light text-neutral-900 leading-snug tracking-tight mb-6"
               style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)' }}
             >
-              {`${item.title} için görüşme başlatın`}
+              {`Reserve ${item.title}`}
             </h2>
             <p className="font-body text-sm text-neutral-600 leading-relaxed max-w-md mx-auto mb-10">
-              Bu deneyim özel olarak düzenlenir. Uygunluk sınırlıdır. Bir görüşmeyle başlayın.
+              This experience is arranged privately. Availability is limited. Begin with a
+              conversation.
             </p>
             <p className="font-body text-[0.6rem] tracking-[0.2em] text-neutral-400/70 uppercase mb-6">
-              Erişim sınırlı ve kürasyonludur.
+              Access is limited and curated.
             </p>
             <InquireCTA
               experienceSlug={canonicalSlug}
-              label="ÖZEL OLARAK İLETİŞİME GEÇ"
+              label="INQUIRE PRIVATELY"
               className="bg-black text-white hover:bg-neutral-800"
             />
             <div className="mt-5">
               <OutboundLink
-                href={`https://wa.me/+905412203000?text=${encodeURIComponent(`${item.title} ile ilgileniyorum.`)}`}
+                href={`https://wa.me/+905412203000?text=I'm interested in ${encodeURIComponent(item.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase text-neutral-400 hover:text-neutral-600"
-                aria-label="WhatsApp üzerinden iletişime geç"
+                aria-label="Contact via WhatsApp"
                 trackingLabel="experience_whatsapp_contact"
                 trackingSource="experience_detail_page"
               >
-                WhatsApp ile İletişim
+                Contact via WhatsApp
               </OutboundLink>
             </div>
           </div>
@@ -1147,7 +1140,7 @@ export async function generateMetadata({
 
   if (result.status === 'error') {
     return {
-      title: isTurkishPublicLaunch() ? 'Deneyim Kullanılamıyor' : 'Experience Unavailable',
+      title: 'Experience Unavailable',
       robots: { index: false, follow: false },
     };
   }

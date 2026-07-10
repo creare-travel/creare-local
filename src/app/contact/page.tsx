@@ -8,32 +8,34 @@ const SITE_URL = 'https://crearetravel.com';
 const OG_IMAGE = `${SITE_URL}/og/default.jpg`;
 
 export const metadata: Metadata = {
-  title: 'İletişim — Özel Talepler',
+  title: 'Contact — Private Inquiries',
   description:
-    'Özel komisyonlar, gizli iş birlikleri ve özenli talepler için. CREARE her mesaja kişisel olarak yanıt verir.',
+    'For private commissions, confidential collaborations, and considered inquiries. CREARE responds personally to every message.',
   alternates: buildMetadataAlternates('/contact'),
   robots: { index: true, follow: true },
   openGraph: {
-    title: 'İletişim — Özel Talepler — Creare',
-    description: 'Özel komisyonlar, gizli iş birlikleri ve özenli talepler için.',
+    title: 'Contact — Private Inquiries — Creare',
+    description: 'For private commissions, confidential collaborations, and considered inquiries.',
     url: `${SITE_URL}/contact`,
     siteName: 'Creare',
     type: 'website',
-    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: 'Creare İletişim — Özel Talepler' }],
+    images: [
+      { url: OG_IMAGE, width: 1200, height: 630, alt: 'Contact Creare — Private Inquiries' },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'İletişim — Özel Talepler — Creare',
-    description: 'Özel komisyonlar, gizli iş birlikleri ve özenli talepler için.',
+    title: 'Contact — Private Inquiries — Creare',
+    description: 'For private commissions, confidential collaborations, and considered inquiries.',
     images: [OG_IMAGE],
   },
 };
 
 export default function ContactPage() {
   const contactSchema = buildContactPageGraph({
-    title: 'İletişim — Özel Talepler',
+    title: 'Contact — Private Inquiries',
     description:
-      'Özel komisyonlar, gizli iş birlikleri ve özenli talepler için. CREARE her mesaja kişisel olarak yanıt verir.',
+      'For private commissions, confidential collaborations, and considered inquiries. CREARE responds personally to every message.',
     path: '/contact',
     email: 'direct@crearetravel.com',
     telephone: '+90-541-220-3000',

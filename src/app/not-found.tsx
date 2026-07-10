@@ -26,9 +26,9 @@ export default function NotFound() {
           </div>
         </div>
 
-        <h2 className="text-2xl font-medium text-onBackground mb-2">Sayfa Bulunamadı</h2>
+        <h2 className="text-2xl font-medium text-onBackground mb-2">Page Not Found</h2>
         <p className="text-onBackground/70 mb-8">
-          Aradığınız sayfa mevcut değil. Sizi geri götürelim.
+          The page you&apos;re looking for doesn&apos;t exist. Let&apos;s get you back!
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -37,7 +37,7 @@ export default function NotFound() {
             className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200"
           >
             <ArrowLeftIcon width={16} height={16} aria-hidden="true" />
-            Geri Dön
+            Go Back
           </button>
 
           <button
@@ -45,7 +45,7 @@ export default function NotFound() {
             className="inline-flex items-center justify-center gap-2 border border-border bg-background text-foreground px-6 py-3 rounded-lg font-medium hover:bg-accent hover:text-accent-foreground transition-colors duration-200"
           >
             <HomeIcon width={16} height={16} aria-hidden="true" />
-            Ana Sayfaya Dön
+            Back to Home
           </button>
         </div>
       </div>

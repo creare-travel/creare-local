@@ -4,7 +4,6 @@ import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import { insights } from '@/data/insights';
 import { filterPublicInsights } from '@/lib/canonical-gates';
-import { logPublicContentIssue, shouldUsePublicStaticEnglishFallbacks } from '@/lib/public-content';
 import {
   buildMetadataAlternates,
   buildOpenGraph,
@@ -13,16 +12,16 @@ import {
   DEFAULT_OG_IMAGE_ALT,
 } from '@/lib/seo';
 import { buildCanonicalUrl, buildInsightListingGraph } from '@/lib/schema-builder';
-import { fetchPublicStrapi, mediaUrl } from '@/lib/strapi';
+import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
 
 const canonicalInsightSlug = (slug: string | undefined): string | undefined =>
   slug === 'the-private-life-of-istanbul' ? 'private-life-of-istanbul' : slug;
 
-const insightsTitle = 'İçgörüler';
+const insightsTitle = 'Insights';
 const insightsDescription =
-  'Türkiye genelinde özel kültürel karşılaşmalara dair editoryal perspektifler — İstanbul, Bodrum, Kapadokya ve Ege kıyısı boyunca.';
+  'Editorial perspectives on private cultural encounters across Turkey — Istanbul, Bodrum, Cappadocia, and the Aegean coast.';
 
 export const metadata: Metadata = {
   title: insightsTitle,
@@ -129,26 +128,26 @@ const SECTION_INTROS: Record<
   { eyebrow: string; title: string; description: string }
 > = {
   featured: {
-    eyebrow: 'Öne Çıkan Yazılar',
-    title: 'En doğrudan konuşan metinler.',
+    eyebrow: 'Featured Essays',
+    title: 'The essays that speak most directly.',
     description:
-      "Bu metinler CREARE'yi en doğrudan biçimde açıklar: yer zekâsı, özel kültürel erişim ve yüzeysel seyahat ile anlamlı karşılaşma arasındaki fark.",
+      'These pieces define CREARE most directly: place intelligence, private cultural access, and the difference between surface travel and meaningful encounter.',
   },
   'cultural-world': {
-    eyebrow: 'Kültürel Dünya Yazıları',
-    title: "İstanbul, Bodrum ve Kapadokya'ya yakından bakış.",
+    eyebrow: 'Cultural World Essays',
+    title: 'Istanbul, Bodrum, and Cappadocia, read closely.',
     description:
-      'Bu yazılar doğrudan kültürel dünyaların kendisine aittir. Coğrafya, hafıza, ritüel ve erişimin tutarlı bir kültürel mantık içinde nasıl birleştiğini açıklar.',
+      'These essays belong to the worlds themselves. They clarify how geography, memory, ritual, and access combine into a coherent cultural logic.',
   },
   editorial: {
-    eyebrow: 'Editoryal Yazılar',
-    title: 'Mahremiyet, nadirlik ve kültürel dikkat üzerine yazılar.',
+    eyebrow: 'Editorial Essays',
+    title: 'Essays on privacy, rarity, and cultural attention.',
     description:
       'These texts extend beyond one destination and deepen CREARE’s editorial understanding of access, permission, and the social life of meaningful travel.',
   },
   archive: {
-    eyebrow: 'Diğer Okumalar',
-    title: 'Koleksiyondaki diğer yazılar.',
+    eyebrow: 'Further Reading',
+    title: 'Further essays in the collection.',
     description:
       'These pieces extend the editorial conversation and remain fully part of the library, even when they sit outside the first reading path.',
   },
@@ -246,7 +245,7 @@ function normalizeInsight(item: StrapiInsight): NormalizedInsight | null {
 async function fetchStrapiInsights(): Promise<NormalizedInsight[] | null> {
   const path = '/api/insights?populate=*';
   try {
-    const json = await fetchPublicStrapi(path);
+    const json = await fetchStrapi(path);
     const items: StrapiInsight[] = json?.data ?? [];
     if (!items.length) return null;
     const normalized = filterPublicInsights(items)
@@ -254,7 +253,7 @@ async function fetchStrapiInsights(): Promise<NormalizedInsight[] | null> {
       .filter(Boolean) as NormalizedInsight[];
     return normalized.length ? normalized : null;
   } catch (error) {
-    logPublicContentIssue('Insights listing unavailable in public locale.', {
+    console.error('Failed to fetch insights index data from Strapi.', {
       route: '/insights',
       strapiPath: path,
       error,
@@ -373,7 +372,7 @@ function CompactInsightsList({
               </p>
             )}
             <span className="motion-link font-body text-xs tracking-[0.12em] uppercase text-white/26 group-hover:text-white/60">
-              Oku →
+              Read →
             </span>
           </Link>
           <div className="border-t border-white/4 mt-7 sm:mt-8" />
@@ -452,13 +451,13 @@ function FeaturedEssays({ items }: { items: NormalizedInsight[] }) {
     <section aria-labelledby="featured-essays" className="mb-20 lg:mb-24">
       <div className="mb-10 max-w-2xl lg:mb-12">
         <p className="font-body text-[0.72rem] uppercase tracking-[0.18em] text-white/26 mb-3">
-          Öne Çıkan Yazılar
+          Featured Essays
         </p>
         <h2
           id="featured-essays"
           className="font-display text-3xl sm:text-4xl font-light leading-snug text-white"
         >
-          En doğrudan konuşan metinler.
+          The essays that speak most directly.
         </h2>
       </div>
 
@@ -496,7 +495,7 @@ function FeaturedEssays({ items }: { items: NormalizedInsight[] }) {
             </p>
           )}
           <span className="font-body text-xs tracking-[0.14em] uppercase text-white/34 group-hover:text-white/62 transition-colors duration-300">
-            Yazıyı Oku →
+            Read Essay →
           </span>
         </Link>
 
@@ -524,7 +523,7 @@ function FeaturedEssays({ items }: { items: NormalizedInsight[] }) {
                       </p>
                     )}
                     <span className="font-body text-[0.68rem] tracking-[0.14em] uppercase text-white/28 group-hover:text-white/58 transition-colors duration-300">
-                      Oku →
+                      Read →
                     </span>
                   </Link>
                   <div className="border-t border-white/5 mt-6" />
@@ -541,11 +540,8 @@ function FeaturedEssays({ items }: { items: NormalizedInsight[] }) {
 export default async function InsightsPage() {
   const strapiInsights = await fetchStrapiInsights();
 
-  const staticInsights = shouldUsePublicStaticEnglishFallbacks() ? buildStaticInsights() : [];
-  const displayItems =
-    staticInsights.length > 0
-      ? mergeInsights(staticInsights, strapiInsights)
-      : (strapiInsights ?? []);
+  const staticInsights = buildStaticInsights();
+  const displayItems = mergeInsights(staticInsights, strapiInsights);
   const sections = partitionInsights(displayItems);
   const insightsSchema = buildInsightListingGraph({
     pageId: `${buildCanonicalUrl('/insights')}#collection`,
@@ -574,15 +570,15 @@ export default async function InsightsPage() {
         {/* Header */}
         <div className="mb-16 max-w-3xl lg:mb-20">
           <p className="font-body text-xs tracking-[0.16em] uppercase text-white/32 mb-6">
-            İçgörüler
+            Insights
           </p>
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-light tracking-wide text-white leading-[1.08] mb-6">
-            Kültür, erişim ve mahrem karşılaşma üzerine yazılar
+            Essays on culture, access, and the private encounter
           </h1>
           <p className="font-body text-sm sm:text-base leading-relaxed text-white/60 max-w-2xl">
-            Bunlar gezi rehberleri değildir. Rotalardan önce bağlam kuran metinlerdir: yüzey yerine
-            derinlik, işlem yerine ilişki ve dikkat, güven ile zaman üzerinden açılan kültürel
-            dünyalar için yazılmıştır.
+            These are not travel guides. They are essays that build context before itinerary:
+            written for depth over surface, relationship over transaction, and cultural worlds that
+            reveal themselves through attention, trust, and time.
           </p>
         </div>
 

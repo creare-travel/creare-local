@@ -10,27 +10,22 @@ import {
   experiences as staticExperiences,
   getPublicLocalExperienceFallbacks,
 } from '@/lib/experiences';
-import {
-  isTurkishPublicLaunch,
-  logPublicContentIssue,
-  shouldUsePublicStaticEnglishFallbacks,
-} from '@/lib/public-content';
 import { buildMetadataAlternates } from '@/lib/seo';
-import { fetchPublicStrapi, mediaUrl } from '@/lib/strapi';
+import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
 const SITE_URL = 'https://crearetravel.com';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Signature Deneyimleri',
+  title: 'Signature Experiences',
   description:
-    'Her karşılaşma kültür, yer ve anlatı etrafında kurgulanır. CREARE Signature koleksiyonunu keşfedin.',
+    'Each encounter is composed around culture, place and narrative. Discover the CREARE Signature collection.',
   alternates: buildMetadataAlternates('/experiences/signature'),
   robots: { index: true, follow: true },
   openGraph: {
-    title: 'Signature Deneyimleri — CREARE',
-    description: 'Her karşılaşma kültür, yer ve anlatı etrafında kurgulanır.',
+    title: 'Signature Experiences — CREARE',
+    description: 'Each encounter is composed around culture, place and narrative.',
     url: 'https://crearetravel.com/experiences/signature',
   },
 };
@@ -120,12 +115,12 @@ function formatIntensity(value?: string | null) {
   if (!normalized) return '';
 
   const intensityMap: Record<string, string> = {
-    low: 'Düşük Yoğunluk',
-    medium: 'Orta Yoğunluk',
-    high: 'Yüksek Yoğunluk',
+    low: 'Low Intensity',
+    medium: 'Medium Intensity',
+    high: 'High Intensity',
   };
 
-  return intensityMap[normalized] ?? `${toTitleCase(value)} Yoğunluk`;
+  return intensityMap[normalized] ?? `${toTitleCase(value)} Intensity`;
 }
 
 function formatMood(value?: string | null) {
@@ -193,12 +188,7 @@ function renderExperienceCard(exp: StrapiExperience, options?: { compact?: boole
   );
 
   return href ? (
-    <Link
-      key={exp.id}
-      href={href}
-      className="group block"
-      aria-label={`${exp.title} deneyimini görüntüle`}
-    >
+    <Link key={exp.id} href={href} className="group block" aria-label={`View ${exp.title}`}>
       {card}
     </Link>
   ) : (
@@ -209,10 +199,6 @@ function renderExperienceCard(exp: StrapiExperience, options?: { compact?: boole
 }
 
 function buildStaticPerformanceFallback(): StrapiExperience[] {
-  if (!shouldUsePublicStaticEnglishFallbacks()) {
-    return [];
-  }
-
   const unavailablePerformanceSlugs = new Set([
     'golden-horn-regatta',
     'princes-islands-regatta',
@@ -238,10 +224,6 @@ function buildStaticPerformanceFallback(): StrapiExperience[] {
 }
 
 function buildStaticSignatureFallback(): StrapiExperience[] {
-  if (!shouldUsePublicStaticEnglishFallbacks()) {
-    return [];
-  }
-
   return getPublicLocalExperienceFallbacks()
     .filter((experience) => experience.slug === 'istanbul-through-the-lens')
     .filter((experience) => experience.category === 'SIGNATURE')
@@ -269,19 +251,17 @@ function buildStaticSignatureFallback(): StrapiExperience[] {
 // ── Strapi fetch helpers ──────────────────────────────────────────────────────
 async function fetchStrapiDestinations(): Promise<StrapiDestination[]> {
   try {
-    const json = await fetchPublicStrapi('/api/destinations?populate=*');
+    const json = await fetchStrapi('/api/destinations?populate=*');
     return Array.isArray(json?.data) ? json.data : [];
   } catch (error) {
-    logPublicContentIssue('Signature destinations unavailable in public locale.', { error });
+    console.error('Failed to fetch destinations for signature experiences.', error);
     return [];
   }
 }
 
 async function fetchStrapiSignatureExperiences(): Promise<StrapiExperience[]> {
   try {
-    const json = await fetchPublicStrapi(
-      '/api/experiences?filters[category][$eqi]=signature&populate=*'
-    );
+    const json = await fetchStrapi('/api/experiences?filters[category][$eqi]=signature&populate=*');
     const all: StrapiExperience[] = Array.isArray(json?.data) ? json.data : [];
 
     if (!all.length) {
@@ -298,7 +278,7 @@ async function fetchStrapiSignatureExperiences(): Promise<StrapiExperience[]> {
         })
     );
   } catch (error) {
-    logPublicContentIssue('Signature experiences unavailable in public locale.', { error });
+    console.error('Failed to fetch signature experiences from Strapi.', error);
     return [];
   }
 }
@@ -340,9 +320,7 @@ export default async function SignatureExperiencesPage() {
     (exp) => normalizeValue(exp.series) === SIGNATURE_SERIES.culinary
   );
   const corporateExperiences =
-    cmsCorporateExperiences.length > 0 || isTurkishPublicLaunch()
-      ? cmsCorporateExperiences
-      : buildStaticPerformanceFallback();
+    cmsCorporateExperiences.length > 0 ? cmsCorporateExperiences : buildStaticPerformanceFallback();
   const visibleExperienceCards = [
     ...visibleSelectedSignatureExperiences,
     ...historicalExperiences,
@@ -355,13 +333,13 @@ export default async function SignatureExperiencesPage() {
     itemListId: ids.itemList,
     breadcrumbId: ids.breadcrumbs,
     path: ids.canonical,
-    title: 'Signature Deneyimleri',
+    title: 'Signature Experiences',
     description:
-      'Her karşılaşma kültür, yer ve anlatı etrafında kurgulanır. CREARE Signature koleksiyonunu keşfedin.',
+      'Each encounter is composed around culture, place and narrative. Discover the CREARE Signature collection.',
     breadcrumbs: [
-      { name: 'Ana Sayfa', url: buildCanonicalUrl('/') },
-      { name: 'Deneyimler', url: buildCanonicalUrl('/experiences') },
-      { name: 'Signature Deneyimleri', url: ids.canonical },
+      { name: 'Home', url: buildCanonicalUrl('/') },
+      { name: 'Experiences', url: buildCanonicalUrl('/experiences') },
+      { name: 'Signature Experiences', url: ids.canonical },
     ],
     items: visibleExperienceCards.map((exp) => ({
       title: exp.title,
@@ -410,16 +388,16 @@ export default async function SignatureExperiencesPage() {
             className="font-display font-light text-white leading-tight mb-10"
             style={{ fontSize: 'clamp(2.8rem, 6vw, 5.5rem)' }}
           >
-            Signature Deneyimleri
+            Signature Experiences
           </h1>
           {/* Tighter max-width for subtext — more cinematic */}
           <p className="font-body font-light text-white/65 text-sm tracking-wide max-w-[280px] mb-16">
-            Kültür, yer ve anlatı etrafında şekillenen küratörlü karşılaşmalar.
+            Curated encounters shaped by culture, place and narrative.
           </p>
           {/* EXPLORE scroll CTA */}
           <div className="flex flex-col items-center gap-3">
             <span className="font-body text-[0.6rem] tracking-[0.3em] text-white/50 uppercase">
-              KEŞFET
+              EXPLORE
             </span>
             <div className="w-px h-10 bg-white/25" aria-hidden="true" />
           </div>
@@ -437,7 +415,7 @@ export default async function SignatureExperiencesPage() {
                   href="/"
                   className="font-body text-[0.6rem] tracking-[0.22em] text-neutral-500 uppercase hover:text-neutral-800 transition-colors"
                 >
-                  ← ANA SAYFA
+                  ← HOME
                 </Link>
               </li>
               <li aria-hidden="true">
@@ -445,7 +423,7 @@ export default async function SignatureExperiencesPage() {
               </li>
               <li>
                 <span className="font-body text-[0.6rem] tracking-[0.22em] text-neutral-800 uppercase">
-                  SIGNATURE DENEYİMLERİ
+                  SIGNATURE EXPERIENCES
                 </span>
               </li>
             </ol>
@@ -454,7 +432,7 @@ export default async function SignatureExperiencesPage() {
           {/* Destinations top links — CMS-driven with static fallback */}
           <nav className="mb-12" aria-label="Destinations">
             <p className="font-body text-[0.55rem] tracking-[0.22em] text-neutral-400/80 uppercase mb-4">
-              Kültürel Dünyalar
+              Destinations
             </p>
             <div className="flex flex-wrap gap-x-6 gap-y-2">
               {strapiDestinations.length > 0 ? (
@@ -473,16 +451,16 @@ export default async function SignatureExperiencesPage() {
                     href="/cultural-worlds/istanbul"
                     className="font-body text-[0.7rem] tracking-[0.15em] text-neutral-600 uppercase hover:text-neutral-900 transition-colors underline underline-offset-2"
                   >
-                    İstanbul
+                    Istanbul
                   </Link>
                   <Link
                     href="/cultural-worlds/cappadocia"
                     className="font-body text-[0.7rem] tracking-[0.15em] text-neutral-600 uppercase hover:text-neutral-900 transition-colors underline underline-offset-2"
                   >
-                    Kapadokya
+                    Cappadocia
                   </Link>
                   <span className="font-body text-[0.7rem] tracking-[0.15em] text-neutral-600 uppercase">
-                    Ege
+                    Aegean
                   </span>
                 </>
               )}
@@ -495,61 +473,62 @@ export default async function SignatureExperiencesPage() {
               className="font-display font-light text-neutral-800 leading-[1.9]"
               style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)' }}
             >
-              Her karşılaşma kültür, yer ve anlatı etrafında kurgulanır.
+              Each encounter is composed around culture, place and narrative.
             </h2>
             <p
               className="font-display font-light text-neutral-800 leading-[1.9] mt-1"
               style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)' }}
             >
-              Rotalar değil; özenle tasarlanmış karşılaşmalar.
+              Not itineraries — but designed experiences.
             </p>
             {/* Third line: smaller, lighter — supporting note */}
             <p
               className="font-body font-light text-neutral-500 tracking-wide mt-5"
               style={{ fontSize: 'clamp(0.78rem, 1.2vw, 0.88rem)' }}
             >
-              Yıllara yayılan erişim, ilişkiler ve yaratıcı zekâdan doğar; kültürel dünyaları içinde
-              kök salar:{' '}
+              Built from years of access, relationships and creative intelligence — rooted in the
+              cultural worlds of{' '}
               <Link
                 href="/cultural-worlds/istanbul"
                 className="underline underline-offset-2 hover:text-neutral-700 transition-colors"
               >
-                İstanbul
+                Istanbul
               </Link>
               ,{' '}
               <Link
                 href="/cultural-worlds/cappadocia"
                 className="underline underline-offset-2 hover:text-neutral-700 transition-colors"
               >
-                Kapadokya
+                Cappadocia
               </Link>
-              , ve <span className="underline underline-offset-2">Ege</span>.
+              , and the <span className="underline underline-offset-2">Aegean</span>.
             </p>
             <p
               className="mx-auto mt-8 max-w-2xl font-body text-sm leading-relaxed text-neutral-600"
               style={{ fontSize: 'clamp(0.9rem, 1.2vw, 0.98rem)' }}
             >
-              Signature, CREARE&apos;nin yazarlı katmanıdır: önceden kurgulanan ama yerin yaşayan
-              zekâsına dayanan kültürel deneyimler. Her biri; yerel bilgi, sınanmış ilişkiler ve bir
-              anı yalnız erişimin ötesinde anlamlı kılan koşullara dair açık bir kavrayışla inşa
-              edilir.
+              Signature is CREARE&apos;s authored layer: cultural experiences shaped in advance, yet
+              grounded in the living intelligence of place. Each one is built through local
+              knowledge, tested relationships, and a clear understanding of what allows a moment to
+              carry meaning beyond access alone.
             </p>
             <p
               className="mx-auto mt-5 max-w-2xl font-body text-sm leading-relaxed text-neutral-600"
               style={{ fontSize: 'clamp(0.9rem, 1.2vw, 0.98rem)' }}
             >
-              Amaç durak biriktirmek değil; mekân, ev sahibi, anlatı ve misafir arasında süreklilik
-              kurmaktır. Kültür burada bir performans ya da dekor olarak değil; emanetçilik, hafıza
-              ve bir yeri içeriden taşımayı sürdüren insanlar tarafından şekillenen yaşayan bir
-              sistem olarak ele alınır.
+              The aim is not to accumulate stops, but to establish continuity between setting, host,
+              narrative, and guest. Culture is approached here not as performance or backdrop, but
+              as a living system shaped by custodianship, memory, and the people who continue to
+              carry a place forward from within.
             </p>
             <p
               className="mx-auto mt-5 max-w-2xl font-body text-sm leading-relaxed text-neutral-600"
               style={{ fontSize: 'clamp(0.9rem, 1.2vw, 0.98rem)' }}
             >
-              Signature deneyimini ayrıksı kılan da budur. Derinlemesine anlaşılmış bir kültürel
-              dünyaya kurgulanmış bir giriş sunar; böylece karşılaşma gezip görmeden değil tanımadan
-              başlayabilir ve erişim teşhirden değil bağlamdan doğabilir.
+              That is what makes a Signature experience distinct. It offers a composed path into a
+              cultural world already understood in depth, so that encounter can begin from
+              recognition rather than sightseeing, and access can emerge through context instead of
+              display.
             </p>
           </div>
         </div>
@@ -567,7 +546,7 @@ export default async function SignatureExperiencesPage() {
             color: 'rgba(26,26,24,0.38)',
           }}
         >
-          Seçilmiş. Tesadüfen bulunmuş değil.
+          Selected. Not discovered.
         </p>
       </div>
 
@@ -575,7 +554,7 @@ export default async function SignatureExperiencesPage() {
       {visibleSelectedSignatureExperiences.length > 0 && (
         <section
           className="bg-[#EDEAE4] pb-36 md:pb-48"
-          aria-label="Seçilmiş Signature deneyimleri"
+          aria-label="Selected Signature Experiences"
         >
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="grid grid-cols-1 gap-x-8 gap-y-16 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-16">
@@ -600,7 +579,7 @@ export default async function SignatureExperiencesPage() {
                 className="font-display font-light text-neutral-900 leading-tight"
                 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)' }}
               >
-                Tarih Serisi
+                Historical Series
               </h2>
             </div>
 
@@ -627,7 +606,7 @@ export default async function SignatureExperiencesPage() {
                 className="font-display font-light text-neutral-900 leading-tight"
                 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)' }}
               >
-                Kurumsal Seri
+                Corporate Series
               </h2>
             </div>
 
@@ -654,7 +633,7 @@ export default async function SignatureExperiencesPage() {
                 className="font-display font-light text-neutral-900 leading-tight"
                 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)' }}
               >
-                Mutfak Serisi
+                Culinary Series
               </h2>
             </div>
 

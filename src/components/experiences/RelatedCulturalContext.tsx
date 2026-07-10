@@ -14,17 +14,17 @@ const CULTURAL_WORLD_CONTEXTS: Record<
     url: '/cultural-worlds/istanbul',
     paragraphs: {
       'floating-salon-d-opera':
-        'Bu deneyim, Boğazın binyıllar boyunca imparatorlukların, ticaretin ve sanatsal ifadenin sahnesi olduğu İstanbul kültürel dünyasında var olur. Bu tekneyi taşıyan sular, Bizans törenlerine, Osmanlı ticaretine ve tek bir kimliğe indirgenmeyi reddeden bir şehrin sürekli yeniden kuruluşuna tanıklık etmiştir.',
+        'This experience exists within the cultural world of Istanbul, where the Bosphorus has been the stage for empire, trade, and artistic expression for millennia. The waters that carry this vessel have witnessed Byzantine ceremonies, Ottoman commerce, and the continuous reinvention of a city that refuses to be singular.',
       'beylerbeyi-1869':
-        'Bu deneyim, İstanbul’un Osmanlı mirasına dayanır; imparatorluk mimarisinin hâlâ bir imparatorluğu şekillendiren törenlerin ve ritüellerin hafızasını taşıdığı bir şehre. Beylerbeyi Sarayı, taşında ve varaklarında korunmuş bu dünyanın fiziksel arşivi olarak ayakta durur.',
+        "This experience is rooted in Istanbul's Ottoman heritage — a city where imperial architecture still holds the memory of the ceremonies and rituals that shaped an empire. Beylerbeyi Palace stands as a physical archive of that world, preserved in stone and gilt.",
       'imperial-flavors':
-        'Bu deneyim, İstanbul’un üç kıtanın kavşağı oluşundan beslenir; imparatorluk mutfağının Osmanlı coğrafyasının dört yanından tatları bir araya getirdiği bir şehirden. Tadacağınız yemekler, ticaret yollarının, kültürel alışverişin ve yüzyıllara yayılan mutfak inceliğinin hafızasını taşır.',
+        "This experience draws from Istanbul's position as the crossroads of three continents, where the imperial kitchen synthesized flavours from across the Ottoman world. The dishes you will taste carry the memory of trade routes, cultural exchange, and centuries of culinary refinement.",
       'istanbul-through-the-lens':
-        'Bu deneyim, İstanbul’un katmanlı coğrafyasında açılır; Bizans, Osmanlı ve çağdaş kültürlerin aynı manzara içinde eşzamanlı var olduğu bir şehirde. Fotoğraf, bu katmanları okumanın; tek bir yerin nasıl bu kadar çok tarihi taşıyabildiğini anlamanın bir yoluna dönüşür.',
+        'This experience unfolds across the layered geography of Istanbul — a city where Byzantine, Ottoman, and contemporary cultures exist simultaneously in the same landscape. Photography becomes a method of reading these layers, of understanding how a single place can hold so many histories.',
       'curated-art-salon':
-        'Bu deneyim, İstanbul’un yaşayan sanat kültürüne bağlanır; çağdaş üretimin, şehri yüzyıllar boyunca tanımlayan himaye ve sanatsal alışveriş geleneklerini sürdürdüğü bir dünyaya. Karşılaşacağınız sanatçılar, kesintisiz bir üretici ve düşünür hattının parçasıdır.',
+        "This experience connects to Istanbul's living artistic culture — a city where contemporary creation continues the traditions of patronage and artistic exchange that have defined the city for centuries. The artists you will meet are part of a continuous lineage of makers and thinkers.",
       'silk-road-istanbul':
-        'Bu deneyim, İstanbul’u Orta Çağ dünyasının merkezi hâline getiren ticaret yollarının izini sürer. Kapalıçarşı, bu yolların fiziksel tezahürü olmayı sürdürür; imparatorluklar kuran ticaretin, zanaatin ve kültürel alışverişin yaşayan arşivi olarak.',
+        'This experience traces the trading routes that made Istanbul the centre of the medieval world. The Grand Bazaar remains the physical manifestation of those routes — a living archive of the commerce, craftsmanship, and cultural exchange that built empires.',
       'golden-horn-regatta':
         "This experience unfolds on the Golden Horn, one of Istanbul's most storied waterways — a place where Byzantine fleets once anchored, where Ottoman commerce flowed, and where the city's relationship with the water has shaped its identity for thousands of years.",
       'princes-islands-regatta':
@@ -32,7 +32,7 @@ const CULTURAL_WORLD_CONTEXTS: Record<
       'driven-by-performance':
         "This experience is grounded in Istanbul's contemporary culture — a city that has always been defined by motion, transformation, and the drive to exceed limits. The principles of performance you will explore are rooted in the city's own relentless energy.",
       'the-studio-session':
-        'Bu deneyim, İstanbul’un en deneysel yaratıcı bölgelerinden biri olan Karaköy’de gerçekleşir; çağdaş sanatsal pratiğin kentin uzun kültürel üretim ve yenilik tarihini sürdürdüğü bir mahallede.',
+        "This experience takes place in Karaköy, one of Istanbul's most experimental creative districts — a neighbourhood where contemporary artistic practice continues the city's long history of cultural production and artistic innovation.",
       'cultural-immersion-lab':
         "This experience unfolds in Balat, one of Istanbul's most layered neighbourhoods, where Byzantine, Ottoman, and contemporary cultures exist in the same streets. The neighbourhood itself becomes a text to be read, understood, and interpreted.",
       'narrative-workshop':
@@ -49,7 +49,7 @@ const CULTURAL_WORLD_CONTEXTS: Record<
     url: '/cultural-worlds/bodrum',
     paragraphs: {
       'table-to-farm-bodrum':
-        'Bu deneyim, Bodrum’un Ege kıyısındaki konumuna dayanır; antik Halikarnassos’un, Haçlı mimarisinin ve çağdaş kıyı yaşamının kesiştiği bir yarımadaya. Ziyaret edeceğiniz çiftlik, Bodrum’un manzarasıyla kurduğu yaşayan ilişkinin bir parçasıdır; burada tarım ve misafirperverlik birbirinden ayrılmaz.',
+        "This experience is rooted in Bodrum's position on the Aegean coast — a peninsula where ancient Halicarnassus, Crusader architecture, and contemporary coastal life converge. The farm you will visit is part of Bodrum's living relationship with its landscape, where agriculture and hospitality remain inseparable.",
     },
   },
   cappadocia: {
@@ -83,13 +83,13 @@ export default function RelatedCulturalContext({
   const contextParagraph =
     normalizedExperienceKey && worldConfig.paragraphs[normalizedExperienceKey]
       ? worldConfig.paragraphs[normalizedExperienceKey]
-      : `Bu deneyim, tarihi, gelenekleri ve yaşayan mirasıyla şekillenen ${culturalWorld} kültürel dünyasına dayanır.`;
+      : `This experience is rooted in the cultural world of ${culturalWorld}, shaped by its history, traditions, and living heritage.`;
 
   // Strip trailing period from paragraph text so the link integrates cleanly
   const paragraphText = contextParagraph.replace(/\.\s*$/, '');
 
   return (
-    <section className="bg-white py-20 md:py-28" aria-label="Kültürel bağlam">
+    <section className="bg-white py-20 md:py-28" aria-label="Cultural context">
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
         <div className="max-w-3xl">
           <p className="font-body text-base text-neutral-700 leading-relaxed mb-6">

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
 import { filterPublicExperiences } from '@/lib/canonical-gates';
-import { fetchPublicStrapi } from '@/lib/strapi';
+import { fetchStrapi } from '@/lib/strapi';
 import { buildCanonicalUrl, buildExperienceListingGraph } from '@/lib/schema-builder';
 import {
   buildMetadataAlternates,
@@ -13,9 +13,9 @@ import {
   DEFAULT_OG_IMAGE_ALT,
 } from '@/lib/seo';
 
-const experiencesTitle = 'Deneyimler';
+const experiencesTitle = 'Experiences';
 const experiencesDescription =
-  'CREARE deneyime üç ayrı yoldan yaklaşır: küratörlü kültürel karşılaşmalar için Signature, birlikte şekillenen komisyonlar için LAB ve mahrem, davete dayalı erişim için BLACK.';
+  'CREARE approaches experience through three distinct paths: Signature for curated cultural encounters, LAB for co-created commissions, and BLACK for discreet invitation-only access.';
 
 export const metadata: Metadata = {
   title: experiencesTitle,
@@ -50,10 +50,10 @@ interface CollectionFeature {
 const collectionFeatures: CollectionFeature[] = [
   {
     label: 'Signature',
-    title: 'Küratörlü kültürel karşılaşmalar.',
+    title: 'Curated cultural experiences.',
     description:
-      'Kurgulanmış, sınanmış ve yaşanmaya hazır. Signature deneyimleri, kültürel biçimi önceden netleşmiş CREARE karşılaşmalarıdır.',
-    distinction: 'Editoryal hassasiyet ve kültürel açıklık arayan misafirler için.',
+      'Composed, tested, and ready to be lived. Signature experiences are CREARE encounters already resolved into a clear cultural form.',
+    distinction: 'For guests seeking editorial precision and cultural clarity.',
     href: '/experiences/signature',
     image:
       'https://res.cloudinary.com/djr97wm0n/image/upload/v1780570337/creare-signature-approach-image.jpg',
@@ -61,11 +61,10 @@ const collectionFeatures: CollectionFeature[] = [
   },
   {
     label: 'LAB',
-    title: 'Niyet etrafında birlikte şekillenir.',
+    title: 'Co-created from the brief.',
     description:
-      'LAB, kişiye özel tasarım katmanıdır. Deneyim bir katalogdan seçilmez; sohbet, bağlam ve niyet üzerinden geliştirilir.',
-    distinction:
-      'Kendileri için özel olarak kurulmuş bir kültürel kompozisyona ihtiyaç duyan misafirler için.',
+      'LAB is the custom design layer. The experience is not selected from a catalogue; it is developed through conversation, context, and intent.',
+    distinction: 'For guests who need a cultural composition built specifically for them.',
     href: '/experiences/lab',
     image:
       'https://res.cloudinary.com/djr97wm0n/image/upload/v1780571707/creare-lab-approach-image.jpg',
@@ -73,10 +72,10 @@ const collectionFeatures: CollectionFeature[] = [
   },
   {
     label: 'BLACK',
-    title: 'Mahrem, davete dayalı erişim.',
+    title: 'Discreet invitation-only access.',
     description:
-      'BLACK; güvene, mahremiyete ve açık dolaşıma uygun olmayan ilişkilere dayanan özel düzenlemeler için ayrılmıştır.',
-    distinction: 'Erişimin kendisinin dahi kontrollü kalması gereken durumlar için.',
+      'BLACK is reserved for private arrangements that rely on trust, discretion, and relationships not intended for open circulation.',
+    distinction: 'For situations where access itself must remain controlled.',
     href: '/experiences/black',
     image:
       'https://res.cloudinary.com/djr97wm0n/image/upload/v1780572561/creare-black-approach-image.jpg',
@@ -110,7 +109,7 @@ function isPublishedExperience(item: unknown): item is StrapiExperience {
 
 async function fetchPublishedExperiences(): Promise<StrapiExperience[]> {
   try {
-    const json = await fetchPublicStrapi(
+    const json = await fetchStrapi(
       '/api/experiences?fields[0]=title&fields[1]=slug&fields[2]=short_description&fields[3]=visibility_status&fields[4]=publishedAt&pagination[pageSize]=12'
     );
     const items: unknown[] = Array.isArray(json?.data) ? json.data : [];
@@ -128,11 +127,11 @@ export default async function ExperiencesPage() {
     itemListId: `${buildCanonicalUrl('/experiences')}#itemlist`,
     breadcrumbId: `${buildCanonicalUrl('/experiences')}#breadcrumbs`,
     path: buildCanonicalUrl('/experiences'),
-    title: 'Deneyimler',
+    title: 'Experiences',
     description: experiencesDescription,
     breadcrumbs: [
-      { name: 'Ana Sayfa', url: buildCanonicalUrl('/') },
-      { name: 'Deneyimler', url: buildCanonicalUrl('/experiences') },
+      { name: 'Home', url: buildCanonicalUrl('/') },
+      { name: 'Experiences', url: buildCanonicalUrl('/experiences') },
     ],
     items: collectionFeatures.map((feature) => ({
       title: feature.label,
@@ -167,17 +166,17 @@ export default async function ExperiencesPage() {
 
         <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-20 pt-36 sm:px-10 lg:px-16">
           <p className="mb-6 font-body text-[0.6rem] uppercase tracking-[0.32em] text-white/32">
-            Üç Farklı Giriş Biçimi
+            Three Ways to Enter
           </p>
           <h1
             className="max-w-4xl font-display font-light leading-[1.05] text-white"
             style={{ fontSize: 'clamp(2.8rem, 6vw, 5.8rem)' }}
           >
-            Deneyimler
+            Experiences
           </h1>
           <p className="mt-8 max-w-2xl font-body text-sm leading-relaxed text-white/58 sm:text-[0.95rem]">
-            CREARE deneyime üç ayrı yoldan yaklaşır: kurgulanmış kültürel karşılaşmalar, misafirin
-            etrafında şekillenen komisyonlar ve doğru bağlama ayrılmış mahrem erişim.
+            CREARE approaches experience through three distinct paths: composed cultural encounters,
+            commissions shaped around the guest, and discreet access reserved for the right context.
           </p>
         </div>
       </section>
@@ -186,27 +185,26 @@ export default async function ExperiencesPage() {
         <div className="grid gap-10 border-t border-white/10 pt-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
           <div>
             <p className="mb-6 font-body text-[0.6rem] uppercase tracking-[0.28em] text-white/32">
-              Koleksiyon
+              The Collection
             </p>
             <p
               className="max-w-2xl font-display font-light leading-relaxed text-white/88"
               style={{ fontSize: 'clamp(1.2rem, 2vw, 1.6rem)' }}
             >
-              Her yol, misafir, yer ve erişim arasında farklı bir ilişkiyi yansıtır. Signature
-              kurgulanmış bir karşılaşmayla başlar. LAB bir sohbetle başlar. BLACK ise yayının
-              bittiği yerde başlar.
+              Each path reflects a different relationship between guest, place, and access.
+              Signature begins with a composed encounter. LAB begins with a conversation. BLACK
+              begins where publication ends.
             </p>
           </div>
 
           <div className="space-y-5">
             <p className="font-body text-sm leading-relaxed text-white/56">
-              Bu koleksiyon, CREARE&apos;nin çalışma biçimlerini; her karşılaşmayı aynı kalıba
-              indirgemeden açıklar.
+              This collection clarifies the different ways CREARE works, without reducing every
+              encounter to the same form.
             </p>
             <p className="font-body text-sm leading-relaxed text-white/40">
-              Misafirin hazır bir karşılaşmaya mı girdiğini, kendine göre bir kompozisyon mu
-              kurduğunu, yoksa daha mahrem bir erişim katmanında mı hareket ettiğini anlamasına
-              yardımcı olur.
+              It helps guests understand whether they are entering a finished encounter, shaping one
+              around themselves, or moving within a more private tier of access.
             </p>
           </div>
         </div>
@@ -219,7 +217,7 @@ export default async function ExperiencesPage() {
               <Link
                 href={feature.href}
                 className="group block"
-                aria-label={`${feature.label} koleksiyonunu keşfet`}
+                aria-label={`Explore ${feature.label}`}
               >
                 <div className="relative aspect-[3/4] overflow-hidden lg:aspect-[7/10]">
                   <Image
@@ -241,7 +239,7 @@ export default async function ExperiencesPage() {
                       {feature.description}
                     </p>
                     <span className="mt-6 inline-block font-body text-[0.62rem] uppercase tracking-[0.24em] text-white/48 transition-colors group-hover:text-white/82">
-                      Gir →
+                      Enter →
                     </span>
                   </div>
                 </div>
@@ -258,9 +256,11 @@ export default async function ExperiencesPage() {
         <section className="mx-auto max-w-7xl px-6 pb-32 sm:px-10 lg:px-16">
           <div className="border-t border-white/10 pt-14">
             <p className="mb-3 font-body text-[0.6rem] uppercase tracking-[0.28em] text-white/30">
-              Diğer Karşılaşmalar
+              Further Encounters
             </p>
-            <h2 className="mb-10 font-display text-3xl font-light text-white">Koleksiyondan</h2>
+            <h2 className="mb-10 font-display text-3xl font-light text-white">
+              From the Collection
+            </h2>
           </div>
 
           <ul className="divide-y divide-white/10">
@@ -284,7 +284,7 @@ export default async function ExperiencesPage() {
                       )}
                     </div>
                     <span className="shrink-0 font-body text-[0.62rem] uppercase tracking-[0.22em] text-white/30 transition-colors group-hover:text-white/62">
-                      Gör →
+                      View →
                     </span>
                   </Link>
                 </li>
