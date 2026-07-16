@@ -7,6 +7,7 @@ import AppImage from '@/components/ui/AppImage';
 import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { buildExperienceInquiryHref } from '@/lib/inquiry';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { buildMetadataAlternates } from '@/lib/seo';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 
@@ -93,9 +94,13 @@ function getGeoMetadataLine(exp: StrapiExperience) {
     .join(' · ');
 }
 
-async function fetchLabExperiences(): Promise<StrapiExperience[]> {
+async function fetchLabExperiences(
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): Promise<StrapiExperience[]> {
   try {
-    const json = await fetchStrapi('/api/experiences?filters[category][$eqi]=lab&populate=*');
+    const json = await fetchStrapi('/api/experiences?filters[category][$eqi]=lab&populate=*', {
+      locale,
+    });
     const items: StrapiExperience[] = Array.isArray(json?.data) ? json.data : [];
     return filterPublicExperiences(items);
   } catch (error) {
@@ -105,7 +110,7 @@ async function fetchLabExperiences(): Promise<StrapiExperience[]> {
 }
 
 export default async function LabPage() {
-  const labExperiences = await fetchLabExperiences();
+  const labExperiences = await fetchLabExperiences(DEFAULT_SITE_LOCALE);
   const ids = listingIds('/experiences/lab');
   const labSchemaGraph = buildExperienceListingGraph({
     pageId: ids.collection,

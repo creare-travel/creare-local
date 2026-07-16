@@ -6,6 +6,8 @@ import CulturalWorldViewTracker from '@/components/CulturalWorldViewTracker';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import { getCulturalWorldContent, type CulturalWorldSystemMapping } from '@/data/cultural-worlds';
+import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import {
   filterPublicExperiences,
   filterPublicInsights,
@@ -226,7 +228,7 @@ function buildFallbackDestinationFromLocalContent(
   };
 }
 
-async function fetchAllExperiences(): Promise<StrapiExperience[]> {
+async function fetchAllExperiences(locale: SiteLocale): Promise<StrapiExperience[]> {
   const params = new URLSearchParams({
     'filters[visibility_status][$eqi]': 'active',
     'pagination[pageSize]': '100',
@@ -238,7 +240,7 @@ async function fetchAllExperiences(): Promise<StrapiExperience[]> {
   const path = `/api/experiences?${params.toString()}`;
 
   try {
-    const json = await fetchStrapi(path);
+    const json = await fetchStrapi(path, { locale });
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
 
     return items
@@ -461,7 +463,10 @@ function renderBodyContent(content?: StrapiRichTextNode[] | string) {
   return null;
 }
 
-async function fetchDestination(slug: string): Promise<StrapiDestination | null> {
+async function fetchDestination(
+  slug: string,
+  locale: SiteLocale
+): Promise<StrapiDestination | null> {
   if (!slug) return null;
 
   const params = new URLSearchParams({
@@ -477,7 +482,7 @@ async function fetchDestination(slug: string): Promise<StrapiDestination | null>
   const path = `/api/destinations?${params.toString()}`;
 
   try {
-    const json = await fetchStrapi(path);
+    const json = await fetchStrapi(path, { locale });
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
     if (!items.length) return null;
 
@@ -519,6 +524,7 @@ async function fetchDestination(slug: string): Promise<StrapiDestination | null>
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const locale = DEFAULT_SITE_LOCALE;
   if (!isCanonicalCulturalWorldSlug(slug)) {
     return {
       title: 'Not Found — Cultural World',
@@ -526,9 +532,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       robots: { index: false, follow: false },
     };
   }
-  const localContent = getCulturalWorldContent(slug);
-  const destination = await fetchDestination(slug);
-  const fallbackDestination = buildFallbackDestinationFromLocalContent(localContent);
+  const localContent = getCulturalWorldContent(slug, locale);
+  const destination = await fetchDestination(slug, locale);
+  const fallbackDestination = canUseEnglishFallback(locale)
+    ? buildFallbackDestinationFromLocalContent(localContent)
+    : null;
 
   if (destination && destination.visibility_status?.toLowerCase() !== 'active') {
     return {
@@ -566,15 +574,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CulturalWorldPage({ params }: Props) {
   const { slug } = await params;
+  const locale = DEFAULT_SITE_LOCALE;
   if (!isCanonicalCulturalWorldSlug(slug)) {
     notFound();
   }
-  const localContent = getCulturalWorldContent(slug);
+  const localContent = getCulturalWorldContent(slug, locale);
   const [destination, allExperiences] = await Promise.all([
-    fetchDestination(slug),
-    fetchAllExperiences(),
+    fetchDestination(slug, locale),
+    fetchAllExperiences(locale),
   ]);
-  const fallbackDestination = buildFallbackDestinationFromLocalContent(localContent);
+  const fallbackDestination = canUseEnglishFallback(locale)
+    ? buildFallbackDestinationFromLocalContent(localContent)
+    : null;
 
   if (destination && destination.visibility_status?.toLowerCase() !== 'active') {
     notFound();
@@ -604,12 +615,14 @@ export default async function CulturalWorldPage({ params }: Props) {
   const cmsSections = normalizeRelationArray<StrapiSection>(resolvedDestination.sections)
     .filter((section) => section.title || section.body)
     .sort((a, b) => (a.section_number ?? Infinity) - (b.section_number ?? Infinity));
-  const fallbackSections = (localContent?.sections ?? []).map((section, index) => ({
-    id: -(index + 1),
-    section_number: index + 1,
-    title: section.title,
-    body: section.body,
-  }));
+  const fallbackSections = canUseEnglishFallback(locale)
+    ? (localContent?.sections ?? []).map((section, index) => ({
+        id: -(index + 1),
+        section_number: index + 1,
+        title: section.title,
+        body: section.body,
+      }))
+    : [];
   const sections = (fallbackSections.length > 0 ? fallbackSections : cmsSections).filter(
     (section) => section.title || section.body
   );
@@ -631,11 +644,13 @@ export default async function CulturalWorldPage({ params }: Props) {
   const cmsInsights = filterPublicInsights(
     normalizeRelationArray<StrapiInsight>(resolvedDestination.insights)
   ).filter((insight) => insight.slug && insight.title);
-  const fallbackInsights = (localContent?.furtherReading ?? []).map((insight, index) => ({
-    id: -(index + 1),
-    slug: insight.slug,
-    title: insight.title,
-  }));
+  const fallbackInsights = canUseEnglishFallback(locale)
+    ? (localContent?.furtherReading ?? []).map((insight, index) => ({
+        id: -(index + 1),
+        slug: insight.slug,
+        title: insight.title,
+      }))
+    : [];
   const insights = (fallbackInsights.length > 0 ? fallbackInsights : cmsInsights).filter(
     (insight) => insight.slug && insight.title
   );

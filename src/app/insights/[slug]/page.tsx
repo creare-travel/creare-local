@@ -16,6 +16,8 @@ import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 import { filterPublicExperiences, isPublicInsightRecord } from '@/lib/canonical-gates';
 import { getInsightBySlug, isCanonicalCulturalWorldSlug, type Insight } from '@/data/insights';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
+import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -142,7 +144,7 @@ const CANONICAL_ISTANBUL_INSIGHT_SLUG = 'private-life-of-istanbul';
 const canonicalInsightSlug = (slug: string | undefined): string | undefined =>
   slug === LEGACY_ISTANBUL_INSIGHT_SLUG ? CANONICAL_ISTANBUL_INSIGHT_SLUG : slug;
 
-async function fetchInsight(slug: string): Promise<StrapiInsight | null> {
+async function fetchInsight(slug: string, locale: SiteLocale): Promise<StrapiInsight | null> {
   if (!slug) return null;
   const params = new URLSearchParams();
   params.set('filters[slug][$eq]', slug);
@@ -152,7 +154,7 @@ async function fetchInsight(slug: string): Promise<StrapiInsight | null> {
   const path = `/api/insights?${params.toString()}`;
 
   try {
-    const json = await fetchStrapi(path);
+    const json = await fetchStrapi(path, { locale });
     const items = json?.data;
     if (!items || items.length === 0) return null;
     const raw = items[0];
@@ -187,7 +189,10 @@ async function fetchInsight(slug: string): Promise<StrapiInsight | null> {
   }
 }
 
-async function fetchExperiencesBySlugs(slugs: string[]): Promise<StrapiExperience[]> {
+async function fetchExperiencesBySlugs(
+  slugs: string[],
+  locale: SiteLocale
+): Promise<StrapiExperience[]> {
   const uniqueSlugs = [...new Set(slugs.filter(Boolean))];
   if (uniqueSlugs.length === 0) return [];
 
@@ -207,7 +212,7 @@ async function fetchExperiencesBySlugs(slugs: string[]): Promise<StrapiExperienc
   params.set('pagination[pageSize]', String(uniqueSlugs.length));
 
   try {
-    const json = await fetchStrapi(`/api/experiences?${params.toString()}`);
+    const json = await fetchStrapi(`/api/experiences?${params.toString()}`, { locale });
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
     const entries: [string, StrapiExperience][] = filterPublicExperiences(
       items.map((item) => flattenItem<StrapiExperience>(item))
@@ -243,8 +248,10 @@ async function fetchExperiencesBySlugs(slugs: string[]): Promise<StrapiExperienc
   }
 }
 
-function buildStaticInsight(slug: string): ResolvedInsight | null {
-  const insight = getInsightBySlug(slug);
+function buildStaticInsight(slug: string, locale: SiteLocale): ResolvedInsight | null {
+  if (!canUseEnglishFallback(locale)) return null;
+
+  const insight = getInsightBySlug(slug, locale);
   if (!insight) return null;
 
   const staticDestination =
@@ -270,9 +277,9 @@ function buildStaticInsight(slug: string): ResolvedInsight | null {
   };
 }
 
-async function resolveInsight(slug: string): Promise<ResolvedInsight | null> {
-  const strapiInsight = await fetchInsight(slug);
-  const staticInsight = buildStaticInsight(slug);
+async function resolveInsight(slug: string, locale: SiteLocale): Promise<ResolvedInsight | null> {
+  const strapiInsight = await fetchInsight(slug, locale);
+  const staticInsight = buildStaticInsight(slug, locale);
 
   const normalizedStrapiDestination =
     strapiInsight?.destination?.slug && isCanonicalCulturalWorldSlug(strapiInsight.destination.slug)
@@ -308,7 +315,8 @@ async function resolveInsight(slug: string): Promise<ResolvedInsight | null> {
 
   if (staticInsight) {
     const staticExperiences = await fetchExperiencesBySlugs(
-      getInsightBySlug(slug)?.relatedExperiences ?? []
+      getInsightBySlug(slug, locale)?.relatedExperiences ?? [],
+      locale
     );
 
     return {
@@ -329,14 +337,16 @@ interface RelatedEssayReference {
 
 function buildRelatedEssayReferences(
   relatedEssaySlugs: string[] | undefined,
-  currentSlug: string
+  currentSlug: string,
+  locale: SiteLocale
 ): RelatedEssayReference[] {
+  if (!canUseEnglishFallback(locale)) return [];
   if (!relatedEssaySlugs?.length) return [];
 
   const seen = new Set<string>();
 
   return relatedEssaySlugs
-    .map((slug) => getInsightBySlug(slug))
+    .map((slug) => getInsightBySlug(slug, locale))
     .filter((essay): essay is Insight => Boolean(essay))
     .filter((essay) => essay.slug !== currentSlug)
     .filter((essay) => {
@@ -355,8 +365,9 @@ function buildRelatedEssayReferences(
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const locale = DEFAULT_SITE_LOCALE;
   const canonicalSlug = canonicalInsightSlug(slug) ?? slug;
-  const insight = await resolveInsight(canonicalSlug);
+  const insight = await resolveInsight(canonicalSlug, locale);
 
   if (!insight) {
     return { title: 'Not Found' };
@@ -594,6 +605,7 @@ function RelatedEssayList({ essays }: { essays: RelatedEssayReference[] }) {
 
 export default async function InsightArticlePage({ params }: Props) {
   const { slug } = await params;
+  const locale = DEFAULT_SITE_LOCALE;
 
   // Slug safety: ensure slug is defined before rendering
   if (!slug) {
@@ -604,7 +616,7 @@ export default async function InsightArticlePage({ params }: Props) {
     permanentRedirect(`/insights/${CANONICAL_ISTANBUL_INSIGHT_SLUG}`);
   }
 
-  const insight = await resolveInsight(canonicalInsightSlug(slug) ?? slug);
+  const insight = await resolveInsight(canonicalInsightSlug(slug) ?? slug, locale);
 
   if (!insight || !insight.slug) {
     notFound();
@@ -625,7 +637,7 @@ export default async function InsightArticlePage({ params }: Props) {
   const relatedExperiences: StrapiExperience[] = Array.isArray(insight.experiences)
     ? insight.experiences
     : [];
-  const relatedEssays = buildRelatedEssayReferences(insight.relatedEssays, insight.slug);
+  const relatedEssays = buildRelatedEssayReferences(insight.relatedEssays, insight.slug, locale);
 
   const contentNode = renderRichText(insight.content);
   const insightSchema = buildInsightDetailGraph({

@@ -1,3 +1,6 @@
+import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
+
 export type CanonicalCulturalWorldSlug = 'istanbul' | 'bodrum' | 'cappadocia';
 
 export interface Insight {
@@ -542,12 +545,20 @@ They were designed to be something else. The invitation is to be present for tha
   },
 ];
 
-export function getInsightBySlug(slug: string): Insight | undefined {
+export function getInsightBySlug(
+  slug: string,
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): Insight | undefined {
+  if (!canUseEnglishFallback(locale)) return undefined;
   const normalizedSlug =
     slug === 'the-private-life-of-istanbul' ? 'private-life-of-istanbul' : slug;
   return insights.find((i) => i.slug === normalizedSlug);
 }
 
-export function getInsightsByLocation(location: Insight['location']): Insight[] {
+export function getInsightsByLocation(
+  location: Insight['location'],
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): Insight[] {
+  if (!canUseEnglishFallback(locale)) return [];
   return insights.filter((i) => i.location === location);
 }

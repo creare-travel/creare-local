@@ -6,6 +6,7 @@ import JsonLd from '@/components/JsonLd';
 import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { buildExperienceInquiryHref } from '@/lib/inquiry';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { buildMetadataAlternates } from '@/lib/seo';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 
@@ -92,9 +93,13 @@ function getGeoMetadataLine(exp: StrapiExperience) {
     .join(' · ');
 }
 
-async function fetchBlackExperiences(): Promise<StrapiExperience[]> {
+async function fetchBlackExperiences(
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): Promise<StrapiExperience[]> {
   try {
-    const json = await fetchStrapi('/api/experiences?filters[category][$eqi]=black&populate=*');
+    const json = await fetchStrapi('/api/experiences?filters[category][$eqi]=black&populate=*', {
+      locale,
+    });
     const items: StrapiExperience[] = Array.isArray(json?.data) ? json.data : [];
     return filterPublicExperiences(items);
   } catch (error) {
@@ -104,7 +109,7 @@ async function fetchBlackExperiences(): Promise<StrapiExperience[]> {
 }
 
 export default async function BlackPage() {
-  const blackExperiences = await fetchBlackExperiences();
+  const blackExperiences = await fetchBlackExperiences(DEFAULT_SITE_LOCALE);
   const ids = listingIds('/experiences/black');
   const blackSchemaGraph = buildExperienceListingGraph({
     pageId: ids.collection,

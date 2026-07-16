@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
 import { filterPublicExperiences } from '@/lib/canonical-gates';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { fetchStrapi } from '@/lib/strapi';
 import { buildCanonicalUrl, buildExperienceListingGraph } from '@/lib/schema-builder';
 import {
@@ -107,10 +108,13 @@ function isPublishedExperience(item: unknown): item is StrapiExperience {
   );
 }
 
-async function fetchPublishedExperiences(): Promise<StrapiExperience[]> {
+async function fetchPublishedExperiences(
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): Promise<StrapiExperience[]> {
   try {
     const json = await fetchStrapi(
-      '/api/experiences?fields[0]=title&fields[1]=slug&fields[2]=short_description&fields[3]=visibility_status&fields[4]=publishedAt&pagination[pageSize]=12'
+      '/api/experiences?fields[0]=title&fields[1]=slug&fields[2]=short_description&fields[3]=visibility_status&fields[4]=publishedAt&pagination[pageSize]=12',
+      { locale }
     );
     const items: unknown[] = Array.isArray(json?.data) ? json.data : [];
 
@@ -121,7 +125,7 @@ async function fetchPublishedExperiences(): Promise<StrapiExperience[]> {
 }
 
 export default async function ExperiencesPage() {
-  const publishedExperiences = await fetchPublishedExperiences();
+  const publishedExperiences = await fetchPublishedExperiences(DEFAULT_SITE_LOCALE);
   const experiencesSchema = buildExperienceListingGraph({
     pageId: `${buildCanonicalUrl('/experiences')}#collection`,
     itemListId: `${buildCanonicalUrl('/experiences')}#itemlist`,

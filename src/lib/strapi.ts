@@ -51,8 +51,13 @@ export function buildLocalizedStrapiPath(path: string, siteLocale: SiteLocale): 
   return `${pathname}?${params.toString()}${hash}`;
 }
 
-export async function fetchStrapi(path: string) {
-  const url = strapiUrl(path);
+interface FetchStrapiOptions {
+  locale?: SiteLocale;
+}
+
+export async function fetchStrapi(path: string, options: FetchStrapiOptions = {}) {
+  const localizedPath = options.locale ? buildLocalizedStrapiPath(path, options.locale) : path;
+  const url = strapiUrl(localizedPath);
 
   try {
     const res = await fetch(url, {
@@ -69,7 +74,7 @@ export async function fetchStrapi(path: string) {
 
     return await res.json();
   } catch (error) {
-    console.error('STRAPI FETCH FAILED:', { path, url, error });
+    console.error('STRAPI FETCH FAILED:', { path: localizedPath, url, error });
     throw error;
   }
 }

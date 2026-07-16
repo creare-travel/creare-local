@@ -8,6 +8,8 @@ import CulturalWorldsDiscoveryRail from './CulturalWorldsDiscoveryRail';
 import { buildCulturalWorldCollectionGraph } from '@/lib/schema-builder';
 import { filterCanonicalCulturalWorlds } from '@/lib/canonical-gates';
 import { CULTURAL_WORLD_CONTENT } from '@/data/cultural-worlds';
+import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { buildMetadataAlternates } from '@/lib/seo';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
@@ -116,9 +118,11 @@ function flattenDestination(raw: Record<string, unknown>): StrapiDestination {
   return raw as unknown as StrapiDestination;
 }
 
-async function fetchActiveDestinations(): Promise<StrapiDestination[]> {
+async function fetchActiveDestinations(
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): Promise<StrapiDestination[]> {
   const path = '/api/destinations?filters[visibility_status][$eqi]=active&populate=*';
-  const json = await fetchStrapi(path);
+  const json = await fetchStrapi(path, { locale });
   const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
   const preferredOrder = ['istanbul', 'cappadocia'];
 
@@ -169,12 +173,13 @@ function getDestinationImageUrl(destination: StrapiDestination): string {
 }
 
 export default async function CulturalWorldsPage() {
+  const locale = DEFAULT_SITE_LOCALE;
   let destinations: StrapiDestination[] = [];
 
   try {
-    destinations = await fetchActiveDestinations();
+    destinations = await fetchActiveDestinations(locale);
   } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' && canUseEnglishFallback(locale)) {
       console.warn(
         '[cultural-worlds] CMS fetch failed in development. Using canonical local fallback data for visual QA.',
         {

@@ -1,3 +1,6 @@
+import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
+
 export interface CulturalWorldSection {
   title: string;
   body: string;
@@ -281,7 +284,11 @@ export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
   },
 };
 
-export function getCulturalWorldContent(slug?: string): CulturalWorldContent | null {
+export function getCulturalWorldContent(
+  slug?: string,
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): CulturalWorldContent | null {
+  if (!canUseEnglishFallback(locale)) return null;
   if (!slug) return null;
   return CULTURAL_WORLD_CONTENT[slug] ?? null;
 }

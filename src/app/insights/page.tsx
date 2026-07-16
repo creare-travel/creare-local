@@ -12,6 +12,8 @@ import {
   DEFAULT_OG_IMAGE_ALT,
 } from '@/lib/seo';
 import { buildCanonicalUrl, buildInsightListingGraph } from '@/lib/schema-builder';
+import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -242,10 +244,12 @@ function normalizeInsight(item: StrapiInsight): NormalizedInsight | null {
   };
 }
 
-async function fetchStrapiInsights(): Promise<NormalizedInsight[] | null> {
+async function fetchStrapiInsights(
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): Promise<NormalizedInsight[] | null> {
   const path = '/api/insights?populate=*';
   try {
-    const json = await fetchStrapi(path);
+    const json = await fetchStrapi(path, { locale });
     const items: StrapiInsight[] = json?.data ?? [];
     if (!items.length) return null;
     const normalized = filterPublicInsights(items)
@@ -262,7 +266,9 @@ async function fetchStrapiInsights(): Promise<NormalizedInsight[] | null> {
   }
 }
 
-function buildStaticInsights(): NormalizedInsight[] {
+function buildStaticInsights(locale: SiteLocale = DEFAULT_SITE_LOCALE): NormalizedInsight[] {
+  if (!canUseEnglishFallback(locale)) return [];
+
   return insights.map((insight) => ({
     slug: insight.slug,
     title: insight.title,
@@ -538,9 +544,10 @@ function FeaturedEssays({ items }: { items: NormalizedInsight[] }) {
 }
 
 export default async function InsightsPage() {
-  const strapiInsights = await fetchStrapiInsights();
+  const locale = DEFAULT_SITE_LOCALE;
+  const strapiInsights = await fetchStrapiInsights(locale);
 
-  const staticInsights = buildStaticInsights();
+  const staticInsights = buildStaticInsights(locale);
   const displayItems = mergeInsights(staticInsights, strapiInsights);
   const sections = partitionInsights(displayItems);
   const insightsSchema = buildInsightListingGraph({

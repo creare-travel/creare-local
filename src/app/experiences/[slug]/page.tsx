@@ -16,6 +16,8 @@ import {
   isPublicExperienceRecord,
 } from '@/lib/canonical-gates';
 import { buildCloudinaryUrl } from '@/lib/cloudinary';
+import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { buildMetadataAlternates, buildTwitterCard, SITE_NAME } from '@/lib/seo';
 import { buildExperienceDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
@@ -191,7 +193,8 @@ function normalizeSingleRelation<T>(value: unknown): T | null {
 }
 
 async function fetchExperienceNavigationItems(
-  category?: string | null
+  category: string | null | undefined,
+  locale: SiteLocale
 ): Promise<StrapiExperienceNavigationItem[]> {
   const params = new URLSearchParams({
     'filters[visibility_status][$eqi]': 'active',
@@ -209,7 +212,7 @@ async function fetchExperienceNavigationItems(
     params.set('filters[category][$eqi]', category);
   }
 
-  const json = await fetchStrapi(`/api/experiences?${params.toString()}`);
+  const json = await fetchStrapi(`/api/experiences?${params.toString()}`, { locale });
   const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
 
   return items
@@ -225,7 +228,10 @@ async function fetchExperienceNavigationItems(
     );
 }
 
-async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperienceResult> {
+async function fetchStrapiExperienceBySlug(
+  slug: string,
+  locale: SiteLocale
+): Promise<StrapiExperienceResult> {
   try {
     const params = new URLSearchParams({
       'filters[slug][$eq]': slug,
@@ -261,7 +267,7 @@ async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperien
       'populate[intensity_entity][fields][5]': 'confidence_score',
     });
 
-    const json = await fetchStrapi(`/api/experiences?${params.toString()}`);
+    const json = await fetchStrapi(`/api/experiences?${params.toString()}`, { locale });
     const items: StrapiExperienceDetail[] = Array.isArray(json?.data) ? json.data : [];
     const item = items[0];
     if (!item) {
@@ -285,7 +291,7 @@ async function fetchStrapiExperienceBySlug(slug: string): Promise<StrapiExperien
       cover_image: normalizeSingleRelation<StrapiCoverImage>(insight.cover_image) ?? undefined,
       destination: normalizeSingleRelation<StrapiDestination>(insight.destination) ?? undefined,
     }));
-    const navigationItems = await fetchExperienceNavigationItems(item.category);
+    const navigationItems = await fetchExperienceNavigationItems(item.category, locale);
 
     return {
       status: 'ok',
@@ -428,13 +434,14 @@ function getExperienceAliasCandidates(slug: string) {
 }
 
 async function resolveExperienceDetailBySlug(
-  requestedSlug: string
+  requestedSlug: string,
+  locale: SiteLocale
 ): Promise<ResolvedExperienceDetail | { status: 'not_found' } | { status: 'error'; error: Error }> {
   const candidateSlugs = getExperienceAliasCandidates(requestedSlug);
   let lastNotFound = false;
 
   for (const candidateSlug of candidateSlugs) {
-    const result = await fetchStrapiExperienceBySlug(candidateSlug);
+    const result = await fetchStrapiExperienceBySlug(candidateSlug, locale);
 
     if (result.status === 'error') {
       return result;
@@ -462,7 +469,12 @@ function toTitleCase(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-function buildStaticReverseLinkedInsights(currentExperienceSlug: string): StrapiRelatedInsight[] {
+function buildStaticReverseLinkedInsights(
+  currentExperienceSlug: string,
+  locale: SiteLocale
+): StrapiRelatedInsight[] {
+  if (!canUseEnglishFallback(locale)) return [];
+
   const normalizedCurrentSlug = normalizeExperienceSlugForInsightGraph(currentExperienceSlug);
   if (!normalizedCurrentSlug) return [];
 
@@ -560,10 +572,12 @@ function StrapiExperiencePage({
   item,
   canonicalSlug,
   navigationItems,
+  locale,
 }: {
   item: StrapiExperienceDetail;
   canonicalSlug: string;
   navigationItems: StrapiExperienceNavigationItem[];
+  locale: SiteLocale;
 }) {
   const coverUrl = getGovernedExperienceImageUrl(item, canonicalSlug);
   const coverAlt = item.cover_image?.alternativeText ?? item.title;
@@ -581,7 +595,7 @@ function StrapiExperiencePage({
     .filter((insight) => insight.slug && insight.title)
     .slice(0, MAX_RELATED_INSIGHTS);
   const fallbackRelatedInsights =
-    cmsRelatedInsights.length === 0 ? buildStaticReverseLinkedInsights(canonicalSlug) : [];
+    cmsRelatedInsights.length === 0 ? buildStaticReverseLinkedInsights(canonicalSlug, locale) : [];
   const relatedInsights =
     cmsRelatedInsights.length > 0 ? cmsRelatedInsights : fallbackRelatedInsights;
   const categoryLabel = item.category || item.tier || item.intent_level || '';
@@ -1135,8 +1149,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string | string[] }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const locale = DEFAULT_SITE_LOCALE;
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
-  const result = await resolveExperienceDetailBySlug(slugValue);
+  const result = await resolveExperienceDetailBySlug(slugValue, locale);
 
   if (result.status === 'error') {
     return {
@@ -1199,8 +1214,9 @@ export async function generateMetadata({
 
 export default async function ExperienceDetailPage({ params }: PageProps) {
   const { slug } = await params;
+  const locale = DEFAULT_SITE_LOCALE;
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
-  const result = await resolveExperienceDetailBySlug(slugValue);
+  const result = await resolveExperienceDetailBySlug(slugValue, locale);
 
   if (result.status === 'error') {
     notFound();
@@ -1219,6 +1235,7 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
       item={result.item}
       canonicalSlug={result.canonicalSlug}
       navigationItems={result.navigationItems}
+      locale={locale}
     />
   );
 }

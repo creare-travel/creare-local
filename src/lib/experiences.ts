@@ -1,3 +1,6 @@
+import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
+
 export interface Experience {
   title: string;
   slug: string;
@@ -606,19 +609,34 @@ export const experiences: Experience[] = [
   },
 ];
 
-export function getExperienceBySlug(slug: string): Experience | undefined {
+export function getExperienceBySlug(
+  slug: string,
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): Experience | undefined {
+  if (!canUseEnglishFallback(locale)) return undefined;
   return experiences.find((e) => e.slug === slug);
 }
 
-export function getRelatedExperiences(slugs: string[]): Experience[] {
+export function getRelatedExperiences(
+  slugs: string[],
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): Experience[] {
+  if (!canUseEnglishFallback(locale)) return [];
   return experiences.filter((e) => slugs.includes(e.slug));
 }
 
-export function getExperiencesByCategory(category: string): Experience[] {
+export function getExperiencesByCategory(
+  category: string,
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): Experience[] {
+  if (!canUseEnglishFallback(locale)) return [];
   return experiences.filter((e) => e.category === category);
 }
 
-export function getPublicLocalExperienceFallbacks(): Experience[] {
+export function getPublicLocalExperienceFallbacks(
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): Experience[] {
+  if (!canUseEnglishFallback(locale)) return [];
   const allowedSlugs = new Set<string>(PUBLIC_LOCAL_EXPERIENCE_FALLBACK_SLUGS);
   return experiences.filter((experience) => allowedSlugs.has(experience.slug));
 }

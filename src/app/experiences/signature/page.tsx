@@ -10,6 +10,8 @@ import {
   experiences as staticExperiences,
   getPublicLocalExperienceFallbacks,
 } from '@/lib/experiences';
+import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { buildMetadataAlternates } from '@/lib/seo';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
@@ -198,7 +200,11 @@ function renderExperienceCard(exp: StrapiExperience, options?: { compact?: boole
   );
 }
 
-function buildStaticPerformanceFallback(): StrapiExperience[] {
+function buildStaticPerformanceFallback(
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): StrapiExperience[] {
+  if (!canUseEnglishFallback(locale)) return [];
+
   const unavailablePerformanceSlugs = new Set([
     'golden-horn-regatta',
     'princes-islands-regatta',
@@ -223,8 +229,12 @@ function buildStaticPerformanceFallback(): StrapiExperience[] {
     }));
 }
 
-function buildStaticSignatureFallback(): StrapiExperience[] {
-  return getPublicLocalExperienceFallbacks()
+function buildStaticSignatureFallback(
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): StrapiExperience[] {
+  if (!canUseEnglishFallback(locale)) return [];
+
+  return getPublicLocalExperienceFallbacks(locale)
     .filter((experience) => experience.slug === 'istanbul-through-the-lens')
     .filter((experience) => experience.category === 'SIGNATURE')
     .map((experience, index) => ({
@@ -249,9 +259,11 @@ function buildStaticSignatureFallback(): StrapiExperience[] {
 }
 
 // ── Strapi fetch helpers ──────────────────────────────────────────────────────
-async function fetchStrapiDestinations(): Promise<StrapiDestination[]> {
+async function fetchStrapiDestinations(
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): Promise<StrapiDestination[]> {
   try {
-    const json = await fetchStrapi('/api/destinations?populate=*');
+    const json = await fetchStrapi('/api/destinations?populate=*', { locale });
     return Array.isArray(json?.data) ? json.data : [];
   } catch (error) {
     console.error('Failed to fetch destinations for signature experiences.', error);
@@ -259,9 +271,14 @@ async function fetchStrapiDestinations(): Promise<StrapiDestination[]> {
   }
 }
 
-async function fetchStrapiSignatureExperiences(): Promise<StrapiExperience[]> {
+async function fetchStrapiSignatureExperiences(
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): Promise<StrapiExperience[]> {
   try {
-    const json = await fetchStrapi('/api/experiences?filters[category][$eqi]=signature&populate=*');
+    const json = await fetchStrapi(
+      '/api/experiences?filters[category][$eqi]=signature&populate=*',
+      { locale }
+    );
     const all: StrapiExperience[] = Array.isArray(json?.data) ? json.data : [];
 
     if (!all.length) {
@@ -285,10 +302,11 @@ async function fetchStrapiSignatureExperiences(): Promise<StrapiExperience[]> {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default async function SignatureExperiencesPage() {
+  const locale = DEFAULT_SITE_LOCALE;
   // Fetch CMS data in parallel
   const [strapiDestinations, strapiSignatureExperiences] = await Promise.all([
-    fetchStrapiDestinations(),
-    fetchStrapiSignatureExperiences(),
+    fetchStrapiDestinations(locale),
+    fetchStrapiSignatureExperiences(locale),
   ]);
 
   const selectedSignatureExperiences = strapiSignatureExperiences.filter((exp) => {
@@ -300,7 +318,7 @@ export default async function SignatureExperiencesPage() {
       )
     );
   });
-  const staticSignatureFallback = buildStaticSignatureFallback();
+  const staticSignatureFallback = buildStaticSignatureFallback(locale);
   const signatureExperienceMap = new Map<string, StrapiExperience>();
 
   for (const experience of [...selectedSignatureExperiences, ...staticSignatureFallback]) {
@@ -320,7 +338,9 @@ export default async function SignatureExperiencesPage() {
     (exp) => normalizeValue(exp.series) === SIGNATURE_SERIES.culinary
   );
   const corporateExperiences =
-    cmsCorporateExperiences.length > 0 ? cmsCorporateExperiences : buildStaticPerformanceFallback();
+    cmsCorporateExperiences.length > 0
+      ? cmsCorporateExperiences
+      : buildStaticPerformanceFallback(locale);
   const visibleExperienceCards = [
     ...visibleSelectedSignatureExperiences,
     ...historicalExperiences,
