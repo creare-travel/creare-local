@@ -1,29 +1,192 @@
 {
   "lang": "tr",
+  "global": {
+    "nav": {
+      "culturalWorlds": "Kültürel Destinasyonlar",
+      "experiences": "Deneyimler",
+      "insights": "Yazılar",
+      "philosophy": "Felsefemiz",
+      "contact": "İletişim"
+    },
+    "footer": {
+      "culturalWorlds": "KÜLTÜREL DESTİNASYONLAR",
+      "experiences": "DENEYİMLER",
+      "insights": "YAZILAR",
+      "philosophy": "FELSEFEMİZ",
+      "contact": "İLETİŞİM",
+      "privacy": "Gizlilik",
+      "cookies": "Çerezler",
+      "terms": "Koşullar"
+    }
+  },
+  "common": {
+    "relatedInsights": "İlgili Yazılar",
+    "relatedExperiences": "İlgili Deneyimler",
+    "relatedEssays": "İlgili Yazılar",
+    "inquirePrivately": "İletişime Geçin",
+    "beginPrivateConversation": "Detayları Görüşelim",
+    "read": "Oku",
+    "enter": "Keşfet",
+    "home": "Ana Sayfa",
+    "privacy": "Gizlilik",
+    "cookies": "Çerezler",
+    "terms": "Koşullar",
+    "contactViaWhatsApp": "WhatsApp Üzerinden İletişime Geçin",
+    "contactCreareUpper": "CREARE İLE İLETİŞİME GEÇİN",
+    "protected": {
+      "creare": "CREARE",
+      "signature": "SIGNATURE™",
+      "lab": "LAB™",
+      "black": "BLACK™"
+    }
+  },
+  "accessibility": {
+    "returnHome": "CREARE — Ana sayfaya dön",
+    "selectLanguage": "Dil seçin",
+    "languageOptions": "Dil seçenekleri",
+    "mainNavigation": "Ana menü",
+    "mobileNavigation": "Mobil menü",
+    "openNavigationMenu": "Menüyü aç",
+    "closeNavigationMenu": "Menüyü kapat"
+  },
   "nav": {
     "experiences": "Deneyimler",
-    "philosophy": "Felsefe",
-    "contact": "\u0130leti\u015fim"
+    "philosophy": "Felsefemiz",
+    "contact": "İletişim"
   },
   "footer": {
     "tagline_1": "",
     "tagline_2": "",
     "tagline_3": "",
-    "philosophy": "FELSEFEM\u0130Z",
-    "contact": "\u0130LET\u0130\u015e\u0130M",
-    "copyright": "\u00a9 2026 CREARE",
-    "sitemap": "Site Haritas\u0131",
+    "philosophy": "FELSEFEMİZ",
+    "contact": "İLETİŞİM",
+    "copyright": "© 2026 CREARE",
+    "sitemap": "Site Haritası",
     "privacy": "Gizlilik",
-    "cookies": "\u00c7erezler",
-    "terms": "Ko\u015fullar"
+    "cookies": "Çerezler",
+    "terms": "Koşullar"
   },
   "home": {
     "hero": {
-      "title": "",
-      "subtitle": ""
+      "eyebrow": "Özenle Kurgulanmış Kültürel Deneyimler",
+      "title": "Deneyimler.",
+      "subtitle": "Sanat Gibi Tasarlanır."
     },
     "cta": {
-      "label": ""
+      "label": "İLETİŞİME GEÇİN",
+      "labelWithArrow": "İletişime Geçin →",
+      "approach": "Deneyimleri Nasıl Oluşturuyoruz? →",
+      "contact": "CREARE ile İletişime Geçin →"
+    },
+    "collections": {
+      "eyebrow": "CREARE deneyimlerini üç farklı biçimde kurgular."
+    },
+    "mainParagraph": {
+      "paragraph1": "CREARE, paket seyahat anlayışı üzerine değil; kültürel erişim, anlatı derinliği ve deneyimlerin özenle oluşturulması üzerine kuruludur.",
+      "paragraph2": "SIGNATURE™, LAB™ ve BLACK™; özenle kurgulanmış kültürel deneyimler, kişiye özel çalışmalar ve bağlam, güven ve destinasyonun derin yapısıyla şekillenen ayrıcalıklı erişim olmak üzere üç farklı çalışma biçimini temsil eder.",
+      "paragraph3": "Amaç, destinasyonları yalnızca ziyaret etmek değil; onlara anlam kazandıran kişileri, yerel bilgiyi ve bir yolculuğu sıradan bir varışın ötesine taşıyan unsurları keşfetmektir."
+    },
+    "contact": {
+      "title": "Detayları Görüşelim."
+    }
+  },
+  "culturalWorlds": {
+    "title": "Kültürel Destinasyonlar",
+    "explore": "Kültürel Destinasyonları Keşfedin",
+    "atlasTitle": "CREARE — Kültürel Destinasyonlar Rehberi",
+    "geography": "Erişim, hafıza ve kültürel deneyimler üzerinden şekillenen bir coğrafya.",
+    "atlas": "Destinasyonlar",
+    "context": "Bağlam",
+    "coreCharacteristics": "Temel Özellikler",
+    "whatDefines": "Bu dünyayı tanımlayan özellikler.",
+    "culturalSystems": "Kültürel Sistemler",
+    "connectedCulturalSystem": "Bağlantılı Kültürel Yapı",
+    "viewExperience": "Deneyimi İnceleyin",
+    "byIntroductionOnly": "Yalnızca özel erişimle",
+    "accessLimited": "Herkese Açık Değildir.",
+    "emptyState": "Kültürel destinasyonlar yakında burada yer alacak."
+  },
+  "experiences": {
+    "title": "Deneyimler",
+    "subtitle": "",
+    "threeWays": "Üç Farklı Deneyim Yaklaşımı",
+    "collection": "Koleksiyon",
+    "category": "Kategori",
+    "location": "Konum",
+    "duration": "Süre",
+    "groupSize": "Grup Büyüklüğü",
+    "overview": "Genel Bakış",
+    "intentLevel": "Deneyimin Amacı",
+    "wowMoment": "Unutulmaz An",
+    "differentiator": "Neden Farklı?",
+    "experience": "Deneyim",
+    "programme": "Deneyim Akışı",
+    "whoThisIsFor": "Kimler İçin",
+    "adjacentExperiences": "İlgili Deneyimler",
+    "furtherCulturalReading": "Kültürel Okumalar",
+    "previousExperience": "Önceki Deneyim",
+    "nextExperience": "Sonraki Deneyim"
+  },
+  "experienceDetail": {
+    "category": "Kategori",
+    "location": "Konum",
+    "duration": "Süre",
+    "groupSize": "Grup Büyüklüğü",
+    "overview": "Genel Bakış",
+    "intentLevel": "Deneyimin Amacı",
+    "wowMoment": "Unutulmaz An",
+    "differentiator": "Neden Farklı?",
+    "experience": "Deneyim",
+    "programme": "Deneyim Akışı",
+    "whoThisIsFor": "Kimler İçin",
+    "adjacentExperiences": "İlgili Deneyimler",
+    "furtherCulturalReading": "Kültürel Okumalar",
+    "previousExperience": "Önceki Deneyim",
+    "nextExperience": "Sonraki Deneyim"
+  },
+  "insights": {
+    "title": "Yazılar",
+    "subtitle": "Kültür, erişim ve özel deneyimler üzerine yazılar",
+    "featuredEssays": "Öne Çıkan Yazılar",
+    "culturalWorldEssays": "Kültürel Destinasyon Yazıları",
+    "editorialEssays": "Editoryal Yazılar",
+    "furtherReading": "Önerilen Yazılar",
+    "readEssay": "Yazıyı Oku",
+    "readEssayWithArrow": "Yazıyı Oku →",
+    "backToInsights": "← Yazılar",
+    "accessNotListed": "Erişim listelenmez. Özenle oluşturulur."
+  },
+  "signature": {
+    "label": "SIGNATURE™",
+    "title": "Özenle kurgulanmış kültürel deneyimler.",
+    "description1": "Tasarlanmış, denenmiş ve deneyimlenmeye hazır.",
+    "description2": "SIGNATURE™, destinasyon bilgisi, kültürel bağlam ve özenle oluşturulmuş bir yapıyı bir araya getirir; böylece her deneyim sonradan birleştirilmiş değil, baştan sona tasarlanmış hissi verir.",
+    "cta": "Keşfedin →",
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "lab": {
+    "label": "LAB™",
+    "title": "Sizinle birlikte oluşturulur.",
+    "description1": "Sıfırdan geliştirilen, size özel kültürel deneyimler.",
+    "description2": "LAB™, bir görüşmeyle başlar; araştırma, yerel bilgi ve yaratıcı yönlendirmeyle gelişir ve doğru erişim biçimi mümkün hale gelene kadar şekillenir.",
+    "cta": "Keşfedin →",
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "black": {
+    "label": "BLACK™",
+    "title": "Herkese açık değildir.",
+    "description1": "Mekânlara, koleksiyonlara ve özel anlara ayrıcalıklı erişim.",
+    "description2": "BLACK™, güvene, gizliliğe ve herkese açık olmayan bağlantılara dayanan özel düzenlemeler için ayrılmıştır; standart talep süreçlerinin dışında şekillenir.",
+    "cta": "Özel Erişim Talep Edin →",
+    "hero": {
+      "title": "",
+      "subtitle": ""
     }
   },
   "philosophy": {
@@ -56,28 +219,6 @@
       "email": "",
       "message": "",
       "submit": ""
-    }
-  },
-  "experiences": {
-    "title": "",
-    "subtitle": ""
-  },
-  "signature": {
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "lab": {
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "black": {
-    "hero": {
-      "title": "",
-      "subtitle": ""
     }
   },
   "editorial": {

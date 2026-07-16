@@ -1,5 +1,54 @@
 {
   "lang": "en",
+  "global": {
+    "nav": {
+      "culturalWorlds": "Cultural Worlds",
+      "experiences": "Experiences",
+      "insights": "Insights",
+      "philosophy": "Philosophy",
+      "contact": "Contact"
+    },
+    "footer": {
+      "culturalWorlds": "CULTURAL WORLDS",
+      "experiences": "EXPERIENCES",
+      "insights": "INSIGHTS",
+      "philosophy": "PHILOSOPHY",
+      "contact": "CONTACT",
+      "privacy": "Privacy",
+      "cookies": "Cookies",
+      "terms": "Terms"
+    }
+  },
+  "common": {
+    "relatedInsights": "Related Insights",
+    "relatedExperiences": "Related Experiences",
+    "relatedEssays": "Related Essays",
+    "inquirePrivately": "Inquire Privately",
+    "beginPrivateConversation": "Begin a Private Conversation",
+    "read": "Read",
+    "enter": "Enter",
+    "home": "Home",
+    "privacy": "Privacy",
+    "cookies": "Cookies",
+    "terms": "Terms",
+    "contactViaWhatsApp": "Contact via WhatsApp",
+    "contactCreareUpper": "CONTACT CREARE",
+    "protected": {
+      "creare": "CREARE",
+      "signature": "SIGNATURE™",
+      "lab": "LAB™",
+      "black": "BLACK™"
+    }
+  },
+  "accessibility": {
+    "returnHome": "CREARE — Return to homepage",
+    "selectLanguage": "Select language",
+    "languageOptions": "Language options",
+    "mainNavigation": "Main navigation",
+    "mobileNavigation": "Mobile navigation",
+    "openNavigationMenu": "Open navigation menu",
+    "closeNavigationMenu": "Close navigation menu"
+  },
   "nav": {
     "experiences": "Experiences",
     "philosophy": "Philosophy",
@@ -11,7 +60,7 @@
     "tagline_3": "Refined experiences.",
     "philosophy": "OUR PHILOSOPHY",
     "contact": "CONTACT",
-    "copyright": "\u00a9 2026 CREARE",
+    "copyright": "© 2026 CREARE",
     "sitemap": "Sitemap",
     "privacy": "Privacy",
     "cookies": "Cookies",
@@ -19,11 +68,125 @@
   },
   "home": {
     "hero": {
-      "title": "",
-      "subtitle": ""
+      "eyebrow": "Curated Cultural Experiences",
+      "title": "Experiences.",
+      "subtitle": "Composed as Art."
     },
     "cta": {
-      "label": ""
+      "label": "INQUIRE PRIVATELY",
+      "labelWithArrow": "Inquire Privately →",
+      "approach": "How We Approach Experience →",
+      "contact": "Contact CREARE →"
+    },
+    "collections": {
+      "eyebrow": "Three ways CREARE composes an encounter."
+    },
+    "mainParagraph": {
+      "paragraph1": "CREARE is not built around packaged travel, but around cultural access, narrative intelligence, and the careful composition of encounter.",
+      "paragraph2": "Signature, LAB, and BLACK define three ways of working: curated cultural experiences, bespoke commissions, and discreet private access shaped by context, trust, and the deeper logic of place.",
+      "paragraph3": "The aim is not to move through places efficiently, but to understand what gives them meaning: the custodians who preserve them, the local knowledge that makes them legible, and the conditions under which an encounter becomes more than arrival."
+    },
+    "contact": {
+      "title": "Begin the conversation."
+    }
+  },
+  "culturalWorlds": {
+    "title": "Cultural Worlds",
+    "explore": "Explore Cultural Worlds",
+    "atlasTitle": "CREARE — Cultural Atlas",
+    "geography": "A geography of access, memory, and encounter.",
+    "atlas": "The Atlas",
+    "context": "Context",
+    "coreCharacteristics": "Core Characteristics",
+    "whatDefines": "What defines this world.",
+    "culturalSystems": "Cultural Systems",
+    "connectedCulturalSystem": "Connected Cultural System",
+    "viewExperience": "View Experience",
+    "byIntroductionOnly": "By introduction only",
+    "accessLimited": "Access is limited.",
+    "emptyState": "Cultural worlds will appear here..."
+  },
+  "experiences": {
+    "title": "Experiences",
+    "subtitle": "",
+    "threeWays": "Three Ways to Enter",
+    "collection": "The Collection",
+    "category": "Category",
+    "location": "Location",
+    "duration": "Duration",
+    "groupSize": "Group Size",
+    "overview": "Overview",
+    "intentLevel": "Intent Level",
+    "wowMoment": "Wow Moment",
+    "differentiator": "Differentiator",
+    "experience": "The Experience",
+    "programme": "The Programme",
+    "whoThisIsFor": "Who This Is For",
+    "adjacentExperiences": "Adjacent Experiences",
+    "furtherCulturalReading": "Further Cultural Reading",
+    "previousExperience": "Previous Experience",
+    "nextExperience": "Next Experience"
+  },
+  "experienceDetail": {
+    "category": "Category",
+    "location": "Location",
+    "duration": "Duration",
+    "groupSize": "Group Size",
+    "overview": "Overview",
+    "intentLevel": "Intent Level",
+    "wowMoment": "Wow Moment",
+    "differentiator": "Differentiator",
+    "experience": "The Experience",
+    "programme": "The Programme",
+    "whoThisIsFor": "Who This Is For",
+    "adjacentExperiences": "Adjacent Experiences",
+    "furtherCulturalReading": "Further Cultural Reading",
+    "previousExperience": "Previous Experience",
+    "nextExperience": "Next Experience"
+  },
+  "insights": {
+    "title": "Insights",
+    "subtitle": "Essays on culture, access, and the private encounter",
+    "featuredEssays": "Featured Essays",
+    "culturalWorldEssays": "Cultural World Essays",
+    "editorialEssays": "Editorial Essays",
+    "furtherReading": "Further Reading",
+    "readEssay": "Read Essay",
+    "readEssayWithArrow": "Read Essay →",
+    "backToInsights": "← Insights",
+    "accessNotListed": "Access is not listed. It is composed."
+  },
+  "signature": {
+    "label": "SIGNATURE™",
+    "title": "Curated cultural experiences.",
+    "description1": "Designed, tested, and ready to be lived.",
+    "description2": "Signature brings together place intelligence, cultural context, and a clear authored structure so that each encounter feels composed rather than assembled.",
+    "cta": "Explore →",
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "lab": {
+    "label": "LAB™",
+    "title": "Built with you.",
+    "description1": "Custom cultural experiences, developed from scratch.",
+    "description2": "LAB begins with conversation, then builds through research, local knowledge, and creative direction until the right form of access becomes possible.",
+    "cta": "Discover →",
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "black": {
+    "label": "BLACK™",
+    "title": "Not publicly available.",
+    "description1": "Private access to places, collections, and moments.",
+    "description2": "BLACK is reserved for arrangements that depend on trust, discretion, and relationships not intended for open circulation or standard inquiry paths.",
+    "cta": "Request Private Access →",
+    "hero": {
+      "title": "",
+      "subtitle": ""
     }
   },
   "philosophy": {
@@ -56,28 +219,6 @@
       "email": "",
       "message": "",
       "submit": ""
-    }
-  },
-  "experiences": {
-    "title": "",
-    "subtitle": ""
-  },
-  "signature": {
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "lab": {
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "black": {
-    "hero": {
-      "title": "",
-      "subtitle": ""
     }
   },
   "editorial": {
