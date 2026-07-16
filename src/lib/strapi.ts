@@ -1,3 +1,5 @@
+import { getStrapiLocale, type SiteLocale } from '@/lib/i18n/config';
+
 const DEFAULT_DEV_STRAPI_BASE = 'http://localhost:1337';
 const IS_DEVELOPMENT = process.env.NODE_ENV !== 'production';
 
@@ -33,6 +35,20 @@ export function isLocalAssetUrl(url?: string) {
   } catch {
     return false;
   }
+}
+
+export function buildLocalizedStrapiPath(path: string, siteLocale: SiteLocale): string {
+  const hashIndex = path.indexOf('#');
+  const pathWithoutHash = hashIndex >= 0 ? path.slice(0, hashIndex) : path;
+  const hash = hashIndex >= 0 ? path.slice(hashIndex) : '';
+  const queryIndex = pathWithoutHash.indexOf('?');
+  const pathname = queryIndex >= 0 ? pathWithoutHash.slice(0, queryIndex) : pathWithoutHash;
+  const query = queryIndex >= 0 ? pathWithoutHash.slice(queryIndex + 1) : '';
+  const params = new URLSearchParams(query);
+
+  params.set('locale', getStrapiLocale(siteLocale));
+
+  return `${pathname}?${params.toString()}${hash}`;
 }
 
 export async function fetchStrapi(path: string) {

@@ -1,14 +1,16 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import {
+  DEFAULT_SITE_LOCALE,
+  LOCALE_OPTIONS,
+  LOCALE_STORAGE_KEY,
+  isSiteLocale,
+  type SiteLocale,
+} from '@/lib/i18n/config';
 
-export type Locale = 'en' | 'tr' | 'ru' | 'zh';
+export type Locale = SiteLocale;
 
-export const LOCALES: { code: Locale; label: string }[] = [
-  { code: 'en', label: 'EN' },
-  { code: 'tr', label: 'TR' },
-  { code: 'ru', label: 'RU' },
-  { code: 'zh', label: 'ZH' },
-];
+export const LOCALES = LOCALE_OPTIONS;
 
 type TranslationDict = Record<string, unknown>;
 
@@ -40,12 +42,12 @@ function getNestedValue(obj: TranslationDict, key: string): string {
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('en');
+  const [locale, setLocaleState] = useState<Locale>(DEFAULT_SITE_LOCALE);
   const [translations, setTranslations] = useState<TranslationDict>({});
 
   useEffect(() => {
-    const stored = localStorage.getItem('creare_locale') as Locale | null;
-    if (stored && ['en', 'tr', 'ru', 'zh'].includes(stored)) {
+    const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
+    if (isSiteLocale(stored)) {
       setLocaleState(stored);
     }
   }, []);
@@ -58,7 +60,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);
-    localStorage.setItem('creare_locale', newLocale);
+    localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
     document.documentElement.lang = newLocale;
     document.documentElement.dir = 'ltr';
   }, []);

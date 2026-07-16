@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
-import { useLanguage, LOCALES, Locale } from '@/context/LanguageContext';
+import { useLanguage, LOCALES } from '@/context/LanguageContext';
 
 export default function LanguageSelector() {
   const { locale, setLocale } = useLanguage();
@@ -55,7 +55,7 @@ export default function LanguageSelector() {
             <li key={code} role="option" aria-selected={locale === code}>
               <button
                 onClick={() => {
-                  setLocale(code as Locale);
+                  setLocale(code);
                   setOpen(false);
                 }}
                 className={`w-full text-left px-4 py-2 font-body text-xs tracking-[0.18em] uppercase transition-colors duration-200 ${
