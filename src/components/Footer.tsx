@@ -1,7 +1,18 @@
+'use client';
 import React from 'react';
 import Link from 'next/link';
+import { useLanguage } from '@/context/LanguageContext';
+import { getDictionary } from '@/lib/i18n/dictionaries';
+import { localizePathname } from '@/lib/i18n/pathname';
 
 export default function Footer() {
+  const { locale } = useLanguage();
+  const dictionary = getDictionary(locale);
+  const taglineLines = [
+    dictionary.footer.tagline_1,
+    dictionary.footer.tagline_2,
+    dictionary.footer.tagline_3,
+  ].filter(Boolean);
   const socialIcons = (
     <>
       <span aria-label="CREARE Instagram profile coming soon" className="text-white/55" role="img">
@@ -48,59 +59,65 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto flex flex-col gap-14 px-6 pb-14 pt-20 sm:px-10 sm:pb-12 sm:pt-18 lg:flex-row lg:items-end lg:justify-between lg:gap-0 lg:px-16">
         {/* Left: Brand + tagline */}
         <div className="max-w-[17rem]">
-          <Link href="/" aria-label="CREARE — Return to homepage">
+          <Link
+            href={localizePathname('/', locale)}
+            aria-label={dictionary.accessibility.returnHome}
+          >
             <span className="font-body font-semibold text-[0.75rem] tracking-[0.22em] text-white uppercase">
               CREARE<sup className="text-[0.5rem] align-super tracking-normal">™</sup>
             </span>
           </Link>
-          <p className="mt-5 max-w-[260px] font-display text-[0.82rem] font-light leading-[1.9] text-white/52 sm:text-[0.78rem] sm:leading-loose">
-            Creative intelligence.
-            <br />
-            Strategic execution.
-            <br />
-            Refined experiences.
-          </p>
+          {taglineLines.length > 0 && (
+            <p className="mt-5 max-w-[260px] font-display text-[0.82rem] font-light leading-[1.9] text-white/52 sm:text-[0.78rem] sm:leading-loose">
+              {taglineLines.map((line, index) => (
+                <React.Fragment key={line}>
+                  {line}
+                  {index < taglineLines.length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </p>
+          )}
         </div>
 
         {/* Right: Nav links + social icons */}
         <nav
           className="flex flex-col items-start gap-8 sm:gap-9 lg:flex-row lg:items-center lg:gap-8"
-          aria-label="Footer navigation"
+          aria-label={dictionary.accessibility.mainNavigation}
         >
           <Link
-            href="/cultural-worlds"
+            href={localizePathname('/cultural-worlds', locale)}
             className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label="Cultural Worlds"
+            aria-label={dictionary.global.nav.culturalWorlds}
           >
-            CULTURAL WORLDS
+            {dictionary.global.footer.culturalWorlds}
           </Link>
           <Link
-            href="/experiences"
+            href={localizePathname('/experiences', locale)}
             className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label="Experiences"
+            aria-label={dictionary.global.nav.experiences}
           >
-            EXPERIENCES
+            {dictionary.global.footer.experiences}
           </Link>
           <Link
-            href="/insights"
+            href={localizePathname('/insights', locale)}
             className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label="Insights"
+            aria-label={dictionary.global.nav.insights}
           >
-            INSIGHTS
+            {dictionary.global.footer.insights}
           </Link>
           <Link
-            href="/philosophy"
+            href={localizePathname('/philosophy', locale)}
             className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label="Philosophy"
+            aria-label={dictionary.global.nav.philosophy}
           >
-            PHILOSOPHY
+            {dictionary.global.footer.philosophy}
           </Link>
           <Link
-            href="/contact"
+            href={localizePathname('/contact', locale)}
             className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label="Contact CREARE"
+            aria-label={dictionary.global.nav.contact}
           >
-            CONTACT
+            {dictionary.global.footer.contact}
           </Link>
 
           <div className="flex items-center gap-6 pt-1">{socialIcons}</div>
@@ -109,13 +126,22 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="max-w-7xl mx-auto flex flex-col items-start justify-between gap-5 border-t border-white/10 px-6 py-6 sm:px-10 sm:py-5 lg:flex-row lg:items-center lg:gap-0 lg:px-16">
         <span className="font-body text-[0.62rem] tracking-[0.1em] text-white/50">
-          © 2026 CREARE
+          {dictionary.footer.copyright}
         </span>
         <nav className="flex flex-wrap items-center gap-x-6 gap-y-3" aria-label="Legal links">
           {[
-            { label: 'Privacy', href: '/privacy' },
-            { label: 'Cookies', href: '/cookies' },
-            { label: 'Terms', href: '/terms' },
+            {
+              label: dictionary.global.footer.privacy,
+              href: localizePathname('/privacy', locale),
+            },
+            {
+              label: dictionary.global.footer.cookies,
+              href: localizePathname('/cookies', locale),
+            },
+            {
+              label: dictionary.global.footer.terms,
+              href: localizePathname('/terms', locale),
+            },
           ]?.map((item) => (
             <Link
               key={item?.label}

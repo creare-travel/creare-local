@@ -3,12 +3,17 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import LanguageSelector from '@/components/LanguageSelector';
+import { useLanguage } from '@/context/LanguageContext';
+import { getDictionary } from '@/lib/i18n/dictionaries';
+import { localizePathname } from '@/lib/i18n/pathname';
 
 export default function Header() {
   const [scrollDensity, setScrollDensity] = useState(0);
   const [headerState, setHeaderState] = useState<'hero' | 'light'>('hero');
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const { locale } = useLanguage();
+  const dictionary = getDictionary(locale);
 
   useEffect(() => {
     let ticking = false;
@@ -51,11 +56,14 @@ export default function Header() {
   }, [pathname]);
 
   const navLinks = [
-    { label: 'Cultural Worlds', href: '/cultural-worlds' },
-    { label: 'Experiences', href: '/experiences' },
-    { label: 'Insights', href: '/insights' },
-    { label: 'Philosophy', href: '/philosophy' },
-    { label: 'Contact', href: '/contact' },
+    {
+      label: dictionary.global.nav.culturalWorlds,
+      href: localizePathname('/cultural-worlds', locale),
+    },
+    { label: dictionary.global.nav.experiences, href: localizePathname('/experiences', locale) },
+    { label: dictionary.global.nav.insights, href: localizePathname('/insights', locale) },
+    { label: dictionary.global.nav.philosophy, href: localizePathname('/philosophy', locale) },
+    { label: dictionary.global.nav.contact, href: localizePathname('/contact', locale) },
   ];
 
   const lightSurface = headerState === 'light';
@@ -100,12 +108,12 @@ export default function Header() {
     >
       <nav
         className="max-w-7xl mx-auto flex h-16 items-center justify-between px-6 pt-[max(env(safe-area-inset-top),0px)] sm:px-10 lg:px-16"
-        aria-label="Main navigation"
+        aria-label={dictionary.accessibility.mainNavigation}
       >
         <Link
-          href="/"
+          href={localizePathname('/', locale)}
           className="group flex flex-shrink-0 items-center"
-          aria-label="CREARE — Return to homepage"
+          aria-label={dictionary.accessibility.returnHome}
         >
           <span
             className={`font-body text-sm font-semibold uppercase tracking-[0.24em] transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] ${
@@ -121,7 +129,7 @@ export default function Header() {
             <Link
               key={item?.label}
               href={item?.href}
-              prefetch={item?.href === '/contact' && item?.label === 'Contact' ? false : undefined}
+              prefetch={item?.href === localizePathname('/contact', locale) ? false : undefined}
               className={`group/nav relative font-body text-[0.7rem] font-medium uppercase tracking-[0.2em] motion-link ${navTone} ${navHoverTone}`}
               aria-label={item?.label}
             >
@@ -139,7 +147,11 @@ export default function Header() {
             lightSurface ? 'hover:text-[#1f1b18]' : 'hover:text-white'
           } ${mobileTone}`}
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-label={
+            mobileOpen
+              ? dictionary.accessibility.closeNavigationMenu
+              : dictionary.accessibility.openNavigationMenu
+          }
           aria-expanded={mobileOpen}
         >
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
@@ -173,7 +185,7 @@ export default function Header() {
           <button
             type="button"
             className={`fixed inset-0 z-0 transition-[background-color,backdrop-filter,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] lg:hidden ${mobileOverlayTone}`}
-            aria-label="Close navigation menu overlay"
+            aria-label={dictionary.accessibility.closeNavigationMenu}
             onClick={() => setMobileOpen(false)}
           />
           <div
@@ -187,7 +199,7 @@ export default function Header() {
               borderTopColor: mobileMenuBorder,
             }}
             role="navigation"
-            aria-label="Mobile navigation"
+            aria-label={dictionary.accessibility.mobileNavigation}
           >
             {navLinks?.map((item) => (
               <Link

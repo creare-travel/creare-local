@@ -1,6 +1,7 @@
 import { buildCloudinaryUrl } from '@/lib/cloudinary';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 import HomeHeroInquiryLink from '@/app/home/components/HomeHeroInquiryLink';
+import type { Dictionary } from '@/lib/i18n/types';
 
 const HOMEPAGE_HERO_PUBLIC_ID = 'creare-hero-image.jpg';
 const HOMEPAGE_HERO_IMAGE = buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
@@ -15,7 +16,13 @@ const HOMEPAGE_HERO_DESKTOP_WIDTHS = [1080, 1440, 1920] as const;
 const HOMEPAGE_HERO_MOBILE_COMPACT_WIDTH = 475;
 const HOMEPAGE_HERO_MOBILE_TALL_WIDTH = 524;
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  dictionary?: Dictionary;
+}
+
+export default function HeroSection({ dictionary }: HeroSectionProps) {
+  const heroCopy = dictionary?.home.hero;
+  const ctaCopy = dictionary?.home.cta;
   const heroBlurDataUrl = buildCinematicBlurDataUrl(HOMEPAGE_HERO_IMAGE, {
     atmosphere: 'dark',
     profile: 'hero',
@@ -103,21 +110,21 @@ export default function HeroSection() {
       <div className="relative z-30 mx-auto flex w-full max-w-7xl items-end px-6 pb-20 pt-28 sm:px-10 sm:pb-16 sm:pt-32 md:pb-20 lg:px-16">
         <div className="max-w-[21.5rem] sm:max-w-xl">
           <p className="hero-label mb-8 font-body text-[0.56rem] font-light uppercase tracking-[0.34em] text-white/48 sm:mb-7 sm:text-[0.58rem] sm:tracking-[0.38em]">
-            Curated Cultural Experiences
+            {heroCopy?.eyebrow ?? 'Curated Cultural Experiences'}
           </p>
 
           <h1 className="hero-title-lg mb-3 font-display text-[clamp(2.45rem,10.4vw,5.5rem)] font-light leading-[1.11] tracking-[-0.018em] text-white sm:mb-2 sm:text-[clamp(2.8rem,6vw,5.5rem)] sm:leading-[1.06] sm:tracking-tight">
-            Experiences.
+            {heroCopy?.title ?? 'Experiences.'}
           </h1>
 
           <p
             className="hero-subtitle mb-14 font-display text-[clamp(2.45rem,10.4vw,5.5rem)] font-light leading-[1.11] tracking-[-0.018em] text-white/58 sm:mb-12 sm:text-[clamp(2.8rem,6vw,5.5rem)] sm:leading-[1.06] sm:tracking-tight sm:text-white/55"
             aria-hidden="true"
           >
-            Composed as Art.
+            {heroCopy?.subtitle ?? 'Composed as Art.'}
           </p>
 
-          <HomeHeroInquiryLink />
+          <HomeHeroInquiryLink label={ctaCopy?.label} labelWithArrow={ctaCopy?.labelWithArrow} />
         </div>
       </div>
     </section>

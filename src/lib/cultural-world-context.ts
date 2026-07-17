@@ -1,3 +1,5 @@
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
+
 interface CulturalWorldContextDefinition {
   definition: string;
   introParagraphs: string[];
@@ -14,6 +16,7 @@ interface CulturalWorldContextFallbackInput {
   highlight?: string;
   introText?: string;
   description?: unknown;
+  locale?: SiteLocale;
 }
 
 export interface ResolvedCulturalWorldContext extends CulturalWorldContextDefinition {
@@ -98,7 +101,9 @@ export function getCulturalWorldContext(
   input: CulturalWorldContextFallbackInput
 ): ResolvedCulturalWorldContext {
   const normalizedSlug = input.slug?.trim().toLowerCase();
-  const base = (normalizedSlug && CULTURAL_WORLD_CONTEXT[normalizedSlug]) || null;
+  const canUseStaticContext = !input.locale || input.locale === DEFAULT_SITE_LOCALE;
+  const base =
+    (canUseStaticContext && normalizedSlug && CULTURAL_WORLD_CONTEXT[normalizedSlug]) || null;
 
   const fallbackParagraphs = [
     ...toParagraphs(input.introText),
@@ -111,15 +116,19 @@ export function getCulturalWorldContext(
     definition:
       base?.definition ||
       input.highlight ||
-      `${input.name || 'This cultural world'} is approached through meaning, setting, and relation rather than tourism alone.`,
+      (canUseStaticContext
+        ? `${input.name || 'This cultural world'} is approached through meaning, setting, and relation rather than tourism alone.`
+        : input.name || ''),
     introParagraphs:
       base?.introParagraphs && base.introParagraphs.length > 0
         ? base.introParagraphs
         : fallbackParagraphs.length > 0
           ? fallbackParagraphs
-          : [
-              `${input.name || 'This cultural world'} is treated as a system of memory, movement, and setting rather than a simple destination.`,
-            ],
+          : canUseStaticContext
+            ? [
+                `${input.name || 'This cultural world'} is treated as a system of memory, movement, and setting rather than a simple destination.`,
+              ]
+            : [],
     characteristics:
       base?.characteristics && base.characteristics.length > 0
         ? base.characteristics
@@ -132,6 +141,10 @@ export function getCulturalWorldContext(
 }
 
 function compactFallbackCharacteristics(input: CulturalWorldContextFallbackInput): string[] {
+  if (input.locale && input.locale !== DEFAULT_SITE_LOCALE) {
+    return input.highlight ? [input.highlight.replace(/\.\s*$/, '.')] : [];
+  }
+
   const characteristics = [
     input.highlight ? `${input.highlight.replace(/\.\s*$/, '')}.` : null,
     input.name

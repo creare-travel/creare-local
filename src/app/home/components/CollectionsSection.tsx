@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
+import type { Dictionary } from '@/lib/i18n/types';
 
 interface CollectionFeature {
   label: string;
@@ -11,6 +12,10 @@ interface CollectionFeature {
   alt: string;
   imageRight?: boolean;
   subduedCta?: boolean;
+}
+
+interface LocalizedCollectionFeature extends CollectionFeature {
+  cta: string;
 }
 
 const collectionFeatures: CollectionFeature[] = [
@@ -48,12 +53,52 @@ const collectionFeatures: CollectionFeature[] = [
   },
 ];
 
-export default function CollectionsSection() {
+interface CollectionsSectionProps {
+  dictionary?: Dictionary;
+}
+
+function getLocalizedFeatures(dictionary?: Dictionary): LocalizedCollectionFeature[] {
+  if (!dictionary) {
+    return [
+      { ...collectionFeatures[0], cta: 'Explore →' },
+      { ...collectionFeatures[1], cta: 'Discover →' },
+      { ...collectionFeatures[2], cta: 'Request Private Access →' },
+    ];
+  }
+
+  return [
+    {
+      ...collectionFeatures[0],
+      label: dictionary.signature.label,
+      title: dictionary.signature.title,
+      description: `${dictionary.signature.description1} ${dictionary.signature.description2}`,
+      cta: dictionary.signature.cta,
+    },
+    {
+      ...collectionFeatures[1],
+      label: dictionary.lab.label,
+      title: dictionary.lab.title,
+      description: `${dictionary.lab.description1} ${dictionary.lab.description2}`,
+      cta: dictionary.lab.cta,
+    },
+    {
+      ...collectionFeatures[2],
+      label: dictionary.black.label,
+      title: dictionary.black.title,
+      description: `${dictionary.black.description1} ${dictionary.black.description2}`,
+      cta: dictionary.black.cta,
+    },
+  ];
+}
+
+export default function CollectionsSection({ dictionary }: CollectionsSectionProps) {
+  const localizedFeatures = getLocalizedFeatures(dictionary);
+
   return (
     <div className="w-full bg-neutral-50">
       <div className="mx-auto max-w-7xl px-6 pt-16 sm:px-10 sm:pt-18 lg:px-16 lg:pt-20">
         <p className="font-body text-[0.66rem] font-medium uppercase tracking-[0.18em] text-neutral-600">
-          Three ways CREARE composes an encounter.
+          {dictionary?.home.collections.eyebrow ?? 'Three ways CREARE composes an encounter.'}
         </p>
       </div>
       <section
@@ -63,21 +108,21 @@ export default function CollectionsSection() {
         <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-20 xl:gap-28">
           <div className="mb-2 lg:mb-0 lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
             <p className="mb-5 font-body text-[0.58rem] font-bold uppercase tracking-[0.26em] text-neutral-500 sm:mb-6 sm:text-[0.6rem] sm:tracking-[0.3em]">
-              {collectionFeatures[0].label}
+              {localizedFeatures[0].label}
             </p>
             <p className="mb-8 font-display text-[clamp(1.55rem,7.3vw,2.4rem)] font-light leading-[1.18] tracking-[-0.015em] text-neutral-900 sm:mb-10 sm:text-[clamp(1.7rem,2.8vw,2.4rem)] sm:leading-[1.1] sm:tracking-tight">
-              {collectionFeatures[0].title}
+              {localizedFeatures[0].title}
             </p>
             <p className="mb-10 max-w-sm font-body text-[0.95rem] leading-[1.9] text-neutral-500 sm:mb-12 sm:max-w-xs sm:text-sm sm:leading-relaxed">
-              {collectionFeatures[0].description}
+              {localizedFeatures[0].description}
             </p>
             <Link
-              href={collectionFeatures[0].href}
+              href={localizedFeatures[0].href}
               className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
               aria-label="Explore SIGNATURE experiences"
             >
               <span className="relative inline-block">
-                Explore →
+                {localizedFeatures[0].cta}
                 <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
               </span>
             </Link>
@@ -85,8 +130,8 @@ export default function CollectionsSection() {
           <div className="group overflow-hidden lg:w-7/12 xl:w-8/12">
             <div>
               <AppImage
-                src={collectionFeatures[0].image}
-                alt={collectionFeatures[0].alt}
+                src={localizedFeatures[0].image}
+                alt={localizedFeatures[0].alt}
                 width={1200}
                 height={780}
                 deliveryProfile="hero"
@@ -106,8 +151,8 @@ export default function CollectionsSection() {
           <div className="group mb-2 lg:mb-0 lg:w-7/12 xl:w-8/12">
             <div className="w-full overflow-hidden">
               <AppImage
-                src={collectionFeatures[1].image}
-                alt={collectionFeatures[1].alt}
+                src={localizedFeatures[1].image}
+                alt={localizedFeatures[1].alt}
                 width={1200}
                 height={780}
                 deliveryProfile="hero"
@@ -118,21 +163,21 @@ export default function CollectionsSection() {
           </div>
           <div className="lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
             <p className="mb-5 font-body text-[0.58rem] font-bold uppercase tracking-[0.26em] text-neutral-500 sm:mb-6 sm:text-[0.6rem] sm:tracking-[0.3em]">
-              {collectionFeatures[1].label}
+              {localizedFeatures[1].label}
             </p>
             <p className="mb-8 font-display text-[clamp(1.55rem,7.3vw,2.4rem)] font-light leading-[1.18] tracking-[-0.015em] text-neutral-900 sm:mb-10 sm:text-[clamp(1.7rem,2.8vw,2.4rem)] sm:leading-[1.1] sm:tracking-tight">
-              {collectionFeatures[1].title}
+              {localizedFeatures[1].title}
             </p>
             <p className="mb-10 max-w-sm font-body text-[0.95rem] leading-[1.9] text-neutral-500 sm:mb-12 sm:max-w-xs sm:text-sm sm:leading-relaxed">
-              {collectionFeatures[1].description}
+              {localizedFeatures[1].description}
             </p>
             <Link
-              href={collectionFeatures[1].href}
+              href={localizedFeatures[1].href}
               className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
               aria-label="Discover LAB experience design"
             >
               <span className="relative inline-block">
-                Discover →
+                {localizedFeatures[1].cta}
                 <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
               </span>
             </Link>
@@ -147,21 +192,21 @@ export default function CollectionsSection() {
         <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-20 xl:gap-28">
           <div className="mb-2 lg:mb-0 lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
             <p className="mb-5 font-body text-[0.58rem] font-bold uppercase tracking-[0.26em] text-neutral-500 sm:mb-6 sm:text-[0.6rem] sm:tracking-[0.3em]">
-              {collectionFeatures[2].label}
+              {localizedFeatures[2].label}
             </p>
             <p className="mb-8 font-display text-[clamp(1.55rem,7.3vw,2.4rem)] font-light leading-[1.18] tracking-[-0.015em] text-neutral-900 sm:mb-10 sm:text-[clamp(1.7rem,2.8vw,2.4rem)] sm:leading-[1.1] sm:tracking-tight">
-              {collectionFeatures[2].title}
+              {localizedFeatures[2].title}
             </p>
             <p className="mb-10 max-w-sm font-body text-[0.95rem] leading-[1.9] text-neutral-500 sm:mb-12 sm:max-w-xs sm:text-sm sm:leading-relaxed">
-              {collectionFeatures[2].description}
+              {localizedFeatures[2].description}
             </p>
             <Link
-              href={collectionFeatures[2].href}
+              href={localizedFeatures[2].href}
               className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
               aria-label="Request private access to BLACK experiences"
             >
               <span className="relative inline-block">
-                Request Private Access →
+                {localizedFeatures[2].cta}
                 <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
               </span>
             </Link>
@@ -169,8 +214,8 @@ export default function CollectionsSection() {
           <div className="group lg:w-7/12 xl:w-8/12">
             <div className="w-full overflow-hidden">
               <AppImage
-                src={collectionFeatures[2].image}
-                alt={collectionFeatures[2].alt}
+                src={localizedFeatures[2].image}
+                alt={localizedFeatures[2].alt}
                 width={1200}
                 height={780}
                 deliveryProfile="hero"

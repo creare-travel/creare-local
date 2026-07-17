@@ -53,6 +53,17 @@ export function localizePathname(pathname: string, locale: SiteLocale): string {
   return unprefixedPathname === '/' ? TURKISH_PREFIX : `${TURKISH_PREFIX}${unprefixedPathname}`;
 }
 
+export function buildLocalizedRouteTarget(
+  basePath: string,
+  slug: string,
+  locale: SiteLocale
+): string {
+  const normalizedBasePath = stripLocalePrefix(basePath);
+  const path = `${normalizedBasePath}/${slug}`.replace(/\/{2,}/g, '/');
+
+  return localizePathname(path, locale);
+}
+
 export function isTurkishPathname(pathname: string): boolean {
   return getLocaleFromPathname(pathname) === 'tr';
 }

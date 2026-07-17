@@ -1,12 +1,8 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import {
-  DEFAULT_SITE_LOCALE,
-  LOCALE_OPTIONS,
-  LOCALE_STORAGE_KEY,
-  isSiteLocale,
-  type SiteLocale,
-} from '@/lib/i18n/config';
+import { usePathname } from 'next/navigation';
+import { LOCALE_OPTIONS, LOCALE_STORAGE_KEY, type SiteLocale } from '@/lib/i18n/config';
+import { getLocaleFromPathname } from '@/lib/i18n/pathname';
 
 export type Locale = SiteLocale;
 
@@ -42,15 +38,19 @@ function getNestedValue(obj: TranslationDict, key: string): string {
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_SITE_LOCALE);
+  const pathname = usePathname();
+  const pathnameLocale = getLocaleFromPathname(pathname ?? '/');
+  const [locale, setLocaleState] = useState<Locale>(pathnameLocale);
   const [translations, setTranslations] = useState<TranslationDict>({});
 
   useEffect(() => {
-    const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
-    if (isSiteLocale(stored)) {
-      setLocaleState(stored);
-    }
-  }, []);
+    setLocaleState(pathnameLocale);
+  }, [pathnameLocale]);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    document.documentElement.dir = 'ltr';
+  }, [locale]);
 
   useEffect(() => {
     import(`../locales/${locale}.json`)

@@ -1,0 +1,1050 @@
+import React from 'react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import CulturalWorldViewTracker from '@/components/CulturalWorldViewTracker';
+import JsonLd from '@/components/JsonLd';
+import AppImage from '@/components/ui/AppImage';
+import { getCulturalWorldContent, type CulturalWorldSystemMapping } from '@/data/cultural-worlds';
+import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
+import { getDictionary } from '@/lib/i18n/dictionaries';
+import { localizePathname } from '@/lib/i18n/pathname';
+import {
+  filterPublicExperiences,
+  filterPublicInsights,
+  isCanonicalCulturalWorldSlug,
+} from '@/lib/canonical-gates';
+import { getCulturalWorldContext } from '@/lib/cultural-world-context';
+import { buildMetadataAlternates } from '@/lib/seo';
+import { buildCanonicalUrl, buildCulturalWorldDetailGraph } from '@/lib/schema-builder';
+import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
+const FALLBACK_DESCRIPTION =
+  'A cultural world composed through editorial destination content, related experiences, and further reading.';
+const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
+const canonicalInsightSlug = (slug?: string) =>
+  slug === 'the-private-life-of-istanbul' ? 'private-life-of-istanbul' : slug;
+
+function stripBrandSuffix(title?: string | null): string | undefined {
+  return title?.replace(/\s+—\s+Creare$/i, '').trim() || undefined;
+}
+
+interface Props {
+  params: Promise<{ slug: string }>;
+}
+
+interface StrapiRichTextNode {
+  type: string;
+  children?: StrapiRichTextNode[];
+  text?: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+}
+
+interface StrapiImage {
+  name?: string;
+  url?: string;
+  alternativeText?: string;
+  caption?: string;
+  formats?: {
+    large?: { url?: string };
+    medium?: { url?: string };
+    small?: { url?: string };
+  };
+}
+
+interface StrapiSection {
+  id?: number;
+  section_number?: number;
+  title?: string;
+  body?: StrapiRichTextNode[] | string;
+}
+
+interface StrapiExperience {
+  id: number;
+  slug?: string;
+  title?: string;
+  short_description?: string;
+  category?: string;
+  order_index?: number;
+  visibility_status?: string;
+  publishedAt?: string | null;
+  geo_experience_type?: string | null;
+  mood?: string | null;
+  tags?: unknown;
+  destination?: {
+    slug?: string;
+    name?: string;
+  } | null;
+  cover_image?: StrapiImage | null;
+}
+
+interface StrapiInsight {
+  id: number;
+  slug?: string;
+  title?: string;
+  visibility_status?: string;
+  publishedAt?: string | null;
+}
+
+interface StrapiDestination {
+  id: number;
+  slug?: string;
+  name?: string;
+  visibility_status?: string;
+  highlight?: string;
+  short_description?: string;
+  intro_text?: string;
+  description?: StrapiRichTextNode[] | string;
+  meta_title?: string;
+  meta_description?: string;
+  cover_image?: StrapiImage | null;
+  sections?: StrapiSection[] | { data?: Record<string, unknown>[] };
+  experiences?: StrapiExperience[] | { data?: Record<string, unknown>[] };
+  secondary_experiences?: StrapiExperience[] | { data?: Record<string, unknown>[] };
+  insights?: StrapiInsight[] | { data?: Record<string, unknown>[] };
+}
+
+function flattenItem<T>(raw: Record<string, unknown>): T {
+  if (raw?.attributes && typeof raw.attributes === 'object') {
+    return { id: raw.id, ...(raw.attributes as object) } as T;
+  }
+  return raw as T;
+}
+
+function normalizeRelationArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) {
+    return value.map((item) =>
+      item && typeof item === 'object' ? flattenItem<T>(item as Record<string, unknown>) : item
+    ) as T[];
+  }
+
+  if (value && typeof value === 'object' && Array.isArray((value as { data?: unknown[] }).data)) {
+    return ((value as { data: unknown[] }).data ?? []).map((item) =>
+      item && typeof item === 'object' ? flattenItem<T>(item as Record<string, unknown>) : item
+    ) as T[];
+  }
+
+  return [];
+}
+
+function normalizeSingleRelation<T>(value: unknown): T | null {
+  if (!value || typeof value !== 'object') return null;
+
+  if ('data' in (value as Record<string, unknown>)) {
+    const data = (value as { data?: unknown }).data;
+    if (!data || Array.isArray(data) || typeof data !== 'object') return null;
+    return flattenItem<T>(data as Record<string, unknown>);
+  }
+
+  return flattenItem<T>(value as Record<string, unknown>);
+}
+
+function resolveImageUrl(image?: StrapiImage | null): string {
+  const rawUrl =
+    image?.formats?.large?.url ??
+    image?.formats?.medium?.url ??
+    image?.formats?.small?.url ??
+    image?.url;
+
+  return rawUrl ? mediaUrl(rawUrl) : IMAGE_FALLBACK;
+}
+
+function isApprovedLocalHeroPath(imageUrl?: string): boolean {
+  return Boolean(
+    imageUrl && ['/assets/', '/images/', '/uploads/'].some((prefix) => imageUrl.startsWith(prefix))
+  );
+}
+
+function buildLocalHeroImage(imageUrl?: string, imageAlt?: string): StrapiImage | null {
+  if (!imageUrl || !isApprovedLocalHeroPath(imageUrl)) return null;
+
+  return {
+    url: imageUrl,
+    alternativeText: imageAlt,
+  };
+}
+
+function normalizeTags(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((entry) => {
+        if (typeof entry === 'string') return entry.trim().toLowerCase();
+        if (
+          entry &&
+          typeof entry === 'object' &&
+          typeof (entry as { name?: unknown }).name === 'string'
+        ) {
+          return ((entry as { name: string }).name || '').trim().toLowerCase();
+        }
+        return '';
+      })
+      .filter(Boolean);
+  }
+
+  if (value && typeof value === 'object' && Array.isArray((value as { data?: unknown[] }).data)) {
+    return ((value as { data?: unknown[] }).data ?? [])
+      .map((entry) => {
+        if (entry && typeof entry === 'object') {
+          const record = entry as { name?: unknown; attributes?: { name?: unknown } };
+          const directName =
+            typeof record.name === 'string'
+              ? record.name
+              : typeof record.attributes?.name === 'string'
+                ? record.attributes.name
+                : '';
+
+          return directName.trim().toLowerCase();
+        }
+        return '';
+      })
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function buildFallbackDestinationFromLocalContent(
+  localContent: ReturnType<typeof getCulturalWorldContent>
+): StrapiDestination | null {
+  if (!localContent) return null;
+
+  const localHeroImage = buildLocalHeroImage(localContent.heroImage, localContent.heroImageAlt);
+
+  return {
+    id: -1,
+    slug: localContent.slug,
+    name: localContent.title,
+    visibility_status: 'active',
+    highlight: localContent.shortDescription,
+    short_description: localContent.shortDescription,
+    intro_text: localContent.heroStatement,
+    meta_title: localContent.metaTitle,
+    meta_description: localContent.metaDescription,
+    cover_image: localHeroImage,
+    sections: [],
+    experiences: [],
+    secondary_experiences: [],
+    insights: [],
+  };
+}
+
+async function fetchAllExperiences(locale: SiteLocale): Promise<StrapiExperience[]> {
+  const params = new URLSearchParams({
+    'filters[visibility_status][$eqi]': 'active',
+    'pagination[pageSize]': '100',
+    'populate[cover_image]': 'true',
+    'populate[destination]': 'true',
+    'sort[0]': 'title:asc',
+  });
+
+  const path = `/api/experiences?${params.toString()}`;
+
+  try {
+    const json = await fetchStrapi(path, { locale });
+    const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
+
+    return items
+      .map((item) => flattenItem<StrapiExperience>(item))
+      .map((experience) => ({
+        ...experience,
+        cover_image: normalizeSingleRelation<StrapiImage>(experience.cover_image),
+        destination: normalizeSingleRelation<{ slug?: string; name?: string }>(
+          experience.destination
+        ),
+      }))
+      .filter((experience) => experience.slug && experience.title)
+      .filter((experience) => filterPublicExperiences([experience]).length > 0);
+  } catch (error) {
+    console.error('Failed to fetch experiences for cultural world related mapping.', {
+      route: '/cultural-worlds/[slug]',
+      strapiPath: path,
+      error,
+    });
+    return [];
+  }
+}
+
+interface RelatedExperience extends StrapiExperience {
+  relationType: 'primary' | 'secondary';
+  relationScore: number;
+}
+
+function buildSystemMappingIndex(mappings: CulturalWorldSystemMapping[] = []) {
+  return new Map(
+    mappings.map((mapping) => [
+      mapping.experienceTitle.trim().toLowerCase(),
+      mapping.culturalSystem,
+    ])
+  );
+}
+
+function buildRelatedExperiences(
+  destination: StrapiDestination,
+  directExperiences: StrapiExperience[],
+  allExperiences: StrapiExperience[],
+  locale: SiteLocale
+): RelatedExperience[] {
+  const context = getCulturalWorldContext({
+    name: destination.name,
+    slug: destination.slug,
+    highlight: destination.highlight,
+    introText: destination.intro_text,
+    description: destination.description,
+    locale,
+  });
+
+  const fullExperienceIndex = new Map(
+    allExperiences
+      .filter((experience) => experience.slug)
+      .map((experience) => [experience.slug as string, experience] as const)
+  );
+
+  const primaryExperiences = directExperiences
+    .map((experience) =>
+      experience.slug ? fullExperienceIndex.get(experience.slug) || experience : experience
+    )
+    .filter((experience) => experience.slug && experience.title)
+    .map((experience) => ({
+      ...experience,
+      relationType: 'primary' as const,
+      relationScore: 1000,
+    }));
+
+  const primarySlugs = new Set(
+    primaryExperiences.map((experience) => experience.slug).filter(Boolean)
+  );
+  const cmsSecondaryExperiences = filterPublicExperiences(
+    normalizeRelationArray<StrapiExperience>(destination.secondary_experiences)
+  )
+    .map((experience) =>
+      experience.slug ? fullExperienceIndex.get(experience.slug) || experience : experience
+    )
+    .filter(
+      (experience) => experience.slug && experience.title && !primarySlugs.has(experience.slug)
+    )
+    .map((experience, index) => ({
+      ...experience,
+      relationType: 'secondary' as const,
+      relationScore: 900 - index,
+    }));
+  const preferredMoods = new Set(
+    (context.preferredMoods ?? []).map((value) => value.toLowerCase())
+  );
+  const preferredGeoTypes = new Set(
+    (context.preferredGeoTypes ?? []).map((value) => value.toLowerCase())
+  );
+  const preferredTags = new Set((context.preferredTags ?? []).map((value) => value.toLowerCase()));
+  const manualSecondary = new Map(
+    (context.secondaryExperienceSlugs ?? []).map((slug, index) => [slug, index] as const)
+  );
+
+  const secondaryExperiences =
+    cmsSecondaryExperiences.length > 0
+      ? cmsSecondaryExperiences.slice(0, primaryExperiences.length > 0 ? 3 : 4)
+      : (allExperiences
+          .filter((experience) => {
+            return experience.slug && experience.title && !primarySlugs.has(experience.slug);
+          })
+          .map((experience) => {
+            const slug = experience.slug as string;
+            const mood = experience.mood?.toLowerCase() ?? '';
+            const geoType = experience.geo_experience_type?.toLowerCase() ?? '';
+            const tags = normalizeTags(experience.tags);
+
+            let score = 0;
+
+            if (manualSecondary.has(slug)) {
+              score += 100 - (manualSecondary.get(slug) ?? 0);
+            }
+
+            if (preferredMoods.has(mood)) score += 20;
+            if (preferredGeoTypes.has(geoType)) score += 20;
+            if (experience.destination?.slug && experience.destination.slug === destination.slug)
+              score += 12;
+            if (tags.some((tag) => preferredTags.has(tag))) score += 10;
+
+            if (score <= 0) return null;
+
+            return {
+              ...experience,
+              relationType: 'secondary' as const,
+              relationScore: score,
+            };
+          })
+          .filter(Boolean)
+          .sort((left, right) => {
+            if ((right?.relationScore ?? 0) !== (left?.relationScore ?? 0)) {
+              return (right?.relationScore ?? 0) - (left?.relationScore ?? 0);
+            }
+
+            return (left?.title ?? '').localeCompare(right?.title ?? '');
+          })
+          .slice(0, primaryExperiences.length > 0 ? 3 : 4) as RelatedExperience[]);
+
+  return [...primaryExperiences, ...secondaryExperiences];
+}
+
+function renderRichText(nodes: StrapiRichTextNode[]): React.ReactNode {
+  return nodes.map((node, index) => {
+    if (node.type === 'paragraph') {
+      return (
+        <p key={index} className="font-body text-sm text-white/65 leading-loose">
+          {node.children ? renderRichText(node.children) : null}
+        </p>
+      );
+    }
+
+    if (node.type === 'heading') {
+      return (
+        <h3 key={index} className="font-display font-light text-white text-xl mb-4 mt-8">
+          {node.children ? renderRichText(node.children) : null}
+        </h3>
+      );
+    }
+
+    if (node.type === 'list') {
+      return (
+        <ul key={index} className="space-y-2 pl-5">
+          {node.children ? renderRichText(node.children) : null}
+        </ul>
+      );
+    }
+
+    if (node.type === 'list-item') {
+      return (
+        <li key={index} className="font-body text-sm text-white/65 leading-relaxed list-disc">
+          {node.children ? renderRichText(node.children) : null}
+        </li>
+      );
+    }
+
+    if (node.type === 'text') {
+      let content: React.ReactNode = node.text ?? '';
+      if (node.bold)
+        content = (
+          <strong key={index} className="text-white/85">
+            {content}
+          </strong>
+        );
+      if (node.italic) content = <em key={index}>{content}</em>;
+      if (node.underline) content = <u key={index}>{content}</u>;
+      return content;
+    }
+
+    if (node.children) return renderRichText(node.children);
+    return null;
+  });
+}
+
+function renderBodyContent(content?: StrapiRichTextNode[] | string) {
+  if (!content) return null;
+
+  if (typeof content === 'string') {
+    const paragraphs = content
+      .split('\n\n')
+      .map((paragraph) => paragraph.trim())
+      .filter(Boolean);
+
+    return (
+      <div className="space-y-6 text-white/65 font-body font-light text-base leading-relaxed">
+        {paragraphs.map((paragraph, index) => (
+          <p key={index}>{paragraph}</p>
+        ))}
+      </div>
+    );
+  }
+
+  if (Array.isArray(content) && content.length > 0) {
+    return (
+      <div className="space-y-6 text-white/65 font-body font-light text-base leading-relaxed">
+        {renderRichText(content)}
+      </div>
+    );
+  }
+
+  return null;
+}
+
+async function fetchDestination(
+  slug: string,
+  locale: SiteLocale
+): Promise<StrapiDestination | null> {
+  if (!slug) return null;
+
+  const params = new URLSearchParams({
+    'filters[slug][$eq]': slug,
+    'populate[cover_image]': 'true',
+    'populate[sections]': 'true',
+    'populate[insights]': 'true',
+    'populate[experiences][populate][cover_image]': 'true',
+    'populate[experiences][populate][destination]': 'true',
+    'populate[secondary_experiences][populate][cover_image]': 'true',
+    'populate[secondary_experiences][populate][destination]': 'true',
+  });
+  const path = `/api/destinations?${params.toString()}`;
+
+  try {
+    const json = await fetchStrapi(path, { locale });
+    const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
+    if (!items.length) return null;
+
+    const destination = flattenItem<StrapiDestination>(items[0]);
+
+    return {
+      ...destination,
+      cover_image: normalizeSingleRelation<StrapiImage>(destination.cover_image),
+      sections: normalizeRelationArray<StrapiSection>(destination.sections),
+      experiences: normalizeRelationArray<StrapiExperience>(destination.experiences).map(
+        (experience) => ({
+          ...experience,
+          cover_image: normalizeSingleRelation<StrapiImage>(experience.cover_image),
+          destination: normalizeSingleRelation<{ slug?: string; name?: string }>(
+            experience.destination
+          ),
+        })
+      ),
+      secondary_experiences: normalizeRelationArray<StrapiExperience>(
+        destination.secondary_experiences
+      ).map((experience) => ({
+        ...experience,
+        cover_image: normalizeSingleRelation<StrapiImage>(experience.cover_image),
+        destination: normalizeSingleRelation<{ slug?: string; name?: string }>(
+          experience.destination
+        ),
+      })),
+      insights: normalizeRelationArray<StrapiInsight>(destination.insights),
+    };
+  } catch (error) {
+    console.error('Failed to fetch cultural world detail.', {
+      route: `/cultural-worlds/${slug}`,
+      strapiPath: path,
+      error,
+    });
+    return null;
+  }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const locale = DEFAULT_SITE_LOCALE;
+  if (!isCanonicalCulturalWorldSlug(slug)) {
+    return {
+      title: 'Not Found — Cultural World',
+      description: FALLBACK_DESCRIPTION,
+      robots: { index: false, follow: false },
+    };
+  }
+  const localContent = getCulturalWorldContent(slug, locale);
+  const destination = await fetchDestination(slug, locale);
+  const fallbackDestination = canUseEnglishFallback(locale)
+    ? buildFallbackDestinationFromLocalContent(localContent)
+    : null;
+
+  if (destination && destination.visibility_status?.toLowerCase() !== 'active') {
+    return {
+      title: 'Not Found — Cultural World',
+      description: FALLBACK_DESCRIPTION,
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const resolvedDestination = destination ?? fallbackDestination;
+
+  if (!resolvedDestination) {
+    return {
+      title: 'Not Found — Cultural World',
+      description: FALLBACK_DESCRIPTION,
+      robots: { index: false, follow: false },
+    };
+  }
+
+  return {
+    title:
+      stripBrandSuffix(localContent?.metaTitle) ||
+      stripBrandSuffix(resolvedDestination.meta_title) ||
+      `${resolvedDestination.name || localContent?.title || 'Destination'} — Cultural World`,
+    description:
+      localContent?.metaDescription ||
+      resolvedDestination.meta_description ||
+      resolvedDestination.highlight ||
+      localContent?.shortDescription ||
+      FALLBACK_DESCRIPTION,
+    alternates: buildMetadataAlternates(`/cultural-worlds/${slug}`),
+    robots: { index: true, follow: true },
+  };
+}
+
+export async function renderCulturalWorldDetailPage(slug: string, locale: SiteLocale) {
+  const dictionary = getDictionary(locale);
+  if (!isCanonicalCulturalWorldSlug(slug)) {
+    notFound();
+  }
+  const localContent = getCulturalWorldContent(slug, locale);
+  const [destination, allExperiences] = await Promise.all([
+    fetchDestination(slug, locale),
+    fetchAllExperiences(locale),
+  ]);
+  const fallbackDestination = canUseEnglishFallback(locale)
+    ? buildFallbackDestinationFromLocalContent(localContent)
+    : null;
+
+  if (destination && destination.visibility_status?.toLowerCase() !== 'active') {
+    notFound();
+  }
+
+  if (!destination && !fallbackDestination) {
+    notFound();
+  }
+
+  const resolvedDestination = destination ?? fallbackDestination;
+
+  if (!resolvedDestination) {
+    notFound();
+  }
+
+  const mergedDestination: StrapiDestination = {
+    ...resolvedDestination,
+    name: resolvedDestination.name || localContent?.title,
+    highlight: localContent?.shortDescription || resolvedDestination.highlight,
+    short_description: localContent?.shortDescription || resolvedDestination.short_description,
+    intro_text: localContent?.heroStatement || resolvedDestination.intro_text,
+    meta_title: localContent?.metaTitle || resolvedDestination.meta_title,
+    meta_description: localContent?.metaDescription || resolvedDestination.meta_description,
+    cover_image: resolvedDestination.cover_image ?? null,
+  };
+
+  const cmsSections = normalizeRelationArray<StrapiSection>(resolvedDestination.sections)
+    .filter((section) => section.title || section.body)
+    .sort((a, b) => (a.section_number ?? Infinity) - (b.section_number ?? Infinity));
+  const fallbackSections = canUseEnglishFallback(locale)
+    ? (localContent?.sections ?? []).map((section, index) => ({
+        id: -(index + 1),
+        section_number: index + 1,
+        title: section.title,
+        body: section.body,
+      }))
+    : [];
+  const sections = (fallbackSections.length > 0 ? fallbackSections : cmsSections).filter(
+    (section) => section.title || section.body
+  );
+
+  const experiences = filterPublicExperiences(
+    normalizeRelationArray<StrapiExperience>(resolvedDestination.experiences)
+  )
+    .filter((experience) => experience.slug && experience.title)
+    .sort((a, b) => (a.order_index ?? Infinity) - (b.order_index ?? Infinity));
+  const allRelatedExperiences = buildRelatedExperiences(
+    mergedDestination,
+    experiences,
+    allExperiences,
+    locale
+  );
+  const relatedExperiences = allRelatedExperiences.filter(
+    (experience) => experience.relationType === 'primary'
+  );
+
+  const cmsInsights = filterPublicInsights(
+    normalizeRelationArray<StrapiInsight>(resolvedDestination.insights)
+  ).filter((insight) => insight.slug && insight.title);
+  const fallbackInsights = canUseEnglishFallback(locale)
+    ? (localContent?.furtherReading ?? []).map((insight, index) => ({
+        id: -(index + 1),
+        slug: insight.slug,
+        title: insight.title,
+      }))
+    : [];
+  const insights = (fallbackInsights.length > 0 ? fallbackInsights : cmsInsights).filter(
+    (insight) => insight.slug && insight.title
+  );
+  const context = getCulturalWorldContext({
+    name: mergedDestination.name,
+    slug: mergedDestination.slug,
+    highlight: mergedDestination.highlight,
+    introText: mergedDestination.intro_text,
+    description: mergedDestination.description,
+    locale,
+  });
+
+  const coverImageUrl = resolveImageUrl(mergedDestination.cover_image);
+  const coverImageAlt =
+    mergedDestination.cover_image?.alternativeText ||
+    mergedDestination.name ||
+    'Cultural world cover image';
+  const systemMappingIndex = buildSystemMappingIndex(localContent?.systemMappings ?? []);
+  const editorialSections = sections.map((section, index) => {
+    const body = renderBodyContent(section.body);
+    if (!body) return null;
+
+    return (
+      <React.Fragment key={section.id ?? `${section.section_number ?? 'section'}-${index}`}>
+        <section
+          className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-20"
+          aria-labelledby={`section-${index}`}
+        >
+          <div className="max-w-3xl">
+            <p className="mb-5 font-body text-xs uppercase tracking-[0.2em] text-white/24">
+              {String(section.section_number ?? index + 1).padStart(2, '0')}
+            </p>
+            {section.title && (
+              <h2
+                id={`section-${index}`}
+                className="font-display font-light text-white leading-tight mb-8"
+                style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}
+              >
+                {section.title}
+              </h2>
+            )}
+            {body}
+          </div>
+        </section>
+        {index < sections.length - 1 ? (
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+            <div className="h-px w-full bg-white/6" />
+          </div>
+        ) : null}
+      </React.Fragment>
+    );
+  });
+
+  const culturalWorldSchema = buildCulturalWorldDetailGraph({
+    destination: mergedDestination,
+    slug,
+    relatedExperiences: allRelatedExperiences
+      .filter((experience) => experience.slug && experience.title)
+      .map((experience) => ({
+        title: experience.title,
+        slug: experience.slug,
+        url: experience.slug ? buildCanonicalUrl(`/experiences/${experience.slug}`) : undefined,
+        description: experience.short_description,
+        category: experience.category,
+        image: experience.cover_image,
+      })),
+    relatedInsights: insights.map((insight) => ({
+      title: insight.title,
+      slug: canonicalInsightSlug(insight.slug),
+      url: insight.slug
+        ? buildCanonicalUrl(`/insights/${canonicalInsightSlug(insight.slug)}`)
+        : undefined,
+    })),
+    sections: sections.map((section) => ({
+      title: section.title,
+      body: section.body,
+    })),
+  });
+  return (
+    <main className="bg-black min-h-screen">
+      {locale === DEFAULT_SITE_LOCALE && (
+        <JsonLd id="cultural-world-detail-jsonld" schema={culturalWorldSchema} />
+      )}
+      <CulturalWorldViewTracker location={slug} />
+      <section className="relative w-full h-[90vh] min-h-[620px] flex items-end overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <AppImage
+            src={coverImageUrl}
+            alt={coverImageAlt}
+            fill
+            priority
+            atmosphere="dark"
+            className="object-cover hero-img-zoom"
+            sizes="100vw"
+            unoptimized={isLocalAssetUrl(coverImageUrl)}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/20" />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pb-24 w-full">
+          <p className="hero-label text-white/50 font-body text-[0.6rem] tracking-[0.35em] uppercase mb-6">
+            {dictionary.culturalWorlds.title}
+          </p>
+          <h1
+            className="hero-title-lg font-display font-light text-white leading-[0.95] tracking-tight"
+            style={{ fontSize: 'clamp(4rem, 9vw, 9rem)' }}
+          >
+            {mergedDestination.name || 'Destination'}
+          </h1>
+          {(localContent?.heroStatement || context.definition) && (
+            <p className="hero-subtitle text-white/60 font-body font-light text-base mt-6 max-w-sm leading-relaxed tracking-wide">
+              {localContent?.heroStatement || context.definition}
+            </p>
+          )}
+        </div>
+      </section>
+
+      <nav className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-6" aria-label="Breadcrumb">
+        <ol className="flex items-center gap-2">
+          <li>
+            <Link
+              href={localizePathname('/', locale)}
+              className="text-white/30 font-body text-xs tracking-[0.15em] uppercase hover:text-white/60 transition-colors"
+            >
+              {dictionary.common.home}
+            </Link>
+          </li>
+          <li aria-hidden="true">
+            <span className="text-white/20 font-body text-xs mx-1">→</span>
+          </li>
+          <li>
+            <Link
+              href={localizePathname('/cultural-worlds', locale)}
+              className="text-white/30 font-body text-xs tracking-[0.15em] uppercase hover:text-white/60 transition-colors"
+            >
+              {dictionary.culturalWorlds.title}
+            </Link>
+          </li>
+          <li aria-hidden="true">
+            <span className="text-white/20 font-body text-xs mx-1">→</span>
+          </li>
+          <li>
+            <span className="text-white/60 font-body text-xs tracking-[0.15em] uppercase">
+              {mergedDestination.name || 'Destination'}
+            </span>
+          </li>
+        </ol>
+      </nav>
+
+      <section
+        className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pt-24 pb-20"
+        aria-labelledby="context-intro"
+      >
+        <div className="max-w-2xl">
+          <p className="text-white/25 font-body text-[0.6rem] tracking-[0.35em] uppercase mb-8">
+            {dictionary.culturalWorlds.context}
+          </p>
+          <h2
+            id="context-intro"
+            className="font-display font-light text-white leading-tight mb-14"
+            style={{ fontSize: 'clamp(2rem, 3.5vw, 3.2rem)' }}
+          >
+            {context.definition}
+          </h2>
+          {context.introParagraphs.length > 0 && (
+            <div className="space-y-10 text-white/60 font-body font-light text-base leading-loose">
+              {context.introParagraphs.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {context.characteristics.length > 0 && (
+        <>
+          <section
+            className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-24"
+            aria-labelledby="core-characteristics"
+          >
+            <div className="max-w-3xl">
+              <p className="text-white/22 font-body text-[0.58rem] tracking-[0.24em] uppercase mb-7">
+                {dictionary.culturalWorlds.coreCharacteristics}
+              </p>
+              <h2
+                id="core-characteristics"
+                className="font-display font-light text-white leading-tight mb-10"
+                style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}
+              >
+                {dictionary.culturalWorlds.whatDefines}
+              </h2>
+              <ul className="space-y-6">
+                {context.characteristics.map((characteristic, index) => (
+                  <li
+                    key={`${mergedDestination.slug || 'world'}-characteristic-${index}`}
+                    className="flex gap-4 text-white/65 font-body font-light text-base leading-relaxed"
+                  >
+                    <span className="mt-2 block h-1.5 w-1.5 rounded-full bg-white/35 shrink-0" />
+                    <span>{characteristic}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        </>
+      )}
+
+      {localContent?.culturalSystems?.length ? (
+        <>
+          <section
+            className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-24"
+            aria-labelledby="cultural-systems"
+          >
+            <div className="max-w-3xl">
+              <p className="text-white/22 font-body text-[0.58rem] tracking-[0.24em] uppercase mb-7">
+                {dictionary.culturalWorlds.culturalSystems}
+              </p>
+              <h2
+                id="cultural-systems"
+                className="font-display font-light text-white leading-tight mb-10"
+                style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}
+              >
+                The cultural systems that structure this world.
+              </h2>
+              <ul className="space-y-6">
+                {localContent.culturalSystems.map((system, index) => (
+                  <li
+                    key={`${mergedDestination.slug || 'world'}-system-${index}`}
+                    className="flex gap-4 text-white/65 font-body font-light text-base leading-relaxed"
+                  >
+                    <span className="mt-2 block h-1.5 w-1.5 rounded-full bg-white/35 shrink-0" />
+                    <span>{system}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        </>
+      ) : null}
+
+      {relatedExperiences.length > 0 && (
+        <>
+          <section
+            className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-24"
+            aria-labelledby="related-experiences"
+          >
+            <div className="max-w-3xl mb-14">
+              <p className="text-white/22 font-body text-[0.58rem] tracking-[0.24em] uppercase mb-7">
+                {dictionary.common.relatedExperiences}
+              </p>
+              <h2
+                id="related-experiences"
+                className="font-display font-light text-white leading-tight mb-8"
+                style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}
+              >
+                {dictionary.experiences.adjacentExperiences}
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 xl:gap-5">
+              {relatedExperiences.map((experience, index) => {
+                const imageUrl = resolveImageUrl(experience.cover_image);
+                const imageAlt =
+                  experience.cover_image?.alternativeText ?? experience.title ?? 'Experience image';
+
+                return (
+                  <Link
+                    key={experience.slug || experience.id}
+                    href={localizePathname(`/experiences/${experience.slug}`, locale)}
+                    className="group block overflow-hidden rounded-[14px] border border-white/6 bg-white/[0.02]"
+                  >
+                    <div className="relative aspect-[16/9] overflow-hidden">
+                      <AppImage
+                        src={imageUrl}
+                        alt={imageAlt}
+                        fill
+                        deliveryProfile="card"
+                        className="motion-media-drift object-cover"
+                        priority={index < 2}
+                        sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
+                        unoptimized={isLocalAssetUrl(imageUrl)}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    </div>
+                    <div className="p-4 md:p-5">
+                      <h3 className="mb-2 font-display font-light text-[1.2rem] leading-snug text-white md:text-[1.3rem]">
+                        {experience.title}
+                      </h3>
+                      {experience.short_description && (
+                        <p className="mb-3.5 text-white/55 font-body font-light text-[0.92rem] leading-relaxed md:line-clamp-2">
+                          {experience.short_description}
+                        </p>
+                      )}
+                      {experience.title &&
+                      systemMappingIndex.has(experience.title.trim().toLowerCase()) ? (
+                        <p className="mb-3.5 text-white/42 font-body text-[0.65rem] tracking-[0.11em] uppercase leading-relaxed">
+                          <span className="block">
+                            {dictionary.culturalWorlds.connectedCulturalSystem}
+                          </span>
+                          <span className="mt-1 block text-white/58 tracking-[0.09em]">
+                            {systemMappingIndex.get(experience.title.trim().toLowerCase())}
+                          </span>
+                        </p>
+                      ) : null}
+                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-white/22 font-body text-[0.64rem] tracking-[0.11em] uppercase">
+                        {experience.category ? <span>{experience.category}</span> : null}
+                        {experience.geo_experience_type ? (
+                          <span>{experience.geo_experience_type}</span>
+                        ) : null}
+                        <span className="text-white/40 transition-colors group-hover:text-white/70">
+                          → {dictionary.culturalWorlds.viewExperience}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        </>
+      )}
+
+      {insights.length > 0 && (
+        <section
+          className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pt-16 pb-0"
+          aria-label="Related insights"
+        >
+          <div className="max-w-3xl">
+            <p className="text-white/26 font-body text-[0.58rem] tracking-[0.16em] uppercase mb-2">
+              {dictionary.common.relatedInsights}
+            </p>
+            <div className="space-y-4">
+              {insights.map((insight) => (
+                <Link
+                  key={`${insight.id}-${insight.slug}`}
+                  href={localizePathname(`/insights/${canonicalInsightSlug(insight.slug)}`, locale)}
+                  className="block font-body text-sm text-white/55 hover:text-white/80 transition-colors underline underline-offset-4 decoration-white/20"
+                >
+                  {insight.title}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {editorialSections}
+
+      <section
+        className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-24 pb-36"
+        aria-label="Private inquiry"
+      >
+        <div className="border border-white/10 p-12 md:p-16 max-w-2xl">
+          <p className="text-white/30 font-body text-[0.6rem] tracking-[0.25em] uppercase mb-6">
+            {localContent?.cta.eyebrow || dictionary.culturalWorlds.byIntroductionOnly}
+          </p>
+          <p
+            className="font-display font-light text-white/80 leading-relaxed mb-2"
+            style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)' }}
+          >
+            {localContent?.cta.title || dictionary.culturalWorlds.accessLimited}
+          </p>
+          {(localContent?.cta.subtitle || locale === DEFAULT_SITE_LOCALE) && (
+            <p
+              className="font-display font-light text-white/50 leading-relaxed mb-3"
+              style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)' }}
+            >
+              {localContent?.cta.subtitle ||
+                'Each cultural world is composed through a small number of encounters each season.'}
+            </p>
+          )}
+          {(localContent?.cta.note || locale === DEFAULT_SITE_LOCALE) && (
+            <p className="text-white/30 font-body font-light text-sm leading-relaxed mb-10">
+              {localContent?.cta.note ||
+                'Availability is shaped by access, timing, and cultural permission.'}
+            </p>
+          )}
+          <Link
+            href="/contact"
+            className="motion-button-editorial inline-block border border-white/20 px-8 py-4 font-body text-[0.65rem] uppercase tracking-[0.3em] text-white/70 hover:border-white/50 hover:text-white"
+            aria-label={`Begin a private conversation about ${mergedDestination.name || 'this destination'}`}
+          >
+            {dictionary.common.beginPrivateConversation} →
+          </Link>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+export default async function CulturalWorldPage({ params }: Props) {
+  const { slug } = await params;
+  return renderCulturalWorldDetailPage(slug, DEFAULT_SITE_LOCALE);
+}

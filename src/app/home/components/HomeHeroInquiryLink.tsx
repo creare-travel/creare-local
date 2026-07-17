@@ -4,7 +4,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { trackCtaClick } from '@/lib/analytics/tracking';
 
-export default function HomeHeroInquiryLink() {
+interface HomeHeroInquiryLinkProps {
+  label?: string;
+  labelWithArrow?: string;
+}
+
+export default function HomeHeroInquiryLink({
+  label = 'INQUIRE PRIVATELY',
+  labelWithArrow = 'Inquire Privately →',
+}: HomeHeroInquiryLinkProps) {
   const pathname = usePathname();
 
   return (
@@ -13,7 +21,7 @@ export default function HomeHeroInquiryLink() {
       prefetch={false}
       onClick={() =>
         trackCtaClick({
-          label: 'INQUIRE PRIVATELY',
+          label,
           page_path: pathname,
           source: 'home_hero',
           cta_position: 'hero',
@@ -23,7 +31,7 @@ export default function HomeHeroInquiryLink() {
       aria-label="Inquire privately about CREARE experiences"
     >
       <span className="relative inline-block">
-        Inquire Privately →
+        {labelWithArrow}
         <span className="absolute -bottom-px left-0 h-px w-0 bg-white/60 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
       </span>
     </Link>
