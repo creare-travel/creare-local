@@ -58,12 +58,18 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       .catch(() => setTranslations({}));
   }, [locale]);
 
-  const setLocale = useCallback((newLocale: Locale) => {
-    setLocaleState(newLocale);
-    localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
-    document.documentElement.lang = newLocale;
-    document.documentElement.dir = 'ltr';
-  }, []);
+  const setLocale = useCallback(
+    (newLocale: Locale) => {
+      localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
+
+      if (newLocale === pathnameLocale) {
+        setLocaleState(newLocale);
+        document.documentElement.lang = newLocale;
+        document.documentElement.dir = 'ltr';
+      }
+    },
+    [pathnameLocale]
+  );
 
   const t = useCallback(
     (key: string): string => {
