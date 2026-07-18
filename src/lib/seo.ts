@@ -2,6 +2,7 @@
  * Centralized SEO constants for CREARE
  * Use these across all pages for consistency.
  */
+import type { Metadata } from 'next';
 import { DEFAULT_SITE_LOCALE, isSiteLocale, type SiteLocale } from './i18n/config';
 
 export const SITE_URL = 'https://crearetravel.com';
@@ -17,11 +18,19 @@ export type CanonicalRouteFamily =
   | 'insights'
   | 'insight-detail';
 
-interface RouteCanonicalOptions {
+export interface RouteCanonicalOptions {
   family: CanonicalRouteFamily;
   locale: SiteLocale;
   slug?: string;
 }
+
+export type OpenGraphLocale = 'en_US' | 'tr_TR';
+export type SupportedMetadataPageType = 'website' | 'article';
+
+const OPEN_GRAPH_LOCALE_BY_SITE_LOCALE = {
+  en: 'en_US',
+  tr: 'tr_TR',
+} as const satisfies Record<SiteLocale, OpenGraphLocale>;
 
 /**
  * Default OG image — 1200×630, used as fallback across all pages.
@@ -42,6 +51,14 @@ export const DEFAULT_METADATA = {
   defaultDescription:
     'Creare curates private cultural encounters across Turkey and beyond — monastery access, atelier visits, and extraordinary moments for discerning clients.',
 };
+
+export function getOpenGraphLocale(locale: SiteLocale): OpenGraphLocale {
+  if (!isSiteLocale(locale)) {
+    throw new Error(`Unsupported metadata locale: ${String(locale)}`);
+  }
+
+  return OPEN_GRAPH_LOCALE_BY_SITE_LOCALE[locale];
+}
 
 /**
  * Build a canonical URL from a path segment.
@@ -140,6 +157,39 @@ export function buildRouteCanonicalUrl(options: RouteCanonicalOptions): string {
   return canonicalUrl(getCanonicalRoutePath(options));
 }
 
+export function assertRouteCanonicalOwnership(
+  route: RouteCanonicalOptions,
+  canonical: string
+): void {
+  const url = new URL(canonical);
+
+  if (url.hostname !== PRODUCTION_CANONICAL_HOSTNAME) {
+    throw new Error(`Metadata canonical must use ${PRODUCTION_CANONICAL_HOSTNAME}: ${canonical}`);
+  }
+
+  const segments = url.pathname.split('/').filter(Boolean);
+
+  if (segments[0] === 'tr' && segments[1] === 'tr') {
+    throw new Error(`Metadata canonical cannot contain duplicate Turkish prefix: ${canonical}`);
+  }
+
+  if (route.locale === DEFAULT_SITE_LOCALE && segments[0] === 'tr') {
+    throw new Error(`English metadata canonical cannot use Turkish prefix: ${canonical}`);
+  }
+
+  if (route.locale !== DEFAULT_SITE_LOCALE && segments[0] !== 'tr') {
+    throw new Error(`Turkish metadata canonical must use Turkish prefix: ${canonical}`);
+  }
+
+  const expectedCanonical = buildRouteCanonicalUrl(route);
+
+  if (canonical !== expectedCanonical) {
+    throw new Error(
+      `Metadata canonical ${canonical} does not match ${route.locale} route canonical ${expectedCanonical}.`
+    );
+  }
+}
+
 export function buildRouteCanonicalAlternates(options: RouteCanonicalOptions) {
   return {
     canonical: buildRouteCanonicalUrl(options),
@@ -180,6 +230,18 @@ export function buildMetadataAlternates(path: string) {
   };
 }
 
+function metadataPathFromRoute(options: RouteCanonicalOptions): string {
+  return new URL(buildRouteCanonicalUrl(options)).pathname;
+}
+
+function buildRouteMetadataAlternates(options: RouteCanonicalOptions) {
+  if (options.locale === DEFAULT_SITE_LOCALE) {
+    return buildMetadataAlternates(metadataPathFromRoute(options));
+  }
+
+  return buildRouteCanonicalAlternates(options);
+}
+
 /**
  * Resolve OG image URL — always returns an absolute URL.
  * If a full URL is passed (http/https), it is returned as-is.
@@ -204,7 +266,8 @@ export function buildOpenGraph(options: {
   path: string;
   image?: string;
   imageAlt?: string;
-  type?: 'website' | 'article';
+  locale?: SiteLocale;
+  type?: SupportedMetadataPageType;
 }) {
   const imageUrl = resolveOgImage(options.image);
   return {
@@ -212,6 +275,7 @@ export function buildOpenGraph(options: {
     description: options.description,
     url: canonicalUrl(options.path),
     siteName: SITE_NAME,
+    locale: getOpenGraphLocale(options.locale ?? DEFAULT_SITE_LOCALE),
     images: [
       {
         url: imageUrl,
@@ -220,7 +284,7 @@ export function buildOpenGraph(options: {
         alt: options.imageAlt || options.title,
       },
     ],
-    type: (options.type ?? 'website') as 'website' | 'article',
+    type: getSupportedMetadataPageType(options.type),
   };
 }
 
@@ -241,6 +305,95 @@ export function buildTwitterCard(options: {
     description: options.description,
     images: [imageUrl],
     ...(options.imageAlt ? { imageAlt: options.imageAlt } : {}),
+  };
+}
+
+function normalizeMetadataCopy(field: 'title' | 'description', value?: string | null): string {
+  const normalized = (value ?? '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!normalized) {
+    throw new Error(`Locale-owned metadata ${field} is required.`);
+  }
+
+  return normalized;
+}
+
+function getSupportedMetadataPageType(
+  type: SupportedMetadataPageType | undefined
+): SupportedMetadataPageType {
+  if (type === undefined) return 'website';
+  if (type === 'website' || type === 'article') return type;
+
+  throw new Error(`Unsupported metadata page type: ${String(type)}`);
+}
+
+export function buildLocaleOwnedMetadata(options: {
+  locale: SiteLocale;
+  copyLocale: SiteLocale;
+  route: RouteCanonicalOptions;
+  title?: string | null;
+  description?: string | null;
+  openGraphTitle?: string | null;
+  openGraphDescription?: string | null;
+  image?: string;
+  imageAlt?: string;
+  type?: SupportedMetadataPageType;
+  robots?: Metadata['robots'];
+  titleMode?: 'templated' | 'absolute';
+}): Metadata {
+  if (!isSiteLocale(options.locale)) {
+    throw new Error(`Unsupported metadata locale: ${String(options.locale)}`);
+  }
+
+  if (!isSiteLocale(options.copyLocale)) {
+    throw new Error(`Unsupported metadata copy locale: ${String(options.copyLocale)}`);
+  }
+
+  if (options.copyLocale !== options.locale) {
+    throw new Error(
+      `Metadata copy locale ${options.copyLocale} cannot be used for ${options.locale}.`
+    );
+  }
+
+  if (options.route.locale !== options.locale) {
+    throw new Error(`Metadata route locale must match metadata locale: ${options.locale}.`);
+  }
+
+  const title = normalizeMetadataCopy('title', options.title);
+  const description = normalizeMetadataCopy('description', options.description);
+  const openGraphTitle = normalizeMetadataCopy('title', options.openGraphTitle ?? title);
+  const openGraphDescription = normalizeMetadataCopy(
+    'description',
+    options.openGraphDescription ?? description
+  );
+  const canonical = buildRouteCanonicalUrl(options.route);
+  assertRouteCanonicalOwnership(options.route, canonical);
+  const pathname = new URL(canonical).pathname;
+
+  return {
+    metadataBase: DEFAULT_METADATA.metadataBase,
+    title: options.titleMode === 'absolute' ? { absolute: title } : title,
+    description,
+    alternates: buildRouteMetadataAlternates(options.route),
+    ...(options.robots ? { robots: options.robots } : {}),
+    openGraph: buildOpenGraph({
+      title: openGraphTitle,
+      description: openGraphDescription,
+      path: pathname,
+      image: options.image,
+      imageAlt: options.imageAlt,
+      locale: options.locale,
+      type: options.type,
+    }),
+    twitter: buildTwitterCard({
+      title: openGraphTitle,
+      description: openGraphDescription,
+      image: options.image,
+      imageAlt: options.imageAlt,
+    }),
   };
 }
 

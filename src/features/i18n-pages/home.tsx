@@ -4,7 +4,12 @@ import HeroSection from '@/app/home/components/HeroSection';
 import CollectionsSection from '@/app/home/components/CollectionsSection';
 import JsonLd from '@/components/JsonLd';
 import { buildHomepageWebPageGraph } from '@/lib/schema-builder';
-import { buildMetadataAlternates, DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT } from '@/lib/seo';
+import {
+  buildMetadataAlternates,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_OG_IMAGE_ALT,
+  getOpenGraphLocale,
+} from '@/lib/seo';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 
@@ -19,6 +24,7 @@ export const metadata: Metadata = {
     url: 'https://crearetravel.com',
     siteName: 'Creare',
     type: 'website',
+    locale: getOpenGraphLocale(DEFAULT_SITE_LOCALE),
     images: [
       {
         url: DEFAULT_OG_IMAGE,

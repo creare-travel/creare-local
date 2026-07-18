@@ -12,7 +12,7 @@ import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { localizePathname } from '@/lib/i18n/pathname';
-import { buildMetadataAlternates } from '@/lib/seo';
+import { buildMetadataAlternates, getOpenGraphLocale } from '@/lib/seo';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -32,6 +32,7 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/cultural-worlds`,
     siteName: 'Creare',
     type: 'website',
+    locale: getOpenGraphLocale(DEFAULT_SITE_LOCALE),
   },
 };
 

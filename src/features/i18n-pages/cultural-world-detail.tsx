@@ -16,17 +16,44 @@ import {
   isCanonicalCulturalWorldSlug,
 } from '@/lib/canonical-gates';
 import { getCulturalWorldContext } from '@/lib/cultural-world-context';
-import { buildMetadataAlternates, buildRouteCanonicalAlternates } from '@/lib/seo';
+import {
+  DEFAULT_METADATA,
+  DEFAULT_OG_IMAGE_ALT,
+  buildLocaleOwnedMetadata,
+  buildMetadataAlternates,
+  buildRouteCanonicalAlternates,
+  buildRouteCanonicalUrl,
+  getOpenGraphLocale,
+  SITE_NAME,
+} from '@/lib/seo';
 import { buildCanonicalUrl, buildCulturalWorldDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 const FALLBACK_DESCRIPTION =
   'A cultural world composed through editorial destination content, related experiences, and further reading.';
 const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
+const INHERITED_EN_SOCIAL_DESCRIPTION =
+  'Private cultural access. Thoughtfully designed encounters.';
+const INHERITED_EN_OG_IMAGE_PATH = '/opengraph-image?282b2b8eda0907e3';
 const canonicalInsightSlug = (slug?: string) =>
   slug === 'the-private-life-of-istanbul' ? 'private-life-of-istanbul' : slug;
 
 function stripBrandSuffix(title?: string | null): string | undefined {
   return title?.replace(/\s+—\s+Creare$/i, '').trim() || undefined;
+}
+
+function buildCulturalWorldNotFoundMetadata(locale: SiteLocale): Metadata {
+  if (locale === DEFAULT_SITE_LOCALE) {
+    return {
+      title: 'Not Found — Cultural World',
+      description: FALLBACK_DESCRIPTION,
+      robots: { index: false, follow: false },
+    };
+  }
+
+  return {
+    title: { absolute: '404' },
+    robots: { index: false, follow: false },
+  };
 }
 
 interface Props {
@@ -149,6 +176,38 @@ function resolveImageUrl(image?: StrapiImage | null): string {
     image?.url;
 
   return rawUrl ? mediaUrl(rawUrl) : IMAGE_FALLBACK;
+}
+
+export type CulturalWorldDetailMetadataDestination = Pick<
+  StrapiDestination,
+  'name' | 'highlight' | 'short_description' | 'meta_title' | 'meta_description' | 'cover_image'
+>;
+
+export function buildLocalizedCulturalWorldDetailMetadata({
+  locale,
+  slug,
+  destination,
+}: {
+  locale: SiteLocale;
+  slug: string;
+  destination: CulturalWorldDetailMetadataDestination;
+}): Metadata {
+  return buildLocaleOwnedMetadata({
+    locale,
+    copyLocale: locale,
+    route: {
+      family: 'cultural-world-detail',
+      locale,
+      slug,
+    },
+    title: destination.meta_title || destination.name,
+    description:
+      destination.meta_description || destination.highlight || destination.short_description,
+    image: resolveImageUrl(destination.cover_image),
+    imageAlt: destination.name || destination.cover_image?.alternativeText,
+    robots: { index: true, follow: true },
+    titleMode: destination.meta_title ? 'absolute' : 'templated',
+  });
 }
 
 function isApprovedLocalHeroPath(imageUrl?: string): boolean {
@@ -532,11 +591,7 @@ export async function generateCulturalWorldDetailMetadata({
 }: Props & { locale?: SiteLocale }): Promise<Metadata> {
   const { slug } = await params;
   if (!isCanonicalCulturalWorldSlug(slug)) {
-    return {
-      title: 'Not Found — Cultural World',
-      description: FALLBACK_DESCRIPTION,
-      robots: { index: false, follow: false },
-    };
+    return buildCulturalWorldNotFoundMetadata(locale);
   }
   const localContent = getCulturalWorldContent(slug, locale);
   const destination = await fetchDestination(slug, locale);
@@ -545,21 +600,13 @@ export async function generateCulturalWorldDetailMetadata({
     : null;
 
   if (destination && destination.visibility_status?.toLowerCase() !== 'active') {
-    return {
-      title: 'Not Found — Cultural World',
-      description: FALLBACK_DESCRIPTION,
-      robots: { index: false, follow: false },
-    };
+    return buildCulturalWorldNotFoundMetadata(locale);
   }
 
   const resolvedDestination = destination ?? fallbackDestination;
 
   if (!resolvedDestination) {
-    return {
-      title: 'Not Found — Cultural World',
-      description: FALLBACK_DESCRIPTION,
-      robots: { index: false, follow: false },
-    };
+    return buildCulturalWorldNotFoundMetadata(locale);
   }
 
   const alternates =
@@ -572,9 +619,11 @@ export async function generateCulturalWorldDetailMetadata({
         });
 
   if (locale !== DEFAULT_SITE_LOCALE) {
-    return {
-      alternates,
-    };
+    return buildLocalizedCulturalWorldDetailMetadata({
+      locale,
+      slug,
+      destination: resolvedDestination,
+    });
   }
 
   return {
@@ -590,6 +639,26 @@ export async function generateCulturalWorldDetailMetadata({
       FALLBACK_DESCRIPTION,
     alternates,
     robots: { index: true, follow: true },
+    openGraph: {
+      title: DEFAULT_METADATA.defaultTitle,
+      description: INHERITED_EN_SOCIAL_DESCRIPTION,
+      url: buildRouteCanonicalUrl({
+        family: 'cultural-world-detail',
+        locale,
+        slug,
+      }),
+      siteName: SITE_NAME,
+      locale: getOpenGraphLocale(locale),
+      images: [
+        {
+          url: INHERITED_EN_OG_IMAGE_PATH,
+          width: 1200,
+          height: 630,
+          alt: DEFAULT_OG_IMAGE_ALT,
+        },
+      ],
+      type: 'website',
+    },
   };
 }
 

@@ -21,10 +21,12 @@ import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { buildLocalizedRouteTarget, localizePathname } from '@/lib/i18n/pathname';
 import {
+  buildLocaleOwnedMetadata,
   buildMetadataAlternates,
   buildRouteCanonicalAlternates,
   buildRouteCanonicalUrl,
   buildTwitterCard,
+  getOpenGraphLocale,
   SITE_NAME,
 } from '@/lib/seo';
 import { buildExperienceDetailGraph } from '@/lib/schema-builder';
@@ -391,12 +393,45 @@ function getGovernedExperienceImageUrl(item: StrapiExperienceDetail, slug: strin
   return getExperienceImageUrl(item);
 }
 
-function getExperienceDescription(item: StrapiExperienceDetail) {
+export type ExperienceDetailMetadataItem = Pick<
+  StrapiExperienceDetail,
+  'title' | 'seo_title' | 'seo_description' | 'short_description' | 'description'
+>;
+
+function getExperienceDescription(item: ExperienceDetailMetadataItem) {
   if (item.seo_description) return item.seo_description;
   if (item.short_description) return item.short_description;
 
   const paragraphs = extractParagraphs(item.description);
   return paragraphs[0] ?? '';
+}
+
+export function buildLocalizedExperienceDetailMetadata({
+  locale,
+  slug,
+  item,
+  image,
+}: {
+  locale: SiteLocale;
+  slug: string;
+  item: ExperienceDetailMetadataItem;
+  image?: string | null;
+}): Metadata {
+  return buildLocaleOwnedMetadata({
+    locale,
+    copyLocale: locale,
+    route: {
+      family: 'experience-detail',
+      locale,
+      slug,
+    },
+    title: item.seo_title ?? item.title,
+    description: getExperienceDescription(item),
+    image: image ?? undefined,
+    imageAlt: item.title,
+    robots: { index: true, follow: true },
+    titleMode: item.seo_title ? 'absolute' : 'templated',
+  });
 }
 
 function normalizeOptionalText(value?: string | null) {
@@ -1165,6 +1200,23 @@ function stripBrandSuffix(title?: string | null): string | undefined {
   return title?.replace(/\s+—\s+CREARE$/i, '').trim() || undefined;
 }
 
+function buildExperienceNotFoundMetadata(
+  locale: SiteLocale,
+  title: 'Experience Unavailable' | 'Experience Not Found'
+): Metadata {
+  if (locale === DEFAULT_SITE_LOCALE) {
+    return {
+      title,
+      robots: { index: false, follow: false },
+    };
+  }
+
+  return {
+    title: { absolute: '404' },
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function generateExperienceDetailMetadata({
   locale = DEFAULT_SITE_LOCALE,
   params,
@@ -1177,17 +1229,11 @@ export async function generateExperienceDetailMetadata({
   const result = await resolveExperienceDetailBySlug(slugValue, locale);
 
   if (result.status === 'error') {
-    return {
-      title: 'Experience Unavailable',
-      robots: { index: false, follow: false },
-    };
+    return buildExperienceNotFoundMetadata(locale, 'Experience Unavailable');
   }
 
   if (result.status === 'not_found') {
-    return {
-      title: 'Experience Not Found',
-      robots: { index: false, follow: false },
-    };
+    return buildExperienceNotFoundMetadata(locale, 'Experience Not Found');
   }
 
   const strapiItem = result.item;
@@ -1201,16 +1247,19 @@ export async function generateExperienceDetailMetadata({
           slug: canonicalSlug,
         });
 
-  if (locale !== DEFAULT_SITE_LOCALE) {
-    return {
-      alternates,
-    };
-  }
-
   const ogTitle = strapiItem.seo_title ?? `${strapiItem.title} — CREARE`;
   const pageTitle = stripBrandSuffix(strapiItem.seo_title) || strapiItem.title;
   const ogDescription = getExperienceDescription(strapiItem);
   const coverUrl = getGovernedExperienceImageUrl(strapiItem, canonicalSlug);
+
+  if (locale !== DEFAULT_SITE_LOCALE) {
+    return buildLocalizedExperienceDetailMetadata({
+      locale,
+      slug: canonicalSlug,
+      item: strapiItem,
+      image: coverUrl,
+    });
+  }
 
   return {
     title: pageTitle,
@@ -1226,6 +1275,7 @@ export async function generateExperienceDetailMetadata({
         slug: canonicalSlug,
       }),
       siteName: SITE_NAME,
+      locale: getOpenGraphLocale(locale),
       ...(coverUrl
         ? {
             images: [

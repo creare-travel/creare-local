@@ -5,6 +5,7 @@ import { cache } from 'react';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import {
+  buildLocaleOwnedMetadata,
   buildMetadataAlternates,
   canonicalUrl,
   buildOpenGraph,
@@ -141,6 +142,62 @@ const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
 
 function stripBrandSuffix(title?: string | null): string | undefined {
   return title?.replace(/\s+—\s+Creare$/i, '').trim() || undefined;
+}
+
+function buildInsightNotFoundMetadata(locale: SiteLocale): Metadata {
+  if (locale === DEFAULT_SITE_LOCALE) {
+    return { title: 'Not Found' };
+  }
+
+  return {
+    title: { absolute: '404' },
+    robots: { index: false, follow: false },
+  };
+}
+
+function getInsightMetadataImageUrl(insight: Pick<ResolvedInsight, 'cover_image'>): string {
+  const rawUrl =
+    insight.cover_image?.formats?.large?.url ??
+    insight.cover_image?.formats?.medium?.url ??
+    insight.cover_image?.formats?.small?.url ??
+    insight.cover_image?.url;
+
+  return rawUrl ? resolveImageUrl(rawUrl) : DEFAULT_OG_IMAGE;
+}
+
+export type InsightDetailMetadataItem = Pick<
+  ResolvedInsight,
+  'title' | 'excerpt' | 'seo_title' | 'seo_description' | 'cover_image'
+>;
+
+export function buildLocalizedInsightDetailMetadata({
+  locale,
+  slug,
+  insight,
+}: {
+  locale: SiteLocale;
+  slug: string;
+  insight: InsightDetailMetadataItem;
+}): Metadata {
+  const title = stripBrandSuffix(insight.seo_title || insight.title) || 'Not Found';
+  const description = insight.seo_description || insight.excerpt || '';
+  const imageUrl = getInsightMetadataImageUrl(insight);
+
+  return buildLocaleOwnedMetadata({
+    locale,
+    copyLocale: locale,
+    route: {
+      family: 'insight-detail',
+      locale,
+      slug,
+    },
+    title: insight.seo_title || insight.title,
+    description,
+    image: imageUrl,
+    imageAlt: insight.cover_image?.alternativeText ?? title,
+    type: 'article',
+    titleMode: insight.seo_title ? 'absolute' : 'templated',
+  });
 }
 const MAX_RELATED_ESSAYS = 4;
 const LEGACY_ISTANBUL_INSIGHT_SLUG = 'the-private-life-of-istanbul';
@@ -379,7 +436,7 @@ export async function generateInsightDetailMetadata({
   const insight = await resolveInsight(canonicalSlug, locale);
 
   if (!insight) {
-    return { title: 'Not Found' };
+    return buildInsightNotFoundMetadata(locale);
   }
 
   // SEO fallbacks: seo_title || title, seo_description || excerpt
@@ -395,9 +452,11 @@ export async function generateInsightDetailMetadata({
         });
 
   if (locale !== DEFAULT_SITE_LOCALE) {
-    return {
-      alternates,
-    };
+    return buildLocalizedInsightDetailMetadata({
+      locale,
+      slug: canonicalSlug,
+      insight,
+    });
   }
 
   return {
