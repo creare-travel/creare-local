@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { cache } from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -20,12 +20,17 @@ import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { buildLocalizedRouteTarget, localizePathname } from '@/lib/i18n/pathname';
-import { buildMetadataAlternates, buildTwitterCard, SITE_NAME } from '@/lib/seo';
+import {
+  buildMetadataAlternates,
+  buildRouteCanonicalAlternates,
+  buildRouteCanonicalUrl,
+  buildTwitterCard,
+  SITE_NAME,
+} from '@/lib/seo';
 import { buildExperienceDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 
-const SITE_URL = 'https://crearetravel.com';
 const GOVERNED_TABLE_TO_FARM_HERO_URL = buildCloudinaryUrl(
   'creare/experiences/table-to-farm-bodrum/hero/main',
   { profile: 'hero' }
@@ -435,7 +440,7 @@ function getExperienceAliasCandidates(slug: string) {
   return [normalizedSlug, ...familySlugs.filter((aliasSlug) => aliasSlug !== normalizedSlug)];
 }
 
-async function resolveExperienceDetailBySlug(
+const resolveExperienceDetailBySlug = cache(async function resolveExperienceDetailBySlug(
   requestedSlug: string,
   locale: SiteLocale
 ): Promise<ResolvedExperienceDetail | { status: 'not_found' } | { status: 'error'; error: Error }> {
@@ -465,7 +470,7 @@ async function resolveExperienceDetailBySlug(
   }
 
   return lastNotFound ? { status: 'not_found' } : { status: 'not_found' };
-}
+});
 
 function toTitleCase(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
@@ -1160,13 +1165,14 @@ function stripBrandSuffix(title?: string | null): string | undefined {
   return title?.replace(/\s+—\s+CREARE$/i, '').trim() || undefined;
 }
 
-export async function generateMetadata({
+export async function generateExperienceDetailMetadata({
+  locale = DEFAULT_SITE_LOCALE,
   params,
 }: {
+  locale?: SiteLocale;
   params: Promise<{ slug: string | string[] }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const locale = DEFAULT_SITE_LOCALE;
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
   const result = await resolveExperienceDetailBySlug(slugValue, locale);
 
@@ -1186,6 +1192,20 @@ export async function generateMetadata({
 
   const strapiItem = result.item;
   const canonicalSlug = result.canonicalSlug;
+  const alternates =
+    locale === DEFAULT_SITE_LOCALE
+      ? buildMetadataAlternates(`/experiences/${canonicalSlug}`)
+      : buildRouteCanonicalAlternates({
+          family: 'experience-detail',
+          locale,
+          slug: canonicalSlug,
+        });
+
+  if (locale !== DEFAULT_SITE_LOCALE) {
+    return {
+      alternates,
+    };
+  }
 
   const ogTitle = strapiItem.seo_title ?? `${strapiItem.title} — CREARE`;
   const pageTitle = stripBrandSuffix(strapiItem.seo_title) || strapiItem.title;
@@ -1195,12 +1215,16 @@ export async function generateMetadata({
   return {
     title: pageTitle,
     description: ogDescription,
-    alternates: buildMetadataAlternates(`/experiences/${canonicalSlug}`),
+    alternates,
     robots: { index: true, follow: true },
     openGraph: {
       title: ogTitle,
       description: ogDescription,
-      url: `${SITE_URL}/experiences/${canonicalSlug}`,
+      url: buildRouteCanonicalUrl({
+        family: 'experience-detail',
+        locale,
+        slug: canonicalSlug,
+      }),
       siteName: SITE_NAME,
       ...(coverUrl
         ? {
@@ -1227,6 +1251,14 @@ export async function generateMetadata({
         : {}),
     }),
   };
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string | string[] }>;
+}): Promise<Metadata> {
+  return generateExperienceDetailMetadata({ params });
 }
 
 export async function renderExperienceDetailPage(slug: string | string[], locale: SiteLocale) {

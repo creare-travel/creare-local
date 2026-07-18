@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { cache } from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -16,7 +16,7 @@ import {
   isCanonicalCulturalWorldSlug,
 } from '@/lib/canonical-gates';
 import { getCulturalWorldContext } from '@/lib/cultural-world-context';
-import { buildMetadataAlternates } from '@/lib/seo';
+import { buildMetadataAlternates, buildRouteCanonicalAlternates } from '@/lib/seo';
 import { buildCanonicalUrl, buildCulturalWorldDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 const FALLBACK_DESCRIPTION =
@@ -467,7 +467,7 @@ function renderBodyContent(content?: StrapiRichTextNode[] | string) {
   return null;
 }
 
-async function fetchDestination(
+const fetchDestination = cache(async function fetchDestination(
   slug: string,
   locale: SiteLocale
 ): Promise<StrapiDestination | null> {
@@ -524,11 +524,13 @@ async function fetchDestination(
     });
     return null;
   }
-}
+});
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateCulturalWorldDetailMetadata({
+  locale = DEFAULT_SITE_LOCALE,
+  params,
+}: Props & { locale?: SiteLocale }): Promise<Metadata> {
   const { slug } = await params;
-  const locale = DEFAULT_SITE_LOCALE;
   if (!isCanonicalCulturalWorldSlug(slug)) {
     return {
       title: 'Not Found — Cultural World',
@@ -560,6 +562,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const alternates =
+    locale === DEFAULT_SITE_LOCALE
+      ? buildMetadataAlternates(`/cultural-worlds/${slug}`)
+      : buildRouteCanonicalAlternates({
+          family: 'cultural-world-detail',
+          locale,
+          slug,
+        });
+
+  if (locale !== DEFAULT_SITE_LOCALE) {
+    return {
+      alternates,
+    };
+  }
+
   return {
     title:
       stripBrandSuffix(localContent?.metaTitle) ||
@@ -571,9 +588,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       resolvedDestination.highlight ||
       localContent?.shortDescription ||
       FALLBACK_DESCRIPTION,
-    alternates: buildMetadataAlternates(`/cultural-worlds/${slug}`),
+    alternates,
     robots: { index: true, follow: true },
   };
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  return generateCulturalWorldDetailMetadata(props);
 }
 
 export async function renderCulturalWorldDetailPage(slug: string, locale: SiteLocale) {

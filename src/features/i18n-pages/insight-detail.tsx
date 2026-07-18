@@ -1,12 +1,14 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { cache } from 'react';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import {
   buildMetadataAlternates,
   canonicalUrl,
   buildOpenGraph,
+  buildRouteCanonicalAlternates,
   buildTwitterCard,
   DEFAULT_OG_IMAGE,
   DEFAULT_OG_IMAGE_ALT,
@@ -279,7 +281,10 @@ function buildStaticInsight(slug: string, locale: SiteLocale): ResolvedInsight |
   };
 }
 
-async function resolveInsight(slug: string, locale: SiteLocale): Promise<ResolvedInsight | null> {
+const resolveInsight = cache(async function resolveInsight(
+  slug: string,
+  locale: SiteLocale
+): Promise<ResolvedInsight | null> {
   const strapiInsight = await fetchInsight(slug, locale);
   const staticInsight = buildStaticInsight(slug, locale);
 
@@ -328,7 +333,7 @@ async function resolveInsight(slug: string, locale: SiteLocale): Promise<Resolve
   }
 
   return staticInsight;
-}
+});
 
 interface RelatedEssayReference {
   slug: string;
@@ -365,9 +370,11 @@ function buildRelatedEssayReferences(
     }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateInsightDetailMetadata({
+  locale = DEFAULT_SITE_LOCALE,
+  params,
+}: Props & { locale?: SiteLocale }): Promise<Metadata> {
   const { slug } = await params;
-  const locale = DEFAULT_SITE_LOCALE;
   const canonicalSlug = canonicalInsightSlug(slug) ?? slug;
   const insight = await resolveInsight(canonicalSlug, locale);
 
@@ -378,11 +385,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // SEO fallbacks: seo_title || title, seo_description || excerpt
   const title = stripBrandSuffix(insight.seo_title || insight.title) || 'Not Found';
   const description = insight.seo_description || insight.excerpt || '';
+  const alternates =
+    locale === DEFAULT_SITE_LOCALE
+      ? buildMetadataAlternates(`/insights/${canonicalSlug}`)
+      : buildRouteCanonicalAlternates({
+          family: 'insight-detail',
+          locale,
+          slug: canonicalSlug,
+        });
+
+  if (locale !== DEFAULT_SITE_LOCALE) {
+    return {
+      alternates,
+    };
+  }
 
   return {
     title,
     description,
-    alternates: buildMetadataAlternates(`/insights/${canonicalSlug}`),
+    alternates,
     openGraph: buildOpenGraph({
       title,
       description,
@@ -396,6 +417,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       imageAlt: DEFAULT_OG_IMAGE_ALT,
     }),
   };
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  return generateInsightDetailMetadata(props);
 }
 
 function resolveImageUrl(url?: string | null): string {

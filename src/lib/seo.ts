@@ -2,9 +2,26 @@
  * Centralized SEO constants for CREARE
  * Use these across all pages for consistency.
  */
+import { DEFAULT_SITE_LOCALE, isSiteLocale, type SiteLocale } from './i18n/config';
 
 export const SITE_URL = 'https://crearetravel.com';
 export const SITE_NAME = 'Creare';
+export const PRODUCTION_CANONICAL_HOSTNAME = 'crearetravel.com';
+
+export type CanonicalRouteFamily =
+  | 'home'
+  | 'cultural-worlds'
+  | 'cultural-world-detail'
+  | 'experiences'
+  | 'experience-detail'
+  | 'insights'
+  | 'insight-detail';
+
+interface RouteCanonicalOptions {
+  family: CanonicalRouteFamily;
+  locale: SiteLocale;
+  slug?: string;
+}
 
 /**
  * Default OG image — 1200×630, used as fallback across all pages.
@@ -31,8 +48,102 @@ export const DEFAULT_METADATA = {
  * @example canonicalUrl('/philosophy') → 'https://crearetravel.com/philosophy'
  */
 export function canonicalUrl(path: string): string {
-  const normalized = path.startsWith('/') ? path : `/${path}`;
-  return `${SITE_URL}${normalized}`;
+  return `${SITE_URL}${normalizeCanonicalPath(path)}`;
+}
+
+function normalizeCanonicalPath(path: string): string {
+  const rawPath = path.trim();
+
+  if (!rawPath) return '/';
+  if (rawPath.startsWith('//') || /^[a-z][a-z0-9+.-]*:/i.test(rawPath)) {
+    throw new Error(`Canonical path must be internal: ${path}`);
+  }
+
+  const withoutHash = rawPath.split('#')[0] ?? '';
+  const withoutQuery = withoutHash.split('?')[0] ?? '';
+  const withRoot = withoutQuery.startsWith('/') ? withoutQuery : `/${withoutQuery}`;
+  const normalized = withRoot.replace(/\/{2,}/g, '/');
+  const segments = normalized.split('/').filter(Boolean);
+
+  if (segments[0] === 'tr' && segments[1] === 'tr') {
+    throw new Error(`Canonical path cannot contain duplicate Turkish prefix: ${path}`);
+  }
+
+  if (segments.length === 0) return '/';
+
+  return `/${segments.join('/')}`;
+}
+
+function normalizeSlugSegment(slug: string | undefined, family: CanonicalRouteFamily): string {
+  if (!slug) {
+    throw new Error(`Canonical slug is required for ${family}`);
+  }
+
+  const trimmedSlug = slug.trim();
+
+  if (
+    !trimmedSlug ||
+    trimmedSlug.startsWith('//') ||
+    /^[a-z][a-z0-9+.-]*:/i.test(trimmedSlug) ||
+    /[/?#]/.test(trimmedSlug)
+  ) {
+    throw new Error(`Invalid canonical slug: ${slug}`);
+  }
+
+  let decodedSlug: string;
+
+  try {
+    decodedSlug = decodeURIComponent(trimmedSlug);
+  } catch {
+    throw new Error(`Malformed canonical slug: ${slug}`);
+  }
+
+  if (!decodedSlug || /[/?#]/.test(decodedSlug)) {
+    throw new Error(`Invalid canonical slug: ${slug}`);
+  }
+
+  return encodeURIComponent(decodedSlug);
+}
+
+function getCanonicalRoutePath({ family, locale, slug }: RouteCanonicalOptions): string {
+  if (!isSiteLocale(locale)) {
+    throw new Error(`Unsupported canonical locale: ${String(locale)}`);
+  }
+
+  const localePrefix = locale === DEFAULT_SITE_LOCALE ? '' : '/tr';
+
+  switch (family) {
+    case 'home':
+      if (slug) throw new Error('Homepage canonical must not include a slug');
+      return locale === DEFAULT_SITE_LOCALE ? '/' : '/tr';
+    case 'cultural-worlds':
+      if (slug) throw new Error('Cultural worlds listing canonical must not include a slug');
+      return `${localePrefix}/cultural-worlds`;
+    case 'cultural-world-detail':
+      return `${localePrefix}/cultural-worlds/${normalizeSlugSegment(slug, family)}`;
+    case 'experiences':
+      if (slug) throw new Error('Experiences listing canonical must not include a slug');
+      return `${localePrefix}/experiences`;
+    case 'experience-detail':
+      return `${localePrefix}/experiences/${normalizeSlugSegment(slug, family)}`;
+    case 'insights':
+      if (slug) throw new Error('Insights listing canonical must not include a slug');
+      return `${localePrefix}/insights`;
+    case 'insight-detail':
+      return `${localePrefix}/insights/${normalizeSlugSegment(slug, family)}`;
+    default:
+      throw new Error(`Unsupported canonical route family: ${String(family)}`);
+  }
+}
+
+export function buildRouteCanonicalUrl(options: RouteCanonicalOptions): string {
+  return canonicalUrl(getCanonicalRoutePath(options));
+}
+
+export function buildRouteCanonicalAlternates(options: RouteCanonicalOptions) {
+  return {
+    canonical: buildRouteCanonicalUrl(options),
+  };
 }
 
 /**
