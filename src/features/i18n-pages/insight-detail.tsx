@@ -23,6 +23,7 @@ import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { buildLocalizedRouteTarget, localizePathname } from '@/lib/i18n/pathname';
+import { getPrivateInquiryHref } from '@/lib/i18n/static-routes';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -705,6 +706,7 @@ function RelatedEssayList({
 
 export async function renderInsightDetailPage(slug: string, locale: SiteLocale) {
   const dictionary = getDictionary(locale);
+  const privateInquiryHref = getPrivateInquiryHref(locale);
   // Slug safety: ensure slug is defined before rendering
   if (!slug) {
     notFound();
@@ -874,13 +876,15 @@ export async function renderInsightDetailPage(slug: string, locale: SiteLocale) 
           <p className="font-body text-xs text-white/30 leading-relaxed mb-4">
             {dictionary.insights.accessNotListed}
           </p>
-          <Link
-            href="/contact"
-            className="font-body text-xs tracking-[0.14em] uppercase text-white/52 hover:text-white transition-colors duration-300"
-            aria-label="Inquire privately about a CREARE experience"
-          >
-            {dictionary.common.contactCreareUpper}
-          </Link>
+          {privateInquiryHref && (
+            <Link
+              href={privateInquiryHref}
+              className="font-body text-xs tracking-[0.14em] uppercase text-white/52 hover:text-white transition-colors duration-300"
+              aria-label="Inquire privately about a CREARE experience"
+            >
+              {dictionary.common.contactCreareUpper}
+            </Link>
+          )}
         </div>
       </div>
     </main>

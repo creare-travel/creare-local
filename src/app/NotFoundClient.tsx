@@ -2,15 +2,21 @@
 
 import React from 'react';
 import { ArrowLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-export default function NotFoundClient() {
-  const router = useRouter();
+interface NotFoundCopy {
+  title: string;
+  message: string;
+  goBack: string;
+  backHome: string;
+}
 
-  const handleGoHome = () => {
-    router?.push('/');
-  };
+interface NotFoundClientProps {
+  copy: NotFoundCopy;
+  homeHref: string;
+}
 
+export default function NotFoundClient({ copy, homeHref }: NotFoundClientProps) {
   const handleGoBack = () => {
     if (typeof window !== 'undefined') {
       window.history?.back();
@@ -26,10 +32,8 @@ export default function NotFoundClient() {
           </div>
         </div>
 
-        <h2 className="text-2xl font-medium text-onBackground mb-2">Page Not Found</h2>
-        <p className="text-onBackground/70 mb-8">
-          The page you&apos;re looking for doesn&apos;t exist. Let&apos;s get you back!
-        </p>
+        <h2 className="text-2xl font-medium text-onBackground mb-2">{copy.title}</h2>
+        <p className="text-onBackground/70 mb-8">{copy.message}</p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
@@ -37,16 +41,16 @@ export default function NotFoundClient() {
             className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200"
           >
             <ArrowLeftIcon width={16} height={16} aria-hidden="true" />
-            Go Back
+            {copy.goBack}
           </button>
 
-          <button
-            onClick={handleGoHome}
+          <Link
+            href={homeHref}
             className="inline-flex items-center justify-center gap-2 border border-border bg-background text-foreground px-6 py-3 rounded-lg font-medium hover:bg-accent hover:text-accent-foreground transition-colors duration-200"
           >
             <HomeIcon width={16} height={16} aria-hidden="true" />
-            Back to Home
-          </button>
+            {copy.backHome}
+          </Link>
         </div>
       </div>
     </div>

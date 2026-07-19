@@ -229,6 +229,12 @@
     "title": "",
     "subtitle": ""
   },
+  "notFound": {
+    "title": "Sayfa Bulunamadı",
+    "message": "Aradığınız sayfa mevcut değil veya taşınmış olabilir.",
+    "goBack": "Geri Dön",
+    "backHome": "Ana Sayfaya Dön"
+  },
   "sitemap": {
     "breadcrumb_home": "ANA SAYFA",
     "breadcrumb_current": "SİTE HARİTASI",

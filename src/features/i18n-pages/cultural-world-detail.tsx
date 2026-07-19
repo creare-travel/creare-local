@@ -10,6 +10,7 @@ import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { localizePathname } from '@/lib/i18n/pathname';
+import { getPrivateInquiryHref } from '@/lib/i18n/static-routes';
 import {
   filterPublicExperiences,
   filterPublicInsights,
@@ -668,6 +669,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export async function renderCulturalWorldDetailPage(slug: string, locale: SiteLocale) {
   const dictionary = getDictionary(locale);
+  const privateInquiryHref = getPrivateInquiryHref(locale);
   if (!isCanonicalCulturalWorldSlug(slug)) {
     notFound();
   }
@@ -1121,13 +1123,15 @@ export async function renderCulturalWorldDetailPage(slug: string, locale: SiteLo
                 'Availability is shaped by access, timing, and cultural permission.'}
             </p>
           )}
-          <Link
-            href="/contact"
-            className="motion-button-editorial inline-block border border-white/20 px-8 py-4 font-body text-[0.65rem] uppercase tracking-[0.3em] text-white/70 hover:border-white/50 hover:text-white"
-            aria-label={`Begin a private conversation about ${mergedDestination.name || 'this destination'}`}
-          >
-            {dictionary.common.beginPrivateConversation} →
-          </Link>
+          {privateInquiryHref && (
+            <Link
+              href={privateInquiryHref}
+              className="motion-button-editorial inline-block border border-white/20 px-8 py-4 font-body text-[0.65rem] uppercase tracking-[0.3em] text-white/70 hover:border-white/50 hover:text-white"
+              aria-label={`Begin a private conversation about ${mergedDestination.name || 'this destination'}`}
+            >
+              {dictionary.common.beginPrivateConversation} →
+            </Link>
+          )}
         </div>
       </section>
     </main>

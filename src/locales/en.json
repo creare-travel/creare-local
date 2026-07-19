@@ -229,6 +229,12 @@
     "title": "",
     "subtitle": ""
   },
+  "notFound": {
+    "title": "Page Not Found",
+    "message": "The page you're looking for doesn't exist. Let's get you back!",
+    "goBack": "Go Back",
+    "backHome": "Back to Home"
+  },
   "sitemap": {
     "breadcrumb_home": "HOME",
     "breadcrumb_current": "SITE MAP",

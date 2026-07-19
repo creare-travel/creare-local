@@ -12,6 +12,7 @@ import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { localizePathname } from '@/lib/i18n/pathname';
+import { getPrivateInquiryHref } from '@/lib/i18n/static-routes';
 import { buildMetadataAlternates, getOpenGraphLocale } from '@/lib/seo';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
@@ -177,6 +178,7 @@ function getDestinationImageUrl(destination: StrapiDestination): string {
 
 export async function renderCulturalWorldsPage(locale: SiteLocale = DEFAULT_SITE_LOCALE) {
   const dictionary = getDictionary(locale);
+  const privateInquiryHref = getPrivateInquiryHref(locale);
   let destinations: StrapiDestination[] = [];
 
   try {
@@ -441,12 +443,14 @@ export async function renderCulturalWorldsPage(locale: SiteLocale = DEFAULT_SITE
           >
             {dictionary.home.contact.title}
           </p>
-          <Link
-            href="/contact"
-            className="inline-flex min-h-11 items-center justify-center self-start border border-white/16 px-7 py-3 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/32 hover:text-white"
-          >
-            {dictionary.common.contactCreareUpper} →
-          </Link>
+          {privateInquiryHref && (
+            <Link
+              href={privateInquiryHref}
+              className="inline-flex min-h-11 items-center justify-center self-start border border-white/16 px-7 py-3 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/32 hover:text-white"
+            >
+              {dictionary.common.contactCreareUpper} →
+            </Link>
+          )}
         </div>
       </section>
     </main>

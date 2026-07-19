@@ -1,6 +1,7 @@
 import { buildCloudinaryUrl } from '@/lib/cloudinary';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 import HomeHeroInquiryLink from '@/app/home/components/HomeHeroInquiryLink';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import type { Dictionary } from '@/lib/i18n/types';
 
 const HOMEPAGE_HERO_PUBLIC_ID = 'creare-hero-image.jpg';
@@ -18,9 +19,13 @@ const HOMEPAGE_HERO_MOBILE_TALL_WIDTH = 524;
 
 interface HeroSectionProps {
   dictionary?: Dictionary;
+  locale?: SiteLocale;
 }
 
-export default function HeroSection({ dictionary }: HeroSectionProps) {
+export default function HeroSection({
+  dictionary,
+  locale = DEFAULT_SITE_LOCALE,
+}: HeroSectionProps) {
   const heroCopy = dictionary?.home.hero;
   const ctaCopy = dictionary?.home.cta;
   const heroBlurDataUrl = buildCinematicBlurDataUrl(HOMEPAGE_HERO_IMAGE, {
@@ -124,7 +129,11 @@ export default function HeroSection({ dictionary }: HeroSectionProps) {
             {heroCopy?.subtitle ?? 'Composed as Art.'}
           </p>
 
-          <HomeHeroInquiryLink label={ctaCopy?.label} labelWithArrow={ctaCopy?.labelWithArrow} />
+          <HomeHeroInquiryLink
+            label={ctaCopy?.label}
+            labelWithArrow={ctaCopy?.labelWithArrow}
+            locale={locale}
+          />
         </div>
       </div>
     </section>

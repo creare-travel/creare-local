@@ -6,6 +6,7 @@ import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { localizePathname } from '@/lib/i18n/pathname';
+import { getExperienceCategoryTarget } from '@/lib/i18n/static-routes';
 import { fetchStrapi } from '@/lib/strapi';
 import { buildCanonicalUrl, buildExperienceListingGraph } from '@/lib/schema-builder';
 import {
@@ -152,6 +153,10 @@ export async function renderExperiencesPage(locale: SiteLocale = DEFAULT_SITE_LO
             description: `${dictionary.black.description1} ${dictionary.black.description2}`,
           },
         ];
+  const categoryFeatures = localizedCollectionFeatures.map((feature) => ({
+    ...feature,
+    href: getExperienceCategoryTarget(feature.href, locale),
+  }));
   const experiencesSchema = buildExperienceListingGraph({
     pageId: `${buildCanonicalUrl('/experiences')}#collection`,
     itemListId: `${buildCanonicalUrl('/experiences')}#itemlist`,
@@ -249,7 +254,7 @@ export async function renderExperiencesPage(locale: SiteLocale = DEFAULT_SITE_LO
 
       <section className="mx-auto max-w-7xl px-6 pb-28 sm:px-10 lg:px-16">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {localizedCollectionFeatures.map((feature) => (
+          {categoryFeatures.map((feature) => (
             <article key={feature.label} className="flex flex-col">
               <Link
                 href={feature.href}

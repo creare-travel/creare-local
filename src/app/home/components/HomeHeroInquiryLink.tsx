@@ -2,22 +2,30 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import type { SiteLocale } from '@/lib/i18n/config';
+import { DEFAULT_SITE_LOCALE } from '@/lib/i18n/config';
+import { getPrivateInquiryHref } from '@/lib/i18n/static-routes';
 import { trackCtaClick } from '@/lib/analytics/tracking';
 
 interface HomeHeroInquiryLinkProps {
   label?: string;
   labelWithArrow?: string;
+  locale?: SiteLocale;
 }
 
 export default function HomeHeroInquiryLink({
   label = 'INQUIRE PRIVATELY',
   labelWithArrow = 'Inquire Privately →',
+  locale = DEFAULT_SITE_LOCALE,
 }: HomeHeroInquiryLinkProps) {
   const pathname = usePathname();
+  const href = getPrivateInquiryHref(locale);
+
+  if (!href) return null;
 
   return (
     <Link
-      href="/contact"
+      href={href}
       prefetch={false}
       onClick={() =>
         trackCtaClick({

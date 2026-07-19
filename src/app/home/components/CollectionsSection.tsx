@@ -1,13 +1,15 @@
 import React from 'react';
 import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
+import { getExperienceCategoryTarget, type ExperienceCategoryPath } from '@/lib/i18n/static-routes';
 import type { Dictionary } from '@/lib/i18n/types';
 
 interface CollectionFeature {
   label: string;
   title: string;
   description: string;
-  href: string;
+  href: ExperienceCategoryPath;
   image: string;
   alt: string;
   imageRight?: boolean;
@@ -55,6 +57,7 @@ const collectionFeatures: CollectionFeature[] = [
 
 interface CollectionsSectionProps {
   dictionary?: Dictionary;
+  locale?: SiteLocale;
 }
 
 function getLocalizedFeatures(dictionary?: Dictionary): LocalizedCollectionFeature[] {
@@ -91,8 +94,14 @@ function getLocalizedFeatures(dictionary?: Dictionary): LocalizedCollectionFeatu
   ];
 }
 
-export default function CollectionsSection({ dictionary }: CollectionsSectionProps) {
-  const localizedFeatures = getLocalizedFeatures(dictionary);
+export default function CollectionsSection({
+  dictionary,
+  locale = DEFAULT_SITE_LOCALE,
+}: CollectionsSectionProps) {
+  const localizedFeatures = getLocalizedFeatures(dictionary).map((feature) => ({
+    ...feature,
+    href: getExperienceCategoryTarget(feature.href, locale),
+  }));
 
   return (
     <div className="w-full bg-neutral-50">
@@ -119,7 +128,7 @@ export default function CollectionsSection({ dictionary }: CollectionsSectionPro
             <Link
               href={localizedFeatures[0].href}
               className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
-              aria-label="Explore SIGNATURE experiences"
+              aria-label={`${localizedFeatures[0].cta} ${localizedFeatures[0].label}`}
             >
               <span className="relative inline-block">
                 {localizedFeatures[0].cta}
@@ -174,7 +183,7 @@ export default function CollectionsSection({ dictionary }: CollectionsSectionPro
             <Link
               href={localizedFeatures[1].href}
               className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
-              aria-label="Discover LAB experience design"
+              aria-label={`${localizedFeatures[1].cta} ${localizedFeatures[1].label}`}
             >
               <span className="relative inline-block">
                 {localizedFeatures[1].cta}
@@ -203,7 +212,7 @@ export default function CollectionsSection({ dictionary }: CollectionsSectionPro
             <Link
               href={localizedFeatures[2].href}
               className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
-              aria-label="Request private access to BLACK experiences"
+              aria-label={`${localizedFeatures[2].cta} ${localizedFeatures[2].label}`}
             >
               <span className="relative inline-block">
                 {localizedFeatures[2].cta}

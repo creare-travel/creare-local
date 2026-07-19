@@ -4,10 +4,13 @@ import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { localizePathname } from '@/lib/i18n/pathname';
+import { getFooterNavigationRoutes, getLegalNavigationRoutes } from '@/lib/i18n/static-routes';
 
 export default function Footer() {
   const { locale } = useLanguage();
   const dictionary = getDictionary(locale);
+  const footerLinks = getFooterNavigationRoutes(locale);
+  const legalLinks = getLegalNavigationRoutes(locale);
   const taglineLines = [
     dictionary.footer.tagline_1,
     dictionary.footer.tagline_2,
@@ -84,41 +87,16 @@ export default function Footer() {
           className="flex flex-col items-start gap-8 sm:gap-9 lg:flex-row lg:items-center lg:gap-8"
           aria-label={dictionary.accessibility.mainNavigation}
         >
-          <Link
-            href={localizePathname('/cultural-worlds', locale)}
-            className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label={dictionary.global.nav.culturalWorlds}
-          >
-            {dictionary.global.footer.culturalWorlds}
-          </Link>
-          <Link
-            href={localizePathname('/experiences', locale)}
-            className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label={dictionary.global.nav.experiences}
-          >
-            {dictionary.global.footer.experiences}
-          </Link>
-          <Link
-            href={localizePathname('/insights', locale)}
-            className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label={dictionary.global.nav.insights}
-          >
-            {dictionary.global.footer.insights}
-          </Link>
-          <Link
-            href={localizePathname('/philosophy', locale)}
-            className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label={dictionary.global.nav.philosophy}
-          >
-            {dictionary.global.footer.philosophy}
-          </Link>
-          <Link
-            href={localizePathname('/contact', locale)}
-            className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
-            aria-label={dictionary.global.nav.contact}
-          >
-            {dictionary.global.footer.contact}
-          </Link>
+          {footerLinks.map((item) => (
+            <Link
+              key={item.key}
+              href={item.href}
+              className="font-body text-[0.64rem] tracking-[0.22em] text-white/55 uppercase transition-colors duration-700 hover:text-white/90"
+              aria-label={dictionary.global.nav[item.key]}
+            >
+              {dictionary.global.footer[item.key]}
+            </Link>
+          ))}
 
           <div className="flex items-center gap-6 pt-1">{socialIcons}</div>
         </nav>
@@ -128,31 +106,20 @@ export default function Footer() {
         <span className="font-body text-[0.62rem] tracking-[0.1em] text-white/50">
           {dictionary.footer.copyright}
         </span>
-        <nav className="flex flex-wrap items-center gap-x-6 gap-y-3" aria-label="Legal links">
-          {[
-            {
-              label: dictionary.global.footer.privacy,
-              href: localizePathname('/privacy', locale),
-            },
-            {
-              label: dictionary.global.footer.cookies,
-              href: localizePathname('/cookies', locale),
-            },
-            {
-              label: dictionary.global.footer.terms,
-              href: localizePathname('/terms', locale),
-            },
-          ]?.map((item) => (
-            <Link
-              key={item?.label}
-              href={item?.href}
-              className="font-body text-[0.62rem] tracking-[0.1em] text-white/60 transition-colors duration-700 hover:text-white focus-visible:text-white"
-              aria-label={item?.label}
-            >
-              {item?.label}
-            </Link>
-          ))}
-        </nav>
+        {legalLinks.length > 0 && (
+          <nav className="flex flex-wrap items-center gap-x-6 gap-y-3" aria-label="Legal links">
+            {legalLinks.map((item) => (
+              <Link
+                key={item.key}
+                href={item.href}
+                className="font-body text-[0.62rem] tracking-[0.1em] text-white/60 transition-colors duration-700 hover:text-white focus-visible:text-white"
+                aria-label={dictionary.global.footer[item.key]}
+              >
+                {dictionary.global.footer[item.key]}
+              </Link>
+            ))}
+          </nav>
+        )}
       </div>
     </footer>
   );

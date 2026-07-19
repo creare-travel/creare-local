@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import LanguageSelector from '@/components/LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
 import { getDictionary } from '@/lib/i18n/dictionaries';
-import { localizePathname } from '@/lib/i18n/pathname';
+import { getPrimaryNavigationRoutes } from '@/lib/i18n/static-routes';
 
 export default function Header() {
   const [scrollDensity, setScrollDensity] = useState(0);
@@ -55,16 +55,10 @@ export default function Header() {
     setMobileOpen(false);
   }, [pathname]);
 
-  const navLinks = [
-    {
-      label: dictionary.global.nav.culturalWorlds,
-      href: localizePathname('/cultural-worlds', locale),
-    },
-    { label: dictionary.global.nav.experiences, href: localizePathname('/experiences', locale) },
-    { label: dictionary.global.nav.insights, href: localizePathname('/insights', locale) },
-    { label: dictionary.global.nav.philosophy, href: localizePathname('/philosophy', locale) },
-    { label: dictionary.global.nav.contact, href: localizePathname('/contact', locale) },
-  ];
+  const navLinks = getPrimaryNavigationRoutes(locale).map((route) => ({
+    label: dictionary.global.nav[route.key],
+    href: route.href,
+  }));
 
   const lightSurface = headerState === 'light';
   const logoTone = lightSurface ? 'text-[#1f1b18]' : 'text-white/88';
@@ -111,7 +105,7 @@ export default function Header() {
         aria-label={dictionary.accessibility.mainNavigation}
       >
         <Link
-          href={localizePathname('/', locale)}
+          href={locale === 'tr' ? '/tr' : '/'}
           className="group flex flex-shrink-0 items-center"
           aria-label={dictionary.accessibility.returnHome}
         >
@@ -129,7 +123,7 @@ export default function Header() {
             <Link
               key={item?.label}
               href={item?.href}
-              prefetch={item?.href === localizePathname('/contact', locale) ? false : undefined}
+              prefetch={item?.href === '/contact' ? false : undefined}
               className={`group/nav relative font-body text-[0.7rem] font-medium uppercase tracking-[0.2em] motion-link ${navTone} ${navHoverTone}`}
               aria-label={item?.label}
             >

@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { trackCtaClick } from '@/lib/analytics/tracking';
+import { useLanguage } from '@/context/LanguageContext';
 import { buildExperienceInquiryHref } from '@/lib/inquiry';
 
 interface InquireCTAProps {
@@ -17,7 +18,10 @@ export default function InquireCTA({
   className = '',
 }: InquireCTAProps) {
   const pathname = usePathname();
-  const href = buildExperienceInquiryHref(experienceSlug);
+  const { locale } = useLanguage();
+  const href = locale === 'tr' ? null : buildExperienceInquiryHref(experienceSlug);
+
+  if (!href) return null;
 
   const handleClick = () => {
     trackCtaClick({

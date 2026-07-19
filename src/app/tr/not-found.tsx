@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import NotFoundClient from './NotFoundClient';
+import NotFoundClient from '@/app/NotFoundClient';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 
 export const metadata: Metadata = {
@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     description: '404',
     siteName: 'Creare',
     type: 'website',
+    locale: 'tr_TR',
   },
   twitter: {
     card: 'summary',
@@ -19,6 +20,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function NotFound() {
-  return <NotFoundClient copy={getDictionary('en').notFound} homeHref="/" />;
+export default function TurkishNotFound() {
+  return <NotFoundClient copy={getDictionary('tr').notFound} homeHref="/tr" />;
 }
