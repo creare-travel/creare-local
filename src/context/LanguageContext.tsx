@@ -37,20 +37,20 @@ function getNestedValue(obj: TranslationDict, key: string): string {
   return typeof current === 'string' ? current : key;
 }
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
+interface LanguageProviderProps {
+  children: React.ReactNode;
+  initialLocale?: Locale;
+}
+
+export function LanguageProvider({ children, initialLocale }: LanguageProviderProps) {
   const pathname = usePathname();
   const pathnameLocale = getLocaleFromPathname(pathname ?? '/');
-  const [locale, setLocaleState] = useState<Locale>(pathnameLocale);
+  const [locale, setLocaleState] = useState<Locale>(initialLocale ?? pathnameLocale);
   const [translations, setTranslations] = useState<TranslationDict>({});
 
   useEffect(() => {
     setLocaleState(pathnameLocale);
   }, [pathnameLocale]);
-
-  useEffect(() => {
-    document.documentElement.lang = locale;
-    document.documentElement.dir = 'ltr';
-  }, [locale]);
 
   useEffect(() => {
     import(`../locales/${locale}.json`)
@@ -64,8 +64,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
       if (newLocale === pathnameLocale) {
         setLocaleState(newLocale);
-        document.documentElement.lang = newLocale;
-        document.documentElement.dir = 'ltr';
       }
     },
     [pathnameLocale]

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import NotFoundClient from './NotFoundClient';
+import NotFoundClient from '@/app/NotFoundClient';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 
 export const metadata: Metadata = {

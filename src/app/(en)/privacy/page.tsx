@@ -1,13 +1,39 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { buildMetadataAlternates } from '@/lib/seo';
+import {
+  DEFAULT_METADATA,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_OG_IMAGE_ALT,
+  SITE_URL,
+  buildMetadataAlternates,
+} from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description:
     'CREARE privacy policy — how we collect, use, and protect your personal information.',
   alternates: buildMetadataAlternates('/privacy'),
+  openGraph: {
+    type: 'website',
+    title: DEFAULT_METADATA.defaultTitle,
+    description: 'Private cultural access. Thoughtfully designed encounters.',
+    url: SITE_URL,
+    images: [
+      {
+        url: '/opengraph-image?282b2b8eda0907e3',
+        width: 1200,
+        height: 630,
+        alt: DEFAULT_OG_IMAGE_ALT,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: DEFAULT_METADATA.defaultTitle,
+    description: 'Private cultural access. Thoughtfully designed encounters.',
+    images: [DEFAULT_OG_IMAGE],
+  },
 };
 
 interface PolicySection {

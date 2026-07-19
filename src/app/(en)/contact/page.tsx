@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import JsonLd from '@/components/JsonLd';
 import { buildContactPageGraph } from '@/lib/schema-builder';
 import { buildMetadataAlternates } from '@/lib/seo';
-import ContactPageClient from './ContactPageClient';
+import ContactPageClient from '@/app/contact/ContactPageClient';
 
 const SITE_URL = 'https://crearetravel.com';
 const OG_IMAGE = `${SITE_URL}/og/default.jpg`;

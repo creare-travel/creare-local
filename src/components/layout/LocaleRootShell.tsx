@@ -1,7 +1,6 @@
-import '../styles/tailwind.css';
 import React from 'react';
-import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
+import type { Metadata, Viewport } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GoogleTagManager from '@/components/GoogleTagManager';
@@ -14,26 +13,25 @@ import {
   buildOrganizationSchema,
   buildWebSiteSchema,
 } from '@/lib/schema-builder';
-import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT } from '@/lib/seo';
+import { DEFAULT_METADATA, DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT } from '@/lib/seo';
+import type { SiteLocale } from '@/lib/i18n/config';
 
 const isMaintenanceMode = process.env.NEXT_PUBLIC_SITE_MODE === 'maintenance';
 
-export const viewport: Viewport = {
+export const localeRootViewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
 };
 
-export const metadata: Metadata = {
-  metadataBase: new URL('https://crearetravel.com'),
+export const localeRootMetadata: Metadata = {
+  metadataBase: DEFAULT_METADATA.metadataBase,
   title: {
-    default: isMaintenanceMode
-      ? 'CREARE — Under Construction'
-      : 'Creare — Experiences Composed as Art',
-    template: '%s — Creare',
+    default: isMaintenanceMode ? 'CREARE — Under Construction' : DEFAULT_METADATA.defaultTitle,
+    template: DEFAULT_METADATA.titleTemplate,
   },
   description: isMaintenanceMode
     ? 'CREARE is finalizing a private portfolio of experiences designed for a limited circle of clients.'
-    : 'Creare curates private cultural encounters across Turkey and beyond — monastery access, atelier visits, and extraordinary moments for discerning clients.',
+    : DEFAULT_METADATA.defaultDescription,
   robots: {
     index: !isMaintenanceMode,
     follow: !isMaintenanceMode,
@@ -49,13 +47,10 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Creare',
-    title: isMaintenanceMode
-      ? 'CREARE — Under Construction'
-      : 'Creare — Experiences Composed as Art',
+    title: isMaintenanceMode ? 'CREARE — Under Construction' : DEFAULT_METADATA.defaultTitle,
     description: isMaintenanceMode
       ? 'CREARE is finalizing a private portfolio of experiences designed for a limited circle of clients.'
       : 'Private cultural access. Thoughtfully designed encounters.',
-    url: 'https://crearetravel.com',
     images: [
       {
         url: DEFAULT_OG_IMAGE,
@@ -67,9 +62,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: isMaintenanceMode
-      ? 'CREARE — Under Construction'
-      : 'Creare — Experiences Composed as Art',
+    title: isMaintenanceMode ? 'CREARE — Under Construction' : DEFAULT_METADATA.defaultTitle,
     description: isMaintenanceMode
       ? 'CREARE is finalizing a private portfolio of experiences designed for a limited circle of clients.'
       : 'Private cultural access. Thoughtfully designed encounters.',
@@ -77,39 +70,41 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+interface LocaleRootShellProps {
+  children: React.ReactNode;
+  locale: SiteLocale;
+}
+
+export default function LocaleRootShell({ children, locale }: LocaleRootShellProps) {
   const globalSchemaGraph = [buildOrganizationSchema(), buildBrandSchema(), buildWebSiteSchema()];
 
   return (
-    <html lang="en">
-      <head />
-      <body className="bg-black text-white antialiased">
-        {isGtmEnabled() ? (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-              height="0"
-              width="0"
-              style={{ display: 'none', visibility: 'hidden' }}
-            />
-          </noscript>
-        ) : null}
-        <Suspense fallback={null}>
-          <GoogleTagManager />
-        </Suspense>
-        <JsonLd id="global-schema-jsonld" schema={globalSchemaGraph} />
-        <LanguageProvider>
-          {isMaintenanceMode ? (
-            <UnderConstruction />
-          ) : (
-            <>
-              <Header />
-              {children}
-              <Footer />
-            </>
-          )}
-        </LanguageProvider>
-      </body>
-    </html>
+    <body className="bg-black text-white antialiased">
+      {isGtmEnabled() ? (
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
+      ) : null}
+      <Suspense fallback={null}>
+        <GoogleTagManager />
+      </Suspense>
+      <JsonLd id="global-schema-jsonld" schema={globalSchemaGraph} />
+      <LanguageProvider initialLocale={locale}>
+        {isMaintenanceMode ? (
+          <UnderConstruction />
+        ) : (
+          <>
+            <Header />
+            {children}
+            <Footer />
+          </>
+        )}
+      </LanguageProvider>
+    </body>
   );
 }

@@ -164,11 +164,11 @@ assert.equal(
 );
 
 [
-  'src/app/tr/page.tsx',
-  'src/app/tr/cultural-worlds/page.tsx',
-  'src/app/tr/experiences/page.tsx',
-  'src/app/tr/insights/page.tsx',
-  'src/app/tr/not-found.tsx',
+  'src/app/(tr)/tr/page.tsx',
+  'src/app/(tr)/tr/cultural-worlds/page.tsx',
+  'src/app/(tr)/tr/experiences/page.tsx',
+  'src/app/(tr)/tr/insights/page.tsx',
+  'src/app/(tr)/tr/not-found.tsx',
 ].forEach((filePath) => {
   assert.equal(
     existsSync(join(process.cwd(), filePath)),
@@ -178,14 +178,14 @@ assert.equal(
 });
 
 [
-  'src/app/tr/philosophy/page.tsx',
-  'src/app/tr/contact/page.tsx',
-  'src/app/tr/privacy/page.tsx',
-  'src/app/tr/terms/page.tsx',
-  'src/app/tr/cookies/page.tsx',
-  'src/app/tr/experiences/signature/page.tsx',
-  'src/app/tr/experiences/lab/page.tsx',
-  'src/app/tr/experiences/black/page.tsx',
+  'src/app/(tr)/tr/philosophy/page.tsx',
+  'src/app/(tr)/tr/contact/page.tsx',
+  'src/app/(tr)/tr/privacy/page.tsx',
+  'src/app/(tr)/tr/terms/page.tsx',
+  'src/app/(tr)/tr/cookies/page.tsx',
+  'src/app/(tr)/tr/experiences/signature/page.tsx',
+  'src/app/(tr)/tr/experiences/lab/page.tsx',
+  'src/app/(tr)/tr/experiences/black/page.tsx',
 ].forEach((filePath) => {
   assert.equal(
     existsSync(join(process.cwd(), filePath)),
@@ -223,14 +223,17 @@ assert.equal(
   'NotFoundClient must require an explicit homeHref'
 );
 
-const rootNotFoundSource = readFileSync(join(process.cwd(), 'src/app/not-found.tsx'), 'utf8');
+const rootNotFoundSource = readFileSync(join(process.cwd(), 'src/app/(en)/not-found.tsx'), 'utf8');
 assert.equal(
   rootNotFoundSource.includes('homeHref="/"'),
   true,
   'Root English 404 must pass the English home target explicitly'
 );
 
-const turkishNotFoundSource = readFileSync(join(process.cwd(), 'src/app/tr/not-found.tsx'), 'utf8');
+const turkishNotFoundSource = readFileSync(
+  join(process.cwd(), 'src/app/(tr)/tr/not-found.tsx'),
+  'utf8'
+);
 assert.equal(
   turkishNotFoundSource.includes('homeHref="/tr"'),
   true,

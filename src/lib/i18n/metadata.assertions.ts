@@ -699,6 +699,93 @@ assertThrows('assertion failure exits non-zero on invariant failure', () =>
 );
 
 const assertionFilePath = join(process.cwd(), 'src/lib/i18n/metadata.assertions.ts');
+const localeRootShellSource = readFileSync(
+  join(process.cwd(), 'src/components/layout/LocaleRootShell.tsx'),
+  'utf8'
+);
+const enRootLayoutSource = readFileSync(join(process.cwd(), 'src/app/(en)/layout.tsx'), 'utf8');
+const trRootLayoutSource = readFileSync(join(process.cwd(), 'src/app/(tr)/layout.tsx'), 'utf8');
+const legalMetadataPagePaths = [
+  'src/app/(en)/privacy/page.tsx',
+  'src/app/(en)/terms/page.tsx',
+  'src/app/(en)/cookies/page.tsx',
+];
+
+assert.equal(
+  localeRootShellSource.includes('default: isMaintenanceMode'),
+  true,
+  'approved root title default exists'
+);
+assert.equal(
+  localeRootShellSource.includes('template: DEFAULT_METADATA.titleTemplate'),
+  true,
+  'approved root title template exists'
+);
+assert.equal(
+  localeRootShellSource.includes('applicationName'),
+  false,
+  'unapproved applicationName output is absent'
+);
+assert.equal(
+  localeRootShellSource.includes('robots:'),
+  true,
+  'approved root robots fallback exists'
+);
+assert.equal(
+  localeRootShellSource.includes("card: 'summary_large_image'"),
+  true,
+  'approved Twitter card fallback exists'
+);
+assert.equal(
+  enRootLayoutSource.includes('canonical') || trRootLayoutSource.includes('canonical'),
+  false,
+  'root layouts contain no canonical owner'
+);
+assert.equal(
+  enRootLayoutSource.includes('openGraph') || trRootLayoutSource.includes('openGraph'),
+  false,
+  'root layouts contain no page-specific Open Graph owner'
+);
+assert.equal(
+  localeRootShellSource.includes('alternates:'),
+  false,
+  'root metadata contains no canonical or hreflang alternates'
+);
+assert.equal(
+  localeRootShellSource.includes('url: SITE_URL') ||
+    localeRootShellSource.includes("url: 'https://crearetravel.com'"),
+  false,
+  'root metadata contains no page-specific Open Graph URL'
+);
+
+legalMetadataPagePaths.forEach((filePath) => {
+  const source = readFileSync(join(process.cwd(), filePath), 'utf8');
+
+  assert.equal(source.includes('openGraph:'), true, `${filePath} owns approved Open Graph output`);
+  assert.equal(source.includes('twitter:'), true, `${filePath} owns approved Twitter output`);
+  assert.equal(
+    source.includes('title: DEFAULT_METADATA.defaultTitle'),
+    true,
+    `${filePath} preserves inherited social title explicitly`
+  );
+  assert.equal(
+    source.includes("description: 'Private cultural access. Thoughtfully designed encounters.'"),
+    true,
+    `${filePath} preserves inherited social description explicitly`
+  );
+  assert.equal(source.includes('url: SITE_URL'), true, `${filePath} owns approved OG URL`);
+  assert.equal(
+    source.includes("url: '/opengraph-image?282b2b8eda0907e3'"),
+    true,
+    `${filePath} owns approved inherited OG image route`
+  );
+  assert.equal(
+    source.includes('images: [DEFAULT_OG_IMAGE]'),
+    true,
+    `${filePath} owns approved inherited Twitter image`
+  );
+});
+
 const runtimeImportViolations = listSourceFiles(join(process.cwd(), 'src'))
   .filter((filePath) => filePath !== assertionFilePath)
   .filter((filePath) => readFileSync(filePath, 'utf8').includes('metadata.assertions'));

@@ -85,13 +85,13 @@ assert.equal(getStrapiLocale(relatedContentLocale), 'tr-TR');
 });
 
 const routeFiles = [
-  'src/app/tr/page.tsx',
-  'src/app/tr/cultural-worlds/page.tsx',
-  'src/app/tr/cultural-worlds/[slug]/page.tsx',
-  'src/app/tr/experiences/page.tsx',
-  'src/app/tr/experiences/[slug]/page.tsx',
-  'src/app/tr/insights/page.tsx',
-  'src/app/tr/insights/[slug]/page.tsx',
+  'src/app/(tr)/tr/page.tsx',
+  'src/app/(tr)/tr/cultural-worlds/page.tsx',
+  'src/app/(tr)/tr/cultural-worlds/[slug]/page.tsx',
+  'src/app/(tr)/tr/experiences/page.tsx',
+  'src/app/(tr)/tr/experiences/[slug]/page.tsx',
+  'src/app/(tr)/tr/insights/page.tsx',
+  'src/app/(tr)/tr/insights/[slug]/page.tsx',
 ];
 
 routeFiles.forEach((filePath) => {
