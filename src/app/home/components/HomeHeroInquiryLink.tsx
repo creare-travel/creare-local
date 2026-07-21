@@ -20,6 +20,10 @@ export default function HomeHeroInquiryLink({
 }: HomeHeroInquiryLinkProps) {
   const pathname = usePathname();
   const href = getPrivateInquiryHref(locale);
+  const ariaLabel =
+    locale === 'tr'
+      ? 'CREARE deneyimleri için özel talep gönderin'
+      : 'Inquire privately about CREARE experiences';
 
   if (!href) return null;
 
@@ -36,7 +40,7 @@ export default function HomeHeroInquiryLink({
         })
       }
       className="hero-cta group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.62rem] uppercase tracking-[0.24em] text-white/74 hover:text-white/92 sm:tracking-[0.3em]"
-      aria-label="Inquire privately about CREARE experiences"
+      aria-label={ariaLabel}
     >
       <span className="relative inline-block">
         {labelWithArrow}

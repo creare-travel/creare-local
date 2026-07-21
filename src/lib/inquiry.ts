@@ -1,4 +1,6 @@
 import { isValidEmail } from '@/lib/email/config';
+import type { SiteLocale } from '@/lib/i18n/config';
+import { localizePathname } from '@/lib/i18n/pathname';
 
 export interface InquirySubmissionInput {
   name: string;
@@ -8,9 +10,12 @@ export interface InquirySubmissionInput {
   experience_slug?: string;
 }
 
-export function buildExperienceInquiryHref(experienceSlug: string): string {
+export function buildExperienceInquiryHref(
+  experienceSlug: string,
+  locale: SiteLocale = 'en'
+): string {
   const slug = encodeURIComponent(experienceSlug);
-  return `/contact?source=experience&slug=${slug}&exp=${slug}`;
+  return `${localizePathname('/contact', locale)}?source=experience&slug=${slug}&exp=${slug}`;
 }
 
 export function normalizeInquiryIntent(value?: string | string[] | null): string | undefined {

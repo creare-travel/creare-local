@@ -113,8 +113,20 @@ assert.equal(
   '/tr/experiences'
 );
 assert.equal(
-  finalizeLocaleSwitchTarget(createLocaleSwitchPlan('/contact', 'tr'), false).targetPath,
-  '/tr'
+  finalizeLocaleSwitchTarget(createLocaleSwitchPlan('/contact', 'tr'), true).targetPath,
+  '/tr/contact'
+);
+assert.equal(
+  finalizeLocaleSwitchTarget(createLocaleSwitchPlan('/tr/contact', 'en'), true).targetPath,
+  '/contact'
+);
+assert.equal(
+  finalizeLocaleSwitchTarget(createLocaleSwitchPlan('/privacy', 'tr'), true).targetPath,
+  '/tr/privacy'
+);
+assert.equal(
+  finalizeLocaleSwitchTarget(createLocaleSwitchPlan('/tr/terms', 'en'), true).targetPath,
+  '/terms'
 );
 assert.equal(
   finalizeLocaleSwitchTarget(createLocaleSwitchPlan('/unknown-route', 'tr'), false).targetPath,

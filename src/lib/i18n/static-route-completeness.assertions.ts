@@ -46,23 +46,18 @@ function assertNonEmptyTurkishKey(path: string): void {
 const trPrimaryLinks = getPrimaryNavigationRoutes('tr');
 assert.deepEqual(
   trPrimaryLinks.map((route) => route.href),
-  ['/tr/cultural-worlds', '/tr/experiences', '/tr/insights'],
-  'TR primary navigation must expose only implemented Turkish routes'
-);
-assert.equal(
-  trPrimaryLinks.some((route) => route.href === '/tr/philosophy' || route.href === '/tr/contact'),
-  false,
-  'TR primary navigation must not link to copy-incomplete static routes'
+  ['/tr/cultural-worlds', '/tr/experiences', '/tr/insights', '/tr/philosophy', '/tr/contact'],
+  'TR primary navigation must expose implemented Turkish routes'
 );
 assert.deepEqual(
   getFooterNavigationRoutes('tr').map((route) => route.href),
-  ['/tr/cultural-worlds', '/tr/experiences', '/tr/insights'],
-  'TR footer navigation must expose only implemented Turkish routes'
+  ['/tr/cultural-worlds', '/tr/experiences', '/tr/insights', '/tr/philosophy', '/tr/contact'],
+  'TR footer navigation must expose implemented Turkish routes'
 );
 assert.deepEqual(
-  getLegalNavigationRoutes('tr'),
-  [],
-  'TR legal footer links must stay hidden until approved legal copy exists'
+  getLegalNavigationRoutes('tr').map((route) => route.href),
+  ['/tr/privacy', '/tr/cookies', '/tr/terms'],
+  'TR legal footer links must expose implemented Turkish legal routes'
 );
 
 PRIMARY_NAVIGATION_ROUTES.filter((route) => route.trAvailability === 'available').forEach(
@@ -72,23 +67,17 @@ PRIMARY_NAVIGATION_ROUTES.filter((route) => route.trAvailability === 'available'
   }
 );
 
-PRIMARY_NAVIGATION_ROUTES.filter(
-  (route) => route.trAvailability === 'copy-approval-required'
-).forEach((route) => {
-  assert.equal(
-    getPrimaryNavigationRoutes('tr').some((item) => item.key === route.key),
-    false,
-    `Copy-incomplete route must not be in TR primary navigation: ${route.path}`
-  );
-});
+assert.equal(
+  PRIMARY_NAVIGATION_ROUTES.some((route) => route.trAvailability === 'copy-approval-required'),
+  false,
+  'TR copy-approved primary routes must no longer be marked unavailable'
+);
 
-LEGAL_NAVIGATION_ROUTES.forEach((route) => {
-  assert.equal(
-    getLegalNavigationRoutes('tr').some((item) => item.key === route.key),
-    false,
-    `Legal route must not be linked in TR footer until legal approval exists: ${route.path}`
-  );
-});
+assert.equal(
+  LEGAL_NAVIGATION_ROUTES.some((route) => route.trAvailability === 'legal-approval-required'),
+  false,
+  'Implemented TR legal routes must no longer be marked unavailable'
+);
 
 EXPERIENCE_CATEGORY_ROUTES.forEach((path) => {
   assert.equal(
@@ -103,8 +92,13 @@ EXPERIENCE_CATEGORY_ROUTES.forEach((path) => {
   );
 });
 
-assert.equal(getPrivateInquiryHref('tr'), null, 'TR inquiry links require approved contact copy');
+assert.equal(getPrivateInquiryHref('tr'), '/tr/contact', 'TR inquiry links must target TR contact');
 assert.equal(getPrivateInquiryHref('en'), '/contact', 'EN inquiry link must remain unchanged');
+assert.equal(
+  getPrivateInquiryHref('tr', '?source=experience&slug=test'),
+  '/tr/contact?source=experience&slug=test',
+  'TR inquiry query state must be preserved'
+);
 assert.equal(
   getPrivateInquiryHref('en', '?source=experience&slug=test'),
   '/contact?source=experience&slug=test',
@@ -169,6 +163,11 @@ assert.equal(
   'src/app/(tr)/tr/experiences/page.tsx',
   'src/app/(tr)/tr/insights/page.tsx',
   'src/app/(tr)/tr/not-found.tsx',
+  'src/app/(tr)/tr/philosophy/page.tsx',
+  'src/app/(tr)/tr/contact/page.tsx',
+  'src/app/(tr)/tr/privacy/page.tsx',
+  'src/app/(tr)/tr/terms/page.tsx',
+  'src/app/(tr)/tr/cookies/page.tsx',
 ].forEach((filePath) => {
   assert.equal(
     existsSync(join(process.cwd(), filePath)),
@@ -178,11 +177,6 @@ assert.equal(
 });
 
 [
-  'src/app/(tr)/tr/philosophy/page.tsx',
-  'src/app/(tr)/tr/contact/page.tsx',
-  'src/app/(tr)/tr/privacy/page.tsx',
-  'src/app/(tr)/tr/terms/page.tsx',
-  'src/app/(tr)/tr/cookies/page.tsx',
   'src/app/(tr)/tr/experiences/signature/page.tsx',
   'src/app/(tr)/tr/experiences/lab/page.tsx',
   'src/app/(tr)/tr/experiences/black/page.tsx',

@@ -92,6 +92,11 @@ const routeFiles = [
   'src/app/(tr)/tr/experiences/[slug]/page.tsx',
   'src/app/(tr)/tr/insights/page.tsx',
   'src/app/(tr)/tr/insights/[slug]/page.tsx',
+  'src/app/(tr)/tr/philosophy/page.tsx',
+  'src/app/(tr)/tr/contact/page.tsx',
+  'src/app/(tr)/tr/privacy/page.tsx',
+  'src/app/(tr)/tr/terms/page.tsx',
+  'src/app/(tr)/tr/cookies/page.tsx',
 ];
 
 routeFiles.forEach((filePath) => {

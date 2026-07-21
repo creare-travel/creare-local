@@ -16,7 +16,7 @@
       "contact": "İLETİŞİM",
       "privacy": "Gizlilik",
       "cookies": "Çerezler",
-      "terms": "Koşullar"
+      "terms": "Şartlar"
     }
   },
   "common": {
@@ -24,13 +24,13 @@
     "relatedExperiences": "İlgili Deneyimler",
     "relatedEssays": "İlgili Yazılar",
     "inquirePrivately": "İletişime Geçin",
-    "beginPrivateConversation": "Detayları Görüşelim",
+    "beginPrivateConversation": "ÖZEL TALEP",
     "read": "Oku",
     "enter": "Keşfet",
     "home": "Ana Sayfa",
     "privacy": "Gizlilik",
     "cookies": "Çerezler",
-    "terms": "Koşullar",
+    "terms": "Şartlar",
     "contactViaWhatsApp": "WhatsApp Üzerinden İletişime Geçin",
     "contactCreareUpper": "CREARE İLE İLETİŞİME GEÇİN",
     "protected": {
@@ -73,10 +73,10 @@
       "subtitle": "Sanat Gibi Tasarlanır."
     },
     "cta": {
-      "label": "İLETİŞİME GEÇİN",
-      "labelWithArrow": "İletişime Geçin →",
+      "label": "ÖZEL TALEP",
+      "labelWithArrow": "ÖZEL TALEP →",
       "approach": "Deneyimleri Nasıl Oluşturuyoruz? →",
-      "contact": "CREARE ile İletişime Geçin →"
+      "contact": "ÖZEL TALEP"
     },
     "collections": {
       "eyebrow": "CREARE deneyimlerini üç farklı biçimde kurgular."

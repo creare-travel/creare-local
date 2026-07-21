@@ -107,7 +107,10 @@ export default function Footer() {
           {dictionary.footer.copyright}
         </span>
         {legalLinks.length > 0 && (
-          <nav className="flex flex-wrap items-center gap-x-6 gap-y-3" aria-label="Legal links">
+          <nav
+            className="flex flex-wrap items-center gap-x-6 gap-y-3"
+            aria-label={locale === 'tr' ? 'Yasal bağlantılar' : 'Legal links'}
+          >
             {legalLinks.map((item) => (
               <Link
                 key={item.key}

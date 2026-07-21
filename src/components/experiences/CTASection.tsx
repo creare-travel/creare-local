@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import OutboundLink from '@/components/analytics/OutboundLink';
 import { trackCtaClick } from '@/lib/analytics/tracking';
 import { buildExperienceInquiryHref } from '@/lib/inquiry';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface CTASectionProps {
   heading?: string;
@@ -28,6 +29,7 @@ export default function CTASection({
   source = 'experience_page',
 }: CTASectionProps) {
   const pathname = usePathname();
+  const { locale } = useLanguage();
   const bg = dark ? 'bg-black' : 'bg-[#E8E0D5]';
   const textHeading = dark ? 'text-white' : 'text-neutral-900';
   const textSub = dark ? 'text-white/60' : 'text-neutral-600';
@@ -38,8 +40,12 @@ export default function CTASection({
   // Preserve experience context when routing into the shared contact form flow.
   const resolvedHref =
     buttonHref === '/contact' && experienceSlug
-      ? buildExperienceInquiryHref(experienceSlug)
-      : buttonHref;
+      ? buildExperienceInquiryHref(experienceSlug, locale)
+      : buttonHref === '/contact'
+        ? locale === 'tr'
+          ? '/tr/contact'
+          : '/contact'
+        : buttonHref;
 
   const handleCtaClick = () => {
     trackCtaClick({

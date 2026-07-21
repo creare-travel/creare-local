@@ -53,16 +53,15 @@ const CATEGORY_ROUTES_WITHOUT_TR = new Set([
   '/experiences/black',
 ]);
 
-const STATIC_ROUTES_WITHOUT_TR = new Set([
+const STATIC_ROUTES_WITH_TR = new Set([
   '/contact',
   '/philosophy',
   '/privacy',
   '/cookies',
   '/terms',
-  '/editorial',
-  '/stories',
-  '/thank-you',
 ]);
+
+const STATIC_ROUTES_WITHOUT_TR = new Set(['/editorial', '/stories', '/thank-you']);
 
 const LISTING_PATHS = new Set(['/cultural-worlds', '/experiences', '/insights']);
 
@@ -158,6 +157,17 @@ export function classifyLocalizedRoute(pathname: string): LocalizedRouteClassifi
     };
   }
 
+  if (STATIC_ROUTES_WITH_TR.has(unprefixedPathname)) {
+    return {
+      currentLocale,
+      family: null,
+      kind: 'static',
+      normalizedPathname,
+      slug: null,
+      unprefixedPathname,
+    };
+  }
+
   if (currentLocale === DEFAULT_SITE_LOCALE && STATIC_ROUTES_WITHOUT_TR.has(unprefixedPathname)) {
     return {
       currentLocale,
@@ -232,6 +242,13 @@ export function buildLocaleSwitchCandidate(
 
   if (classification.kind === 'category' && targetLocale === DEFAULT_SITE_LOCALE) {
     return classification.unprefixedPathname;
+  }
+
+  if (
+    classification.kind === 'static' &&
+    STATIC_ROUTES_WITH_TR.has(classification.unprefixedPathname)
+  ) {
+    return localizePathname(classification.unprefixedPathname, targetLocale);
   }
 
   return null;

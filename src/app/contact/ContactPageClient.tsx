@@ -11,6 +11,7 @@ import {
   trackFormError,
   getExperienceSlug,
 } from '@/lib/analytics/tracking';
+import type { SiteLocale } from '@/lib/i18n/config';
 
 interface FormData {
   name: string;
@@ -21,25 +22,141 @@ interface FormData {
 interface FormErrors {
   name?: string;
   email?: string;
+  message?: string;
   general?: string;
 }
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
-const projectIntents: string[] = [
-  'Private Travel',
-  'Corporate & Brand Experience',
-  'Cultural Experience',
-  'Ultra-Private Access',
-  'Long-Term Collaboration',
-];
+interface ContactPageClientProps {
+  locale?: SiteLocale;
+  successRedirectHref?: string | null;
+}
+
+const contactCopy = {
+  en: {
+    heroTitle: 'Private Inquiries',
+    heroSupport: 'We respond personally.',
+    heroDescription:
+      'For strategic engagements, private commissions, and confidential collaborations. We respond personally to international guest requests, partner-led introductions, and culturally specific planning briefs, with each inquiry reviewed in confidence before any proposal, coordination, or access design begins.',
+    directLineLabel: 'DIRECT LINE',
+    directLineDescription: 'Direct line for private inquiries.',
+    privateMessageLabel: 'PRIVATE MESSAGE LINE',
+    privateMessageDescription: 'Encrypted private messaging.',
+    emailLabel: 'EMAIL',
+    emailDescription:
+      'For private requests, structured proposals, and strategic collaborations. Early conversations help establish pace, feasibility, and the level of coordination required across hosts, cultural partners, and on-the-ground logistics.',
+    locationLabel: 'LOCATION',
+    locationDescription: 'Meetings by appointment only.',
+    mapsAriaLabel: 'View CREARE office location on Google Maps — 32G7+P8 Şişli, İstanbul',
+    meetingButtonAriaLabel: 'Request a meeting with CREARE',
+    meetingButtonLabel: 'Speak with CREARE™',
+    imageAlt:
+      'Ferko Signature Plaza in Şişli, Istanbul, home of CREARE Travel Consultancy Limited Co.',
+    successTitle: 'Thank you.',
+    successMessage: 'We have received your inquiry and will be in touch shortly.',
+    formAriaLabel: 'Private inquiry form',
+    nameLabel: 'NAME',
+    namePlaceholder: 'Name',
+    emailLabelField: 'EMAIL',
+    emailPlaceholder: 'Email address',
+    intentLabel: 'PROJECT INTENT',
+    intents: [
+      'Private Travel',
+      'Corporate & Brand Experience',
+      'Cultural Experience',
+      'Ultra-Private Access',
+      'Long-Term Collaboration',
+    ],
+    messageLabel: 'MESSAGE',
+    messagePlaceholder: 'Tell us about your vision...',
+    messageHelper: 'Share your objectives. We design the structure.',
+    submitAriaLabel: 'Submit your private inquiry',
+    loadingLabel: 'SENDING…',
+    submitLabel: 'SEND INQUIRY →',
+    confidentiality:
+      'All inquiries are reviewed personally and handled with strict confidentiality.',
+    requiredName: 'Name is required.',
+    requiredEmail: 'Email is required.',
+    invalidEmail: 'Please enter a valid email address.',
+    requiredMessage: 'Message is required.',
+    genericFailure: 'Something went wrong. Please try again.',
+    globalCapabilityLabel: 'GLOBAL EXECUTION CAPABILITY',
+    globalCapabilityText:
+      'Cross-border experience delivery • Brand & institutional collaborations • Multi-market coordination • High-security engagements, with planning shaped around discretion, clear communication, and the practical realities of executing complex requests across different cultural and operational environments.',
+    operatingInternationally: 'Operating Internationally.',
+    roots: 'With roots in Istanbul and Bodrum.',
+    scope:
+      'Experience scope, timelines, and response expectations are discussed confidentially, so each engagement can move from inquiry to planning with the right level of clarity, privacy, and local coordination.',
+    locationScope: 'Istanbul • Bodrum • International',
+  },
+  tr: {
+    heroTitle: 'Özel Talepler',
+    heroSupport: 'Kişisel olarak yanıt veriyoruz.',
+    heroDescription:
+      'Stratejik çalışmalar, özel tasarım talepleri ve gizlilik gerektiren iş birlikleri için.',
+    directLineLabel: 'DOĞRUDAN HAT',
+    directLineDescription: 'Özel talepler için doğrudan iletişim.',
+    privateMessageLabel: 'ÖZEL MESAJ HATTI',
+    privateMessageDescription: 'Özel ve güvenli mesajlaşma.',
+    emailLabel: 'E-POSTA',
+    emailDescription: 'Özel talepler, yapılandırılmış öneriler ve stratejik iş birlikleri için.',
+    locationLabel: 'KONUM',
+    locationDescription: 'Görüşmeler yalnızca randevu ile gerçekleştirilir.',
+    mapsAriaLabel:
+      'CREARE ofis konumunu Google Maps üzerinde görüntüleyin — 32G7+P8 Şişli, İstanbul',
+    meetingButtonAriaLabel: 'CREARE ile görüşme talep edin',
+    meetingButtonLabel: 'CREARE™ ile Görüşün',
+    imageAlt:
+      'CREARE Travel Consultancy Limited Co. adresinin bulunduğu Şişli, İstanbul’daki Ferko Signature Plaza',
+    successTitle: 'Teşekkür ederiz.',
+    successMessage: 'Talebinizi aldık. Sizinle en kısa sürede iletişime geçeceğiz.',
+    formAriaLabel: 'Özel talep formu',
+    nameLabel: 'AD SOYAD',
+    namePlaceholder: 'Adınız ve soyadınız',
+    emailLabelField: 'E-POSTA',
+    emailPlaceholder: 'E-posta adresiniz',
+    intentLabel: 'TALEBİN NİTELİĞİ',
+    intents: [
+      'Özel Deneyim Tasarımı',
+      'Kurumsal ve Marka Deneyimi',
+      'Kültürel Deneyim',
+      'Ultra Özel Erişim',
+      'Uzun Vadeli İş Birliği',
+    ],
+    messageLabel: 'MESAJ',
+    messagePlaceholder: 'Vizyonunuzu ve aradığınız yapıyı paylaşın...',
+    messageHelper: 'Hedefinizi paylaşın. Yapıyı biz tasarlayalım.',
+    submitAriaLabel: 'Özel talebinizi gönderin',
+    loadingLabel: 'Gönderiliyor…',
+    submitLabel: 'TALEBİ GÖNDER →',
+    confidentiality: 'Tüm talepler kişisel olarak incelenir ve kesin gizlilikle ele alınır.',
+    requiredName: 'Lütfen adınızı ve soyadınızı girin.',
+    requiredEmail: 'Lütfen e-posta adresinizi girin.',
+    invalidEmail: 'Lütfen geçerli bir e-posta adresi girin.',
+    requiredMessage: 'Lütfen talebinizle ilgili kısa bir açıklama paylaşın.',
+    genericFailure:
+      'Talebiniz şu anda gönderilemedi. Lütfen tekrar deneyin veya bizimle doğrudan iletişime geçin.',
+    globalCapabilityLabel: 'KÜRESEL UYGULAMA KAPASİTESİ',
+    globalCapabilityText:
+      'Sınır ötesi deneyim uygulaması • Marka ve kurum iş birlikleri • Çoklu pazar koordinasyonu • Yüksek güvenlik gerektiren çalışmalar',
+    operatingInternationally: 'Uluslararası ölçekte çalışıyoruz.',
+    roots: 'İstanbul ve Bodrum kökleriyle.',
+    scope: 'Deneyim kapsamı ve zaman planı gizlilik içinde görüşülür.',
+    locationScope: 'İstanbul • Bodrum • Uluslararası',
+  },
+} as const;
 
 function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-export default function ContactPageClient() {
+export default function ContactPageClient({
+  locale = 'en',
+  successRedirectHref = '/thank-you',
+}: ContactPageClientProps) {
   const router = useRouter();
+  const copy = contactCopy[locale];
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -75,12 +192,12 @@ export default function ContactPageClient() {
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required.';
+      newErrors.name = copy.requiredName;
     }
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required.';
+      newErrors.email = copy.requiredEmail;
     } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address.';
+      newErrors.email = copy.invalidEmail;
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -116,7 +233,7 @@ export default function ContactPageClient() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data?.error || 'Submission failed.');
+        throw new Error(data?.error || copy.genericFailure);
       }
 
       // Fire form_success ONLY on confirmed API success (response.ok)
@@ -124,11 +241,12 @@ export default function ContactPageClient() {
 
       setFormStatus('success');
 
-      // Redirect to /thank-you after successful submission
-      router.push('/thank-you');
+      if (successRedirectHref) {
+        router.push(successRedirectHref);
+      }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      const rawErrorMessage = err instanceof Error ? err.message : copy.genericFailure;
+      const errorMessage = locale === 'tr' ? copy.genericFailure : rawErrorMessage;
 
       // Fire form_error on failure
       trackFormError({
@@ -151,14 +269,11 @@ export default function ContactPageClient() {
       {/* Hero Section */}
       <section className="flex flex-col items-center text-center px-6 pt-44 pb-20">
         <h1 className="font-display text-white font-normal leading-tight mb-6 text-[clamp(3rem,6vw,72px)]">
-          Private Inquiries
+          {copy.heroTitle}
         </h1>
-        <p className="text-white/60 font-body text-base mb-4">We respond personally.</p>
+        <p className="text-white/60 font-body text-base mb-4">{copy.heroSupport}</p>
         <p className="text-white/35 font-body text-sm leading-relaxed max-w-[500px]">
-          For strategic engagements, private commissions, and confidential collaborations. We
-          respond personally to international guest requests, partner-led introductions, and
-          culturally specific planning briefs, with each inquiry reviewed in confidence before any
-          proposal, coordination, or access design begins.
+          {copy.heroDescription}
         </p>
       </section>
 
@@ -174,45 +289,41 @@ export default function ContactPageClient() {
               {/* Direct Line */}
               <div>
                 <p className="text-white/35 font-body text-[10px] tracking-[0.25em] uppercase mb-4">
-                  DIRECT LINE
+                  {copy.directLineLabel}
                 </p>
                 <p className="text-white font-body font-bold mb-3 text-[clamp(1.5rem,3vw,28px)]">
                   +90 541 220 3000
                 </p>
-                <p className="text-white/35 font-body text-sm">
-                  Direct line for private inquiries.
-                </p>
+                <p className="text-white/35 font-body text-sm">{copy.directLineDescription}</p>
               </div>
 
               {/* Private Message Line */}
               <div>
                 <p className="text-white/35 font-body text-[10px] tracking-[0.25em] uppercase mb-4">
-                  PRIVATE MESSAGE LINE
+                  {copy.privateMessageLabel}
                 </p>
                 <p className="text-white font-body font-bold text-lg leading-relaxed">WhatsApp</p>
                 <p className="text-white font-body font-bold text-lg leading-relaxed mb-3">
                   WeChat
                 </p>
-                <p className="text-white/35 font-body text-sm">Encrypted private messaging.</p>
+                <p className="text-white/35 font-body text-sm">{copy.privateMessageDescription}</p>
               </div>
 
               {/* Email */}
               <div>
                 <p className="text-white/35 font-body text-[10px] tracking-[0.25em] uppercase mb-4">
-                  EMAIL
+                  {copy.emailLabel}
                 </p>
                 <p className="text-white font-body text-base mb-3">direct@crearetravel.com</p>
                 <p className="text-white/35 font-body text-xs leading-relaxed">
-                  For private requests, structured proposals, and strategic collaborations. Early
-                  conversations help establish pace, feasibility, and the level of coordination
-                  required across hosts, cultural partners, and on-the-ground logistics.
+                  {copy.emailDescription}
                 </p>
               </div>
 
               {/* Location */}
               <div>
                 <p className="text-white/35 font-body text-[10px] tracking-[0.25em] uppercase mb-4">
-                  LOCATION
+                  {copy.locationLabel}
                 </p>
                 <p className="text-white font-body font-semibold text-base mb-4">
                   CREARE Travel Consultancy Limited Co.
@@ -228,7 +339,7 @@ export default function ContactPageClient() {
                     href="https://maps.google.com/?q=32G7%2BP8+%C5%9Ei%C5%9Fli,+%C4%B0stanbul"
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="View CREARE office location on Google Maps — 32G7+P8 Şişli, İstanbul"
+                    aria-label={copy.mapsAriaLabel}
                     className="motion-link text-blue-400 font-body text-sm hover:text-blue-300"
                     trackingLabel="contact_google_maps"
                     trackingSource="contact_page"
@@ -236,13 +347,13 @@ export default function ContactPageClient() {
                     📍 32G7+P8 Şişli, İstanbul
                   </OutboundLink>
                 </p>
-                <p className="text-white font-body text-sm mb-6">Meetings by appointment only.</p>
+                <p className="text-white font-body text-sm mb-6">{copy.locationDescription}</p>
                 <button
                   type="button"
-                  aria-label="Request a meeting with CREARE"
+                  aria-label={copy.meetingButtonAriaLabel}
                   className="motion-button-editorial border border-white bg-black px-6 py-3 font-body text-sm tracking-wide text-white hover:bg-white hover:text-black"
                 >
-                  Speak with CREARE™
+                  {copy.meetingButtonLabel}
                 </button>
               </div>
 
@@ -257,7 +368,7 @@ export default function ContactPageClient() {
                     aspectRatio: '4:3',
                     width: 1200,
                   })}
-                  alt="Ferko Signature Plaza in Şişli, Istanbul, home of CREARE Travel Consultancy Limited Co."
+                  alt={copy.imageAlt}
                   width={600}
                   height={450}
                   className="w-full h-full object-cover grayscale"
@@ -271,9 +382,11 @@ export default function ContactPageClient() {
               {formStatus === 'success' ? (
                 <div className="py-20">
                   <div className="w-8 h-px bg-white/30 mb-10" />
-                  <h2 className="font-display font-light text-white text-3xl mb-6">Thank you.</h2>
+                  <h2 className="font-display font-light text-white text-3xl mb-6">
+                    {copy.successTitle}
+                  </h2>
                   <p className="text-white/50 font-body text-sm leading-loose">
-                    We have received your inquiry and will be in touch shortly.
+                    {copy.successMessage}
                   </p>
                 </div>
               ) : (
@@ -281,7 +394,7 @@ export default function ContactPageClient() {
                   onSubmit={handleSubmit}
                   onFocus={handleFormFocus}
                   className="flex flex-col gap-10"
-                  aria-label="Private inquiry form"
+                  aria-label={copy.formAriaLabel}
                   noValidate
                 >
                   {/* General error */}
@@ -297,7 +410,7 @@ export default function ContactPageClient() {
                       htmlFor="name"
                       className="text-white/40 font-body text-[10px] tracking-[0.25em] uppercase"
                     >
-                      NAME{' '}
+                      {copy.nameLabel}{' '}
                       <span className="text-white/25" aria-hidden="true">
                         *
                       </span>
@@ -312,7 +425,7 @@ export default function ContactPageClient() {
                       aria-describedby={errors.name ? 'name-error' : undefined}
                       value={formData.name}
                       onChange={handleChange}
-                      placeholder="Name"
+                      placeholder={copy.namePlaceholder}
                       disabled={formStatus === 'loading'}
                       className="bg-transparent border-0 border-b border-white/20 focus:border-white/50 outline-none text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] w-full disabled:opacity-50"
                     />
@@ -334,7 +447,7 @@ export default function ContactPageClient() {
                       htmlFor="email"
                       className="text-white/40 font-body text-[10px] tracking-[0.25em] uppercase"
                     >
-                      EMAIL{' '}
+                      {copy.emailLabelField}{' '}
                       <span className="text-white/25" aria-hidden="true">
                         *
                       </span>
@@ -349,7 +462,7 @@ export default function ContactPageClient() {
                       aria-describedby={errors.email ? 'email-error' : undefined}
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="Email address"
+                      placeholder={copy.emailPlaceholder}
                       disabled={formStatus === 'loading'}
                       className="bg-transparent border-0 border-b border-white/20 focus:border-white/50 outline-none text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] w-full disabled:opacity-50"
                     />
@@ -368,10 +481,10 @@ export default function ContactPageClient() {
                   {/* Project Intent */}
                   <fieldset className="flex flex-col gap-4 border-0 p-0 m-0">
                     <legend className="text-white/40 font-body text-[10px] tracking-[0.25em] uppercase mb-1">
-                      PROJECT INTENT
+                      {copy.intentLabel}
                     </legend>
                     <div className="flex flex-wrap gap-3">
-                      {projectIntents.map((intent) => {
+                      {copy.intents.map((intent) => {
                         const isSelected = selectedIntents.includes(intent);
                         return (
                           <button
@@ -399,7 +512,7 @@ export default function ContactPageClient() {
                       htmlFor="message"
                       className="text-white/40 font-body text-[10px] tracking-[0.25em] uppercase"
                     >
-                      MESSAGE
+                      {copy.messageLabel}
                     </label>
                     <textarea
                       id="message"
@@ -407,13 +520,27 @@ export default function ContactPageClient() {
                       rows={5}
                       value={formData.message}
                       onChange={handleChange}
-                      placeholder="Tell us about your vision..."
+                      aria-invalid={!!errors.message}
+                      aria-describedby={
+                        errors.message ? 'message-error message-helper' : 'message-helper'
+                      }
+                      placeholder={copy.messagePlaceholder}
                       disabled={formStatus === 'loading'}
                       className="bg-transparent border-0 border-b border-white/20 focus:border-white/50 outline-none text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] w-full resize-none disabled:opacity-50"
                     />
 
-                    <p className="text-white/35 font-body text-xs mt-1">
-                      Share your objectives. We design the structure.
+                    {errors.message && (
+                      <p
+                        id="message-error"
+                        role="alert"
+                        className="text-red-400 font-body text-xs mt-1"
+                      >
+                        {errors.message}
+                      </p>
+                    )}
+
+                    <p id="message-helper" className="text-white/35 font-body text-xs mt-1">
+                      {copy.messageHelper}
                     </p>
                   </div>
 
@@ -421,7 +548,7 @@ export default function ContactPageClient() {
                   <div className="flex flex-col gap-3 pt-2">
                     <button
                       type="submit"
-                      aria-label="Submit your private inquiry"
+                      aria-label={copy.submitAriaLabel}
                       disabled={formStatus === 'loading'}
                       className="motion-link text-white font-body text-sm tracking-[0.2em] uppercase text-left hover:text-white/70 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
                     >
@@ -431,14 +558,14 @@ export default function ContactPageClient() {
                             className="inline-block w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin"
                             aria-hidden="true"
                           />
-                          SENDING…
+                          {copy.loadingLabel}
                         </>
                       ) : (
-                        'SEND INQUIRY →'
+                        copy.submitLabel
                       )}
                     </button>
                     <p className="text-white/35 font-body text-xs leading-relaxed">
-                      All inquiries are reviewed personally and handled with strict confidentiality.
+                      {copy.confidentiality}
                     </p>
                   </div>
                 </form>
@@ -454,40 +581,31 @@ export default function ContactPageClient() {
         aria-label="Global execution capability"
       >
         <h2 className="text-white font-body text-[10px] tracking-[0.3em] uppercase mb-4">
-          GLOBAL EXECUTION CAPABILITY
+          {copy.globalCapabilityLabel}
         </h2>
         <div className="w-[200px] h-px bg-white/30" />
 
         <p className="text-white font-body text-center leading-relaxed mt-14 mb-12 px-6 text-lg max-w-[800px]">
-          Cross-border experience delivery • Brand &amp; institutional collaborations • Multi-market
-          coordination • High-security engagements, with planning shaped around discretion, clear
-          communication, and the practical realities of executing complex requests across different
-          cultural and operational environments.
+          {copy.globalCapabilityText}
         </p>
 
         <div className="text-center mb-8">
           <p className="text-white font-body font-normal text-base mb-2">
-            Operating Internationally.
+            {copy.operatingInternationally}
           </p>
-          <p className="text-white font-body font-normal text-base">
-            With roots in Istanbul and Bodrum.
-          </p>
+          <p className="text-white font-body font-normal text-base">{copy.roots}</p>
         </div>
 
-        <p className="text-white/40 font-body text-sm text-center mb-12">
-          Experience scope, timelines, and response expectations are discussed confidentially, so
-          each engagement can move from inquiry to planning with the right level of clarity,
-          privacy, and local coordination.
-        </p>
+        <p className="text-white/40 font-body text-sm text-center mb-12">{copy.scope}</p>
 
         <div className="w-[200px] h-px bg-white/20" />
 
         <p className="text-white/40 font-body text-[10px] tracking-[0.3em] uppercase mt-8 mb-4">
-          LOCATION
+          {copy.locationLabel}
         </p>
 
         <p className="text-white font-body tracking-[0.15em] text-center text-base">
-          Istanbul • Bodrum • International
+          {copy.locationScope}
         </p>
       </section>
     </main>

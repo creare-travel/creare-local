@@ -35,17 +35,17 @@ export const PRIMARY_NAVIGATION_ROUTES: ReadonlyArray<NavigationRoute<PrimaryNav
   { key: 'culturalWorlds', path: '/cultural-worlds', trAvailability: 'available' },
   { key: 'experiences', path: '/experiences', trAvailability: 'available' },
   { key: 'insights', path: '/insights', trAvailability: 'available' },
-  { key: 'philosophy', path: '/philosophy', trAvailability: 'copy-approval-required' },
-  { key: 'contact', path: '/contact', trAvailability: 'copy-approval-required' },
+  { key: 'philosophy', path: '/philosophy', trAvailability: 'available' },
+  { key: 'contact', path: '/contact', trAvailability: 'available' },
 ];
 
 export const FOOTER_NAVIGATION_ROUTES: ReadonlyArray<NavigationRoute<FooterNavigationKey>> =
   PRIMARY_NAVIGATION_ROUTES;
 
 export const LEGAL_NAVIGATION_ROUTES: ReadonlyArray<NavigationRoute<LegalNavigationKey>> = [
-  { key: 'privacy', path: '/privacy', trAvailability: 'legal-approval-required' },
-  { key: 'cookies', path: '/cookies', trAvailability: 'legal-approval-required' },
-  { key: 'terms', path: '/terms', trAvailability: 'legal-approval-required' },
+  { key: 'privacy', path: '/privacy', trAvailability: 'available' },
+  { key: 'cookies', path: '/cookies', trAvailability: 'available' },
+  { key: 'terms', path: '/terms', trAvailability: 'available' },
 ];
 
 export const EXPERIENCE_CATEGORY_ROUTES: ReadonlyArray<ExperienceCategoryPath> = [
@@ -97,9 +97,5 @@ export function getExperienceCategoryTarget(
 }
 
 export function getPrivateInquiryHref(locale: SiteLocale, query = ''): string | null {
-  if (locale !== DEFAULT_SITE_LOCALE) {
-    return null;
-  }
-
   return `${localizePathname('/contact', locale)}${query}`;
 }

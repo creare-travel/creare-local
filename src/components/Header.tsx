@@ -123,7 +123,7 @@ export default function Header() {
             <Link
               key={item?.label}
               href={item?.href}
-              prefetch={item?.href === '/contact' ? false : undefined}
+              prefetch={item?.href.endsWith('/contact') ? false : undefined}
               className={`group/nav relative font-body text-[0.7rem] font-medium uppercase tracking-[0.2em] motion-link ${navTone} ${navHoverTone}`}
               aria-label={item?.label}
             >

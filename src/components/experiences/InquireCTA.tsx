@@ -19,9 +19,7 @@ export default function InquireCTA({
 }: InquireCTAProps) {
   const pathname = usePathname();
   const { locale } = useLanguage();
-  const href = locale === 'tr' ? null : buildExperienceInquiryHref(experienceSlug);
-
-  if (!href) return null;
+  const href = buildExperienceInquiryHref(experienceSlug, locale);
 
   const handleClick = () => {
     trackCtaClick({
