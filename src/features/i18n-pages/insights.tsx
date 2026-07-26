@@ -288,20 +288,33 @@ function mergeInsights(
   strapiItems: NormalizedInsight[] | null
 ): NormalizedInsight[] {
   const bySlug = new Map(staticItems.map((item) => [item.slug, item]));
+  const cmsOnlySlugs: string[] = [];
 
   strapiItems?.forEach((item) => {
     const existing = bySlug.get(item.slug);
-    bySlug.set(item.slug, {
+    const merged = {
       ...(existing ?? item),
       ...item,
       excerpt: item.excerpt || existing?.excerpt || '',
       destinationName: item.destinationName ?? existing?.destinationName ?? null,
       coverImageUrl: item.coverImageUrl ?? existing?.coverImageUrl,
       coverImage: item.coverImage ?? existing?.coverImage,
-    });
+    };
+
+    if (!existing && !cmsOnlySlugs.includes(item.slug)) {
+      cmsOnlySlugs.push(item.slug);
+    }
+
+    bySlug.set(item.slug, merged);
   });
 
-  return staticItems.map((item) => bySlug.get(item.slug) ?? item);
+  return [
+    ...staticItems.map((item) => bySlug.get(item.slug) ?? item),
+    ...cmsOnlySlugs.flatMap((slug) => {
+      const item = bySlug.get(slug);
+      return item ? [item] : [];
+    }),
+  ];
 }
 
 function partitionInsights(items: NormalizedInsight[]) {
