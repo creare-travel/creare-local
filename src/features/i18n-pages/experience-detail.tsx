@@ -135,6 +135,7 @@ interface StrapiExperienceDetail {
   audience?: StrapiRichTextNode[] | string;
   cta_enabled?: boolean;
   cta_text?: string;
+  cta_label?: string | null;
   geo_experience_type?: string;
   mood?: string;
   audience_segment?: string;
@@ -439,6 +440,17 @@ function normalizeOptionalText(value?: string | null) {
   return trimmed ? trimmed : undefined;
 }
 
+function resolveExperienceCtaLabel(
+  experience: StrapiExperienceDetail,
+  fallbackLabel: string
+): string {
+  return (
+    normalizeOptionalText(experience.cta_label) ??
+    normalizeOptionalText(experience.cta_text) ??
+    fallbackLabel
+  );
+}
+
 const MAX_RELATED_INSIGHTS = 3;
 
 const EXPERIENCE_SLUG_CANONICAL_MAP: Record<string, string> = {
@@ -653,6 +665,7 @@ function StrapiExperiencePage({
       : null;
   const wowMoment = normalizeOptionalText(item.wow_moment);
   const differentiator = normalizeOptionalText(item.differentiator);
+  const visibleCtaLabel = resolveExperienceCtaLabel(item, dictionary.home.cta.label);
   const experienceSchemaGraph = buildExperienceDetailGraph(item, canonicalSlug, relatedInsights);
   const coverBlurDataUrl = coverUrl
     ? buildCinematicBlurDataUrl(coverUrl, { atmosphere: 'dark', profile: 'hero' })
@@ -1125,7 +1138,7 @@ function StrapiExperiencePage({
             </p>
             <InquireCTA
               experienceSlug={canonicalSlug}
-              label={item.cta_text || dictionary.common.beginPrivateConversation}
+              label={visibleCtaLabel}
               className="border border-white/30 text-white hover:bg-white hover:text-neutral-900"
             />
             <div className="mt-5">
@@ -1167,7 +1180,7 @@ function StrapiExperiencePage({
             </p>
             <InquireCTA
               experienceSlug={canonicalSlug}
-              label={dictionary.home.cta.label}
+              label={visibleCtaLabel}
               className="bg-black text-white hover:bg-neutral-800"
             />
             <div className="mt-5">

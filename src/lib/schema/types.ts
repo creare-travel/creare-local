@@ -85,6 +85,7 @@ export interface StrapiExperience {
   audience?: StrapiRichTextNode[] | string;
   cta_enabled?: boolean;
   cta_text?: string;
+  cta_label?: string | null;
   geo_experience_type?: string | null;
   mood?: string | null;
   audience_segment?: string | null;

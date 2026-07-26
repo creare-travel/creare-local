@@ -116,7 +116,7 @@ async function fetchPublishedExperiences(
 ): Promise<StrapiExperience[]> {
   try {
     const json = await fetchStrapi(
-      '/api/experiences?fields[0]=title&fields[1]=slug&fields[2]=short_description&fields[3]=visibility_status&fields[4]=publishedAt&pagination[pageSize]=12',
+      '/api/experiences?fields[0]=title&fields[1]=slug&fields[2]=short_description&fields[3]=visibility_status&fields[4]=publishedAt&pagination[pageSize]=100',
       { locale }
     );
     const items: unknown[] = Array.isArray(json?.data) ? json.data : [];
