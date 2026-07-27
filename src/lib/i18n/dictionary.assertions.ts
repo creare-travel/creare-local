@@ -75,6 +75,7 @@ const approvedKeys = [
   'culturalWorlds.coreCharacteristics',
   'culturalWorlds.whatDefines',
   'culturalWorlds.culturalSystems',
+  'culturalWorlds.culturalSystemsSubheading',
   'culturalWorlds.connectedCulturalSystem',
   'culturalWorlds.viewExperience',
   'culturalWorlds.byIntroductionOnly',

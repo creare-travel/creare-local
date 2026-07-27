@@ -5,7 +5,11 @@ import { notFound } from 'next/navigation';
 import CulturalWorldViewTracker from '@/components/CulturalWorldViewTracker';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
-import { getCulturalWorldContent, type CulturalWorldSystemMapping } from '@/data/cultural-worlds';
+import {
+  getCulturalWorldContent,
+  getCulturalWorldSystems,
+  type CulturalWorldSystemMapping,
+} from '@/data/cultural-worlds';
 import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
@@ -331,13 +335,45 @@ interface RelatedExperience extends StrapiExperience {
   relationScore: number;
 }
 
+function formatCulturalSystemMapping(mapping: CulturalWorldSystemMapping) {
+  return [mapping.culturalSystem, mapping.secondaryCulturalSystem].filter(Boolean).join(' / ');
+}
+
 function buildSystemMappingIndex(mappings: CulturalWorldSystemMapping[] = []) {
-  return new Map(
-    mappings.map((mapping) => [
-      mapping.experienceTitle.trim().toLowerCase(),
-      mapping.culturalSystem,
-    ])
-  );
+  const bySlug = new Map<string, string>();
+  const byTitle = new Map<string, string>();
+
+  for (const mapping of mappings) {
+    const label = formatCulturalSystemMapping(mapping);
+    if (!label) continue;
+
+    if (mapping.experienceSlug) {
+      bySlug.set(mapping.experienceSlug.trim().toLowerCase(), label);
+    }
+
+    if (mapping.experienceTitle) {
+      byTitle.set(mapping.experienceTitle.trim().toLowerCase(), label);
+    }
+  }
+
+  return { bySlug, byTitle };
+}
+
+function resolveCulturalSystemMapping(
+  experience: Pick<StrapiExperience, 'slug' | 'title'>,
+  systemMappingIndex: ReturnType<typeof buildSystemMappingIndex>
+) {
+  const slugKey = experience.slug?.trim().toLowerCase();
+  if (slugKey && systemMappingIndex.bySlug.has(slugKey)) {
+    return systemMappingIndex.bySlug.get(slugKey);
+  }
+
+  const titleKey = experience.title?.trim().toLowerCase();
+  if (titleKey && systemMappingIndex.byTitle.has(titleKey)) {
+    return systemMappingIndex.byTitle.get(titleKey);
+  }
+
+  return undefined;
 }
 
 function buildRelatedExperiences(
@@ -674,6 +710,7 @@ export async function renderCulturalWorldDetailPage(slug: string, locale: SiteLo
     notFound();
   }
   const localContent = getCulturalWorldContent(slug, locale);
+  const systemsContent = getCulturalWorldSystems(slug, locale);
   const [destination, allExperiences] = await Promise.all([
     fetchDestination(slug, locale),
     fetchAllExperiences(locale),
@@ -764,7 +801,7 @@ export async function renderCulturalWorldDetailPage(slug: string, locale: SiteLo
     mergedDestination.cover_image?.alternativeText ||
     mergedDestination.name ||
     'Cultural world cover image';
-  const systemMappingIndex = buildSystemMappingIndex(localContent?.systemMappings ?? []);
+  const systemMappingIndex = buildSystemMappingIndex(systemsContent?.systemMappings ?? []);
   const editorialSections = sections.map((section, index) => {
     const body = renderBodyContent(section.body);
     if (!body) return null;
@@ -954,7 +991,7 @@ export async function renderCulturalWorldDetailPage(slug: string, locale: SiteLo
         </>
       )}
 
-      {localContent?.culturalSystems?.length ? (
+      {systemsContent?.culturalSystems?.length ? (
         <>
           <section
             className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-24"
@@ -969,10 +1006,10 @@ export async function renderCulturalWorldDetailPage(slug: string, locale: SiteLo
                 className="font-display font-light text-white leading-tight mb-10"
                 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.8rem)' }}
               >
-                The cultural systems that structure this world.
+                {dictionary.culturalWorlds.culturalSystemsSubheading}
               </h2>
               <ul className="space-y-6">
-                {localContent.culturalSystems.map((system, index) => (
+                {systemsContent.culturalSystems.map((system, index) => (
                   <li
                     key={`${mergedDestination.slug || 'world'}-system-${index}`}
                     className="flex gap-4 text-white/65 font-body font-light text-base leading-relaxed"
@@ -1039,14 +1076,13 @@ export async function renderCulturalWorldDetailPage(slug: string, locale: SiteLo
                           {experience.short_description}
                         </p>
                       )}
-                      {experience.title &&
-                      systemMappingIndex.has(experience.title.trim().toLowerCase()) ? (
+                      {resolveCulturalSystemMapping(experience, systemMappingIndex) ? (
                         <p className="mb-3.5 text-white/42 font-body text-[0.65rem] tracking-[0.11em] uppercase leading-relaxed">
                           <span className="block">
                             {dictionary.culturalWorlds.connectedCulturalSystem}
                           </span>
                           <span className="mt-1 block text-white/58 tracking-[0.09em]">
-                            {systemMappingIndex.get(experience.title.trim().toLowerCase())}
+                            {resolveCulturalSystemMapping(experience, systemMappingIndex)}
                           </span>
                         </p>
                       ) : null}

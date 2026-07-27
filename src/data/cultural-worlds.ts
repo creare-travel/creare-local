@@ -12,7 +12,8 @@ export interface CulturalWorldLink {
 }
 
 export interface CulturalWorldSystemMapping {
-  experienceTitle: string;
+  experienceTitle?: string;
+  experienceSlug?: string;
   culturalSystem: string;
   secondaryCulturalSystem?: string;
 }
@@ -38,6 +39,11 @@ export interface CulturalWorldContent {
   systemMappings: CulturalWorldSystemMapping[];
   furtherReading: CulturalWorldLink[];
   cta: CulturalWorldCta;
+}
+
+export interface CulturalWorldSystemsContent {
+  culturalSystems: string[];
+  systemMappings: CulturalWorldSystemMapping[];
 }
 
 export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
@@ -73,15 +79,17 @@ export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
       },
     ],
     culturalSystems: [
-      'Bosphorus Maritime Culture',
+      'Istanbul Maritime Culture',
       'Ottoman Culinary Memory',
       'Palace Memory',
       'Byzantine Subterranean Heritage',
       'Contemporary Craft Traditions',
+      'Istanbul Performance & Salon Culture',
     ],
     systemMappings: [
       {
-        experienceTitle: 'Imperial Flavors™',
+        experienceSlug: 'imperial-flavors-culinary-atelier',
+        experienceTitle: 'Imperial Flavors™ — Culinary Atelier',
         culturalSystem: 'Ottoman Culinary Memory',
       },
       {
@@ -89,24 +97,29 @@ export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
         culturalSystem: 'Ottoman Culinary Memory',
       },
       {
+        experienceSlug: 'floating-salon-d-opera',
         experienceTitle: "Floating Salon d'Opera™",
-        culturalSystem: 'Bosphorus Maritime Culture',
+        culturalSystem: 'Istanbul Performance & Salon Culture',
+        secondaryCulturalSystem: 'Istanbul Maritime Culture',
       },
       {
         experienceTitle: 'Bosphorus at Dawn',
-        culturalSystem: 'Bosphorus Maritime Culture',
+        culturalSystem: 'Istanbul Maritime Culture',
       },
       {
-        experienceTitle: 'Beylerbeyi 1869™',
+        experienceSlug: 'beylerbeyi-1869-empire-interrupted',
+        experienceTitle: 'Beylerbeyi 1869™ — Empire, Interrupted',
         culturalSystem: 'Palace Memory',
       },
       {
+        experienceSlug: 'the-salon-of-hands',
         experienceTitle: 'The Salon of Hands™',
         culturalSystem: 'Contemporary Craft Traditions',
       },
       {
+        experienceSlug: 'golden-horn-regatta',
         experienceTitle: 'Golden Horn Regatta™',
-        culturalSystem: 'Bosphorus Maritime Culture',
+        culturalSystem: 'Istanbul Maritime Culture',
       },
       {
         experienceTitle: 'Byzantine Underground',
@@ -167,7 +180,8 @@ export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
     ],
     systemMappings: [
       {
-        experienceTitle: 'Table to Farm',
+        experienceSlug: 'table-to-farm-bodrum',
+        experienceTitle: 'Table to Farm Bodrum™',
         culturalSystem: 'Aegean Cultivation Traditions',
         secondaryCulturalSystem: 'Peninsula Table Culture',
       },
@@ -284,6 +298,74 @@ export const CULTURAL_WORLD_CONTENT: Record<string, CulturalWorldContent> = {
   },
 };
 
+const TR_CULTURAL_WORLD_SYSTEMS: Record<string, CulturalWorldSystemsContent> = {
+  cappadocia: {
+    culturalSystems: [
+      'Volkanik Coğrafya ve Uygarlık',
+      'Yeraltı Yerleşim Ağları',
+      'Anadolu Manastır Mirası',
+      'Bizans Sürekliliği',
+      'Anadolu Zanaat Hafızası',
+    ],
+    systemMappings: [],
+  },
+  istanbul: {
+    culturalSystems: [
+      'İstanbul Denizcilik Kültürü',
+      'Osmanlı Mutfak Hafızası',
+      'Saray Hafızası',
+      'Bizans Yeraltı Mirası',
+      'Çağdaş Zanaat Gelenekleri',
+      'İstanbul Salon ve Performans Kültürü',
+    ],
+    systemMappings: [
+      {
+        experienceSlug: 'imperial-flavors-culinary-atelier',
+        experienceTitle: 'İmparatorluk Lezzetleri™ — Mutfak Atölyesi',
+        culturalSystem: 'Osmanlı Mutfak Hafızası',
+      },
+      {
+        experienceSlug: 'floating-salon-d-opera',
+        experienceTitle: 'Yüzen Opera™',
+        culturalSystem: 'İstanbul Salon ve Performans Kültürü',
+        secondaryCulturalSystem: 'İstanbul Denizcilik Kültürü',
+      },
+      {
+        experienceSlug: 'golden-horn-regatta',
+        experienceTitle: 'Altın Boynuz Regattası™',
+        culturalSystem: 'İstanbul Denizcilik Kültürü',
+      },
+      {
+        experienceSlug: 'beylerbeyi-1869-empire-interrupted',
+        experienceTitle: 'Beylerbeyi 1869™ — Kesintiye Uğrayan İmparatorluk',
+        culturalSystem: 'Saray Hafızası',
+      },
+      {
+        experienceSlug: 'the-salon-of-hands',
+        experienceTitle: 'Ellerin İzinde™',
+        culturalSystem: 'Çağdaş Zanaat Gelenekleri',
+      },
+    ],
+  },
+  bodrum: {
+    culturalSystems: [
+      'Halikarnassos Arkeolojik Hafızası',
+      'Ege Denizcilik Kültürü',
+      'Yarımada Sofra Kültürü',
+      'Ege Tarım Gelenekleri',
+      'Edebi Bodrum',
+    ],
+    systemMappings: [
+      {
+        experienceSlug: 'table-to-farm-bodrum',
+        experienceTitle: 'Topraktan Sofraya Bodrum™',
+        culturalSystem: 'Ege Tarım Gelenekleri',
+        secondaryCulturalSystem: 'Yarımada Sofra Kültürü',
+      },
+    ],
+  },
+};
+
 export function getCulturalWorldContent(
   slug?: string,
   locale: SiteLocale = DEFAULT_SITE_LOCALE
@@ -291,4 +373,20 @@ export function getCulturalWorldContent(
   if (!canUseEnglishFallback(locale)) return null;
   if (!slug) return null;
   return CULTURAL_WORLD_CONTENT[slug] ?? null;
+}
+
+export function getCulturalWorldSystems(
+  slug?: string,
+  locale: SiteLocale = DEFAULT_SITE_LOCALE
+): CulturalWorldSystemsContent | null {
+  if (!slug) return null;
+  if (locale === 'tr') return TR_CULTURAL_WORLD_SYSTEMS[slug] ?? null;
+
+  const content = getCulturalWorldContent(slug, locale);
+  if (!content) return null;
+
+  return {
+    culturalSystems: content.culturalSystems,
+    systemMappings: content.systemMappings,
+  };
 }
