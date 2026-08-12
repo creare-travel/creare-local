@@ -111,6 +111,10 @@ const FEATURED_ESSAY_SLUGS = [
   'bodrum-beyond-the-coast-where-the-aegean-slows-down',
 ] as const;
 
+// Preserve the one established CMS-backed cover while static Insights remain
+// the listing presentation authority during the migration window.
+const STATIC_INSIGHT_CMS_COVER_ALLOWLIST = new Set(['private-life-of-istanbul']);
+
 const CULTURAL_WORLD_ESSAY_SLUGS = [
   'private-experiences-bodrum-beyond-the-marina',
   'cappadocia-at-first-light',
@@ -292,13 +296,16 @@ function mergeInsights(
 
   strapiItems?.forEach((item) => {
     const existing = bySlug.get(item.slug);
+    const useCmsCover = !existing || STATIC_INSIGHT_CMS_COVER_ALLOWLIST.has(item.slug);
     const merged = {
       ...(existing ?? item),
       ...item,
       excerpt: item.excerpt || existing?.excerpt || '',
       destinationName: item.destinationName ?? existing?.destinationName ?? null,
-      coverImageUrl: item.coverImageUrl ?? existing?.coverImageUrl,
-      coverImage: item.coverImage ?? existing?.coverImage,
+      coverImageUrl: useCmsCover
+        ? (item.coverImageUrl ?? existing?.coverImageUrl)
+        : existing?.coverImageUrl,
+      coverImage: useCmsCover ? (item.coverImage ?? existing?.coverImage) : existing?.coverImage,
     };
 
     if (!existing && !cmsOnlySlugs.includes(item.slug)) {

@@ -266,9 +266,8 @@ async function fetchExperiencesBySlugs(
   params.set('fields[2]', 'short_description');
   params.set('fields[3]', 'category');
   params.set('fields[4]', 'duration');
-  params.set('fields[5]', 'location_label');
-  params.set('fields[6]', 'visibility_status');
-  params.set('fields[7]', 'publishedAt');
+  params.set('fields[5]', 'visibility_status');
+  params.set('fields[6]', 'publishedAt');
   params.set('populate[cover_image]', 'true');
   params.set('populate[destination]', 'true');
   params.set('pagination[pageSize]', String(uniqueSlugs.length));
@@ -345,6 +344,7 @@ const resolveInsight = cache(async function resolveInsight(
 ): Promise<ResolvedInsight | null> {
   const strapiInsight = await fetchInsight(slug, locale);
   const staticInsight = buildStaticInsight(slug, locale);
+  const staticRelatedExperienceSlugs = getInsightBySlug(slug, locale)?.relatedExperiences ?? [];
 
   const normalizedStrapiDestination =
     strapiInsight?.destination?.slug && isCanonicalCulturalWorldSlug(strapiInsight.destination.slug)
@@ -363,6 +363,10 @@ const resolveInsight = cache(async function resolveInsight(
         experience.destination
       ),
     }));
+    const fallbackExperiences =
+      strapiExperiences.length === 0
+        ? await fetchExperiencesBySlugs(staticRelatedExperienceSlugs, locale)
+        : [];
 
     return {
       ...staticInsight,
@@ -372,17 +376,13 @@ const resolveInsight = cache(async function resolveInsight(
       excerpt: strapiInsight.excerpt || staticInsight?.excerpt,
       content: strapiInsight.content || staticInsight?.content,
       destination: normalizedStrapiDestination || staticInsight?.destination || null,
-      experiences:
-        strapiExperiences.length > 0 ? strapiExperiences : (staticInsight?.experiences ?? []),
+      experiences: strapiExperiences.length > 0 ? strapiExperiences : fallbackExperiences,
       source: 'strapi',
     };
   }
 
   if (staticInsight) {
-    const staticExperiences = await fetchExperiencesBySlugs(
-      getInsightBySlug(slug, locale)?.relatedExperiences ?? [],
-      locale
-    );
+    const staticExperiences = await fetchExperiencesBySlugs(staticRelatedExperienceSlugs, locale);
 
     return {
       ...staticInsight,
