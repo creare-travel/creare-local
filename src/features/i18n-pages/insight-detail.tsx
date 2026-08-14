@@ -433,8 +433,7 @@ async function fetchInsightsBySlugs(
   params.set('fields[0]', 'slug');
   params.set('fields[1]', 'title');
   params.set('fields[2]', 'excerpt');
-  params.set('fields[3]', 'visibility_status');
-  params.set('fields[4]', 'publishedAt');
+  params.set('fields[3]', 'publishedAt');
   params.set('pagination[pageSize]', String(uniqueSlugs.length));
 
   try {

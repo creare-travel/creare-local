@@ -56,6 +56,13 @@ const expectedEnBaselineOrder = [
   'what-makes-an-experience-truly-private',
 ] as const;
 
+const expectedBatchARelation = {
+  sourceSlug: 'private-experiences-istanbul-what-access-really-means',
+  targetSlug: 'private-life-of-istanbul',
+  targetPath: '/tr/insights/private-life-of-istanbul',
+} as const;
+const expectedRelatedLinkCounts = [1, 11, 30] as const;
+
 const migrationSlugs = insights
   .map((insight) => insight.slug)
   .filter((slug) => slug !== PRIVATE_LIFE_INSIGHT_SLUG);
@@ -240,11 +247,25 @@ for (const slug of migrationSlugs) {
 }
 
 const relatedLinkCounts: number[] = [];
+const relatedLinksByBatch: Array<
+  Array<{ sourceSlug: string; targetSlug: string; targetPath: string }>
+> = [];
+const unpublishedRelatedLinkCounts: number[] = [];
+
+assert.equal(
+  getStaticInsightIdentity(expectedBatchARelation.sourceSlug)?.relatedInsightSlugs.includes(
+    expectedBatchARelation.targetSlug
+  ),
+  true,
+  'Batch A source must retain the private-life related Insight identity'
+);
+
 for (const publishedMigrationCount of [5, 10, 15]) {
   const publishedSlugs = new Set([
     PRIVATE_LIFE_INSIGHT_SLUG,
     ...migrationSlugs.slice(0, publishedMigrationCount),
   ]);
+  const unpublishedMigrationSlugs = new Set(migrationSlugs.slice(publishedMigrationCount));
   const publishedCmsItems = [...publishedSlugs].map((slug) => ({
     slug,
     title: `TR CMS TITLE: ${slug}`,
@@ -255,6 +276,8 @@ for (const publishedMigrationCount of [5, 10, 15]) {
   assert.equal(new Set(partialListing.map((item) => item.slug)).size, partialListing.length);
 
   let relatedLinkCount = 0;
+  let unpublishedRelatedLinkCount = 0;
+  const relatedLinks: Array<{ sourceSlug: string; targetSlug: string; targetPath: string }> = [];
   for (const currentSlug of publishedSlugs) {
     if (currentSlug === PRIVATE_LIFE_INSIGHT_SLUG) continue;
     const intendedSlugs = getStaticInsightIdentity(currentSlug)?.relatedInsightSlugs ?? [];
@@ -266,17 +289,34 @@ for (const publishedMigrationCount of [5, 10, 15]) {
       `Published-only related Insight filtering failed for ${currentSlug}`
     );
     relatedItems.forEach((item) => {
-      assert.equal(localizePathname(`/insights/${item.slug}`, 'tr'), `/tr/insights/${item.slug}`);
+      const targetPath = localizePathname(`/insights/${item.slug}`, 'tr');
+      assert.equal(targetPath, `/tr/insights/${item.slug}`);
       assert.equal(publishedSlugs.has(item.slug), true, `TR 404 link generated for ${item.slug}`);
+      if (!publishedSlugs.has(item.slug) || unpublishedMigrationSlugs.has(item.slug)) {
+        unpublishedRelatedLinkCount += 1;
+      }
+      relatedLinks.push({ sourceSlug: currentSlug, targetSlug: item.slug, targetPath });
     });
     relatedLinkCount += relatedItems.length;
   }
   relatedLinkCounts.push(relatedLinkCount);
+  relatedLinksByBatch.push(relatedLinks);
+  unpublishedRelatedLinkCounts.push(unpublishedRelatedLinkCount);
+
+  assert.equal(
+    unpublishedRelatedLinkCount,
+    0,
+    `Publication batch ${publishedMigrationCount} generated an unpublished related Insight link`
+  );
 }
 
 assert.ok(relatedLinkCounts[1] >= relatedLinkCounts[0]);
 assert.ok(relatedLinkCounts[2] >= relatedLinkCounts[1]);
 assert.ok(relatedLinkCounts[2] > relatedLinkCounts[0]);
+assert.deepEqual(relatedLinkCounts, [...expectedRelatedLinkCounts]);
+assert.equal(relatedLinkCounts[0], 1, 'Batch A must render exactly one related Insight link');
+assert.deepEqual(relatedLinksByBatch[0], [expectedBatchARelation]);
+assert.deepEqual(unpublishedRelatedLinkCounts, [0, 0, 0]);
 
 const listingSource = readFileSync(
   join(process.cwd(), 'src/features/i18n-pages/insights.tsx'),
@@ -285,6 +325,10 @@ const listingSource = readFileSync(
 const detailSource = readFileSync(
   join(process.cwd(), 'src/features/i18n-pages/insight-detail.tsx'),
   'utf8'
+);
+const relatedInsightFetchSource = detailSource.slice(
+  detailSource.indexOf('async function fetchInsightsBySlugs'),
+  detailSource.indexOf('async function buildRelatedEssayReferences')
 );
 
 assert.match(listingSource, /if \(!canUseEnglishFallback\(locale\)\) return \[\];/);
@@ -297,6 +341,10 @@ assert.match(
   /useMigratedTrExperienceIdentity \? \[\.\.\.\(identity\?\.relatedInsightSlugs \?\? \[\]\)\] : undefined/
 );
 assert.match(detailSource, /const publishedInsights = await fetchInsightsBySlugs/);
+assert.doesNotMatch(relatedInsightFetchSource, /visibility_status/);
+assert.match(relatedInsightFetchSource, /params\.set\('status', 'published'\)/);
+assert.match(relatedInsightFetchSource, /params\.set\('fields\[3\]', 'publishedAt'\)/);
+assert.match(relatedInsightFetchSource, /\.filter\(\(item\) => isPublicInsightRecord\(item\)\)/);
 assert.match(detailSource, /getRelatedEssaysSectionAriaLabel\(locale,/);
 assert.match(detailSource, /getRelatedEssayLinkAriaLabel\(/);
 assert.match(detailSource, /coverImageUrl && \(/);
@@ -309,4 +357,6 @@ console.info('TR Insight parity assertions passed', {
   renderedRealCovers: 1,
   batchListingCounts: [6, 11, 16],
   relatedLinkCounts,
+  exactBatchARelation: expectedBatchARelation,
+  unpublishedRelatedLinkCounts,
 });
