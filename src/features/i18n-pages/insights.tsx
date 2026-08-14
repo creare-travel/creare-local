@@ -2,8 +2,9 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
-import { insights } from '@/data/insights';
+import { insights, isCanonicalCulturalWorldSlug } from '@/data/insights';
 import { filterPublicInsights } from '@/lib/canonical-gates';
+import { isRenderableEditorialImage, type EditorialImageLike } from '@/lib/editorial-image';
 import {
   buildMetadataAlternates,
   buildOpenGraph,
@@ -16,6 +17,14 @@ import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { localizePathname } from '@/lib/i18n/pathname';
+import {
+  CULTURAL_WORLD_INSIGHT_SLUGS,
+  EDITORIAL_INSIGHT_SLUGS,
+  FEATURED_INSIGHT_SLUGS,
+  getCulturalWorldLabel,
+  getInsightIdentityDestination,
+  orderInsightItemsForLocale,
+} from '@/lib/insights/parity';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -44,7 +53,14 @@ export const metadata: Metadata = {
   }),
 };
 
-const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
+interface InsightCoverImage extends EditorialImageLike {
+  alternativeText?: string;
+}
+
+interface StrapiMediaEntity {
+  id?: number;
+  attributes?: InsightCoverImage;
+}
 
 interface StrapiInsight {
   id: number;
@@ -53,17 +69,13 @@ interface StrapiInsight {
     slug?: string;
     excerpt?: string;
     cover_image?: {
-      data?: {
-        attributes?: {
-          url?: string;
-          alternativeText?: string;
-        };
-      };
+      data?: StrapiMediaEntity | StrapiMediaEntity[];
     };
     destination?: {
       data?: {
         attributes?: {
           name?: string;
+          slug?: string;
         };
       };
     };
@@ -74,18 +86,10 @@ interface StrapiInsight {
   excerpt?: string;
   visibility_status?: string;
   publishedAt?: string | null;
-  cover_image?:
-    | {
-        url?: string;
-        alternativeText?: string;
-      }
-    | {
-        url?: string;
-        alternativeText?: string;
-      }[]
-    | null;
+  cover_image?: InsightCoverImage | InsightCoverImage[] | null;
   destination?: {
     name?: string;
+    slug?: string;
   } | null;
 }
 
@@ -99,37 +103,11 @@ interface NormalizedInsight {
     alternativeText?: string;
   };
   destinationName: string | null;
+  culturalWorldSlug?: CulturalWorldGroupKey;
 }
 
 type InsightSectionKey = 'featured' | 'cultural-world' | 'editorial' | 'archive';
 type CulturalWorldGroupKey = 'bodrum' | 'cappadocia' | 'istanbul';
-
-const FEATURED_ESSAY_SLUGS = [
-  'private-experiences-istanbul-what-access-really-means',
-  'private-life-of-istanbul',
-  'cappadocia-without-balloons-a-different-kind-of-silence',
-  'bodrum-beyond-the-coast-where-the-aegean-slows-down',
-] as const;
-
-// Preserve the one established CMS-backed cover while static Insights remain
-// the listing presentation authority during the migration window.
-const STATIC_INSIGHT_CMS_COVER_ALLOWLIST = new Set(['private-life-of-istanbul']);
-
-const CULTURAL_WORLD_ESSAY_SLUGS = [
-  'private-experiences-bodrum-beyond-the-marina',
-  'cappadocia-at-first-light',
-  'cappadocia-without-tours-moving-outside-the-routes',
-  'bodrum-without-beach-clubs-a-different-rhythm',
-  'istanbul-without-the-crowds-where-the-city-still-breathes',
-  'private-experiences-cappadocia-silence-space-access',
-] as const;
-
-const EDITORIAL_ESSAY_SLUGS = [
-  'what-makes-an-experience-truly-private',
-  'what-exclusive-travel-actually-means',
-  'why-most-luxury-travel-is-actually-mass-tourism',
-  'the-aegean-as-a-cultural-argument',
-] as const;
 
 const SECTION_INTROS: Record<
   InsightSectionKey,
@@ -163,33 +141,33 @@ const SECTION_INTROS: Record<
 
 const CULTURAL_WORLD_GROUP_ORDER: CulturalWorldGroupKey[] = ['bodrum', 'cappadocia', 'istanbul'];
 
-const CULTURAL_WORLD_GROUP_LABELS: Record<CulturalWorldGroupKey, string> = {
-  bodrum: 'Bodrum',
-  cappadocia: 'Cappadocia',
-  istanbul: 'Istanbul',
-};
-
-function resolveFirstInsightCoverImage(item: StrapiInsight): {
-  url?: string;
-  alternativeText?: string;
-} | null {
+function resolveFirstInsightCoverImage(item: StrapiInsight): InsightCoverImage | null {
   const attributeImage = item.attributes?.cover_image;
+  const attributeImageData = attributeImage?.data;
 
-  if (Array.isArray(attributeImage?.data)) {
-    const first = attributeImage.data[0];
+  if (Array.isArray(attributeImageData)) {
+    const first = attributeImageData[0];
     const attrs = first?.attributes;
     if (attrs?.url) {
       return {
+        id: first.id,
+        name: attrs.name,
         url: attrs.url,
         alternativeText: attrs.alternativeText,
       };
     }
   }
 
-  if (attributeImage?.data?.attributes?.url) {
+  if (
+    attributeImageData &&
+    !Array.isArray(attributeImageData) &&
+    attributeImageData.attributes?.url
+  ) {
     return {
-      url: attributeImage.data.attributes.url,
-      alternativeText: attributeImage.data.attributes.alternativeText,
+      id: attributeImageData.id,
+      name: attributeImageData.attributes.name,
+      url: attributeImageData.attributes.url,
+      alternativeText: attributeImageData.attributes.alternativeText,
     };
   }
 
@@ -197,6 +175,8 @@ function resolveFirstInsightCoverImage(item: StrapiInsight): {
     const first = item.cover_image[0];
     if (first?.url) {
       return {
+        id: first.id,
+        name: first.name,
         url: first.url,
         alternativeText: first.alternativeText,
       };
@@ -210,6 +190,8 @@ function resolveFirstInsightCoverImage(item: StrapiInsight): {
     item.cover_image.url
   ) {
     return {
+      id: item.cover_image.id,
+      name: item.cover_image.name,
       url: item.cover_image.url,
       alternativeText: item.cover_image.alternativeText,
     };
@@ -218,7 +200,7 @@ function resolveFirstInsightCoverImage(item: StrapiInsight): {
   return null;
 }
 
-function normalizeInsight(item: StrapiInsight): NormalizedInsight | null {
+function normalizeInsight(item: StrapiInsight, locale: SiteLocale): NormalizedInsight | null {
   // Support both Strapi v4 (attributes) and v5 (flat)
   const attrs = item.attributes ?? item;
   const slug = canonicalInsightSlug(attrs?.slug);
@@ -227,19 +209,22 @@ function normalizeInsight(item: StrapiInsight): NormalizedInsight | null {
 
   const excerpt = attrs?.excerpt ?? '';
 
-  // cover_image — fallback to owned placeholder if missing
-  const coverImage = resolveFirstInsightCoverImage(item);
-  const coverImageUrl = coverImage?.url ? mediaUrl(coverImage.url) : IMAGE_FALLBACK;
+  const coverCandidate = resolveFirstInsightCoverImage(item);
+  const coverImage = isRenderableEditorialImage(coverCandidate) ? coverCandidate : null;
 
-  // destination.name — safe optional chaining
-  const destinationName =
-    item.attributes?.destination?.data?.attributes?.name || item.destination?.name || null;
+  const cmsDestination = item.attributes?.destination?.data?.attributes ?? item.destination;
+  const cmsCulturalWorldSlug = isCanonicalCulturalWorldSlug(cmsDestination?.slug)
+    ? cmsDestination.slug
+    : undefined;
+  const identityDestination = getInsightIdentityDestination(slug, locale);
+  const culturalWorldSlug = cmsCulturalWorldSlug ?? identityDestination?.slug;
+  const destinationName = cmsDestination?.name ?? identityDestination?.name ?? null;
 
   return {
     slug,
     title,
     excerpt,
-    coverImageUrl,
+    coverImageUrl: coverImage?.url ? mediaUrl(coverImage.url) : undefined,
     coverImage: coverImage
       ? {
           url: coverImage.url,
@@ -247,19 +232,20 @@ function normalizeInsight(item: StrapiInsight): NormalizedInsight | null {
         }
       : undefined,
     destinationName,
+    culturalWorldSlug,
   };
 }
 
 async function fetchStrapiInsights(
   locale: SiteLocale = DEFAULT_SITE_LOCALE
 ): Promise<NormalizedInsight[] | null> {
-  const path = '/api/insights?populate=*';
+  const path = '/api/insights?status=published&populate=*';
   try {
     const json = await fetchStrapi(path, { locale });
     const items: StrapiInsight[] = json?.data ?? [];
     if (!items.length) return null;
     const normalized = filterPublicInsights(items)
-      .map(normalizeInsight)
+      .map((item) => normalizeInsight(item, locale))
       .filter(Boolean) as NormalizedInsight[];
     return normalized.length ? normalized : null;
   } catch (error) {
@@ -284,28 +270,28 @@ function buildStaticInsights(locale: SiteLocale = DEFAULT_SITE_LOCALE): Normaliz
     destinationName: insight.location
       ? insight.location.charAt(0).toUpperCase() + insight.location.slice(1)
       : null,
+    culturalWorldSlug: insight.culturalWorldSlug,
   }));
 }
 
 function mergeInsights(
   staticItems: NormalizedInsight[],
-  strapiItems: NormalizedInsight[] | null
+  strapiItems: NormalizedInsight[] | null,
+  locale: SiteLocale
 ): NormalizedInsight[] {
   const bySlug = new Map(staticItems.map((item) => [item.slug, item]));
   const cmsOnlySlugs: string[] = [];
 
   strapiItems?.forEach((item) => {
     const existing = bySlug.get(item.slug);
-    const useCmsCover = !existing || STATIC_INSIGHT_CMS_COVER_ALLOWLIST.has(item.slug);
     const merged = {
       ...(existing ?? item),
       ...item,
       excerpt: item.excerpt || existing?.excerpt || '',
       destinationName: item.destinationName ?? existing?.destinationName ?? null,
-      coverImageUrl: useCmsCover
-        ? (item.coverImageUrl ?? existing?.coverImageUrl)
-        : existing?.coverImageUrl,
-      coverImage: useCmsCover ? (item.coverImage ?? existing?.coverImage) : existing?.coverImage,
+      culturalWorldSlug: item.culturalWorldSlug ?? existing?.culturalWorldSlug,
+      coverImageUrl: item.coverImageUrl ?? existing?.coverImageUrl,
+      coverImage: item.coverImage ?? existing?.coverImage,
     };
 
     if (!existing && !cmsOnlySlugs.includes(item.slug)) {
@@ -315,28 +301,31 @@ function mergeInsights(
     bySlug.set(item.slug, merged);
   });
 
-  return [
-    ...staticItems.map((item) => bySlug.get(item.slug) ?? item),
-    ...cmsOnlySlugs.flatMap((slug) => {
-      const item = bySlug.get(slug);
-      return item ? [item] : [];
-    }),
-  ];
+  return orderInsightItemsForLocale(
+    [
+      ...staticItems.map((item) => bySlug.get(item.slug) ?? item),
+      ...cmsOnlySlugs.flatMap((slug) => {
+        const item = bySlug.get(slug);
+        return item ? [item] : [];
+      }),
+    ],
+    locale
+  );
 }
 
 function partitionInsights(items: NormalizedInsight[]) {
-  const featuredSet = new Set<string>(FEATURED_ESSAY_SLUGS);
-  const culturalWorldSet = new Set<string>(CULTURAL_WORLD_ESSAY_SLUGS);
-  const editorialSet = new Set<string>(EDITORIAL_ESSAY_SLUGS);
+  const featuredSet = new Set<string>(FEATURED_INSIGHT_SLUGS);
+  const culturalWorldSet = new Set<string>(CULTURAL_WORLD_INSIGHT_SLUGS);
+  const editorialSet = new Set<string>(EDITORIAL_INSIGHT_SLUGS);
 
   const pickByOrder = (slugs: readonly string[]) =>
     slugs
       .map((slug) => items.find((item) => item.slug === slug))
       .filter((item): item is NormalizedInsight => Boolean(item));
 
-  const featured = pickByOrder(FEATURED_ESSAY_SLUGS);
-  const culturalWorld = pickByOrder(CULTURAL_WORLD_ESSAY_SLUGS);
-  const editorial = pickByOrder(EDITORIAL_ESSAY_SLUGS);
+  const featured = pickByOrder(FEATURED_INSIGHT_SLUGS);
+  const culturalWorld = pickByOrder(CULTURAL_WORLD_INSIGHT_SLUGS);
+  const editorial = pickByOrder(EDITORIAL_INSIGHT_SLUGS);
   const archive = items.filter(
     (item) =>
       !featuredSet.has(item.slug) &&
@@ -436,20 +425,20 @@ function SectionHeading({ section, locale }: { section: InsightSectionKey; local
   );
 }
 
-function groupCulturalWorldEssays(items: NormalizedInsight[]) {
+function groupCulturalWorldEssays(items: NormalizedInsight[], locale: SiteLocale) {
   const grouped = new Map<CulturalWorldGroupKey, NormalizedInsight[]>(
     CULTURAL_WORLD_GROUP_ORDER.map((key) => [key, []])
   );
 
   items.forEach((item) => {
-    const key = item.destinationName?.toLowerCase() as CulturalWorldGroupKey | undefined;
+    const key = item.culturalWorldSlug;
     if (!key || !grouped.has(key)) return;
     grouped.get(key)?.push(item);
   });
 
   return CULTURAL_WORLD_GROUP_ORDER.map((key) => ({
     key,
-    label: CULTURAL_WORLD_GROUP_LABELS[key],
+    label: getCulturalWorldLabel(key, locale),
     items: grouped.get(key) ?? [],
   })).filter((group) => group.items.length > 0);
 }
@@ -461,7 +450,7 @@ function CulturalWorldEssayGroups({
   items: NormalizedInsight[];
   locale: SiteLocale;
 }) {
-  const groups = groupCulturalWorldEssays(items);
+  const groups = groupCulturalWorldEssays(items, locale);
   if (!groups.length) return null;
 
   return (
@@ -595,7 +584,7 @@ export async function renderInsightsPage(locale: SiteLocale = DEFAULT_SITE_LOCAL
   const strapiInsights = await fetchStrapiInsights(locale);
 
   const staticInsights = buildStaticInsights(locale);
-  const displayItems = mergeInsights(staticInsights, strapiInsights);
+  const displayItems = mergeInsights(staticInsights, strapiInsights, locale);
   const sections = partitionInsights(displayItems);
   const insightsSchema = buildInsightListingGraph({
     pageId: `${buildCanonicalUrl('/insights')}#collection`,

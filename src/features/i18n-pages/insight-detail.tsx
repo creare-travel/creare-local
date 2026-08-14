@@ -18,11 +18,21 @@ import { buildCanonicalUrl, buildInsightDetailGraph } from '@/lib/schema-builder
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 import { filterPublicExperiences, isPublicInsightRecord } from '@/lib/canonical-gates';
 import { getInsightBySlug, isCanonicalCulturalWorldSlug, type Insight } from '@/data/insights';
+import { isRenderableEditorialImage } from '@/lib/editorial-image';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { buildLocalizedRouteTarget, localizePathname } from '@/lib/i18n/pathname';
+import {
+  getRelatedEssayLinkAriaLabel,
+  getRelatedEssaysSectionAriaLabel,
+  getInsightIdentityDestination,
+  getInsightIdentityLocationLabel,
+  getStaticInsightIdentity,
+  isMigratedStaticInsightSlug,
+  selectItemsBySlugOrder,
+} from '@/lib/insights/parity';
 import { getPrivateInquiryHref } from '@/lib/i18n/static-routes';
 
 interface Props {
@@ -48,6 +58,8 @@ interface StrapiInsight {
 }
 
 interface StrapiImage {
+  id?: number | string | null;
+  name?: string;
   url?: string;
   alternativeText?: string;
   formats?: {
@@ -210,6 +222,7 @@ async function fetchInsight(slug: string, locale: SiteLocale): Promise<StrapiIns
   if (!slug) return null;
   const params = new URLSearchParams();
   params.set('filters[slug][$eq]', slug);
+  params.set('status', 'published');
   params.set('populate[cover_image]', 'true');
   params.set('populate[experiences][populate][cover_image]', 'true');
   params.set('populate[experiences][populate][destination]', 'true');
@@ -223,9 +236,11 @@ async function fetchInsight(slug: string, locale: SiteLocale): Promise<StrapiIns
     const insight = raw?.attributes ? { id: raw.id, ...raw.attributes } : raw;
     if (!isPublicInsightRecord(insight)) return null;
 
+    const coverImage = normalizeMediaItem<StrapiImage>(insight.cover_image);
+
     return {
       ...insight,
-      cover_image: normalizeMediaItem<StrapiImage>(insight.cover_image),
+      cover_image: isRenderableEditorialImage(coverImage) ? coverImage : null,
       destination: normalizeSingleRelation<NonNullable<StrapiInsight['destination']>>(
         insight.destination
       ),
@@ -252,7 +267,7 @@ async function fetchInsight(slug: string, locale: SiteLocale): Promise<StrapiIns
 }
 
 async function fetchExperiencesBySlugs(
-  slugs: string[],
+  slugs: readonly string[],
   locale: SiteLocale
 ): Promise<StrapiExperience[]> {
   const uniqueSlugs = [...new Set(slugs.filter(Boolean))];
@@ -260,6 +275,7 @@ async function fetchExperiencesBySlugs(
 
   const params = new URLSearchParams();
   uniqueSlugs.forEach((slug, index) => params.set(`filters[slug][$in][${index}]`, slug));
+  params.set('status', 'published');
   params.set('filters[visibility_status][$eqi]', 'active');
   params.set('fields[0]', 'slug');
   params.set('fields[1]', 'title');
@@ -294,11 +310,10 @@ async function fetchExperiencesBySlugs(
           : null;
       })
       .filter((entry): entry is [string, StrapiExperience] => Boolean(entry));
-    const bySlug = new Map(entries);
-
-    return uniqueSlugs
-      .map((slug) => bySlug.get(slug))
-      .filter((experience): experience is StrapiExperience => Boolean(experience));
+    return selectItemsBySlugOrder(
+      uniqueSlugs,
+      entries.map(([, experience]) => experience)
+    );
   } catch (error) {
     console.error('Failed to fetch fallback related experiences from Strapi.', {
       route: '/insights/[slug]',
@@ -315,15 +330,7 @@ function buildStaticInsight(slug: string, locale: SiteLocale): ResolvedInsight |
   const insight = getInsightBySlug(slug, locale);
   if (!insight) return null;
 
-  const staticDestination =
-    insight.location &&
-    insight.culturalWorldSlug &&
-    isCanonicalCulturalWorldSlug(insight.culturalWorldSlug)
-      ? {
-          slug: insight.culturalWorldSlug,
-          name: insight.location.charAt(0).toUpperCase() + insight.location.slice(1),
-        }
-      : null;
+  const staticDestination = getInsightIdentityDestination(slug, locale);
 
   return {
     id: 0,
@@ -344,7 +351,9 @@ const resolveInsight = cache(async function resolveInsight(
 ): Promise<ResolvedInsight | null> {
   const strapiInsight = await fetchInsight(slug, locale);
   const staticInsight = buildStaticInsight(slug, locale);
-  const staticRelatedExperienceSlugs = getInsightBySlug(slug, locale)?.relatedExperiences ?? [];
+  const identity = getStaticInsightIdentity(slug);
+  const staticRelatedExperienceSlugs = identity?.relatedExperienceSlugs ?? [];
+  const identityDestination = getInsightIdentityDestination(slug, locale);
 
   const normalizedStrapiDestination =
     strapiInsight?.destination?.slug && isCanonicalCulturalWorldSlug(strapiInsight.destination.slug)
@@ -363,9 +372,12 @@ const resolveInsight = cache(async function resolveInsight(
         experience.destination
       ),
     }));
-    const fallbackExperiences =
-      strapiExperiences.length === 0
-        ? await fetchExperiencesBySlugs(staticRelatedExperienceSlugs, locale)
+    const useMigratedTrExperienceIdentity =
+      locale !== DEFAULT_SITE_LOCALE && isMigratedStaticInsightSlug(slug);
+    const identityExperiences =
+      useMigratedTrExperienceIdentity ||
+      (canUseEnglishFallback(locale) && strapiExperiences.length === 0)
+        ? await fetchExperiencesBySlugs([...staticRelatedExperienceSlugs], locale)
         : [];
 
     return {
@@ -375,8 +387,16 @@ const resolveInsight = cache(async function resolveInsight(
       slug: strapiInsight.slug || staticInsight?.slug,
       excerpt: strapiInsight.excerpt || staticInsight?.excerpt,
       content: strapiInsight.content || staticInsight?.content,
-      destination: normalizedStrapiDestination || staticInsight?.destination || null,
-      experiences: strapiExperiences.length > 0 ? strapiExperiences : fallbackExperiences,
+      destination:
+        normalizedStrapiDestination || staticInsight?.destination || identityDestination || null,
+      experiences: useMigratedTrExperienceIdentity
+        ? identityExperiences
+        : strapiExperiences.length > 0
+          ? strapiExperiences
+          : identityExperiences,
+      relatedEssays:
+        staticInsight?.relatedEssays ??
+        (useMigratedTrExperienceIdentity ? [...(identity?.relatedInsightSlugs ?? [])] : undefined),
       source: 'strapi',
     };
   }
@@ -397,34 +417,83 @@ interface RelatedEssayReference {
   slug: string;
   title: string;
   excerpt: string;
-  location: Insight['location'];
+  locationLabel?: string;
 }
 
-function buildRelatedEssayReferences(
+async function fetchInsightsBySlugs(
+  slugs: readonly string[],
+  locale: SiteLocale
+): Promise<StrapiInsight[]> {
+  const uniqueSlugs = [...new Set(slugs.filter(Boolean))];
+  if (uniqueSlugs.length === 0) return [];
+
+  const params = new URLSearchParams();
+  uniqueSlugs.forEach((slug, index) => params.set(`filters[slug][$in][${index}]`, slug));
+  params.set('status', 'published');
+  params.set('fields[0]', 'slug');
+  params.set('fields[1]', 'title');
+  params.set('fields[2]', 'excerpt');
+  params.set('fields[3]', 'visibility_status');
+  params.set('fields[4]', 'publishedAt');
+  params.set('pagination[pageSize]', String(uniqueSlugs.length));
+
+  try {
+    const json = await fetchStrapi(`/api/insights?${params.toString()}`, { locale });
+    const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
+    const publicItems = items
+      .map((item) => flattenItem<StrapiInsight>(item))
+      .filter((item) => isPublicInsightRecord(item));
+
+    return selectItemsBySlugOrder(uniqueSlugs, publicItems);
+  } catch (error) {
+    console.error('Failed to fetch published related Insights from Strapi.', {
+      route: '/insights/[slug]',
+      slugs: uniqueSlugs,
+      error,
+    });
+    return [];
+  }
+}
+
+async function buildRelatedEssayReferences(
   relatedEssaySlugs: string[] | undefined,
   currentSlug: string,
   locale: SiteLocale
-): RelatedEssayReference[] {
-  if (!canUseEnglishFallback(locale)) return [];
+): Promise<RelatedEssayReference[]> {
   if (!relatedEssaySlugs?.length) return [];
 
   const seen = new Set<string>();
-
-  return relatedEssaySlugs
-    .map((slug) => getInsightBySlug(slug, locale))
-    .filter((essay): essay is Insight => Boolean(essay))
-    .filter((essay) => essay.slug !== currentSlug)
-    .filter((essay) => {
-      if (seen.has(essay.slug)) return false;
-      seen.add(essay.slug);
+  const orderedSlugs = relatedEssaySlugs
+    .filter((slug) => slug !== currentSlug)
+    .filter((slug) => {
+      if (seen.has(slug)) return false;
+      seen.add(slug);
       return true;
     })
-    .slice(0, MAX_RELATED_ESSAYS)
+    .slice(0, MAX_RELATED_ESSAYS);
+
+  if (!canUseEnglishFallback(locale)) {
+    const publishedInsights = await fetchInsightsBySlugs(orderedSlugs, locale);
+    return publishedInsights
+      .filter((essay): essay is StrapiInsight & { slug: string; title: string } =>
+        Boolean(essay.slug && essay.title)
+      )
+      .map((essay) => ({
+        slug: essay.slug,
+        title: essay.title,
+        excerpt: essay.excerpt ?? '',
+        locationLabel: getInsightIdentityLocationLabel(essay.slug, locale),
+      }));
+  }
+
+  return orderedSlugs
+    .map((slug) => getInsightBySlug(slug, locale))
+    .filter((essay): essay is Insight => Boolean(essay))
     .map((essay) => ({
       slug: essay.slug,
       title: essay.title,
       excerpt: essay.description,
-      location: essay.location,
+      locationLabel: getInsightIdentityLocationLabel(essay.slug, locale),
     }));
 }
 
@@ -671,7 +740,10 @@ function RelatedEssayList({
   const dictionary = getDictionary(locale);
 
   return (
-    <section className="max-w-3xl mx-auto px-6 sm:px-10 mt-20" aria-label="Related essays">
+    <section
+      className="max-w-3xl mx-auto px-6 sm:px-10 mt-20"
+      aria-label={getRelatedEssaysSectionAriaLabel(locale, dictionary.common.relatedEssays)}
+    >
       <div className="border-t border-white/6 pt-12">
         <p className="font-body text-xs tracking-[0.16em] uppercase text-white/24 mb-8">
           {dictionary.common.relatedEssays}
@@ -682,11 +754,13 @@ function RelatedEssayList({
               key={essay.slug}
               href={localizePathname(`/insights/${essay.slug}`, locale)}
               className="group block border-b border-white/6 pb-6 last:border-b-0 last:pb-0"
-              aria-label={`Read related essay: ${essay.title}`}
+              aria-label={getRelatedEssayLinkAriaLabel(locale, essay.title, dictionary.common.read)}
             >
-              <p className="font-body text-[0.58rem] tracking-[0.18em] text-white/24 uppercase mb-2">
-                {essay.location.charAt(0).toUpperCase() + essay.location.slice(1)}
-              </p>
+              {essay.locationLabel && (
+                <p className="font-body text-[0.58rem] tracking-[0.18em] text-white/24 uppercase mb-2">
+                  {essay.locationLabel}
+                </p>
+              )}
               <h2 className="motion-copy-fade font-display text-xl sm:text-2xl font-light text-white leading-snug mb-2 group-hover:text-white/74 transition-colors duration-300">
                 {essay.title}
               </h2>
@@ -724,13 +798,14 @@ export async function renderInsightDetailPage(slug: string, locale: SiteLocale) 
     notFound();
   }
 
-  // Image: fallback to owned placeholder if cover_image is missing
-  const coverImageUrl = resolveImageUrl(insight.cover_image?.url);
+  const coverImageUrl = insight.cover_image?.url ? resolveImageUrl(insight.cover_image.url) : null;
   const coverImageAlt = insight.cover_image?.alternativeText || insight.title || 'Insight cover';
-  const coverBlurDataUrl = buildCinematicBlurDataUrl(coverImageUrl, {
-    atmosphere: 'dark',
-    profile: 'hero',
-  });
+  const coverBlurDataUrl = coverImageUrl
+    ? buildCinematicBlurDataUrl(coverImageUrl, {
+        atmosphere: 'dark',
+        profile: 'hero',
+      })
+    : undefined;
 
   // Destination: safe optional chaining
   const destinationName = insight.destination?.name || '';
@@ -739,7 +814,11 @@ export async function renderInsightDetailPage(slug: string, locale: SiteLocale) 
   const relatedExperiences: StrapiExperience[] = Array.isArray(insight.experiences)
     ? insight.experiences
     : [];
-  const relatedEssays = buildRelatedEssayReferences(insight.relatedEssays, insight.slug, locale);
+  const relatedEssays = await buildRelatedEssayReferences(
+    insight.relatedEssays,
+    insight.slug,
+    locale
+  );
 
   const contentNode = renderRichText(insight.content);
   const insightSchema = buildInsightDetailGraph({
@@ -784,23 +863,26 @@ export async function renderInsightDetailPage(slug: string, locale: SiteLocale) 
       {locale === DEFAULT_SITE_LOCALE && (
         <JsonLd id="insight-detail-jsonld" schema={insightSchema} />
       )}
-      {/* Hero cover image — always shown (fallback image if missing) */}
-      <div className="relative w-full h-[60vh] min-h-[360px] max-h-[600px] overflow-hidden">
-        <AppImage
-          src={coverImageUrl}
-          alt={coverImageAlt}
-          fill
-          priority
-          blurDataURL={coverBlurDataUrl}
-          atmosphere="dark"
-          deliveryProfile="hero"
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black" />
-      </div>
+      {coverImageUrl && (
+        <div className="relative w-full h-[60vh] min-h-[360px] max-h-[600px] overflow-hidden">
+          <AppImage
+            src={coverImageUrl}
+            alt={coverImageAlt}
+            fill
+            priority
+            blurDataURL={coverBlurDataUrl}
+            atmosphere="dark"
+            deliveryProfile="hero"
+            className="object-cover"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black" />
+        </div>
+      )}
 
-      <div className="max-w-2xl mx-auto px-6 sm:px-10 pt-12">
+      <div
+        className={`max-w-2xl mx-auto px-6 sm:px-10 ${coverImageUrl ? 'pt-12' : 'pt-36 sm:pt-44'}`}
+      >
         {/* Breadcrumb */}
         <nav className="mb-12" aria-label="Breadcrumb">
           <Link
