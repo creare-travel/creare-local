@@ -22,12 +22,12 @@ import { getDictionary } from '@/lib/i18n/dictionaries';
 import { buildLocalizedRouteTarget, localizePathname } from '@/lib/i18n/pathname';
 import {
   buildLocaleOwnedMetadata,
-  buildMetadataAlternates,
   buildRouteCanonicalAlternates,
   buildRouteCanonicalUrl,
   buildTwitterCard,
   getOpenGraphLocale,
   SITE_NAME,
+  stripBrandSuffix,
 } from '@/lib/seo';
 import { buildExperienceDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
@@ -1209,10 +1209,6 @@ interface PageProps {
 
 export const dynamic = 'force-dynamic';
 
-function stripBrandSuffix(title?: string | null): string | undefined {
-  return title?.replace(/\s+—\s+CREARE$/i, '').trim() || undefined;
-}
-
 function buildExperienceNotFoundMetadata(
   locale: SiteLocale,
   title: 'Experience Unavailable' | 'Experience Not Found'
@@ -1251,14 +1247,11 @@ export async function generateExperienceDetailMetadata({
 
   const strapiItem = result.item;
   const canonicalSlug = result.canonicalSlug;
-  const alternates =
-    locale === DEFAULT_SITE_LOCALE
-      ? buildMetadataAlternates(`/experiences/${canonicalSlug}`)
-      : buildRouteCanonicalAlternates({
-          family: 'experience-detail',
-          locale,
-          slug: canonicalSlug,
-        });
+  const alternates = buildRouteCanonicalAlternates({
+    family: 'experience-detail',
+    locale,
+    slug: canonicalSlug,
+  });
 
   const ogTitle = strapiItem.seo_title ?? `${strapiItem.title} — CREARE`;
   const pageTitle = stripBrandSuffix(strapiItem.seo_title) || strapiItem.title;

@@ -6,13 +6,13 @@ import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
 import {
   buildLocaleOwnedMetadata,
-  buildMetadataAlternates,
   canonicalUrl,
   buildOpenGraph,
   buildRouteCanonicalAlternates,
   buildTwitterCard,
   DEFAULT_OG_IMAGE,
   DEFAULT_OG_IMAGE_ALT,
+  stripBrandSuffix,
 } from '@/lib/seo';
 import { buildCanonicalUrl, buildInsightDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, mediaUrl } from '@/lib/strapi';
@@ -152,10 +152,6 @@ function normalizeMediaItem<T>(value: unknown): T | null {
 }
 
 const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
-
-function stripBrandSuffix(title?: string | null): string | undefined {
-  return title?.replace(/\s+—\s+Creare$/i, '').trim() || undefined;
-}
 
 function buildInsightNotFoundMetadata(locale: SiteLocale): Metadata {
   if (locale === DEFAULT_SITE_LOCALE) {
@@ -511,14 +507,11 @@ export async function generateInsightDetailMetadata({
   // SEO fallbacks: seo_title || title, seo_description || excerpt
   const title = stripBrandSuffix(insight.seo_title || insight.title) || 'Not Found';
   const description = insight.seo_description || insight.excerpt || '';
-  const alternates =
-    locale === DEFAULT_SITE_LOCALE
-      ? buildMetadataAlternates(`/insights/${canonicalSlug}`)
-      : buildRouteCanonicalAlternates({
-          family: 'insight-detail',
-          locale,
-          slug: canonicalSlug,
-        });
+  const alternates = buildRouteCanonicalAlternates({
+    family: 'insight-detail',
+    locale,
+    slug: canonicalSlug,
+  });
 
   if (locale !== DEFAULT_SITE_LOCALE) {
     return buildLocalizedInsightDetailMetadata({
@@ -820,18 +813,31 @@ export async function renderInsightDetailPage(slug: string, locale: SiteLocale) 
   );
 
   const contentNode = renderRichText(insight.content);
+  const insightPath = localizePathname(`/insights/${insight.slug}`, locale);
+  const insightUrl = canonicalUrl(insightPath);
+  const insightsPath = localizePathname('/insights', locale);
+  const homePath = localizePathname('/', locale);
+  const destinationUrl = insight.destination?.slug
+    ? canonicalUrl(localizePathname(`/cultural-worlds/${insight.destination.slug}`, locale))
+    : undefined;
   const insightSchema = buildInsightDetailGraph({
-    pageId: `${canonicalUrl(`/insights/${insight.slug}`)}#webpage`,
-    articleId: `${canonicalUrl(`/insights/${insight.slug}`)}#article`,
-    imageId: `${canonicalUrl(`/insights/${insight.slug}`)}#image`,
-    breadcrumbId: `${canonicalUrl(`/insights/${insight.slug}`)}#breadcrumbs`,
-    path: canonicalUrl(`/insights/${insight.slug}`),
+    pageId: `${insightUrl}#webpage`,
+    articleId: `${insightUrl}#article`,
+    imageId: `${insightUrl}#image`,
+    breadcrumbId: `${insightUrl}#breadcrumbs`,
+    path: insightUrl,
     breadcrumbs: [
-      { name: 'Home', url: buildCanonicalUrl('/') },
-      { name: 'Insights', url: buildCanonicalUrl('/insights') },
+      {
+        name: locale === DEFAULT_SITE_LOCALE ? 'Home' : dictionary.common.home,
+        url: buildCanonicalUrl(homePath),
+      },
+      {
+        name: locale === DEFAULT_SITE_LOCALE ? 'Insights' : dictionary.insights.title,
+        url: buildCanonicalUrl(insightsPath),
+      },
       {
         name: insight.title,
-        url: canonicalUrl(`/insights/${insight.slug}`),
+        url: insightUrl,
         slugFallback: insight.slug,
       },
     ],
@@ -842,26 +848,30 @@ export async function renderInsightDetailPage(slug: string, locale: SiteLocale) 
     image: insight.cover_image ?? undefined,
     destinationName,
     destinationSlug: insight.destination?.slug,
+    destinationUrl: locale === DEFAULT_SITE_LOCALE ? undefined : destinationUrl,
+    inLanguage: locale === DEFAULT_SITE_LOCALE ? undefined : 'tr-TR',
     relatedEssays: relatedEssays.map((essay) => ({
       title: essay.title,
-      url: canonicalUrl(`/insights/${essay.slug}`),
+      url: canonicalUrl(localizePathname(`/insights/${essay.slug}`, locale)),
       description: essay.excerpt,
     })),
     relatedExperiences: relatedExperiences
       .filter((experience) => experience.slug && experience.title)
       .map((experience) => ({
+        id:
+          locale === DEFAULT_SITE_LOCALE
+            ? undefined
+            : `${canonicalUrl(localizePathname(`/experiences/${experience.slug}`, locale))}#service`,
         title: experience.title,
         slug: experience.slug,
-        url: canonicalUrl(`/experiences/${experience.slug}`),
+        url: canonicalUrl(localizePathname(`/experiences/${experience.slug}`, locale)),
         description: experience.short_description,
       })),
   });
 
   return (
     <main className="min-h-screen bg-black text-white pb-24">
-      {locale === DEFAULT_SITE_LOCALE && (
-        <JsonLd id="insight-detail-jsonld" schema={insightSchema} />
-      )}
+      <JsonLd id="insight-detail-jsonld" schema={insightSchema} />
       {coverImageUrl && (
         <div className="relative w-full h-[60vh] min-h-[360px] max-h-[600px] overflow-hidden">
           <AppImage

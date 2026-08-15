@@ -103,6 +103,8 @@ const enTwitter = asRecord(enMetadata.twitter, 'EN Twitter');
 const trTwitter = asRecord(trMetadata.twitter, 'TR Twitter');
 const enAlternates = asRecord(enMetadata.alternates, 'EN alternates');
 const trAlternates = asRecord(trMetadata.alternates, 'TR alternates');
+const enLanguages = asRecord(enAlternates.languages, 'EN hreflang languages');
+const trLanguages = asRecord(trAlternates.languages, 'TR hreflang languages');
 const trCanonical = buildRouteCanonicalUrl({ family: 'home', locale: 'tr' });
 const inheritedEnglishSocialTitle = DEFAULT_METADATA.defaultTitle;
 const inheritedEnglishSocialDescription =
@@ -680,7 +682,34 @@ assert.ok(
   String(trMetadata.description).includes('ü'),
   'Turkish diacritics are preserved in description'
 );
-assert.equal('languages' in trAlternates, false, 'TR metadata emits no hreflang languages');
+assert.deepEqual(enLanguages, {
+  en: `${SITE_URL}/experiences`,
+  tr: `${SITE_URL}/tr/experiences`,
+  'x-default': `${SITE_URL}/experiences`,
+});
+assert.deepEqual(trLanguages, {
+  en: `${SITE_URL}/`,
+  tr: `${SITE_URL}/tr`,
+  'x-default': `${SITE_URL}/`,
+});
+
+const templatedRepeatedBrandMetadata = buildLocaleOwnedMetadata({
+  locale: 'en',
+  copyLocale: 'en',
+  route: { family: 'insights', locale: 'en' },
+  title: 'Example Insight — Creare — Creare',
+  description: 'Example description.',
+});
+const absoluteRepeatedBrandMetadata = buildLocaleOwnedMetadata({
+  locale: 'tr',
+  copyLocale: 'tr',
+  route: { family: 'insights', locale: 'tr' },
+  title: 'Örnek Yazı — Creare — Creare',
+  description: 'Örnek açıklama.',
+  titleMode: 'absolute',
+});
+assert.equal(titleValue(templatedRepeatedBrandMetadata), 'Example Insight');
+assert.equal(titleValue(absoluteRepeatedBrandMetadata), 'Örnek Yazı — Creare');
 
 collectStrings([enMetadata, trMetadata]).forEach((value) => {
   assert.equal(value.includes('www.crearetravel.com'), false, 'metadata does not use www host');

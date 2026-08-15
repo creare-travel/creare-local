@@ -25,6 +25,7 @@ interface InsightDetailInput extends ArticleInput {
   breadcrumbId: string;
   path: string;
   breadcrumbs: BreadcrumbItemInput[];
+  destinationUrl?: string;
   relatedEssays?: ListingItemInput[];
   relatedExperiences?: ListingItemInput[];
 }
@@ -73,9 +74,11 @@ export function buildInsightDetailGraph(input: InsightDetailInput): SchemaNode[]
     fallbackName: input.title || 'Insight',
     representativeOfPage: true,
   });
-  const culturalWorldUrl = input.destinationSlug
-    ? buildCanonicalUrl(`/cultural-worlds/${input.destinationSlug}`)
-    : undefined;
+  const culturalWorldUrl =
+    input.destinationUrl ??
+    (input.destinationSlug
+      ? buildCanonicalUrl(`/cultural-worlds/${input.destinationSlug}`)
+      : undefined);
   const culturalWorldPlace =
     input.destinationName && culturalWorldUrl
       ? buildPlaceSchema({
@@ -100,7 +103,7 @@ export function buildInsightDetailGraph(input: InsightDetailInput): SchemaNode[]
         .filter((experience) => experience.url && experience.title && experience.slug)
         .map((experience) => ({
           '@type': 'Service',
-          '@id': experienceIds(experience.slug as string).service,
+          '@id': experience.id ?? experienceIds(experience.slug as string).service,
           url: experience.url,
           name: experience.title,
           description: experience.description,

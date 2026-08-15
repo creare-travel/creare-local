@@ -6,41 +6,36 @@ import {
   isPublicInsightRecord,
 } from '@/lib/canonical-gates';
 import { insights as localInsights } from '@/data/insights';
-import { getPublicLocalExperienceFallbacks } from '@/lib/experiences';
+import { type SiteLocale } from '@/lib/i18n/config';
+import { localizePathname } from '@/lib/i18n/pathname';
+import { SITE_URL, buildLocalizedLanguageAlternates } from '@/lib/seo';
 import { fetchStrapi } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
 
-const BASE_URL = 'https://crearetravel.com';
-
 type SitemapEntry = MetadataRoute.Sitemap[number];
 
-interface SitemapDestination {
+interface SitemapRecord {
   id: number;
+  documentId?: string;
   slug?: string;
-  name?: string;
-  visibility_status?: string;
   publishedAt?: string | null;
   updatedAt?: string | null;
 }
 
-interface SitemapExperience {
-  id: number;
-  slug?: string;
+interface SitemapDestination extends SitemapRecord {
+  name?: string;
+  visibility_status?: string;
+}
+
+interface SitemapExperience extends SitemapRecord {
   category?: string;
   title?: string;
   visibility_status?: string;
-  publishedAt?: string | null;
-  updatedAt?: string | null;
 }
 
-interface SitemapInsight {
-  id: number;
-  slug?: string;
+interface SitemapInsight extends SitemapRecord {
   title?: string;
-  visibility_status?: string;
-  publishedAt?: string | null;
-  updatedAt?: string | null;
 }
 
 const LEGACY_INSIGHT_SLUG_MAP: Record<string, string> = {
@@ -74,115 +69,148 @@ function createEntry(
     changeFrequency: SitemapEntry['changeFrequency'];
     priority: number;
     lastModified?: Date;
+    alternates?: SitemapEntry['alternates'];
   }
 ): SitemapEntry {
   return {
-    url: `${BASE_URL}${path}`,
+    url: `${SITE_URL}${path}`,
     changeFrequency: options.changeFrequency,
     priority: options.priority,
     ...(options.lastModified ? { lastModified: options.lastModified } : {}),
+    ...(options.alternates ? { alternates: options.alternates } : {}),
   };
 }
 
-async function fetchActiveCulturalWorldUrls() {
+function createLocalizedStaticEntries(
+  path: string,
+  options: Pick<Parameters<typeof createEntry>[1], 'changeFrequency' | 'priority'>
+): SitemapEntry[] {
+  const alternates = { languages: buildLocalizedLanguageAlternates(path) };
+
+  return (['en', 'tr'] as const).map((locale) =>
+    createEntry(localizePathname(path, locale), { ...options, alternates })
+  );
+}
+
+function buildPairedAlternates(englishPath: string, turkishPath: string) {
+  const english = `${SITE_URL}${englishPath}`;
+  const turkish = `${SITE_URL}${turkishPath}`;
+
+  return {
+    languages: {
+      en: english,
+      tr: turkish,
+      'x-default': english,
+    },
+  };
+}
+
+function isLocalizedCounterpart(left: SitemapRecord, right: SitemapRecord) {
+  if (left.documentId && right.documentId) {
+    return left.documentId === right.documentId;
+  }
+
+  return Boolean(left.slug && right.slug && left.slug === right.slug);
+}
+
+function dedupeBySlug<T extends SitemapRecord>(records: T[]): T[] {
+  const seen = new Set<string>();
+
+  return records.filter((record) => {
+    if (!record.slug || seen.has(record.slug)) return false;
+    seen.add(record.slug);
+    return true;
+  });
+}
+
+function buildLocalizedDetailEntries<T extends SitemapRecord>(
+  englishRecords: T[],
+  turkishRecords: T[],
+  pathPrefix: '/cultural-worlds' | '/experiences' | '/insights',
+  options: Pick<Parameters<typeof createEntry>[1], 'changeFrequency' | 'priority'>
+): SitemapEntry[] {
+  const buildEntries = (records: T[], counterparts: T[], locale: SiteLocale): SitemapEntry[] =>
+    records.flatMap((record) => {
+      if (!record.slug) return [];
+
+      const counterpart = counterparts.find((candidate) =>
+        isLocalizedCounterpart(record, candidate)
+      );
+      const path = localizePathname(`${pathPrefix}/${record.slug}`, locale);
+      const counterpartPath = counterpart?.slug
+        ? localizePathname(`${pathPrefix}/${counterpart.slug}`, locale === 'en' ? 'tr' : 'en')
+        : undefined;
+      const englishPath = locale === 'en' ? path : counterpartPath;
+      const turkishPath = locale === 'tr' ? path : counterpartPath;
+
+      return [
+        createEntry(path, {
+          ...options,
+          lastModified: resolveLastModified(record.updatedAt, record.publishedAt),
+          ...(englishPath && turkishPath
+            ? { alternates: buildPairedAlternates(englishPath, turkishPath) }
+            : {}),
+        }),
+      ];
+    });
+
+  return [
+    ...buildEntries(englishRecords, turkishRecords, 'en'),
+    ...buildEntries(turkishRecords, englishRecords, 'tr'),
+  ].sort((a, b) => a.url.localeCompare(b.url));
+}
+
+async function fetchActiveCulturalWorldRecords(locale: SiteLocale): Promise<SitemapDestination[]> {
   const path =
-    '/api/destinations?fields[0]=slug&fields[1]=name&fields[2]=visibility_status&fields[3]=publishedAt&fields[4]=updatedAt&pagination[pageSize]=100';
+    '/api/destinations?status=published&fields[0]=slug&fields[1]=name&fields[2]=visibility_status&fields[3]=publishedAt&fields[4]=updatedAt&pagination[pageSize]=100';
 
   try {
-    const json = await fetchStrapi(path);
+    const json = await fetchStrapi(path, { locale });
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
 
-    return filterCanonicalCulturalWorlds(
-      items.map((item) => flattenRecord<SitemapDestination>(item))
-    )
-      .map((item) =>
-        createEntry(`/cultural-worlds/${item.slug}`, {
-          lastModified: resolveLastModified(item.updatedAt, item.publishedAt),
-          changeFrequency: 'weekly',
-          priority: 0.85,
-        })
-      )
-      .sort((a, b) => a.url.localeCompare(b.url));
+    return dedupeBySlug(
+      filterCanonicalCulturalWorlds(items.map((item) => flattenRecord<SitemapDestination>(item)))
+    );
   } catch (error) {
     console.error('Failed to build dynamic cultural-world sitemap entries.', {
       route: '/sitemap.xml',
+      locale,
       strapiPath: path,
       error,
     });
 
-    return [
-      createEntry('/cultural-worlds/bodrum', {
-        changeFrequency: 'weekly',
-        priority: 0.85,
-      }),
-      createEntry('/cultural-worlds/cappadocia', {
-        changeFrequency: 'weekly',
-        priority: 0.85,
-      }),
-      createEntry('/cultural-worlds/istanbul', {
-        changeFrequency: 'weekly',
-        priority: 0.85,
-      }),
-    ];
+    if (locale === 'tr') return [];
+
+    return ['bodrum', 'cappadocia', 'istanbul'].map((slug, index) => ({
+      id: 9000 + index,
+      slug,
+      name: slug.charAt(0).toUpperCase() + slug.slice(1),
+      visibility_status: 'active',
+    }));
   }
 }
 
-async function fetchCanonicalExperienceUrls() {
+async function fetchCanonicalExperienceRecords(locale: SiteLocale): Promise<SitemapExperience[]> {
   const path =
-    '/api/experiences?fields[0]=slug&fields[1]=category&fields[2]=title&fields[3]=visibility_status&fields[4]=publishedAt&fields[5]=updatedAt&pagination[pageSize]=100';
+    '/api/experiences?status=published&fields[0]=slug&fields[1]=category&fields[2]=title&fields[3]=visibility_status&fields[4]=publishedAt&fields[5]=updatedAt&pagination[pageSize]=100';
 
   try {
-    const json = await fetchStrapi(path);
+    const json = await fetchStrapi(path, { locale });
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
-
-    const strapiEntries = filterPublicExperiences(
+    const strapiRecords = filterPublicExperiences(
       items.map((item) => flattenRecord<SitemapExperience>(item))
-    )
-      .filter((item) => item.slug)
-      .filter((item) => item.category?.toLowerCase() !== 'black')
-      .map((item) => ({
-        slug: item.slug as string,
-        entry: createEntry(`/experiences/${item.slug}`, {
-          lastModified: resolveLastModified(item.updatedAt, item.publishedAt),
-          changeFrequency: 'monthly',
-          priority: 0.8,
-        }),
-      }));
+    ).filter((item) => item.category?.toLowerCase() !== 'black');
 
-    const localFallbackEntries = getPublicLocalExperienceFallbacks().map((experience) => ({
-      slug: experience.slug,
-      entry: createEntry(`/experiences/${experience.slug}`, {
-        changeFrequency: 'monthly',
-        priority: 0.8,
-      }),
-    }));
-
-    const mergedEntries = [...strapiEntries, ...localFallbackEntries];
-    const seen = new Set<string>();
-
-    return mergedEntries
-      .filter(({ slug }) => {
-        if (seen.has(slug)) return false;
-        seen.add(slug);
-        return true;
-      })
-      .map(({ entry }) => entry)
-      .sort((a, b) => a.url.localeCompare(b.url));
+    return dedupeBySlug(strapiRecords);
   } catch (error) {
     console.error('Failed to build dynamic experience sitemap entries.', {
       route: '/sitemap.xml',
+      locale,
       strapiPath: path,
       error,
     });
 
-    return getPublicLocalExperienceFallbacks()
-      .map((experience) =>
-        createEntry(`/experiences/${experience.slug}`, {
-          changeFrequency: 'monthly',
-          priority: 0.8,
-        })
-      )
-      .sort((a, b) => a.url.localeCompare(b.url));
+    return [];
   }
 }
 
@@ -191,75 +219,116 @@ function buildLocalInsightInventory(): SitemapInsight[] {
     id: index + 1,
     slug: insight.slug,
     title: insight.title,
-    visibility_status: 'published',
   }));
 }
 
-async function fetchCanonicalInsightUrls() {
+async function fetchCanonicalInsightRecords(locale: SiteLocale): Promise<SitemapInsight[]> {
   const path =
-    '/api/insights?fields[0]=slug&fields[1]=title&fields[2]=visibility_status&fields[3]=publishedAt&fields[4]=updatedAt&pagination[pageSize]=100';
+    '/api/insights?status=published&fields[0]=slug&fields[1]=title&fields[2]=publishedAt&fields[3]=updatedAt&pagination[pageSize]=100';
 
   let strapiInsights: SitemapInsight[] = [];
 
   try {
-    const json = await fetchStrapi(path);
+    const json = await fetchStrapi(path, { locale });
     const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
     strapiInsights = filterPublicInsights(items.map((item) => flattenRecord<SitemapInsight>(item)));
   } catch (error) {
     console.error('Failed to fetch dynamic insight sitemap entries.', {
       route: '/sitemap.xml',
+      locale,
       strapiPath: path,
       error,
     });
   }
 
-  const merged = [...strapiInsights, ...buildLocalInsightInventory()];
-  const seen = new Set<string>();
+  const merged =
+    locale === 'en' ? [...strapiInsights, ...buildLocalInsightInventory()] : strapiInsights;
 
-  return merged
-    .map((item) => ({
-      ...item,
-      slug: canonicalInsightSlug(item.slug),
-    }))
-    .filter((item) => isPublicInsightRecord(item))
-    .filter((item) => item.slug)
-    .filter((item) => {
-      if (!item.slug || seen.has(item.slug)) return false;
-      seen.add(item.slug);
-      return true;
-    })
-    .map((item) =>
-      createEntry(`/insights/${item.slug}`, {
-        lastModified: resolveLastModified(item.updatedAt, item.publishedAt),
-        changeFrequency: 'monthly',
-        priority: 0.75,
-      })
-    )
-    .sort((a, b) => a.url.localeCompare(b.url));
+  return dedupeBySlug(
+    merged
+      .map((item) => ({
+        ...item,
+        slug: canonicalInsightSlug(item.slug),
+      }))
+      .filter((item) => isPublicInsightRecord(item))
+  );
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [culturalWorldEntries, experienceEntries, insightEntries] = await Promise.all([
-    fetchActiveCulturalWorldUrls(),
-    fetchCanonicalExperienceUrls(),
-    fetchCanonicalInsightUrls(),
+  const [
+    englishCulturalWorlds,
+    turkishCulturalWorlds,
+    englishExperiences,
+    turkishExperiences,
+    englishInsights,
+    turkishInsights,
+  ] = await Promise.all([
+    fetchActiveCulturalWorldRecords('en'),
+    fetchActiveCulturalWorldRecords('tr'),
+    fetchCanonicalExperienceRecords('en'),
+    fetchCanonicalExperienceRecords('tr'),
+    fetchCanonicalInsightRecords('en'),
+    fetchCanonicalInsightRecords('tr'),
   ]);
 
+  const culturalWorldEntries = buildLocalizedDetailEntries(
+    englishCulturalWorlds,
+    turkishCulturalWorlds,
+    '/cultural-worlds',
+    { changeFrequency: 'weekly', priority: 0.85 }
+  );
+  const experienceEntries = buildLocalizedDetailEntries(
+    englishExperiences,
+    turkishExperiences,
+    '/experiences',
+    { changeFrequency: 'monthly', priority: 0.8 }
+  );
+  const insightEntries = buildLocalizedDetailEntries(
+    englishInsights,
+    turkishInsights,
+    '/insights',
+    { changeFrequency: 'monthly', priority: 0.75 }
+  );
+
   return [
-    createEntry('/', { changeFrequency: 'weekly', priority: 1.0 }),
-    createEntry('/experiences', { changeFrequency: 'weekly', priority: 0.9 }),
+    ...createLocalizedStaticEntries('/', { changeFrequency: 'weekly', priority: 1.0 }),
+    ...createLocalizedStaticEntries('/experiences', {
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    }),
     createEntry('/experiences/lab', { changeFrequency: 'weekly', priority: 0.85 }),
     createEntry('/experiences/signature', { changeFrequency: 'weekly', priority: 0.85 }),
     createEntry('/experiences/black', { changeFrequency: 'weekly', priority: 0.85 }),
     ...experienceEntries,
-    createEntry('/cultural-worlds', { changeFrequency: 'weekly', priority: 0.9 }),
+    ...createLocalizedStaticEntries('/cultural-worlds', {
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    }),
     ...culturalWorldEntries,
-    createEntry('/insights', { changeFrequency: 'weekly', priority: 0.8 }),
+    ...createLocalizedStaticEntries('/insights', {
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }),
     ...insightEntries,
-    createEntry('/philosophy', { changeFrequency: 'monthly', priority: 0.7 }),
-    createEntry('/contact', { changeFrequency: 'monthly', priority: 0.7 }),
-    createEntry('/privacy', { changeFrequency: 'monthly', priority: 0.4 }),
-    createEntry('/terms', { changeFrequency: 'monthly', priority: 0.4 }),
-    createEntry('/cookies', { changeFrequency: 'monthly', priority: 0.4 }),
+    ...createLocalizedStaticEntries('/philosophy', {
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    }),
+    ...createLocalizedStaticEntries('/contact', {
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    }),
+    ...createLocalizedStaticEntries('/privacy', {
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    }),
+    ...createLocalizedStaticEntries('/terms', {
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    }),
+    ...createLocalizedStaticEntries('/cookies', {
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    }),
   ];
 }

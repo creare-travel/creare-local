@@ -25,11 +25,11 @@ import {
   DEFAULT_METADATA,
   DEFAULT_OG_IMAGE_ALT,
   buildLocaleOwnedMetadata,
-  buildMetadataAlternates,
   buildRouteCanonicalAlternates,
   buildRouteCanonicalUrl,
   getOpenGraphLocale,
   SITE_NAME,
+  stripBrandSuffix,
 } from '@/lib/seo';
 import { buildCanonicalUrl, buildCulturalWorldDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
@@ -41,10 +41,6 @@ const INHERITED_EN_SOCIAL_DESCRIPTION =
 const INHERITED_EN_OG_IMAGE_PATH = '/opengraph-image?282b2b8eda0907e3';
 const canonicalInsightSlug = (slug?: string) =>
   slug === 'the-private-life-of-istanbul' ? 'private-life-of-istanbul' : slug;
-
-function stripBrandSuffix(title?: string | null): string | undefined {
-  return title?.replace(/\s+—\s+Creare$/i, '').trim() || undefined;
-}
 
 function buildCulturalWorldNotFoundMetadata(locale: SiteLocale): Metadata {
   if (locale === DEFAULT_SITE_LOCALE) {
@@ -646,14 +642,11 @@ export async function generateCulturalWorldDetailMetadata({
     return buildCulturalWorldNotFoundMetadata(locale);
   }
 
-  const alternates =
-    locale === DEFAULT_SITE_LOCALE
-      ? buildMetadataAlternates(`/cultural-worlds/${slug}`)
-      : buildRouteCanonicalAlternates({
-          family: 'cultural-world-detail',
-          locale,
-          slug,
-        });
+  const alternates = buildRouteCanonicalAlternates({
+    family: 'cultural-world-detail',
+    locale,
+    slug,
+  });
 
   if (locale !== DEFAULT_SITE_LOCALE) {
     return buildLocalizedCulturalWorldDetailMetadata({

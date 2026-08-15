@@ -316,7 +316,7 @@ That opening is the experience. Everything else is threshold.`,
     culturalWorldSlug: 'cappadocia',
     content: `There is a specific quality of silence in the Göreme valley before dawn. It is not the silence of absence — of a place where nothing is happening. It is the silence of deep time made audible. The rock formations that surround you were shaped over millions of years by volcanic eruption and erosion, and they carry that duration in the way they hold the darkness. Standing in the valley at four in the morning, you are not in a quiet place. You are in a place that is doing something very slowly, and has been doing it for longer than the human species has existed.
 
-This is the Cappadocia that private access is designed to reach. Not the Cappadocia of the balloon flights and the cave hotel check-ins and the tour buses that arrive at the Göreme Open Air Museum at nine in the morning — though all of these have their place. The Cappadocia that is worth arriving for is the one that exists within the city's own life — within its relationships, its institutions, its private spaces — and that is accessible only to those who have earned the right of access.
+This is the Cappadocia that private access is designed to reach. Not the Cappadocia of the balloon flights and the cave hotel check-ins and the tour buses that arrive at the Göreme Open Air Museum at nine in the morning — though all of these have their place. The Cappadocia that is worth arriving for is the one that exists within the region's own life — within its relationships, its institutions, its private spaces — and that is accessible only to those who have earned the right of access.
 
 The cultural world of Cappadocia is built around this understanding. That the landscape is not background but subject. That the experience of being here is fundamentally different from the experience of being anywhere else, and that this difference deserves to be met with attention rather than spectacle.
 
@@ -407,7 +407,7 @@ That is the different rhythm. It is worth finding.`,
       'Istanbul has learned to absorb millions of visitors without revealing itself to most of them. The city that breathes is not the one on the tourist map.',
     location: 'istanbul',
     culturalWorldSlug: 'istanbul',
-    content: `Istanbul receives forty million visitors a year. It has learned, over centuries of being a city that everyone wants to see, how to absorb this attention without being changed by it. The monuments remain. The Bosphorus remains. The Grand Bazaar remains. And the city that actually breathes — the city that has been breathing for two thousand years — remains almost entirely invisible to the people who come to see it.
+    content: `Istanbul receives millions of visitors each year. It has learned, over centuries of being a city that everyone wants to see, how to absorb this attention without being changed by it. The monuments remain. The Bosphorus remains. The Grand Bazaar remains. And the city that actually breathes — the city that has been breathing for two thousand years — remains almost entirely invisible to the people who come to see it.
 
 This is not an accident. Istanbul has always had a public face and a private life. The public face is magnificent and has been designed, over two thousand years of imperial ambition, to impress. The Hagia Sophia was built to be the largest building in the world. The Topkapı Palace was built to demonstrate the reach of Ottoman power. The Grand Bazaar was built to be the commercial centre of an empire. These things succeeded. They still succeed. They are genuinely extraordinary.
 
@@ -483,7 +483,7 @@ This is not fraud, exactly. The hotels are genuinely beautiful. The service is g
 
 Mass tourism, in its luxury variant, is still mass tourism. It is the same product at a higher price point, with better thread counts and a more attentive concierge. What it is not is a genuine encounter with the place where it is located.
 
-The cultural world of Istanbul offers a useful test case. Istanbul has approximately forty five-star hotels. They are, without exception, well-run and comfortable. They are also, without exception, interchangeable in the ways that matter most. The experience of being in Istanbul — of encountering the city's specific history, its specific culture, its specific way of understanding the relationship between past and present — is not available in any of them. It is available in the city, which is a different thing.
+The cultural world of Istanbul offers a useful test case. Istanbul has an extensive inventory of five-star hotels. They are, without exception, well-run and comfortable. They are also, without exception, interchangeable in the ways that matter most. The experience of being in Istanbul — of encountering the city's specific history, its specific culture, its specific way of understanding the relationship between past and present — is not available in any of them. It is available in the city, which is a different thing.
 
 The distinction between luxury travel and genuine private experience is not about comfort. It is about encounter. Comfort is purchasable. Encounter is not.
 

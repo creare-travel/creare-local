@@ -5,6 +5,7 @@ import { getLocaleFromPathname } from './pathname';
 import {
   PRODUCTION_CANONICAL_HOSTNAME,
   SITE_URL,
+  buildMetadataAlternates,
   buildRouteCanonicalAlternates,
   buildRouteCanonicalUrl,
   canonicalUrl,
@@ -192,6 +193,11 @@ for (const expectation of routeExpectations) {
 
 assert.deepEqual(buildRouteCanonicalAlternates({ family: 'home', locale: 'tr' }), {
   canonical: 'https://crearetravel.com/tr',
+  languages: {
+    en: 'https://crearetravel.com/',
+    tr: 'https://crearetravel.com/tr',
+    'x-default': 'https://crearetravel.com/',
+  },
 });
 assert.deepEqual(
   buildRouteCanonicalAlternates({
@@ -201,8 +207,28 @@ assert.deepEqual(
   }),
   {
     canonical: 'https://crearetravel.com/tr/experiences/beylerbeyi-1869-empire-interrupted',
+    languages: {
+      en: 'https://crearetravel.com/experiences/beylerbeyi-1869-empire-interrupted',
+      tr: 'https://crearetravel.com/tr/experiences/beylerbeyi-1869-empire-interrupted',
+      'x-default': 'https://crearetravel.com/experiences/beylerbeyi-1869-empire-interrupted',
+    },
   }
 );
+assert.deepEqual(buildMetadataAlternates('/tr/contact'), {
+  canonical: 'https://crearetravel.com/tr/contact',
+  languages: {
+    en: 'https://crearetravel.com/contact',
+    tr: 'https://crearetravel.com/tr/contact',
+    'x-default': 'https://crearetravel.com/contact',
+  },
+});
+assert.deepEqual(buildMetadataAlternates('/experiences/signature'), {
+  canonical: 'https://crearetravel.com/experiences/signature',
+  languages: {
+    en: 'https://crearetravel.com/experiences/signature',
+    'x-default': 'https://crearetravel.com/experiences/signature',
+  },
+});
 
 assertCanonicalUrl(
   'query string is stripped from canonicalUrl',

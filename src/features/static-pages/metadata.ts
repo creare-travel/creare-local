@@ -4,8 +4,8 @@ import {
   DEFAULT_OG_IMAGE,
   SITE_NAME,
   buildOpenGraph,
+  buildMetadataAlternates,
   buildTwitterCard,
-  canonicalUrl,
 } from '@/lib/seo';
 
 interface StaticPageMetadataOptions {
@@ -21,15 +21,11 @@ export function buildTurkishStaticPageMetadata({
   path,
   imageAlt,
 }: StaticPageMetadataOptions): Metadata {
-  const canonical = canonicalUrl(path);
-
   return {
     metadataBase: DEFAULT_METADATA.metadataBase,
     title: { absolute: title },
     description,
-    alternates: {
-      canonical,
-    },
+    alternates: buildMetadataAlternates(path),
     robots: {
       index: true,
       follow: true,

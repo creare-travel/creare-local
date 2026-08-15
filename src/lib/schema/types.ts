@@ -107,6 +107,7 @@ export interface BreadcrumbItemInput {
 }
 
 export interface ListingItemInput {
+  id?: string;
   title?: string;
   slug?: string;
   url?: string;

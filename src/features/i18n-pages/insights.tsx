@@ -586,21 +586,29 @@ export async function renderInsightsPage(locale: SiteLocale = DEFAULT_SITE_LOCAL
   const staticInsights = buildStaticInsights(locale);
   const displayItems = mergeInsights(staticInsights, strapiInsights, locale);
   const sections = partitionInsights(displayItems);
+  const schemaPath = localizePathname('/insights', locale);
+  const schemaUrl = buildCanonicalUrl(schemaPath);
+  const schemaTitle = locale === DEFAULT_SITE_LOCALE ? 'Insights' : dictionary.insights.title;
+  const schemaDescription =
+    locale === DEFAULT_SITE_LOCALE ? insightsDescription : dictionary.insights.subtitle;
   const insightsSchema = buildInsightListingGraph({
-    pageId: `${buildCanonicalUrl('/insights')}#collection`,
-    itemListId: `${buildCanonicalUrl('/insights')}#itemlist`,
-    breadcrumbId: `${buildCanonicalUrl('/insights')}#breadcrumbs`,
-    path: buildCanonicalUrl('/insights'),
-    title: 'Insights',
-    description: insightsDescription,
+    pageId: `${schemaUrl}#collection`,
+    itemListId: `${schemaUrl}#itemlist`,
+    breadcrumbId: `${schemaUrl}#breadcrumbs`,
+    path: schemaUrl,
+    title: schemaTitle,
+    description: schemaDescription,
     breadcrumbs: [
-      { name: 'Home', url: buildCanonicalUrl('/') },
-      { name: 'Insights', url: buildCanonicalUrl('/insights') },
+      {
+        name: locale === DEFAULT_SITE_LOCALE ? 'Home' : dictionary.common.home,
+        url: buildCanonicalUrl(localizePathname('/', locale)),
+      },
+      { name: schemaTitle, url: schemaUrl },
     ],
     items: displayItems.map((insight) => ({
       title: insight.title,
       slug: insight.slug,
-      url: buildCanonicalUrl(`/insights/${insight.slug}`),
+      url: buildCanonicalUrl(localizePathname(`/insights/${insight.slug}`, locale)),
       description: insight.excerpt,
       image: insight.coverImage,
     })),
@@ -608,9 +616,7 @@ export async function renderInsightsPage(locale: SiteLocale = DEFAULT_SITE_LOCAL
 
   return (
     <main className="min-h-screen bg-black text-white pt-24 pb-24">
-      {locale === DEFAULT_SITE_LOCALE && (
-        <JsonLd id="insights-list-jsonld" schema={insightsSchema} />
-      )}
+      <JsonLd id="insights-list-jsonld" schema={insightsSchema} />
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
         {/* Header */}
         <div className="mb-16 max-w-3xl lg:mb-20">

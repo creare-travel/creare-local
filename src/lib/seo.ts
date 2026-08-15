@@ -4,6 +4,7 @@
  */
 import type { Metadata } from 'next';
 import { DEFAULT_SITE_LOCALE, isSiteLocale, type SiteLocale } from './i18n/config';
+import { localizePathname, stripLocalePrefix } from './i18n/pathname';
 
 export const SITE_URL = 'https://crearetravel.com';
 export const SITE_NAME = 'Creare';
@@ -39,9 +40,19 @@ const OPEN_GRAPH_LOCALE_BY_SITE_LOCALE = {
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og/default.jpg`;
 export const DEFAULT_OG_IMAGE_ALT = 'Creare — Private Cultural Experiences Composed as Art';
 
-// Active hreflang foundation for current production. Future locales can be
-// added here once locale-specific routes are actually live.
-export const ACTIVE_HREFLANGS = ['en'] as const;
+export const ACTIVE_HREFLANGS = ['en', 'tr'] as const;
+
+const RECIPROCALLY_LOCALIZED_STATIC_PATHS = new Set([
+  '/',
+  '/contact',
+  '/cookies',
+  '/cultural-worlds',
+  '/experiences',
+  '/insights',
+  '/philosophy',
+  '/privacy',
+  '/terms',
+]);
 
 export const DEFAULT_METADATA = {
   metadataBase: new URL(SITE_URL),
@@ -191,35 +202,61 @@ export function assertRouteCanonicalOwnership(
 }
 
 export function buildRouteCanonicalAlternates(options: RouteCanonicalOptions) {
+  const english = buildRouteCanonicalUrl({ ...options, locale: 'en' });
+  const turkish = buildRouteCanonicalUrl({ ...options, locale: 'tr' });
+
   return {
     canonical: buildRouteCanonicalUrl(options),
+    languages: {
+      en: english,
+      tr: turkish,
+      'x-default': english,
+    },
+  };
+}
+
+export function buildLocalizedLanguageAlternates(path: string) {
+  const english = canonicalUrl(localizePathname(path, 'en'));
+  const turkish = canonicalUrl(localizePathname(path, 'tr'));
+
+  return {
+    en: english,
+    tr: turkish,
+    'x-default': english,
   };
 }
 
 /**
  * Build hreflang alternate links for a page.
  */
-export function buildHreflangs(path: string) {
-  const normalized = path.startsWith('/') ? path : `/${path}`;
-  const alternates: Array<{ hrefLang: string; href: string }> = [];
+export function buildHreflangs(path: string): Array<{ hrefLang: string; href: string }> {
+  const canonical = canonicalUrl(path);
+  const normalizedPath = stripLocalePrefix(new URL(canonical).pathname);
 
-  ACTIVE_HREFLANGS.forEach((lang) => {
-    alternates.push({
-      hrefLang: lang,
-      href: `${SITE_URL}${normalized}`,
-    });
-  });
+  if (!RECIPROCALLY_LOCALIZED_STATIC_PATHS.has(normalizedPath)) {
+    return [
+      { hrefLang: 'en', href: canonical },
+      { hrefLang: 'x-default', href: canonical },
+    ];
+  }
 
-  alternates.push({
-    hrefLang: 'x-default',
-    href: `${SITE_URL}${normalized}`,
-  });
-
-  return alternates;
+  const languages = buildLocalizedLanguageAlternates(path);
+  return [
+    ...ACTIVE_HREFLANGS.map((hrefLang) => ({ hrefLang, href: languages[hrefLang] })),
+    { hrefLang: 'x-default', href: languages['x-default'] },
+  ];
 }
 
 export function buildMetadataAlternates(path: string) {
   const canonical = canonicalUrl(path);
+  const normalizedPath = stripLocalePrefix(new URL(canonical).pathname);
+
+  if (RECIPROCALLY_LOCALIZED_STATIC_PATHS.has(normalizedPath)) {
+    return {
+      canonical,
+      languages: buildLocalizedLanguageAlternates(path),
+    };
+  }
 
   return {
     canonical,
@@ -230,16 +267,23 @@ export function buildMetadataAlternates(path: string) {
   };
 }
 
-function metadataPathFromRoute(options: RouteCanonicalOptions): string {
-  return new URL(buildRouteCanonicalUrl(options)).pathname;
+function buildRouteMetadataAlternates(options: RouteCanonicalOptions) {
+  return buildRouteCanonicalAlternates(options);
 }
 
-function buildRouteMetadataAlternates(options: RouteCanonicalOptions) {
-  if (options.locale === DEFAULT_SITE_LOCALE) {
-    return buildMetadataAlternates(metadataPathFromRoute(options));
+export function stripBrandSuffix(title?: string | null): string | undefined {
+  return title?.replace(/(?:\s+—\s+Creare)+$/i, '').trim() || undefined;
+}
+
+function normalizeMetadataTitle(
+  value: string,
+  titleMode: 'templated' | 'absolute' | undefined
+): string {
+  if (titleMode === 'absolute') {
+    return value.replace(/(?:\s+—\s+Creare){2,}$/i, ' — Creare');
   }
 
-  return buildRouteCanonicalAlternates(options);
+  return stripBrandSuffix(value) ?? value;
 }
 
 /**
@@ -362,7 +406,10 @@ export function buildLocaleOwnedMetadata(options: {
     throw new Error(`Metadata route locale must match metadata locale: ${options.locale}.`);
   }
 
-  const title = normalizeMetadataCopy('title', options.title);
+  const title = normalizeMetadataTitle(
+    normalizeMetadataCopy('title', options.title),
+    options.titleMode
+  );
   const description = normalizeMetadataCopy('description', options.description);
   const openGraphTitle = normalizeMetadataCopy('title', options.openGraphTitle ?? title);
   const openGraphDescription = normalizeMetadataCopy(
