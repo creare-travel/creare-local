@@ -89,11 +89,7 @@ export function getExperienceCategoryTarget(
   path: ExperienceCategoryPath,
   locale: SiteLocale
 ): string {
-  if (locale !== DEFAULT_SITE_LOCALE) {
-    return localizePathname('/experiences', locale);
-  }
-
-  return path;
+  return localizePathname(path, locale);
 }
 
 export function getPrivateInquiryHref(locale: SiteLocale, query = ''): string | null {

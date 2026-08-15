@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   }),
 };
 
-interface CollectionFeature {
+export interface CollectionFeature {
   label: string;
   title: string;
   description: string;
@@ -51,7 +51,7 @@ interface CollectionFeature {
   alt: string;
 }
 
-const collectionFeatures: CollectionFeature[] = [
+export const collectionFeatures: CollectionFeature[] = [
   {
     label: 'Signature',
     title: 'Curated cultural experiences.',

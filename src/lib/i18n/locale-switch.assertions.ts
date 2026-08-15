@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import type { SiteLocale } from './config';
+import { EXPERIENCE_CATEGORY_ROUTES } from './static-routes';
 import {
   buildLocaleSwitchCandidate,
   classifyLocalizedRoute,
@@ -107,11 +108,23 @@ assert.equal(classifyLocalizedRoute('/trailing').kind, 'unknown');
     `Generated duplicate Turkish prefix: ${targetPath}`
   );
 });
-assert.equal(
-  finalizeLocaleSwitchTarget(createLocaleSwitchPlan('/experiences/signature', 'tr'), false)
-    .targetPath,
-  '/tr/experiences'
-);
+EXPERIENCE_CATEGORY_ROUTES.forEach((path) => {
+  assert.equal(
+    finalizeLocaleSwitchTarget(createLocaleSwitchPlan(path, 'tr'), true).targetPath,
+    `/tr${path}`,
+    `EN to TR collection switch must preserve the collection route: ${path}`
+  );
+  assert.equal(
+    finalizeLocaleSwitchTarget(createLocaleSwitchPlan(`/tr${path}`, 'en'), true).targetPath,
+    path,
+    `TR to EN collection switch must preserve the collection route: ${path}`
+  );
+  assert.equal(
+    classifyLocalizedRoute(`/tr${path}`).kind,
+    'category',
+    `TR collection route must not be classified as an Experience detail: ${path}`
+  );
+});
 assert.equal(
   finalizeLocaleSwitchTarget(createLocaleSwitchPlan('/contact', 'tr'), true).targetPath,
   '/tr/contact'

@@ -5,6 +5,7 @@ import {
   normalizePathname,
   stripLocalePrefix,
 } from './pathname';
+import { EXPERIENCE_CATEGORY_ROUTES } from './static-routes';
 
 export type LocaleSwitchFamily = 'cultural-worlds' | 'experiences' | 'insights';
 
@@ -47,11 +48,7 @@ type RouteProbe = (
 
 const ROUTE_FAMILIES = new Set<LocaleSwitchFamily>(['cultural-worlds', 'experiences', 'insights']);
 
-const CATEGORY_ROUTES_WITHOUT_TR = new Set([
-  '/experiences/signature',
-  '/experiences/lab',
-  '/experiences/black',
-]);
+const EXPERIENCE_CATEGORY_PATHS = new Set<string>(EXPERIENCE_CATEGORY_ROUTES);
 
 const STATIC_ROUTES_WITH_TR = new Set([
   '/contact',
@@ -146,7 +143,7 @@ export function classifyLocalizedRoute(pathname: string): LocalizedRouteClassifi
     };
   }
 
-  if (currentLocale === DEFAULT_SITE_LOCALE && CATEGORY_ROUTES_WITHOUT_TR.has(unprefixedPathname)) {
+  if (EXPERIENCE_CATEGORY_PATHS.has(unprefixedPathname)) {
     return {
       currentLocale,
       family: 'experiences',
@@ -212,7 +209,7 @@ export function getLocaleFallbackPath(pathname: string, targetLocale: SiteLocale
   }
 
   if (classification.kind === 'category') {
-    return targetLocale === 'tr' ? '/tr/experiences' : '/experiences';
+    return getFamilyListingPath('experiences', targetLocale);
   }
 
   return targetLocale === 'tr' ? '/tr' : '/';
@@ -240,8 +237,8 @@ export function buildLocaleSwitchCandidate(
     return buildFamilyPath(classification.family, classification.slug, targetLocale);
   }
 
-  if (classification.kind === 'category' && targetLocale === DEFAULT_SITE_LOCALE) {
-    return classification.unprefixedPathname;
+  if (classification.kind === 'category') {
+    return localizePathname(classification.unprefixedPathname, targetLocale);
   }
 
   if (

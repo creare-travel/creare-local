@@ -82,8 +82,8 @@ assert.equal(
 EXPERIENCE_CATEGORY_ROUTES.forEach((path) => {
   assert.equal(
     getExperienceCategoryTarget(path, 'tr'),
-    '/tr/experiences',
-    `TR category route must use the approved parent fallback: ${path}`
+    `/tr${path}`,
+    `TR category route must preserve the localized collection path: ${path}`
   );
   assert.equal(
     getExperienceCategoryTarget(path, 'en'),
@@ -177,14 +177,21 @@ assert.equal(
 });
 
 [
-  'src/app/(tr)/tr/experiences/signature/page.tsx',
-  'src/app/(tr)/tr/experiences/lab/page.tsx',
-  'src/app/(tr)/tr/experiences/black/page.tsx',
-].forEach((filePath) => {
+  ['signature', 'src/app/(tr)/tr/experiences/signature/page.tsx'],
+  ['lab', 'src/app/(tr)/tr/experiences/lab/page.tsx'],
+  ['black', 'src/app/(tr)/tr/experiences/black/page.tsx'],
+].forEach(([category, filePath]) => {
   assert.equal(
     existsSync(join(process.cwd(), filePath)),
-    false,
-    `Copy-incomplete or parent-fallback route must not be implemented as a thin TR page: ${filePath}`
+    true,
+    `Missing localized TR Experience collection route: ${filePath}`
+  );
+  assert.equal(
+    readFileSync(join(process.cwd(), filePath), 'utf8').includes(
+      `renderExperienceCategoryPage('${category}', 'tr')`
+    ),
+    true,
+    `TR Experience collection route must render its localized category: ${filePath}`
   );
 });
 
