@@ -26,8 +26,8 @@ import {
   buildRouteCanonicalUrl,
   buildTwitterCard,
   getOpenGraphLocale,
+  preserveTerminalBrandTitle,
   SITE_NAME,
-  stripBrandSuffix,
 } from '@/lib/seo';
 import { buildExperienceDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
@@ -1254,7 +1254,7 @@ export async function generateExperienceDetailMetadata({
   });
 
   const ogTitle = strapiItem.seo_title ?? `${strapiItem.title} — CREARE`;
-  const pageTitle = stripBrandSuffix(strapiItem.seo_title) || strapiItem.title;
+  const pageTitle = preserveTerminalBrandTitle(strapiItem.seo_title ?? strapiItem.title);
   const ogDescription = getExperienceDescription(strapiItem);
   const coverUrl = getGovernedExperienceImageUrl(strapiItem, canonicalSlug);
 

@@ -275,6 +275,12 @@ export function stripBrandSuffix(title?: string | null): string | undefined {
   return title?.replace(/(?:\s+—\s+Creare)+$/i, '').trim() || undefined;
 }
 
+const TERMINAL_BRAND_SUFFIX_PATTERN = /\s+(?:\||—)\s+Creare$/i;
+
+export function preserveTerminalBrandTitle(title: string): NonNullable<Metadata['title']> {
+  return TERMINAL_BRAND_SUFFIX_PATTERN.test(title.trimEnd()) ? { absolute: title } : title;
+}
+
 function normalizeMetadataTitle(
   value: string,
   titleMode: 'templated' | 'absolute' | undefined

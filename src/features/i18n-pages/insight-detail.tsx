@@ -12,6 +12,7 @@ import {
   buildTwitterCard,
   DEFAULT_OG_IMAGE,
   DEFAULT_OG_IMAGE_ALT,
+  preserveTerminalBrandTitle,
   stripBrandSuffix,
 } from '@/lib/seo';
 import { buildCanonicalUrl, buildInsightDetailGraph } from '@/lib/schema-builder';
@@ -522,7 +523,7 @@ export async function generateInsightDetailMetadata({
   }
 
   return {
-    title,
+    title: preserveTerminalBrandTitle(insight.seo_title || title),
     description,
     alternates,
     openGraph: buildOpenGraph({
