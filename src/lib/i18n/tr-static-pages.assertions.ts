@@ -318,8 +318,13 @@ assert.equal(
   ['src/app/(tr)/tr/cookies/page.tsx', 'Çerez Politikası — Creare', '/tr/cookies'],
 ].forEach(([filePath, title, path]) => {
   const source = readSource(filePath);
+  const unprefixedPath = path.replace(/^\/tr/, '') || '/';
   assert.equal(source.includes(title), true, `TR metadata title missing: ${filePath}`);
-  assert.equal(source.includes(path), true, `TR metadata canonical path missing: ${filePath}`);
+  assert.equal(
+    source.includes(`localizePathname('${unprefixedPath}', 'tr')`),
+    true,
+    `TR metadata canonical path missing: ${filePath}`
+  );
   assert.equal(
     source.includes('buildTurkishStaticPageMetadata'),
     true,

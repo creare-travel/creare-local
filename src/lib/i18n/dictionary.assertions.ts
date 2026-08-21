@@ -3,6 +3,8 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import enDictionary from '@/locales/en.json';
 import trDictionary from '@/locales/tr.json';
+import zhDictionary from '@/locales/zh.json';
+import { assertDictionaryActivationReady } from './dictionary-readiness';
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 type JsonObject = { [key: string]: JsonValue };
@@ -45,6 +47,8 @@ const approvedKeys = [
   'accessibility.mobileNavigation',
   'accessibility.openNavigationMenu',
   'accessibility.closeNavigationMenu',
+  'accessibility.legalLinks',
+  'accessibility.privateInquiry',
   'nav.experiences',
   'nav.philosophy',
   'nav.contact',
@@ -257,6 +261,18 @@ const enKeys = flattenKeys(enDictionary).sort();
 const trKeys = flattenKeys(trDictionary).sort();
 
 assert.deepEqual(trKeys, enKeys, 'EN and TR dictionary structures must match recursively');
+assert.doesNotThrow(() =>
+  assertDictionaryActivationReady('en', enDictionary as JsonObject, enDictionary as JsonObject)
+);
+assert.doesNotThrow(() =>
+  assertDictionaryActivationReady('tr', enDictionary as JsonObject, trDictionary as JsonObject)
+);
+assert.throws(
+  () =>
+    assertDictionaryActivationReady('zh', enDictionary as JsonObject, zhDictionary as JsonObject),
+  /Dictionary activation blocked/,
+  'Incomplete ZH dictionary must remain impossible to activate'
+);
 
 approvedKeys.forEach(assertApprovedString);
 

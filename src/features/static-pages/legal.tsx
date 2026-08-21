@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { localizePathname } from '@/lib/i18n/pathname';
 
 interface LegalSection {
   number: number;
@@ -155,7 +156,7 @@ export function TurkishLegalPage({ content }: { content: LegalPageContent }) {
       <div className="px-6 sm:px-10 lg:px-16 pt-28 pb-24 max-w-4xl mx-auto">
         <nav aria-label="Sayfa yolu" className="flex items-center gap-2 mb-12">
           <Link
-            href="/tr"
+            href={localizePathname('/', 'tr')}
             className="flex items-center gap-1 text-xs tracking-widest text-gray-500 hover:text-black transition-colors uppercase"
           >
             <span aria-hidden="true">←</span>

@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { localizePathname } from '@/lib/i18n/pathname';
 
 export function TurkishPhilosophyPage() {
   return (
@@ -89,7 +90,7 @@ export function TurkishPhilosophyPage() {
             Yazılar
           </p>
           <Link
-            href="/tr/insights"
+            href={localizePathname('/insights', 'tr')}
             className="inline-flex font-body text-xs uppercase tracking-[0.14em] text-white/34 transition-colors hover:text-white/70"
           >
             Okumaya devam et →
@@ -108,7 +109,7 @@ export function TurkishPhilosophyPage() {
             görüşmeliyiz.
           </h2>
           <Link
-            href="/tr/contact"
+            href={localizePathname('/contact', 'tr')}
             className="inline-flex min-h-11 items-center justify-center self-start border border-white/16 px-7 py-3 font-body text-[0.62rem] uppercase tracking-[0.28em] text-white/72 transition-colors duration-300 hover:border-white/32 hover:text-white"
           >
             ÖZEL TALEP

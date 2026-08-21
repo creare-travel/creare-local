@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import LanguageSelector from '@/components/LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
 import { getDictionary } from '@/lib/i18n/dictionaries';
+import { localizePathname } from '@/lib/i18n/pathname';
 import { getPrimaryNavigationRoutes } from '@/lib/i18n/static-routes';
 
 export default function Header() {
@@ -105,7 +106,7 @@ export default function Header() {
         aria-label={dictionary.accessibility.mainNavigation}
       >
         <Link
-          href={locale === 'tr' ? '/tr' : '/'}
+          href={localizePathname('/', locale)}
           className="group flex flex-shrink-0 items-center"
           aria-label={dictionary.accessibility.returnHome}
         >

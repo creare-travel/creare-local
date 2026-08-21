@@ -12,6 +12,7 @@ import {
 } from '@/data/cultural-worlds';
 import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
+import { resolveActiveLocaleAvailability } from '@/lib/i18n/availability';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { localizePathname } from '@/lib/i18n/pathname';
 import { getPrivateInquiryHref } from '@/lib/i18n/static-routes';
@@ -188,10 +189,12 @@ export function buildLocalizedCulturalWorldDetailMetadata({
   locale,
   slug,
   destination,
+  availableLocales,
 }: {
   locale: SiteLocale;
   slug: string;
   destination: CulturalWorldDetailMetadataDestination;
+  availableLocales?: readonly SiteLocale[];
 }): Metadata {
   return buildLocaleOwnedMetadata({
     locale,
@@ -208,6 +211,7 @@ export function buildLocalizedCulturalWorldDetailMetadata({
     imageAlt: destination.name || destination.cover_image?.alternativeText,
     robots: { index: true, follow: true },
     titleMode: destination.meta_title ? 'absolute' : 'templated',
+    availableLocales,
   });
 }
 
@@ -642,17 +646,33 @@ export async function generateCulturalWorldDetailMetadata({
     return buildCulturalWorldNotFoundMetadata(locale);
   }
 
-  const alternates = buildRouteCanonicalAlternates({
-    family: 'cultural-world-detail',
-    locale,
-    slug,
+  const availableLocales = await resolveActiveLocaleAvailability(async (candidateLocale) => {
+    if (candidateLocale === locale) return true;
+    const candidateContent = getCulturalWorldContent(slug, candidateLocale);
+    const candidateDestination = await fetchDestination(slug, candidateLocale);
+    if (candidateDestination) {
+      return candidateDestination.visibility_status?.toLowerCase() === 'active';
+    }
+    return Boolean(
+      canUseEnglishFallback(candidateLocale) &&
+      buildFallbackDestinationFromLocalContent(candidateContent)
+    );
   });
+  const alternates = buildRouteCanonicalAlternates(
+    {
+      family: 'cultural-world-detail',
+      locale,
+      slug,
+    },
+    availableLocales
+  );
 
   if (locale !== DEFAULT_SITE_LOCALE) {
     return buildLocalizedCulturalWorldDetailMetadata({
       locale,
       slug,
       destination: resolvedDestination,
+      availableLocales,
     });
   }
 

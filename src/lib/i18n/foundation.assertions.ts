@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
-import { getStrapiLocale, isSiteLocale } from './config';
+import { getStrapiLocale, isRegisteredLocale, isSiteLocale } from './config';
 import {
   getLocaleFromPathname,
+  getRegisteredLocaleFromPathname,
   isTurkishPathname,
   localizePathname,
   normalizePathname,
@@ -13,6 +14,7 @@ assert.equal(isSiteLocale('en'), true);
 assert.equal(isSiteLocale('tr'), true);
 assert.equal(isSiteLocale('ru'), false);
 assert.equal(isSiteLocale('zh'), false);
+assert.equal(isRegisteredLocale('zh'), true);
 assert.equal(isSiteLocale('ar'), false);
 assert.equal(isSiteLocale('fr'), false);
 assert.equal(isSiteLocale(''), false);
@@ -22,6 +24,7 @@ assert.equal(isSiteLocale('random'), false);
 
 assert.equal(getStrapiLocale('en'), 'en');
 assert.equal(getStrapiLocale('tr'), 'tr-TR');
+assert.equal(getStrapiLocale('zh'), 'zh-CN');
 
 assert.equal(normalizePathname('/'), '/');
 assert.equal(normalizePathname(''), '/');
@@ -45,6 +48,8 @@ assert.equal(getLocaleFromPathname('/tr/experiences/test'), 'tr');
 assert.equal(getLocaleFromPathname('/experiences/test'), 'en');
 assert.equal(getLocaleFromPathname('/travel'), 'en');
 assert.equal(getLocaleFromPathname('/trailing'), 'en');
+assert.equal(getLocaleFromPathname('/zh/experiences'), 'en');
+assert.equal(getRegisteredLocaleFromPathname('/zh/experiences'), 'zh');
 
 assert.equal(isTurkishPathname('/travel'), false);
 assert.equal(isTurkishPathname('/trailing'), false);
@@ -53,6 +58,7 @@ assert.equal(stripLocalePrefix('/tr'), '/');
 assert.equal(stripLocalePrefix('/tr/'), '/');
 assert.equal(stripLocalePrefix('/tr/insights/test'), '/insights/test');
 assert.equal(stripLocalePrefix('/travel'), '/travel');
+assert.equal(stripLocalePrefix('/zh/experiences/test'), '/experiences/test');
 
 assert.equal(localizePathname('/', 'tr'), '/tr');
 assert.equal(localizePathname('/tr', 'en'), '/');
@@ -61,6 +67,7 @@ assert.equal(localizePathname('/tr/experiences/test', 'en'), '/experiences/test'
 assert.equal(localizePathname('/tr/experiences/test', 'tr'), '/tr/experiences/test');
 assert.equal(localizePathname('/tr/tr/experiences/test', 'tr'), '/tr/experiences/test');
 assert.equal(localizePathname('/tr/tr/experiences/test', 'en'), '/experiences/test');
+assert.equal(localizePathname('/experiences/signature', 'zh'), '/zh/experiences/signature');
 
 assert.equal(
   buildLocalizedStrapiPath('/api/destinations?populate=deep', 'tr'),

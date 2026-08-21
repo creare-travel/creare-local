@@ -3,8 +3,22 @@
  * Use these across all pages for consistency.
  */
 import type { Metadata } from 'next';
-import { DEFAULT_SITE_LOCALE, isSiteLocale, type SiteLocale } from './i18n/config';
-import { localizePathname, stripLocalePrefix } from './i18n/pathname';
+import {
+  DEFAULT_SITE_LOCALE,
+  LOCALE_REGISTRY,
+  SUPPORTED_SITE_LOCALES,
+  isRegisteredLocale,
+  isSiteLocale,
+  type LocaleKey,
+  type SiteLocale,
+} from './i18n/config';
+import {
+  getLocaleFromPathname,
+  hasDuplicateLocalePrefix,
+  localizePathname,
+  stripLocalePrefix,
+} from './i18n/pathname';
+import { getAvailableStaticRouteLocales } from './i18n/static-routes';
 
 export const SITE_URL = 'https://crearetravel.com';
 export const SITE_NAME = 'Creare';
@@ -15,6 +29,7 @@ export type CanonicalRouteFamily =
   | 'cultural-worlds'
   | 'cultural-world-detail'
   | 'experiences'
+  | 'experience-category'
   | 'experience-detail'
   | 'insights'
   | 'insight-detail';
@@ -25,13 +40,8 @@ export interface RouteCanonicalOptions {
   slug?: string;
 }
 
-export type OpenGraphLocale = 'en_US' | 'tr_TR';
+export type OpenGraphLocale = (typeof LOCALE_REGISTRY)[LocaleKey]['ogLocale'];
 export type SupportedMetadataPageType = 'website' | 'article';
-
-const OPEN_GRAPH_LOCALE_BY_SITE_LOCALE = {
-  en: 'en_US',
-  tr: 'tr_TR',
-} as const satisfies Record<SiteLocale, OpenGraphLocale>;
 
 /**
  * Default OG image — 1200×630, used as fallback across all pages.
@@ -40,19 +50,9 @@ const OPEN_GRAPH_LOCALE_BY_SITE_LOCALE = {
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og/default.jpg`;
 export const DEFAULT_OG_IMAGE_ALT = 'Creare — Private Cultural Experiences Composed as Art';
 
-export const ACTIVE_HREFLANGS = ['en', 'tr'] as const;
-
-const RECIPROCALLY_LOCALIZED_STATIC_PATHS = new Set([
-  '/',
-  '/contact',
-  '/cookies',
-  '/cultural-worlds',
-  '/experiences',
-  '/insights',
-  '/philosophy',
-  '/privacy',
-  '/terms',
-]);
+export const ACTIVE_HREFLANGS = SUPPORTED_SITE_LOCALES.map(
+  (locale) => LOCALE_REGISTRY[locale].hreflang
+);
 
 export const DEFAULT_METADATA = {
   metadataBase: new URL(SITE_URL),
@@ -63,12 +63,12 @@ export const DEFAULT_METADATA = {
     'Creare curates private cultural encounters across Turkey and beyond — monastery access, atelier visits, and extraordinary moments for discerning clients.',
 };
 
-export function getOpenGraphLocale(locale: SiteLocale): OpenGraphLocale {
-  if (!isSiteLocale(locale)) {
+export function getOpenGraphLocale(locale: LocaleKey): OpenGraphLocale {
+  if (!isRegisteredLocale(locale)) {
     throw new Error(`Unsupported metadata locale: ${String(locale)}`);
   }
 
-  return OPEN_GRAPH_LOCALE_BY_SITE_LOCALE[locale];
+  return LOCALE_REGISTRY[locale].ogLocale;
 }
 
 /**
@@ -138,27 +138,27 @@ function getCanonicalRoutePath({ family, locale, slug }: RouteCanonicalOptions):
     throw new Error(`Unsupported canonical locale: ${String(locale)}`);
   }
 
-  const localePrefix = locale === DEFAULT_SITE_LOCALE ? '' : '/tr';
-
   switch (family) {
     case 'home':
       if (slug) throw new Error('Homepage canonical must not include a slug');
-      return locale === DEFAULT_SITE_LOCALE ? '/' : '/tr';
+      return localizePathname('/', locale);
     case 'cultural-worlds':
       if (slug) throw new Error('Cultural worlds listing canonical must not include a slug');
-      return `${localePrefix}/cultural-worlds`;
+      return localizePathname('/cultural-worlds', locale);
     case 'cultural-world-detail':
-      return `${localePrefix}/cultural-worlds/${normalizeSlugSegment(slug, family)}`;
+      return localizePathname(`/cultural-worlds/${normalizeSlugSegment(slug, family)}`, locale);
     case 'experiences':
       if (slug) throw new Error('Experiences listing canonical must not include a slug');
-      return `${localePrefix}/experiences`;
+      return localizePathname('/experiences', locale);
+    case 'experience-category':
+      return localizePathname(`/experiences/${normalizeSlugSegment(slug, family)}`, locale);
     case 'experience-detail':
-      return `${localePrefix}/experiences/${normalizeSlugSegment(slug, family)}`;
+      return localizePathname(`/experiences/${normalizeSlugSegment(slug, family)}`, locale);
     case 'insights':
       if (slug) throw new Error('Insights listing canonical must not include a slug');
-      return `${localePrefix}/insights`;
+      return localizePathname('/insights', locale);
     case 'insight-detail':
-      return `${localePrefix}/insights/${normalizeSlugSegment(slug, family)}`;
+      return localizePathname(`/insights/${normalizeSlugSegment(slug, family)}`, locale);
     default:
       throw new Error(`Unsupported canonical route family: ${String(family)}`);
   }
@@ -178,18 +178,8 @@ export function assertRouteCanonicalOwnership(
     throw new Error(`Metadata canonical must use ${PRODUCTION_CANONICAL_HOSTNAME}: ${canonical}`);
   }
 
-  const segments = url.pathname.split('/').filter(Boolean);
-
-  if (segments[0] === 'tr' && segments[1] === 'tr') {
-    throw new Error(`Metadata canonical cannot contain duplicate Turkish prefix: ${canonical}`);
-  }
-
-  if (route.locale === DEFAULT_SITE_LOCALE && segments[0] === 'tr') {
-    throw new Error(`English metadata canonical cannot use Turkish prefix: ${canonical}`);
-  }
-
-  if (route.locale !== DEFAULT_SITE_LOCALE && segments[0] !== 'tr') {
-    throw new Error(`Turkish metadata canonical must use Turkish prefix: ${canonical}`);
+  if (hasDuplicateLocalePrefix(url.pathname)) {
+    throw new Error(`Metadata canonical cannot contain a duplicate locale prefix: ${canonical}`);
   }
 
   const expectedCanonical = buildRouteCanonicalUrl(route);
@@ -201,29 +191,61 @@ export function assertRouteCanonicalOwnership(
   }
 }
 
-export function buildRouteCanonicalAlternates(options: RouteCanonicalOptions) {
-  const english = buildRouteCanonicalUrl({ ...options, locale: 'en' });
-  const turkish = buildRouteCanonicalUrl({ ...options, locale: 'tr' });
+export function buildRouteCanonicalAlternates(
+  options: RouteCanonicalOptions,
+  availableLocales: readonly SiteLocale[] = SUPPORTED_SITE_LOCALES
+) {
+  const languages = Object.fromEntries(
+    availableLocales.map((locale) => [
+      LOCALE_REGISTRY[locale].hreflang,
+      buildRouteCanonicalUrl({ ...options, locale }),
+    ])
+  ) as Record<string, string>;
 
-  return {
-    canonical: buildRouteCanonicalUrl(options),
-    languages: {
-      en: english,
-      tr: turkish,
-      'x-default': english,
-    },
-  };
+  if (availableLocales.includes(DEFAULT_SITE_LOCALE)) {
+    languages['x-default'] = buildRouteCanonicalUrl({
+      ...options,
+      locale: DEFAULT_SITE_LOCALE,
+    });
+  }
+
+  return { canonical: buildRouteCanonicalUrl(options), languages };
 }
 
-export function buildLocalizedLanguageAlternates(path: string) {
-  const english = canonicalUrl(localizePathname(path, 'en'));
-  const turkish = canonicalUrl(localizePathname(path, 'tr'));
+export function buildLocalizedLanguageAlternates(
+  path: string,
+  availableLocales: readonly SiteLocale[] = SUPPORTED_SITE_LOCALES
+): Record<string, string> {
+  const languages = Object.fromEntries(
+    availableLocales.map((locale) => [
+      LOCALE_REGISTRY[locale].hreflang,
+      canonicalUrl(localizePathname(path, locale)),
+    ])
+  ) as Record<string, string>;
 
-  return {
-    en: english,
-    tr: turkish,
-    'x-default': english,
-  };
+  if (availableLocales.includes(DEFAULT_SITE_LOCALE)) {
+    languages['x-default'] = canonicalUrl(localizePathname(path, DEFAULT_SITE_LOCALE));
+  }
+
+  return languages;
+}
+
+export function buildLanguageAlternatesFromLocalizedPaths(
+  paths: Readonly<Partial<Record<SiteLocale, string>>>
+): Record<string, string> {
+  const languages = Object.fromEntries(
+    SUPPORTED_SITE_LOCALES.flatMap((locale) => {
+      const path = paths[locale];
+      return path ? [[LOCALE_REGISTRY[locale].hreflang, canonicalUrl(path)]] : [];
+    })
+  ) as Record<string, string>;
+  const defaultPath = paths[DEFAULT_SITE_LOCALE];
+
+  if (defaultPath) {
+    languages['x-default'] = canonicalUrl(defaultPath);
+  }
+
+  return languages;
 }
 
 /**
@@ -232,43 +254,27 @@ export function buildLocalizedLanguageAlternates(path: string) {
 export function buildHreflangs(path: string): Array<{ hrefLang: string; href: string }> {
   const canonical = canonicalUrl(path);
   const normalizedPath = stripLocalePrefix(new URL(canonical).pathname);
+  const availableLocales = getAvailableStaticRouteLocales(normalizedPath);
+  const locales = availableLocales.length > 0 ? availableLocales : [getLocaleFromPathname(path)];
+  const languages = buildLocalizedLanguageAlternates(path, locales);
 
-  if (!RECIPROCALLY_LOCALIZED_STATIC_PATHS.has(normalizedPath)) {
-    return [
-      { hrefLang: 'en', href: canonical },
-      { hrefLang: 'x-default', href: canonical },
-    ];
-  }
-
-  const languages = buildLocalizedLanguageAlternates(path);
-  return [
-    ...ACTIVE_HREFLANGS.map((hrefLang) => ({ hrefLang, href: languages[hrefLang] })),
-    { hrefLang: 'x-default', href: languages['x-default'] },
-  ];
+  return Object.entries(languages).map(([hrefLang, href]) => ({ hrefLang, href }));
 }
 
-export function buildMetadataAlternates(path: string) {
+export function buildMetadataAlternates(path: string, availableLocales?: readonly SiteLocale[]) {
   const canonical = canonicalUrl(path);
   const normalizedPath = stripLocalePrefix(new URL(canonical).pathname);
+  const configuredLocales = availableLocales ?? getAvailableStaticRouteLocales(normalizedPath);
+  const locales = configuredLocales.length > 0 ? configuredLocales : [getLocaleFromPathname(path)];
 
-  if (RECIPROCALLY_LOCALIZED_STATIC_PATHS.has(normalizedPath)) {
-    return {
-      canonical,
-      languages: buildLocalizedLanguageAlternates(path),
-    };
-  }
-
-  return {
-    canonical,
-    languages: {
-      en: canonical,
-      'x-default': canonical,
-    },
-  };
+  return { canonical, languages: buildLocalizedLanguageAlternates(path, locales) };
 }
 
-function buildRouteMetadataAlternates(options: RouteCanonicalOptions) {
-  return buildRouteCanonicalAlternates(options);
+function buildRouteMetadataAlternates(
+  options: RouteCanonicalOptions,
+  availableLocales?: readonly SiteLocale[]
+) {
+  return buildRouteCanonicalAlternates(options, availableLocales);
 }
 
 export function stripBrandSuffix(title?: string | null): string | undefined {
@@ -393,6 +399,7 @@ export function buildLocaleOwnedMetadata(options: {
   type?: SupportedMetadataPageType;
   robots?: Metadata['robots'];
   titleMode?: 'templated' | 'absolute';
+  availableLocales?: readonly SiteLocale[];
 }): Metadata {
   if (!isSiteLocale(options.locale)) {
     throw new Error(`Unsupported metadata locale: ${String(options.locale)}`);
@@ -430,7 +437,7 @@ export function buildLocaleOwnedMetadata(options: {
     metadataBase: DEFAULT_METADATA.metadataBase,
     title: options.titleMode === 'absolute' ? { absolute: title } : title,
     description,
-    alternates: buildRouteMetadataAlternates(options.route),
+    alternates: buildRouteMetadataAlternates(options.route, options.availableLocales),
     ...(options.robots ? { robots: options.robots } : {}),
     openGraph: buildOpenGraph({
       title: openGraphTitle,

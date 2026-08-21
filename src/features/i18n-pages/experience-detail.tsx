@@ -18,6 +18,7 @@ import {
 import { buildCloudinaryUrl } from '@/lib/cloudinary';
 import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
+import { resolveActiveLocaleAvailability } from '@/lib/i18n/availability';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { buildLocalizedRouteTarget, localizePathname } from '@/lib/i18n/pathname';
 import {
@@ -412,11 +413,13 @@ export function buildLocalizedExperienceDetailMetadata({
   slug,
   item,
   image,
+  availableLocales,
 }: {
   locale: SiteLocale;
   slug: string;
   item: ExperienceDetailMetadataItem;
   image?: string | null;
+  availableLocales?: readonly SiteLocale[];
 }): Metadata {
   return buildLocaleOwnedMetadata({
     locale,
@@ -432,6 +435,7 @@ export function buildLocalizedExperienceDetailMetadata({
     imageAlt: item.title,
     robots: { index: true, follow: true },
     titleMode: item.seo_title ? 'absolute' : 'templated',
+    availableLocales,
   });
 }
 
@@ -1247,11 +1251,19 @@ export async function generateExperienceDetailMetadata({
 
   const strapiItem = result.item;
   const canonicalSlug = result.canonicalSlug;
-  const alternates = buildRouteCanonicalAlternates({
-    family: 'experience-detail',
-    locale,
-    slug: canonicalSlug,
+  const availableLocales = await resolveActiveLocaleAvailability(async (candidateLocale) => {
+    if (candidateLocale === locale) return true;
+    const candidate = await resolveExperienceDetailBySlug(canonicalSlug, candidateLocale);
+    return candidate.status === 'ok';
   });
+  const alternates = buildRouteCanonicalAlternates(
+    {
+      family: 'experience-detail',
+      locale,
+      slug: canonicalSlug,
+    },
+    availableLocales
+  );
 
   const ogTitle = strapiItem.seo_title ?? `${strapiItem.title} — CREARE`;
   const pageTitle = preserveTerminalBrandTitle(strapiItem.seo_title ?? strapiItem.title);
@@ -1264,6 +1276,7 @@ export async function generateExperienceDetailMetadata({
       slug: canonicalSlug,
       item: strapiItem,
       image: coverUrl,
+      availableLocales,
     });
   }
 

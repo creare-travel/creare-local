@@ -47,7 +47,9 @@
     "mainNavigation": "Ana menü",
     "mobileNavigation": "Mobil menü",
     "openNavigationMenu": "Menüyü aç",
-    "closeNavigationMenu": "Menüyü kapat"
+    "closeNavigationMenu": "Menüyü kapat",
+    "legalLinks": "Yasal bağlantılar",
+    "privateInquiry": "CREARE deneyimleri için özel talep gönderin"
   },
   "nav": {
     "experiences": "Deneyimler",

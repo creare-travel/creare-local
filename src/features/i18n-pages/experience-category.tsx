@@ -1,13 +1,38 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { localizePathname } from '@/lib/i18n/pathname';
+import { getAvailableStaticRouteLocales } from '@/lib/i18n/static-routes';
+import { buildLocaleOwnedMetadata } from '@/lib/seo';
 import { fetchStrapi } from '@/lib/strapi';
 import { collectionFeatures } from './experiences';
 
 export type ExperienceCategory = 'signature' | 'lab' | 'black';
+
+export function buildExperienceCategoryMetadata(
+  category: ExperienceCategory,
+  locale: SiteLocale
+): Metadata {
+  const dictionary = getDictionary(locale);
+  const copy = dictionary[category];
+  const path = `/experiences/${category}`;
+  const feature = collectionFeatures.find((item) => item.href.endsWith(`/${category}`));
+
+  return buildLocaleOwnedMetadata({
+    locale,
+    copyLocale: locale,
+    route: { family: 'experience-category', locale, slug: category },
+    title: `${copy.label} — ${copy.title}`,
+    description: `${copy.description1} ${copy.description2}`,
+    image: feature?.image,
+    imageAlt: copy.label,
+    robots: { index: true, follow: true },
+    availableLocales: getAvailableStaticRouteLocales(path),
+  });
+}
 
 interface StrapiExperience {
   id: number;

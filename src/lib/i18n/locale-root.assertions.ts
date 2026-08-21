@@ -36,8 +36,26 @@ const enLayoutSource = readSource(enLayoutPath);
 const trLayoutSource = readSource(trLayoutPath);
 const shellSource = readSource(shellPath);
 
-assert.equal(enLayoutSource.includes('<html lang="en">'), true, 'EN root owns lang="en"');
-assert.equal(trLayoutSource.includes('<html lang="tr">'), true, 'TR root owns lang="tr"');
+assert.equal(
+  enLayoutSource.includes("getLocaleDescriptor('en')"),
+  true,
+  'EN root owns the EN locale descriptor'
+);
+assert.equal(
+  trLayoutSource.includes("getLocaleDescriptor('tr')"),
+  true,
+  'TR root owns the TR locale descriptor'
+);
+assert.equal(
+  enLayoutSource.includes('lang={locale.htmlLang}'),
+  true,
+  'EN root derives HTML language from the locale registry'
+);
+assert.equal(
+  trLayoutSource.includes('lang={locale.htmlLang}'),
+  true,
+  'TR root derives HTML language from the locale registry'
+);
 assert.equal(
   enLayoutSource.includes('<LocaleRootShell locale="en">'),
   true,
@@ -191,7 +209,9 @@ appSourceFiles.forEach((filePath) => {
     relativePath.endsWith('/opengraph-image.tsx')
   ) {
     assert.equal(
-      relativePath.includes('src/app/(en)/') || relativePath.includes('src/app/(tr)/'),
+      relativePath.includes('src/app/(en)/') ||
+        relativePath.includes('src/app/(tr)/') ||
+        relativePath.includes('src/app/[locale]/'),
       true,
       `Route-owned file must live under a locale root group: ${relativePath}`
     );

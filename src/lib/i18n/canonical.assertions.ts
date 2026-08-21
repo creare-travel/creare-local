@@ -226,6 +226,7 @@ assert.deepEqual(buildMetadataAlternates('/experiences/signature'), {
   canonical: 'https://crearetravel.com/experiences/signature',
   languages: {
     en: 'https://crearetravel.com/experiences/signature',
+    tr: 'https://crearetravel.com/tr/experiences/signature',
     'x-default': 'https://crearetravel.com/experiences/signature',
   },
 });

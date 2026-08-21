@@ -6,9 +6,14 @@ import {
   isPublicInsightRecord,
 } from '@/lib/canonical-gates';
 import { insights as localInsights } from '@/data/insights';
-import { type SiteLocale } from '@/lib/i18n/config';
+import { DEFAULT_SITE_LOCALE, SUPPORTED_SITE_LOCALES, type SiteLocale } from '@/lib/i18n/config';
 import { localizePathname } from '@/lib/i18n/pathname';
-import { SITE_URL, buildLocalizedLanguageAlternates } from '@/lib/seo';
+import {
+  SITE_URL,
+  buildLanguageAlternatesFromLocalizedPaths,
+  buildLocalizedLanguageAlternates,
+} from '@/lib/seo';
+import { getAvailableStaticRouteLocales } from '@/lib/i18n/static-routes';
 import { fetchStrapi } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
@@ -36,6 +41,11 @@ interface SitemapExperience extends SitemapRecord {
 
 interface SitemapInsight extends SitemapRecord {
   title?: string;
+}
+
+interface LocalizedInventory<T extends SitemapRecord> {
+  locale: SiteLocale;
+  records: T[];
 }
 
 const LEGACY_INSIGHT_SLUG_MAP: Record<string, string> = {
@@ -85,24 +95,14 @@ function createLocalizedStaticEntries(
   path: string,
   options: Pick<Parameters<typeof createEntry>[1], 'changeFrequency' | 'priority'>
 ): SitemapEntry[] {
-  const alternates = { languages: buildLocalizedLanguageAlternates(path) };
+  const availableLocales = getAvailableStaticRouteLocales(path);
+  const alternates = {
+    languages: buildLocalizedLanguageAlternates(path, availableLocales),
+  };
 
-  return (['en', 'tr'] as const).map((locale) =>
+  return availableLocales.map((locale) =>
     createEntry(localizePathname(path, locale), { ...options, alternates })
   );
-}
-
-function buildPairedAlternates(englishPath: string, turkishPath: string) {
-  const english = `${SITE_URL}${englishPath}`;
-  const turkish = `${SITE_URL}${turkishPath}`;
-
-  return {
-    languages: {
-      en: english,
-      tr: turkish,
-      'x-default': english,
-    },
-  };
 }
 
 function isLocalizedCounterpart(left: SitemapRecord, right: SitemapRecord) {
@@ -124,40 +124,42 @@ function dedupeBySlug<T extends SitemapRecord>(records: T[]): T[] {
 }
 
 function buildLocalizedDetailEntries<T extends SitemapRecord>(
-  englishRecords: T[],
-  turkishRecords: T[],
+  inventories: ReadonlyArray<LocalizedInventory<T>>,
   pathPrefix: '/cultural-worlds' | '/experiences' | '/insights',
   options: Pick<Parameters<typeof createEntry>[1], 'changeFrequency' | 'priority'>
 ): SitemapEntry[] {
-  const buildEntries = (records: T[], counterparts: T[], locale: SiteLocale): SitemapEntry[] =>
+  const buildEntries = ({ locale, records }: LocalizedInventory<T>): SitemapEntry[] =>
     records.flatMap((record) => {
       if (!record.slug) return [];
 
-      const counterpart = counterparts.find((candidate) =>
-        isLocalizedCounterpart(record, candidate)
-      );
       const path = localizePathname(`${pathPrefix}/${record.slug}`, locale);
-      const counterpartPath = counterpart?.slug
-        ? localizePathname(`${pathPrefix}/${counterpart.slug}`, locale === 'en' ? 'tr' : 'en')
-        : undefined;
-      const englishPath = locale === 'en' ? path : counterpartPath;
-      const turkishPath = locale === 'tr' ? path : counterpartPath;
+      const localizedPaths = Object.fromEntries(
+        inventories.flatMap((inventory) => {
+          const counterpart = inventory.records.find((candidate) =>
+            isLocalizedCounterpart(record, candidate)
+          );
+          return counterpart?.slug
+            ? [
+                [
+                  inventory.locale,
+                  localizePathname(`${pathPrefix}/${counterpart.slug}`, inventory.locale),
+                ],
+              ]
+            : [];
+        })
+      ) as Partial<Record<SiteLocale, string>>;
+      const languages = buildLanguageAlternatesFromLocalizedPaths(localizedPaths);
 
       return [
         createEntry(path, {
           ...options,
           lastModified: resolveLastModified(record.updatedAt, record.publishedAt),
-          ...(englishPath && turkishPath
-            ? { alternates: buildPairedAlternates(englishPath, turkishPath) }
-            : {}),
+          ...(Object.keys(languages).length > 0 ? { alternates: { languages } } : {}),
         }),
       ];
     });
 
-  return [
-    ...buildEntries(englishRecords, turkishRecords, 'en'),
-    ...buildEntries(turkishRecords, englishRecords, 'tr'),
-  ].sort((a, b) => a.url.localeCompare(b.url));
+  return inventories.flatMap(buildEntries).sort((a, b) => a.url.localeCompare(b.url));
 }
 
 async function fetchActiveCulturalWorldRecords(locale: SiteLocale): Promise<SitemapDestination[]> {
@@ -179,7 +181,7 @@ async function fetchActiveCulturalWorldRecords(locale: SiteLocale): Promise<Site
       error,
     });
 
-    if (locale === 'tr') return [];
+    if (locale !== DEFAULT_SITE_LOCALE) return [];
 
     return ['bodrum', 'cappadocia', 'istanbul'].map((slug, index) => ({
       id: 9000 + index,
@@ -255,40 +257,40 @@ async function fetchCanonicalInsightRecords(locale: SiteLocale): Promise<Sitemap
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [
-    englishCulturalWorlds,
-    turkishCulturalWorlds,
-    englishExperiences,
-    turkishExperiences,
-    englishInsights,
-    turkishInsights,
-  ] = await Promise.all([
-    fetchActiveCulturalWorldRecords('en'),
-    fetchActiveCulturalWorldRecords('tr'),
-    fetchCanonicalExperienceRecords('en'),
-    fetchCanonicalExperienceRecords('tr'),
-    fetchCanonicalInsightRecords('en'),
-    fetchCanonicalInsightRecords('tr'),
+  const [culturalWorldInventories, experienceInventories, insightInventories] = await Promise.all([
+    Promise.all(
+      SUPPORTED_SITE_LOCALES.map(async (locale) => ({
+        locale,
+        records: await fetchActiveCulturalWorldRecords(locale),
+      }))
+    ),
+    Promise.all(
+      SUPPORTED_SITE_LOCALES.map(async (locale) => ({
+        locale,
+        records: await fetchCanonicalExperienceRecords(locale),
+      }))
+    ),
+    Promise.all(
+      SUPPORTED_SITE_LOCALES.map(async (locale) => ({
+        locale,
+        records: await fetchCanonicalInsightRecords(locale),
+      }))
+    ),
   ]);
 
   const culturalWorldEntries = buildLocalizedDetailEntries(
-    englishCulturalWorlds,
-    turkishCulturalWorlds,
+    culturalWorldInventories,
     '/cultural-worlds',
     { changeFrequency: 'weekly', priority: 0.85 }
   );
-  const experienceEntries = buildLocalizedDetailEntries(
-    englishExperiences,
-    turkishExperiences,
-    '/experiences',
-    { changeFrequency: 'monthly', priority: 0.8 }
-  );
-  const insightEntries = buildLocalizedDetailEntries(
-    englishInsights,
-    turkishInsights,
-    '/insights',
-    { changeFrequency: 'monthly', priority: 0.75 }
-  );
+  const experienceEntries = buildLocalizedDetailEntries(experienceInventories, '/experiences', {
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  });
+  const insightEntries = buildLocalizedDetailEntries(insightInventories, '/insights', {
+    changeFrequency: 'monthly',
+    priority: 0.75,
+  });
 
   return [
     ...createLocalizedStaticEntries('/', { changeFrequency: 'weekly', priority: 1.0 }),
@@ -296,9 +298,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.9,
     }),
-    createEntry('/experiences/lab', { changeFrequency: 'weekly', priority: 0.85 }),
-    createEntry('/experiences/signature', { changeFrequency: 'weekly', priority: 0.85 }),
-    createEntry('/experiences/black', { changeFrequency: 'weekly', priority: 0.85 }),
+    ...createLocalizedStaticEntries('/experiences/lab', {
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    }),
+    ...createLocalizedStaticEntries('/experiences/signature', {
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    }),
+    ...createLocalizedStaticEntries('/experiences/black', {
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    }),
     ...experienceEntries,
     ...createLocalizedStaticEntries('/cultural-worlds', {
       changeFrequency: 'weekly',

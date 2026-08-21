@@ -6,6 +6,7 @@ import OutboundLink from '@/components/analytics/OutboundLink';
 import { trackCtaClick } from '@/lib/analytics/tracking';
 import { buildExperienceInquiryHref } from '@/lib/inquiry';
 import { useLanguage } from '@/context/LanguageContext';
+import { localizePathname } from '@/lib/i18n/pathname';
 
 interface CTASectionProps {
   heading?: string;
@@ -42,9 +43,7 @@ export default function CTASection({
     buttonHref === '/contact' && experienceSlug
       ? buildExperienceInquiryHref(experienceSlug, locale)
       : buttonHref === '/contact'
-        ? locale === 'tr'
-          ? '/tr/contact'
-          : '/contact'
+        ? localizePathname('/contact', locale)
         : buttonHref;
 
   const handleCtaClick = () => {

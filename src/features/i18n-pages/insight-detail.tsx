@@ -22,7 +22,8 @@ import { getInsightBySlug, isCanonicalCulturalWorldSlug, type Insight } from '@/
 import { isRenderableEditorialImage } from '@/lib/editorial-image';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
-import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
+import { DEFAULT_SITE_LOCALE, getLocaleDescriptor, type SiteLocale } from '@/lib/i18n/config';
+import { resolveActiveLocaleAvailability } from '@/lib/i18n/availability';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { buildLocalizedRouteTarget, localizePathname } from '@/lib/i18n/pathname';
 import {
@@ -184,10 +185,12 @@ export function buildLocalizedInsightDetailMetadata({
   locale,
   slug,
   insight,
+  availableLocales,
 }: {
   locale: SiteLocale;
   slug: string;
   insight: InsightDetailMetadataItem;
+  availableLocales?: readonly SiteLocale[];
 }): Metadata {
   const title = stripBrandSuffix(insight.seo_title || insight.title) || 'Not Found';
   const description = insight.seo_description || insight.excerpt || '';
@@ -207,6 +210,7 @@ export function buildLocalizedInsightDetailMetadata({
     imageAlt: insight.cover_image?.alternativeText ?? title,
     type: 'article',
     titleMode: insight.seo_title ? 'absolute' : 'templated',
+    availableLocales,
   });
 }
 const MAX_RELATED_ESSAYS = 4;
@@ -508,17 +512,25 @@ export async function generateInsightDetailMetadata({
   // SEO fallbacks: seo_title || title, seo_description || excerpt
   const title = stripBrandSuffix(insight.seo_title || insight.title) || 'Not Found';
   const description = insight.seo_description || insight.excerpt || '';
-  const alternates = buildRouteCanonicalAlternates({
-    family: 'insight-detail',
-    locale,
-    slug: canonicalSlug,
+  const availableLocales = await resolveActiveLocaleAvailability(async (candidateLocale) => {
+    if (candidateLocale === locale) return true;
+    return Boolean(await resolveInsight(canonicalSlug, candidateLocale));
   });
+  const alternates = buildRouteCanonicalAlternates(
+    {
+      family: 'insight-detail',
+      locale,
+      slug: canonicalSlug,
+    },
+    availableLocales
+  );
 
   if (locale !== DEFAULT_SITE_LOCALE) {
     return buildLocalizedInsightDetailMetadata({
       locale,
       slug: canonicalSlug,
       insight,
+      availableLocales,
     });
   }
 
@@ -850,7 +862,8 @@ export async function renderInsightDetailPage(slug: string, locale: SiteLocale) 
     destinationName,
     destinationSlug: insight.destination?.slug,
     destinationUrl: locale === DEFAULT_SITE_LOCALE ? undefined : destinationUrl,
-    inLanguage: locale === DEFAULT_SITE_LOCALE ? undefined : 'tr-TR',
+    inLanguage:
+      locale === DEFAULT_SITE_LOCALE ? undefined : getLocaleDescriptor(locale).jsonLdLanguage,
     relatedEssays: relatedEssays.map((essay) => ({
       title: essay.title,
       url: canonicalUrl(localizePathname(`/insights/${essay.slug}`, locale)),

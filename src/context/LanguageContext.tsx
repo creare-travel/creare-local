@@ -1,7 +1,12 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import { LOCALE_OPTIONS, LOCALE_STORAGE_KEY, type SiteLocale } from '@/lib/i18n/config';
+import {
+  LOCALE_OPTIONS,
+  LOCALE_STORAGE_KEY,
+  getLocaleDescriptor,
+  type SiteLocale,
+} from '@/lib/i18n/config';
 import { getLocaleFromPathname } from '@/lib/i18n/pathname';
 
 export type Locale = SiteLocale;
@@ -78,7 +83,7 @@ export function LanguageProvider({ children, initialLocale }: LanguageProviderPr
     [translations]
   );
 
-  const dir: 'ltr' | 'rtl' = 'ltr';
+  const dir = getLocaleDescriptor(locale).direction;
 
   return (
     <LanguageContext.Provider value={{ locale, setLocale, t, dir }}>

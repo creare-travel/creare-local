@@ -47,7 +47,9 @@
     "mainNavigation": "Main navigation",
     "mobileNavigation": "Mobile navigation",
     "openNavigationMenu": "Open navigation menu",
-    "closeNavigationMenu": "Close navigation menu"
+    "closeNavigationMenu": "Close navigation menu",
+    "legalLinks": "Legal links",
+    "privateInquiry": "Inquire privately about CREARE experiences"
   },
   "nav": {
     "experiences": "Experiences",

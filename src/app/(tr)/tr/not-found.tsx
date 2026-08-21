@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import NotFoundClient from '@/app/NotFoundClient';
 import { getDictionary } from '@/lib/i18n/dictionaries';
+import { getOpenGraphLocale } from '@/lib/seo';
+import { localizePathname } from '@/lib/i18n/pathname';
 
 export const metadata: Metadata = {
   title: { absolute: '404' },
@@ -11,7 +13,7 @@ export const metadata: Metadata = {
     description: '404',
     siteName: 'Creare',
     type: 'website',
-    locale: 'tr_TR',
+    locale: getOpenGraphLocale('tr'),
   },
   twitter: {
     card: 'summary',
@@ -21,5 +23,7 @@ export const metadata: Metadata = {
 };
 
 export default function TurkishNotFound() {
-  return <NotFoundClient copy={getDictionary('tr').notFound} homeHref="/tr" />;
+  return (
+    <NotFoundClient copy={getDictionary('tr').notFound} homeHref={localizePathname('/', 'tr')} />
+  );
 }

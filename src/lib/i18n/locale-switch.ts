@@ -1,11 +1,16 @@
 import { DEFAULT_SITE_LOCALE, isSiteLocale, type SiteLocale } from './config';
 import {
   getLocaleFromPathname,
+  hasDuplicateLocalePrefix,
   localizePathname,
   normalizePathname,
   stripLocalePrefix,
 } from './pathname';
-import { EXPERIENCE_CATEGORY_ROUTES } from './static-routes';
+import {
+  EXPERIENCE_CATEGORY_ROUTES,
+  getStaticRoutePolicy,
+  isRouteAvailableForLocale,
+} from './static-routes';
 
 export type LocaleSwitchFamily = 'cultural-worlds' | 'experiences' | 'insights';
 
@@ -49,16 +54,6 @@ type RouteProbe = (
 const ROUTE_FAMILIES = new Set<LocaleSwitchFamily>(['cultural-worlds', 'experiences', 'insights']);
 
 const EXPERIENCE_CATEGORY_PATHS = new Set<string>(EXPERIENCE_CATEGORY_ROUTES);
-
-const STATIC_ROUTES_WITH_TR = new Set([
-  '/contact',
-  '/philosophy',
-  '/privacy',
-  '/cookies',
-  '/terms',
-]);
-
-const STATIC_ROUTES_WITHOUT_TR = new Set(['/editorial', '/stories', '/thank-you']);
 
 const LISTING_PATHS = new Set(['/cultural-worlds', '/experiences', '/insights']);
 
@@ -154,18 +149,7 @@ export function classifyLocalizedRoute(pathname: string): LocalizedRouteClassifi
     };
   }
 
-  if (STATIC_ROUTES_WITH_TR.has(unprefixedPathname)) {
-    return {
-      currentLocale,
-      family: null,
-      kind: 'static',
-      normalizedPathname,
-      slug: null,
-      unprefixedPathname,
-    };
-  }
-
-  if (currentLocale === DEFAULT_SITE_LOCALE && STATIC_ROUTES_WITHOUT_TR.has(unprefixedPathname)) {
+  if (getStaticRoutePolicy(unprefixedPathname)) {
     return {
       currentLocale,
       family: null,
@@ -212,7 +196,7 @@ export function getLocaleFallbackPath(pathname: string, targetLocale: SiteLocale
     return getFamilyListingPath('experiences', targetLocale);
   }
 
-  return targetLocale === 'tr' ? '/tr' : '/';
+  return localizePathname('/', targetLocale);
 }
 
 export function buildLocaleSwitchCandidate(
@@ -241,9 +225,11 @@ export function buildLocaleSwitchCandidate(
     return localizePathname(classification.unprefixedPathname, targetLocale);
   }
 
+  const staticRoute = getStaticRoutePolicy(classification.unprefixedPathname);
   if (
     classification.kind === 'static' &&
-    STATIC_ROUTES_WITH_TR.has(classification.unprefixedPathname)
+    staticRoute &&
+    isRouteAvailableForLocale(staticRoute, targetLocale)
   ) {
     return localizePathname(classification.unprefixedPathname, targetLocale);
   }
@@ -317,11 +303,6 @@ export function getSafeSameOriginPath(value: string, origin: string): string | n
   return `${url.pathname}${url.search}`;
 }
 
-function hasDuplicateTurkishPrefix(pathname: string): boolean {
-  const segments = pathname.split('/').filter(Boolean);
-  return segments[0] === 'tr' && segments[1] === 'tr';
-}
-
 function isExpectedLocalePath(pathname: string, targetLocale: SiteLocale): boolean {
   return getLocaleFromPathname(pathname) === targetLocale;
 }
@@ -346,7 +327,7 @@ function getValidatedRouteProbePath({
 
   const url = new URL(value, origin);
 
-  if (hasDuplicateTurkishPrefix(url.pathname)) return null;
+  if (hasDuplicateLocalePrefix(url.pathname)) return null;
   if (!isExpectedLocalePath(url.pathname, targetLocale)) return null;
   if (!isExpectedFamilyPath(url.pathname, expectedFamily)) return null;
 

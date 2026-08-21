@@ -1,7 +1,7 @@
-import { DEFAULT_SITE_LOCALE, type SiteLocale } from './config';
+import { DEFAULT_SITE_LOCALE, type LocaleKey, type SiteLocale } from './config';
 import { buildLocalizedStrapiPath } from '@/lib/strapi';
 
-export function canUseEnglishFallback(locale: SiteLocale): boolean {
+export function canUseEnglishFallback(locale: LocaleKey): boolean {
   return locale === DEFAULT_SITE_LOCALE;
 }
 

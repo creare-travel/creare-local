@@ -12,6 +12,7 @@ import {
   getExperienceSlug,
 } from '@/lib/analytics/tracking';
 import type { SiteLocale } from '@/lib/i18n/config';
+import { DEFAULT_SITE_LOCALE } from '@/lib/i18n/config';
 
 interface FormData {
   name: string;
@@ -246,7 +247,7 @@ export default function ContactPageClient({
       }
     } catch (err) {
       const rawErrorMessage = err instanceof Error ? err.message : copy.genericFailure;
-      const errorMessage = locale === 'tr' ? copy.genericFailure : rawErrorMessage;
+      const errorMessage = locale === DEFAULT_SITE_LOCALE ? rawErrorMessage : copy.genericFailure;
 
       // Fire form_error on failure
       trackFormError({

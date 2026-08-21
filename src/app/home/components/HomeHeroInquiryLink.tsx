@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import type { SiteLocale } from '@/lib/i18n/config';
 import { DEFAULT_SITE_LOCALE } from '@/lib/i18n/config';
 import { getPrivateInquiryHref } from '@/lib/i18n/static-routes';
+import { getDictionary } from '@/lib/i18n/dictionaries';
 import { trackCtaClick } from '@/lib/analytics/tracking';
 
 interface HomeHeroInquiryLinkProps {
@@ -20,10 +21,7 @@ export default function HomeHeroInquiryLink({
 }: HomeHeroInquiryLinkProps) {
   const pathname = usePathname();
   const href = getPrivateInquiryHref(locale);
-  const ariaLabel =
-    locale === 'tr'
-      ? 'CREARE deneyimleri için özel talep gönderin'
-      : 'Inquire privately about CREARE experiences';
+  const ariaLabel = getDictionary(locale).accessibility.privateInquiry;
 
   if (!href) return null;
 

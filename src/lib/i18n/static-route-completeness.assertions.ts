@@ -60,7 +60,7 @@ assert.deepEqual(
   'TR legal footer links must expose implemented Turkish legal routes'
 );
 
-PRIMARY_NAVIGATION_ROUTES.filter((route) => route.trAvailability === 'available').forEach(
+PRIMARY_NAVIGATION_ROUTES.filter((route) => route.availability.tr === 'available').forEach(
   (route) => {
     assertNonEmptyTurkishKey(`global.nav.${route.key}`);
     assertNonEmptyTurkishKey(`global.footer.${route.key}`);
@@ -68,13 +68,13 @@ PRIMARY_NAVIGATION_ROUTES.filter((route) => route.trAvailability === 'available'
 );
 
 assert.equal(
-  PRIMARY_NAVIGATION_ROUTES.some((route) => route.trAvailability === 'copy-approval-required'),
+  PRIMARY_NAVIGATION_ROUTES.some((route) => route.availability.tr === 'copy-approval-required'),
   false,
   'TR copy-approved primary routes must no longer be marked unavailable'
 );
 
 assert.equal(
-  LEGAL_NAVIGATION_ROUTES.some((route) => route.trAvailability === 'legal-approval-required'),
+  LEGAL_NAVIGATION_ROUTES.some((route) => route.availability.tr === 'legal-approval-required'),
   false,
   'Implemented TR legal routes must no longer be marked unavailable'
 );
@@ -236,7 +236,7 @@ const turkishNotFoundSource = readFileSync(
   'utf8'
 );
 assert.equal(
-  turkishNotFoundSource.includes('homeHref="/tr"'),
+  turkishNotFoundSource.includes("homeHref={localizePathname('/', 'tr')}"),
   true,
   'Turkish 404 must pass the Turkish home target explicitly'
 );

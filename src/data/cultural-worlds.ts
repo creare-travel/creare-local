@@ -380,7 +380,12 @@ export function getCulturalWorldSystems(
   locale: SiteLocale = DEFAULT_SITE_LOCALE
 ): CulturalWorldSystemsContent | null {
   if (!slug) return null;
-  if (locale === 'tr') return TR_CULTURAL_WORLD_SYSTEMS[slug] ?? null;
+  const localizedSystems: Partial<Record<SiteLocale, Record<string, CulturalWorldSystemsContent>>> =
+    {
+      tr: TR_CULTURAL_WORLD_SYSTEMS,
+    };
+  const localeOwnedSystems = localizedSystems[locale];
+  if (localeOwnedSystems) return localeOwnedSystems[slug] ?? null;
 
   const content = getCulturalWorldContent(slug, locale);
   if (!content) return null;
