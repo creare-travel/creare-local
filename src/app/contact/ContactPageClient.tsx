@@ -11,7 +11,7 @@ import {
   trackFormError,
   getExperienceSlug,
 } from '@/lib/analytics/tracking';
-import type { SiteLocale } from '@/lib/i18n/config';
+import type { LocaleKey } from '@/lib/i18n/config';
 import { DEFAULT_SITE_LOCALE } from '@/lib/i18n/config';
 
 interface FormData {
@@ -30,7 +30,7 @@ interface FormErrors {
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
 interface ContactPageClientProps {
-  locale?: SiteLocale;
+  locale?: LocaleKey;
   successRedirectHref?: string | null;
 }
 
@@ -90,6 +90,8 @@ const contactCopy = {
     scope:
       'Experience scope, timelines, and response expectations are discussed confidentially, so each engagement can move from inquiry to planning with the right level of clarity, privacy, and local coordination.',
     locationScope: 'Istanbul • Bodrum • International',
+    contactSectionAriaLabel: 'Contact information and inquiry form',
+    capabilitySectionAriaLabel: 'Global execution capability',
   },
   tr: {
     heroTitle: 'Özel Talepler',
@@ -145,6 +147,58 @@ const contactCopy = {
     roots: 'İstanbul ve Bodrum kökleriyle.',
     scope: 'Deneyim kapsamı ve zaman planı gizlilik içinde görüşülür.',
     locationScope: 'İstanbul • Bodrum • Uluslararası',
+    contactSectionAriaLabel: 'Contact information and inquiry form',
+    capabilitySectionAriaLabel: 'Global execution capability',
+  },
+  zh: {
+    heroTitle: '私享咨询',
+    heroSupport: '我们将亲自回复。',
+    heroDescription:
+      '面向战略合作、私人委托与保密协作。我们亲自回应国际宾客的需求、合作伙伴引荐及具有特定文化语境的策划简报；在提出任何方案、展开协调或设计通达方式之前，每一项咨询都会在保密前提下审阅。',
+    directLineLabel: '专线电话',
+    directLineDescription: '用于私享咨询的直接联络专线。',
+    privateMessageLabel: '私密消息渠道',
+    privateMessageDescription: '加密私密消息沟通。',
+    emailLabel: '电子邮箱',
+    emailDescription:
+      '用于私人需求、结构化方案与战略合作。尽早沟通有助于明确节奏、可行性，以及与接待方、文化合作伙伴和当地执行团队协调所需的程度。',
+    locationLabel: '地址',
+    locationDescription: '会面仅接受预约。',
+    mapsAriaLabel: '在 Google Maps 上查看 CREARE 办公室位置 — 32G7+P8 Şişli, İstanbul',
+    meetingButtonAriaLabel: '申请与 CREARE 会面',
+    meetingButtonLabel: '与 CREARE™ 沟通',
+    imageAlt: 'CREARE Travel Consultancy Limited Co. 所在的伊斯坦布尔 Şişli Ferko Signature Plaza',
+    successTitle: '谢谢。',
+    successMessage: '我们已收到您的咨询，将很快与您联系。',
+    formAriaLabel: '私享咨询表单',
+    nameLabel: '姓名',
+    namePlaceholder: '您的姓名',
+    emailLabelField: '电子邮箱',
+    emailPlaceholder: '您的电子邮箱地址',
+    intentLabel: '项目意向',
+    intents: ['私人旅行', '企业与品牌体验', '文化体验', '超私密通达', '长期合作'],
+    messageLabel: '留言',
+    messagePlaceholder: '请告诉我们您的构想……',
+    messageHelper: '分享您的目标，由我们构筑其结构。',
+    submitAriaLabel: '提交您的私享咨询',
+    loadingLabel: '正在发送……',
+    submitLabel: '发送咨询 →',
+    confidentiality: '所有咨询均由我们亲自审阅，并严格保密。',
+    requiredName: '请输入您的姓名。',
+    requiredEmail: '请输入您的电子邮箱地址。',
+    invalidEmail: '请输入有效的电子邮箱地址。',
+    requiredMessage: '请输入留言。',
+    genericFailure: '发生错误，请重试。',
+    globalCapabilityLabel: '全球执行能力',
+    globalCapabilityText:
+      '跨境体验执行 • 品牌及机构合作 • 多市场协调 • 高安全级别合作；所有策划均围绕审慎、清晰沟通，以及在不同文化与运营环境中落实复杂需求的现实条件展开。',
+    operatingInternationally: '业务遍及全球。',
+    roots: '植根于伊斯坦布尔与博德鲁姆。',
+    scope:
+      '体验范围、时间安排与回应预期均在保密前提下讨论，使每一次合作都能在适当的清晰度、私密性与当地协调支持下，从咨询进入策划。',
+    locationScope: '伊斯坦布尔 • 博德鲁姆 • 全球',
+    contactSectionAriaLabel: '联系信息与咨询表单',
+    capabilitySectionAriaLabel: '全球执行能力',
   },
 } as const;
 
@@ -279,10 +333,7 @@ export default function ContactPageClient({
       </section>
 
       {/* Two-Column Layout */}
-      <section
-        className="px-6 sm:px-10 lg:px-16 pb-24"
-        aria-label="Contact information and inquiry form"
-      >
+      <section className="px-6 sm:px-10 lg:px-16 pb-24" aria-label={copy.contactSectionAriaLabel}>
         <div className="w-full max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-[45%_55%] gap-16 lg:gap-24 items-start">
             {/* Left Column — Contact Details */}
@@ -579,7 +630,7 @@ export default function ContactPageClient({
       {/* Global Execution Capability */}
       <section
         className="w-full flex flex-col items-center pb-24 pt-8"
-        aria-label="Global execution capability"
+        aria-label={copy.capabilitySectionAriaLabel}
       >
         <h2 className="text-white font-body text-[10px] tracking-[0.3em] uppercase mb-4">
           {copy.globalCapabilityLabel}

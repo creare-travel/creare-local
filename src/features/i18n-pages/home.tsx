@@ -10,7 +10,7 @@ import {
   DEFAULT_OG_IMAGE_ALT,
   getOpenGraphLocale,
 } from '@/lib/seo';
-import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
+import { DEFAULT_SITE_LOCALE, type LocaleKey, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { localizePathname } from '@/lib/i18n/pathname';
 import { getPrivateInquiryHref } from '@/lib/i18n/static-routes';
@@ -48,6 +48,21 @@ export const metadata: Metadata = {
   },
 };
 
+const HOMEPAGE_STATIC_ACCESSIBILITY = {
+  en: {
+    discovery: 'Homepage experience system discovery',
+    contact: 'Homepage contact call to action',
+  },
+  tr: {
+    discovery: 'Homepage experience system discovery',
+    contact: 'Homepage contact call to action',
+  },
+  zh: {
+    discovery: '首页体验体系探索',
+    contact: '首页联系行动',
+  },
+} as const satisfies Record<LocaleKey, { discovery: string; contact: string }>;
+
 export function renderHomePage(locale: SiteLocale = DEFAULT_SITE_LOCALE) {
   const dictionary = getDictionary(locale);
   const homepageSchema = buildHomepageWebPageGraph();
@@ -57,6 +72,7 @@ export function renderHomePage(locale: SiteLocale = DEFAULT_SITE_LOCALE) {
     dictionary.home.mainParagraph.paragraph3,
   ].join(' ');
   const privateInquiryHref = getPrivateInquiryHref(locale);
+  const accessibility = HOMEPAGE_STATIC_ACCESSIBILITY[locale];
 
   return (
     <main className="min-h-screen bg-black">
@@ -65,7 +81,7 @@ export function renderHomePage(locale: SiteLocale = DEFAULT_SITE_LOCALE) {
       )}
       <HeroSection dictionary={dictionary} locale={locale} />
       <CollectionsSection dictionary={dictionary} locale={locale} />
-      <section className="bg-neutral-50" aria-label="Homepage experience system discovery">
+      <section className="bg-neutral-50" aria-label={accessibility.discovery}>
         <div className="mx-auto max-w-7xl px-6 pb-24 sm:px-10 sm:pb-28 lg:px-16 lg:pb-32">
           <p className="mb-6 max-w-2xl font-body text-sm leading-relaxed text-neutral-700">
             {mainParagraph}
@@ -79,10 +95,7 @@ export function renderHomePage(locale: SiteLocale = DEFAULT_SITE_LOCALE) {
         </div>
       </section>
       {privateInquiryHref && (
-        <section
-          className="border-t border-white/10 bg-black"
-          aria-label="Homepage contact call to action"
-        >
+        <section className="border-t border-white/10 bg-black" aria-label={accessibility.contact}>
           <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-12 sm:px-10 sm:py-14 lg:flex-row lg:items-center lg:justify-between lg:px-16 lg:py-16">
             <h2
               className="font-display font-light leading-tight text-white"

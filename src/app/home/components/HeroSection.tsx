@@ -1,7 +1,7 @@
 import { buildCloudinaryUrl } from '@/lib/cloudinary';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 import HomeHeroInquiryLink from '@/app/home/components/HomeHeroInquiryLink';
-import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
+import { DEFAULT_SITE_LOCALE, type LocaleKey, type SiteLocale } from '@/lib/i18n/config';
 import type { Dictionary } from '@/lib/i18n/types';
 
 const HOMEPAGE_HERO_PUBLIC_ID = 'creare-hero-image.jpg';
@@ -13,6 +13,20 @@ const HOMEPAGE_HERO_IMAGE = buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
 });
 const HOMEPAGE_HERO_ALT =
   'Library of Celsus and the Gate of Augustus at sunset with warm architectural light';
+const HOMEPAGE_HERO_ACCESSIBILITY = {
+  en: {
+    sectionLabel: 'Hero — Experiences Composed as Art',
+    imageAlt: HOMEPAGE_HERO_ALT,
+  },
+  tr: {
+    sectionLabel: 'Hero — Experiences Composed as Art',
+    imageAlt: HOMEPAGE_HERO_ALT,
+  },
+  zh: {
+    sectionLabel: '主视觉 — 以艺术之法构筑体验',
+    imageAlt: '夕阳下的塞尔苏斯图书馆与奥古斯都之门，建筑沐浴在温暖光线中',
+  },
+} as const satisfies Record<LocaleKey, { sectionLabel: string; imageAlt: string }>;
 const HOMEPAGE_HERO_DESKTOP_WIDTHS = [1080, 1440, 1920] as const;
 const HOMEPAGE_HERO_MOBILE_COMPACT_WIDTH = 475;
 const HOMEPAGE_HERO_MOBILE_TALL_WIDTH = 524;
@@ -28,6 +42,7 @@ export default function HeroSection({
 }: HeroSectionProps) {
   const heroCopy = dictionary?.home.hero;
   const ctaCopy = dictionary?.home.cta;
+  const accessibility = HOMEPAGE_HERO_ACCESSIBILITY[locale];
   const heroBlurDataUrl = buildCinematicBlurDataUrl(HOMEPAGE_HERO_IMAGE, {
     atmosphere: 'dark',
     profile: 'hero',
@@ -71,7 +86,7 @@ export default function HeroSection({
   return (
     <section
       className="relative flex h-screen min-h-[600px] w-full items-end overflow-hidden"
-      aria-label="Hero — Experiences Composed as Art"
+      aria-label={accessibility.sectionLabel}
     >
       <div className="absolute inset-0 z-0">
         <div
@@ -93,7 +108,7 @@ export default function HeroSection({
             src={heroSrc}
             srcSet={heroDesktopSrcSet}
             sizes="100vw"
-            alt={HOMEPAGE_HERO_ALT}
+            alt={accessibility.imageAlt}
             fetchPriority="high"
             loading="eager"
             decoding="async"

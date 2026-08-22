@@ -1,50 +1,216 @@
 {
   "lang": "zh",
+  "global": {
+    "nav": {
+      "culturalWorlds": "文化世界",
+      "experiences": "体验",
+      "insights": "洞见",
+      "philosophy": "理念",
+      "contact": "联系"
+    },
+    "footer": {
+      "culturalWorlds": "文化世界",
+      "experiences": "体验",
+      "insights": "洞见",
+      "philosophy": "理念",
+      "contact": "联系",
+      "privacy": "隐私",
+      "cookies": "Cookie",
+      "terms": "条款"
+    }
+  },
+  "common": {
+    "relatedInsights": "相关洞见",
+    "relatedExperiences": "相关体验",
+    "relatedEssays": "相关文章",
+    "inquirePrivately": "私享咨询",
+    "beginPrivateConversation": "开启私享对话",
+    "read": "阅读",
+    "enter": "进入",
+    "home": "首页",
+    "privacy": "隐私",
+    "cookies": "Cookie",
+    "terms": "条款",
+    "contactViaWhatsApp": "通过 WhatsApp 联系",
+    "contactCreareUpper": "联系 CREARE",
+    "protected": {
+      "creare": "CREARE",
+      "signature": "SIGNATURE™",
+      "lab": "LAB™",
+      "black": "BLACK™"
+    }
+  },
+  "accessibility": {
+    "returnHome": "CREARE — 返回首页",
+    "selectLanguage": "选择语言",
+    "languageOptions": "语言选项",
+    "mainNavigation": "主导航",
+    "mobileNavigation": "移动端导航",
+    "openNavigationMenu": "打开导航菜单",
+    "closeNavigationMenu": "关闭导航菜单",
+    "legalLinks": "法律链接",
+    "privateInquiry": "就 CREARE 体验进行私享咨询"
+  },
   "nav": {
-    "experiences": "",
-    "philosophy": "",
-    "contact": ""
+    "experiences": "体验",
+    "philosophy": "理念",
+    "contact": "联系"
   },
   "footer": {
-    "tagline_1": "",
-    "tagline_2": "",
-    "tagline_3": "",
-    "philosophy": "",
-    "contact": "",
-    "copyright": "\u00a9 2026 CREARE",
-    "sitemap": "",
-    "privacy": "",
-    "cookies": "",
-    "terms": ""
+    "tagline_1": "创意洞察。",
+    "tagline_2": "战略执行。",
+    "tagline_3": "精心打磨的体验。",
+    "philosophy": "我们的理念",
+    "contact": "联系",
+    "copyright": "© 2026 CREARE",
+    "sitemap": "网站地图",
+    "privacy": "隐私",
+    "cookies": "Cookie",
+    "terms": "条款"
   },
   "home": {
     "hero": {
-      "title": "",
-      "subtitle": ""
+      "eyebrow": "精心策划的文化体验",
+      "title": "体验。",
+      "subtitle": "以艺术之法构筑。"
     },
     "cta": {
-      "label": ""
+      "label": "私享咨询",
+      "labelWithArrow": "私享咨询 →",
+      "approach": "我们如何构筑体验？ →",
+      "contact": "联系 CREARE →"
+    },
+    "collections": {
+      "eyebrow": "CREARE 以三种方式构筑一次相遇。"
+    },
+    "mainParagraph": {
+      "paragraph1": "CREARE 并非围绕打包式旅行而构建，而是立足于文化通达、叙事洞察，以及对每一次相遇的审慎构筑。",
+      "paragraph2": "SIGNATURE™、LAB™ 与 BLACK™ 代表三种不同的工作方式：精心策划的文化体验、量身定制的委托，以及由语境、信任与一地更深层逻辑所塑造的审慎私享通达。",
+      "paragraph3": "目的并非高效地穿行于各地，而是理解赋予其意义的事物：守护并延续它们的人、使其变得可理解的在地知识，以及让一次相遇超越简单抵达的条件。"
+    },
+    "contact": {
+      "title": "开启对话。"
+    }
+  },
+  "culturalWorlds": {
+    "title": "文化世界",
+    "explore": "探索文化世界",
+    "atlasTitle": "CREARE — 文化图谱",
+    "geography": "一幅由通达、记忆与相遇构成的文化地理。",
+    "atlas": "文化图谱",
+    "context": "语境",
+    "coreCharacteristics": "核心特征",
+    "whatDefines": "定义这一世界的核心特质。",
+    "culturalSystems": "文化系统",
+    "culturalSystemsSubheading": "构成这一世界的文化系统。",
+    "connectedCulturalSystem": "关联文化系统",
+    "viewExperience": "查看体验",
+    "byIntroductionOnly": "仅限引荐",
+    "accessLimited": "仅向少数人开放。",
+    "emptyState": "文化世界即将在此呈现……"
+  },
+  "experiences": {
+    "title": "体验",
+    "subtitle": "",
+    "threeWays": "三种进入方式",
+    "collection": "系列",
+    "category": "类别",
+    "location": "地点",
+    "duration": "时长",
+    "groupSize": "人数",
+    "overview": "概览",
+    "intentLevel": "体验意图",
+    "wowMoment": "高光时刻",
+    "differentiator": "独特之处",
+    "experience": "体验",
+    "programme": "体验流程",
+    "whoThisIsFor": "适合谁",
+    "adjacentExperiences": "相关体验",
+    "furtherCulturalReading": "延伸文化阅读",
+    "previousExperience": "上一个体验",
+    "nextExperience": "下一个体验"
+  },
+  "experienceDetail": {
+    "category": "类别",
+    "location": "地点",
+    "duration": "时长",
+    "groupSize": "人数",
+    "overview": "概览",
+    "intentLevel": "体验意图",
+    "wowMoment": "高光时刻",
+    "differentiator": "独特之处",
+    "experience": "体验",
+    "programme": "体验流程",
+    "whoThisIsFor": "适合谁",
+    "adjacentExperiences": "相关体验",
+    "furtherCulturalReading": "延伸文化阅读",
+    "previousExperience": "上一个体验",
+    "nextExperience": "下一个体验"
+  },
+  "insights": {
+    "title": "洞见",
+    "subtitle": "关于文化、通达与私享相遇的文章",
+    "featuredEssays": "精选文章",
+    "culturalWorldEssays": "文化世界文章",
+    "editorialEssays": "编辑文章",
+    "furtherReading": "延伸阅读",
+    "readEssay": "阅读文章",
+    "readEssayWithArrow": "阅读文章 →",
+    "backToInsights": "← 洞见",
+    "accessNotListed": "通达并非列在清单上，而是被精心构筑。"
+  },
+  "signature": {
+    "label": "SIGNATURE™",
+    "title": "精心策划的文化体验。",
+    "description1": "经设计与验证，等待亲历。",
+    "description2": "SIGNATURE™ 将对目的地的深度理解、文化语境与清晰的创作结构结合，让每一次相遇都像被精心构筑，而非简单拼接。",
+    "cta": "探索 →",
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "lab": {
+    "label": "LAB™",
+    "title": "与你共同构筑。",
+    "description1": "从零开始打造的定制文化体验。",
+    "description2": "LAB™ 从一次对话开始，通过研究、在地知识与创意指导逐步成形，直到恰当的通达方式成为可能。",
+    "cta": "探索 →",
+    "hero": {
+      "title": "",
+      "subtitle": ""
+    }
+  },
+  "black": {
+    "label": "BLACK™",
+    "title": "不对公众开放。",
+    "description1": "对地点、收藏与时刻的私享通达。",
+    "description2": "BLACK™ 专为依赖信任、审慎与非公开关系的安排而设；这些安排不面向公开传播，也不进入常规咨询流程。",
+    "cta": "申请私享通达 →",
+    "hero": {
+      "title": "",
+      "subtitle": ""
     }
   },
   "philosophy": {
     "hero": {
-      "line1": "",
-      "line2": ""
+      "line1": "我们相信，最非凡的体验无法购买。",
+      "line2": "它们只能被构筑。"
     },
     "section1": {
-      "title": "",
+      "title": "超越行程表",
       "body": ""
     },
     "section2": {
-      "title": "",
+      "title": "构筑",
       "body": ""
     },
     "section3": {
-      "title": "",
+      "title": "通达即责任",
       "body": ""
     },
     "section4": {
-      "title": "",
+      "title": "客户",
       "body": ""
     }
   },
@@ -58,28 +224,6 @@
       "submit": ""
     }
   },
-  "experiences": {
-    "title": "",
-    "subtitle": ""
-  },
-  "signature": {
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "lab": {
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "black": {
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
   "editorial": {
     "title": "",
     "subtitle": ""
@@ -88,17 +232,23 @@
     "title": "",
     "subtitle": ""
   },
+  "notFound": {
+    "title": "页面未找到",
+    "message": "您访问的页面不存在或已被移动。",
+    "goBack": "返回",
+    "backHome": "返回首页"
+  },
   "sitemap": {
     "breadcrumb_home": "首页",
     "breadcrumb_current": "网站地图",
     "experiences": "体验",
     "creare": "CREARE",
-    "legal": "法律",
+    "legal": "法律信息",
     "lab": "LAB™",
     "signature": "SIGNATURE™",
     "black": "BLACK™",
     "philosophy": "我们的理念",
-    "contact": "联系我们",
+    "contact": "联系",
     "privacy": "隐私",
     "cookies": "Cookie",
     "terms": "条款"

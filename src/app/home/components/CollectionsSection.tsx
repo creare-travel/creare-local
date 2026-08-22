@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
-import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
+import { DEFAULT_SITE_LOCALE, type LocaleKey, type SiteLocale } from '@/lib/i18n/config';
 import { getExperienceCategoryTarget, type ExperienceCategoryPath } from '@/lib/i18n/static-routes';
 import type { Dictionary } from '@/lib/i18n/types';
 
@@ -55,6 +55,25 @@ const collectionFeatures: CollectionFeature[] = [
   },
 ];
 
+const COLLECTION_ACCESSIBILITY = {
+  en: {
+    sections: ['SIGNATURE experiences', 'LAB experiences', 'BLACK private access'],
+    images: collectionFeatures.map((feature) => feature.alt),
+  },
+  tr: {
+    sections: ['SIGNATURE experiences', 'LAB experiences', 'BLACK private access'],
+    images: collectionFeatures.map((feature) => feature.alt),
+  },
+  zh: {
+    sections: ['SIGNATURE™ 体验', 'LAB™ 体验', 'BLACK™ 私享通达'],
+    images: [
+      '一座历史悠久的奥斯曼宫殿石砌庭院，建筑细节华美，沐浴在午后暖光中',
+      '工匠手持精细铅笔，在白色绘图纸上勾勒精准的建筑线条——从零开始量身构筑',
+      '一把古董钥匙置于纯黑哑光表面，侧光勾勒其轮廓——象征有限而专属的通达',
+    ],
+  },
+} as const satisfies Record<LocaleKey, { sections: readonly string[]; images: readonly string[] }>;
+
 interface CollectionsSectionProps {
   dictionary?: Dictionary;
   locale?: SiteLocale;
@@ -98,9 +117,11 @@ export default function CollectionsSection({
   dictionary,
   locale = DEFAULT_SITE_LOCALE,
 }: CollectionsSectionProps) {
-  const localizedFeatures = getLocalizedFeatures(dictionary).map((feature) => ({
+  const accessibility = COLLECTION_ACCESSIBILITY[locale];
+  const localizedFeatures = getLocalizedFeatures(dictionary).map((feature, index) => ({
     ...feature,
     href: getExperienceCategoryTarget(feature.href, locale),
+    alt: accessibility.images[index],
   }));
 
   return (
@@ -112,7 +133,7 @@ export default function CollectionsSection({
       </div>
       <section
         className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:px-10 sm:pt-12 md:pb-36 md:pt-16 lg:px-16 lg:pt-18"
-        aria-label="SIGNATURE experiences"
+        aria-label={accessibility.sections[0]}
       >
         <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-20 xl:gap-28">
           <div className="mb-2 lg:mb-0 lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
@@ -154,7 +175,7 @@ export default function CollectionsSection({
 
       <section
         className="mx-auto max-w-7xl border-t border-neutral-200/80 px-6 pb-28 pt-16 sm:px-10 md:pb-48 md:pt-20 lg:px-16"
-        aria-label="LAB experiences"
+        aria-label={accessibility.sections[1]}
       >
         <div className="flex flex-col gap-10 lg:flex-row-reverse lg:items-center lg:gap-20 xl:gap-28">
           <div className="group mb-2 lg:mb-0 lg:w-7/12 xl:w-8/12">
@@ -196,7 +217,7 @@ export default function CollectionsSection({
 
       <section
         className="mx-auto max-w-7xl border-t border-neutral-200/80 px-6 pb-36 pt-20 sm:px-10 md:pb-56 md:pt-36 lg:px-16"
-        aria-label="BLACK private access"
+        aria-label={accessibility.sections[2]}
       >
         <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-20 xl:gap-28">
           <div className="mb-2 lg:mb-0 lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">

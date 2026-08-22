@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import type { LocaleKey } from '@/lib/i18n/config';
 import { localizePathname } from '@/lib/i18n/pathname';
 
 interface LegalSection {
@@ -150,17 +151,29 @@ export const turkishCookiesContent: LegalPageContent = {
   ],
 };
 
-export function TurkishLegalPage({ content }: { content: LegalPageContent }) {
+interface LocalizedLegalPageProps {
+  locale: LocaleKey;
+  content: LegalPageContent;
+  breadcrumbAriaLabel: string;
+  homeLabel: string;
+}
+
+export function LocalizedLegalPage({
+  locale,
+  content,
+  breadcrumbAriaLabel,
+  homeLabel,
+}: LocalizedLegalPageProps) {
   return (
     <main className="min-h-screen bg-white">
       <div className="px-6 sm:px-10 lg:px-16 pt-28 pb-24 max-w-4xl mx-auto">
-        <nav aria-label="Sayfa yolu" className="flex items-center gap-2 mb-12">
+        <nav aria-label={breadcrumbAriaLabel} className="flex items-center gap-2 mb-12">
           <Link
-            href={localizePathname('/', 'tr')}
+            href={localizePathname('/', locale)}
             className="flex items-center gap-1 text-xs tracking-widest text-gray-500 hover:text-black transition-colors uppercase"
           >
             <span aria-hidden="true">←</span>
-            <span>ANA SAYFA</span>
+            <span>{homeLabel}</span>
           </Link>
           <span className="text-xs text-gray-400" aria-hidden="true">
             /
@@ -186,5 +199,16 @@ export function TurkishLegalPage({ content }: { content: LegalPageContent }) {
         <p className="mt-16 text-xs text-gray-500 tracking-wide">{content.lastUpdated}</p>
       </div>
     </main>
+  );
+}
+
+export function TurkishLegalPage({ content }: { content: LegalPageContent }) {
+  return (
+    <LocalizedLegalPage
+      locale="tr"
+      content={content}
+      breadcrumbAriaLabel="Sayfa yolu"
+      homeLabel="ANA SAYFA"
+    />
   );
 }

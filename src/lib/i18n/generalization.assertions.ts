@@ -131,14 +131,12 @@ for (const category of ['signature', 'lab', 'black'] as const) {
 assert.equal(canUseEnglishFallback('en'), true);
 assert.equal(canUseEnglishFallback('tr'), false);
 assert.equal(canUseEnglishFallback('zh'), false);
-assert.throws(
-  () =>
-    assertDictionaryActivationReady(
-      'zh',
-      enDictionary as DictionaryJson,
-      zhDictionary as DictionaryJson
-    ),
-  /Dictionary activation blocked/
+assert.doesNotThrow(() =>
+  assertDictionaryActivationReady(
+    'zh',
+    enDictionary as DictionaryJson,
+    zhDictionary as DictionaryJson
+  )
 );
 
 const genericLayoutSource = readFileSync(

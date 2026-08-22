@@ -259,19 +259,20 @@ function walkFiles(directory: string): string[] {
 
 const enKeys = flattenKeys(enDictionary).sort();
 const trKeys = flattenKeys(trDictionary).sort();
+const zhKeys = flattenKeys(zhDictionary).sort();
 
 assert.deepEqual(trKeys, enKeys, 'EN and TR dictionary structures must match recursively');
+assert.deepEqual(zhKeys, enKeys, 'EN and ZH dictionary structures must match recursively');
 assert.doesNotThrow(() =>
   assertDictionaryActivationReady('en', enDictionary as JsonObject, enDictionary as JsonObject)
 );
 assert.doesNotThrow(() =>
   assertDictionaryActivationReady('tr', enDictionary as JsonObject, trDictionary as JsonObject)
 );
-assert.throws(
+assert.doesNotThrow(
   () =>
     assertDictionaryActivationReady('zh', enDictionary as JsonObject, zhDictionary as JsonObject),
-  /Dictionary activation blocked/,
-  'Incomplete ZH dictionary must remain impossible to activate'
+  'Complete ZH dictionary must pass content readiness independently of locale activation'
 );
 
 approvedKeys.forEach(assertApprovedString);
