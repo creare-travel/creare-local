@@ -18,7 +18,9 @@ const connectSrc = [
   "'self'",
   'https://www.google-analytics.com',
   'https://*.google-analytics.com',
+  'https://analytics.google.com',
   'https://*.analytics.google.com',
+  'https://*.google.com',
   'https://www.googletagmanager.com',
   configuredStrapiOrigin,
   ...(isDevelopment
@@ -40,6 +42,7 @@ const imageSrc = [
   'blob:',
   'https://www.google-analytics.com',
   'https://*.google-analytics.com',
+  'https://*.google.com',
   'https://www.googletagmanager.com',
   'https://images.unsplash.com',
   'https://images.pexels.com',
