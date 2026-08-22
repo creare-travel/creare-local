@@ -17,6 +17,8 @@ const configuredStrapiOrigin = originFromUrl(process.env.NEXT_PUBLIC_STRAPI_URL)
 const connectSrc = [
   "'self'",
   'https://www.google-analytics.com',
+  'https://*.google-analytics.com',
+  'https://*.analytics.google.com',
   'https://www.googletagmanager.com',
   configuredStrapiOrigin,
   ...(isDevelopment
@@ -37,6 +39,7 @@ const imageSrc = [
   'data:',
   'blob:',
   'https://www.google-analytics.com',
+  'https://*.google-analytics.com',
   'https://www.googletagmanager.com',
   'https://images.unsplash.com',
   'https://images.pexels.com',
