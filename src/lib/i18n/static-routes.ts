@@ -40,13 +40,13 @@ interface NavigationRoute<TKey extends string> extends PublicRoutePolicy {
 const ACTIVE_STATIC_AVAILABILITY = {
   en: 'available',
   tr: 'available',
-  zh: 'locale-inactive',
+  zh: 'available',
 } as const satisfies Record<LocaleKey, RouteAvailability>;
 
 const ENGLISH_ONLY_AVAILABILITY = {
   en: 'available',
   tr: 'unavailable',
-  zh: 'locale-inactive',
+  zh: 'unavailable',
 } as const satisfies Record<LocaleKey, RouteAvailability>;
 
 export const PRIMARY_NAVIGATION_ROUTES: ReadonlyArray<NavigationRoute<PrimaryNavigationKey>> = [

@@ -35,17 +35,18 @@ const defaultLocales = REGISTERED_LOCALES.filter((locale) => LOCALE_REGISTRY[loc
 const activePrefixes = SUPPORTED_SITE_LOCALES.map((locale) => LOCALE_REGISTRY[locale].urlPrefix);
 
 assert.deepEqual(REGISTERED_LOCALES, ['en', 'tr', 'zh']);
-assert.deepEqual(SUPPORTED_SITE_LOCALES, ['en', 'tr']);
+assert.deepEqual(SUPPORTED_SITE_LOCALES, ['en', 'tr', 'zh']);
 assert.deepEqual(defaultLocales, [DEFAULT_SITE_LOCALE]);
 assert.equal(new Set(activePrefixes).size, activePrefixes.length);
 assert.deepEqual(
   LOCALE_OPTIONS.map((option) => option.code),
-  ['en', 'tr']
+  ['en', 'tr', 'zh']
 );
+assert.equal(LOCALE_OPTIONS.find((option) => option.code === 'zh')?.label, '简体中文');
 
 assert.deepEqual(getLocaleDescriptor('zh'), {
   key: 'zh',
-  active: false,
+  active: true,
   urlPrefix: 'zh',
   dictionaryKey: 'zh',
   strapiLocale: 'zh-CN',
@@ -57,15 +58,15 @@ assert.deepEqual(getLocaleDescriptor('zh'), {
   isDefault: false,
   routeMode: 'generic',
 });
-assert.equal(getGenericRouteLocale('zh'), null);
-assert.equal(getLocaleFromPathname('/zh/experiences/signature'), 'en');
+assert.equal(getGenericRouteLocale('zh'), 'zh');
+assert.equal(getLocaleFromPathname('/zh/experiences/signature'), 'zh');
 assert.equal(getRegisteredLocaleFromPathname('/zh/experiences/signature'), 'zh');
 assert.equal(localizePathname('/experiences/signature', 'zh'), '/zh/experiences/signature');
 
 assert.equal(isStaticPathAvailableForLocale('/experiences/signature', 'en'), true);
 assert.equal(isStaticPathAvailableForLocale('/experiences/signature', 'tr'), true);
-assert.equal(isStaticPathAvailableForLocale('/experiences/signature', 'zh'), false);
-assert.deepEqual(getAvailableStaticRouteLocales('/experiences/signature'), ['en', 'tr']);
+assert.equal(isStaticPathAvailableForLocale('/experiences/signature', 'zh'), true);
+assert.deepEqual(getAvailableStaticRouteLocales('/experiences/signature'), ['en', 'tr', 'zh']);
 
 const collectionAlternates = buildLocalizedLanguageAlternates(
   '/experiences/signature',
@@ -74,18 +75,19 @@ const collectionAlternates = buildLocalizedLanguageAlternates(
 assert.deepEqual(collectionAlternates, {
   en: 'https://crearetravel.com/experiences/signature',
   tr: 'https://crearetravel.com/tr/experiences/signature',
+  'zh-Hans': 'https://crearetravel.com/zh/experiences/signature',
   'x-default': 'https://crearetravel.com/experiences/signature',
 });
-assert.equal('zh-Hans' in collectionAlternates, false);
+assert.equal('zh-Hans' in collectionAlternates, true);
 assert.equal(
   Object.values(collectionAlternates).some((url) => url.includes('/zh')),
-  false
+  true
 );
 assert.deepEqual(
   buildMetadataAlternates('/tr/experiences/signature').languages,
   collectionAlternates
 );
-assert.deepEqual(getActiveAvailableLocales({ en: true, tr: false, zh: true }), ['en']);
+assert.deepEqual(getActiveAvailableLocales({ en: true, tr: false, zh: true }), ['en', 'zh']);
 assert.deepEqual(
   buildRouteCanonicalAlternates(
     { family: 'insight-detail', locale: 'en', slug: 'private-life-of-istanbul' },
@@ -121,11 +123,24 @@ for (const category of ['signature', 'lab', 'black'] as const) {
   assert.deepEqual(metadata.alternates?.languages, {
     en: `https://crearetravel.com/experiences/${category}`,
     tr: `https://crearetravel.com/tr/experiences/${category}`,
+    'zh-Hans': `https://crearetravel.com/zh/experiences/${category}`,
     'x-default': `https://crearetravel.com/experiences/${category}`,
   });
   assert.equal(metadata.openGraph?.locale, 'tr_TR');
   assert.equal(metadata.openGraph?.url, `https://crearetravel.com/tr/experiences/${category}`);
   assert.equal(String(metadata.title).includes('Creare — Creare'), false);
+
+  const zhMetadata = buildExperienceCategoryMetadata(category, 'zh');
+  const zhCopy = zhDictionary[category];
+  assert.equal(zhMetadata.title, `${zhCopy.label} — ${zhCopy.title}`);
+  assert.equal(zhMetadata.description, `${zhCopy.description1} ${zhCopy.description2}`);
+  assert.equal(
+    zhMetadata.alternates?.canonical,
+    `https://crearetravel.com/zh/experiences/${category}`
+  );
+  assert.equal(zhMetadata.openGraph?.locale, 'zh_CN');
+  assert.equal(zhMetadata.openGraph?.url, `https://crearetravel.com/zh/experiences/${category}`);
+  assert.equal(String(zhMetadata.title).includes('Creare — Creare'), false);
 }
 
 assert.equal(canUseEnglishFallback('en'), true);

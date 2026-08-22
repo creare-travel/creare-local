@@ -7,6 +7,7 @@ import {
   buildMetadataAlternates,
   buildTwitterCard,
 } from '@/lib/seo';
+import type { SiteLocale } from '@/lib/i18n/config';
 
 interface StaticPageMetadataOptions {
   title: string;
@@ -15,12 +16,17 @@ interface StaticPageMetadataOptions {
   imageAlt: string;
 }
 
-export function buildTurkishStaticPageMetadata({
+interface LocalizedStaticPageMetadataOptions extends StaticPageMetadataOptions {
+  locale: SiteLocale;
+}
+
+export function buildLocalizedStaticPageMetadata({
   title,
   description,
   path,
   imageAlt,
-}: StaticPageMetadataOptions): Metadata {
+  locale,
+}: LocalizedStaticPageMetadataOptions): Metadata {
   return {
     metadataBase: DEFAULT_METADATA.metadataBase,
     title: { absolute: title },
@@ -37,7 +43,7 @@ export function buildTurkishStaticPageMetadata({
         path,
         image: DEFAULT_OG_IMAGE,
         imageAlt,
-        locale: 'tr',
+        locale,
         type: 'website',
       }),
       siteName: SITE_NAME,
@@ -49,4 +55,13 @@ export function buildTurkishStaticPageMetadata({
       imageAlt,
     }),
   };
+}
+
+export function buildTurkishStaticPageMetadata({
+  title,
+  description,
+  path,
+  imageAlt,
+}: StaticPageMetadataOptions): Metadata {
+  return buildLocalizedStaticPageMetadata({ title, description, path, imageAlt, locale: 'tr' });
 }

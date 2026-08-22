@@ -29,7 +29,9 @@ import { getGenericRouteLocale, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { isStaticPathAvailableForLocale } from '@/lib/i18n/static-routes';
 import { getAvailableStaticRouteLocales } from '@/lib/i18n/static-routes';
+import { localizePathname } from '@/lib/i18n/pathname';
 import { buildLocaleOwnedMetadata } from '@/lib/seo';
+import { buildLocalizedStaticPageMetadata } from '@/features/static-pages/metadata';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +40,29 @@ interface GenericLocalePageProps {
 }
 
 const EXPERIENCE_CATEGORIES = new Set<ExperienceCategory>(['signature', 'lab', 'black']);
+
+const ZH_STATIC_METADATA = {
+  '/philosophy': {
+    title: '理念',
+    description: '我们相信，最非凡的体验无法被购买，只能被精心构筑。',
+  },
+  '/contact': {
+    title: '私享咨询',
+    description: '面向战略合作、私人委托与保密协作。我们将亲自回复。',
+  },
+  '/privacy': {
+    title: '隐私政策',
+    description: '了解 CREARE 如何收集、使用并保护您提供的个人信息。',
+  },
+  '/cookies': {
+    title: 'Cookie 政策',
+    description: '了解 CREARE 如何使用 Cookie 以支持网站功能并改善访问体验。',
+  },
+  '/terms': {
+    title: '使用条款',
+    description: '了解适用于 CREARE 网站、沟通渠道与合作服务的使用条款。',
+  },
+} as const;
 
 async function resolveParams(params: GenericLocalePageProps['params']) {
   const { locale: localeKey, segments = [] } = await params;
@@ -138,6 +163,19 @@ export async function generateMetadata({ params }: GenericLocalePageProps): Prom
   }
   if (family === 'insights' && slug) {
     return generateInsightDetailMetadata({ locale, params: Promise.resolve({ slug }) });
+  }
+
+  if (!slug && locale === 'zh') {
+    const staticMetadata = ZH_STATIC_METADATA[`/${family}` as keyof typeof ZH_STATIC_METADATA];
+    if (staticMetadata) {
+      return buildLocalizedStaticPageMetadata({
+        locale,
+        path: localizePathname(`/${family}`, locale),
+        title: staticMetadata.title,
+        description: staticMetadata.description,
+        imageAlt: `${staticMetadata.title} — CREARE`,
+      });
+    }
   }
 
   return { title: { absolute: '404' }, robots: { index: false, follow: false } };

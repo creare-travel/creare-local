@@ -196,6 +196,7 @@ assert.deepEqual(buildRouteCanonicalAlternates({ family: 'home', locale: 'tr' })
   languages: {
     en: 'https://crearetravel.com/',
     tr: 'https://crearetravel.com/tr',
+    'zh-Hans': 'https://crearetravel.com/zh',
     'x-default': 'https://crearetravel.com/',
   },
 });
@@ -210,6 +211,7 @@ assert.deepEqual(
     languages: {
       en: 'https://crearetravel.com/experiences/beylerbeyi-1869-empire-interrupted',
       tr: 'https://crearetravel.com/tr/experiences/beylerbeyi-1869-empire-interrupted',
+      'zh-Hans': 'https://crearetravel.com/zh/experiences/beylerbeyi-1869-empire-interrupted',
       'x-default': 'https://crearetravel.com/experiences/beylerbeyi-1869-empire-interrupted',
     },
   }
@@ -219,6 +221,7 @@ assert.deepEqual(buildMetadataAlternates('/tr/contact'), {
   languages: {
     en: 'https://crearetravel.com/contact',
     tr: 'https://crearetravel.com/tr/contact',
+    'zh-Hans': 'https://crearetravel.com/zh/contact',
     'x-default': 'https://crearetravel.com/contact',
   },
 });
@@ -227,6 +230,7 @@ assert.deepEqual(buildMetadataAlternates('/experiences/signature'), {
   languages: {
     en: 'https://crearetravel.com/experiences/signature',
     tr: 'https://crearetravel.com/tr/experiences/signature',
+    'zh-Hans': 'https://crearetravel.com/zh/experiences/signature',
     'x-default': 'https://crearetravel.com/experiences/signature',
   },
 });

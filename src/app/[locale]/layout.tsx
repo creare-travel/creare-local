@@ -1,3 +1,4 @@
+import '../../styles/tailwind.css';
 import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 import LocaleRootShell, {

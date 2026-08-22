@@ -15,6 +15,7 @@ export default function LanguageSelector() {
   const switchIdRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
   const mountedRef = useRef(true);
+  const activeLocaleLabel = LOCALES.find((option) => option.code === locale)?.label ?? locale;
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -108,7 +109,7 @@ export default function LanguageSelector() {
         aria-expanded={open}
         aria-haspopup="listbox"
       >
-        {locale.toUpperCase()}
+        {activeLocaleLabel}
         <svg
           width="8"
           height="5"
@@ -131,7 +132,7 @@ export default function LanguageSelector() {
         <ul
           role="listbox"
           aria-label="Language options"
-          className="absolute right-0 top-full mt-3 bg-black border border-white/10 min-w-[72px] py-1 z-50"
+          className="absolute right-0 top-full mt-3 min-w-[112px] border border-white/10 bg-black py-1 z-50"
         >
           {LOCALES.map(({ code, label }) => (
             <li key={code} role="option" aria-selected={locale === code}>

@@ -83,6 +83,12 @@ const locationLabels: Record<SiteLocale, Record<Insight['location'], string>> = 
     cappadocia: 'Kapadokya',
     aegean: 'Ege',
   },
+  zh: {
+    istanbul: '伊斯坦布尔',
+    bodrum: '博德鲁姆',
+    cappadocia: '卡帕多奇亚',
+    aegean: '爱琴海',
+  },
 };
 
 export function getStaticInsightIdentity(slug: string): StaticInsightIdentity | undefined {

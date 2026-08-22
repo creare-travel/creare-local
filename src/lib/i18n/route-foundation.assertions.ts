@@ -25,7 +25,9 @@ function walkFiles(directory: string): string[] {
 
 assert.equal(getLocaleFromPathname('/experiences/test'), 'en');
 assert.equal(getLocaleFromPathname('/tr/experiences/test'), 'tr');
+assert.equal(getLocaleFromPathname('/zh/experiences/test'), 'zh');
 assert.equal(getStrapiLocale('tr'), 'tr-TR');
+assert.equal(getStrapiLocale('zh'), 'zh-CN');
 assert.equal(
   buildLocaleAwareStrapiPath('/api/experiences?filters[slug][$eq]=test', 'tr'),
   '/api/experiences?filters%5Bslug%5D%5B%24eq%5D=test&locale=tr-TR'
@@ -49,6 +51,10 @@ assert.equal(
   '/tr/insights/canonical-slug'
 );
 assert.equal(
+  buildLocalizedRouteTarget('/insights', 'canonical-slug', 'zh'),
+  '/zh/insights/canonical-slug'
+);
+assert.equal(
   buildLocalizedRouteTarget('/tr/experiences', 'canonical-slug', 'tr'),
   '/tr/experiences/canonical-slug'
 );
@@ -58,7 +64,8 @@ assert.equal(getLocaleFromPathname('/travel'), 'en');
 assert.equal(getLocaleFromPathname('/trailing'), 'en');
 assert.equal(isSiteLocale('en'), true);
 assert.equal(isSiteLocale('tr'), true);
-['ru', 'zh', 'ar', 'fr', '', null, undefined, 'de', 'english'].forEach((locale) => {
+assert.equal(isSiteLocale('zh'), true);
+['ru', 'ar', 'fr', '', null, undefined, 'de', 'english'].forEach((locale) => {
   assert.equal(
     isSiteLocale(locale),
     false,
@@ -66,6 +73,7 @@ assert.equal(isSiteLocale('tr'), true);
   );
 });
 assert.equal(canUseEnglishFallback('tr'), false);
+assert.equal(canUseEnglishFallback('zh'), false);
 
 const relatedContentLocale = 'tr' satisfies SiteLocale;
 assert.equal(getStrapiLocale(relatedContentLocale), 'tr-TR');

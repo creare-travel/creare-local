@@ -20,9 +20,9 @@ function assertChineseText(value: string, label: string): void {
   assert.match(value, /[\u3400-\u9fff]/u, `${label} must contain Simplified Chinese copy`);
 }
 
-assert.equal(LOCALE_REGISTRY.zh.active, false);
+assert.equal(LOCALE_REGISTRY.zh.active, true);
 assert.equal(LOCALE_REGISTRY.zh.strapiLocale, 'zh-CN');
-assert.equal(getGenericRouteLocale('zh'), null);
+assert.equal(getGenericRouteLocale('zh'), 'zh');
 assert.doesNotThrow(() =>
   assertDictionaryActivationReady(
     'zh',
@@ -40,8 +40,8 @@ staticPaths.forEach((path) => {
     true,
     `${path} must have a locale-owned ZH renderer`
   );
-  assert.equal(isStaticPathAvailableForLocale(path, 'zh'), false);
-  assert.deepEqual(getAvailableStaticRouteLocales(path), ['en', 'tr']);
+  assert.equal(isStaticPathAvailableForLocale(path, 'zh'), true);
+  assert.deepEqual(getAvailableStaticRouteLocales(path), ['en', 'tr', 'zh']);
 });
 
 const chineseLegalPages = [

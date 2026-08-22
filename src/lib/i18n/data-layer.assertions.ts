@@ -43,6 +43,11 @@ assert.ok(slugFilterPath.includes('populate%5Bcover_image%5D=true'));
 
 assert.equal(canUseEnglishFallback('en'), true);
 assert.equal(canUseEnglishFallback('tr'), false);
+assert.equal(canUseEnglishFallback('zh'), false);
+
+const destinationZhPath = buildLocaleAwareStrapiPath('/api/destinations?populate=*', 'zh');
+assertSingleLocale(destinationZhPath, 'zh-CN');
+assert.ok(destinationZhPath.includes('locale=zh-CN'));
 
 const relatedExperiencePath = buildLocaleAwareStrapiPath(
   '/api/experiences?filters[slug][$in][0]=imperial-flavors&filters[visibility_status][$eqi]=active',
@@ -87,8 +92,8 @@ assert.equal(absoluteUrlPath.includes('locale=en'), false);
 
 assert.equal(isSiteLocale('en'), true);
 assert.equal(isSiteLocale('tr'), true);
+assert.equal(isSiteLocale('zh'), true);
 assert.equal(isSiteLocale('ru'), false);
-assert.equal(isSiteLocale('zh'), false);
 assert.equal(isSiteLocale('ar'), false);
 assert.equal(isSiteLocale('fr'), false);
 assert.equal(isSiteLocale(''), false);

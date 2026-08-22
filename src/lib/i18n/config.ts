@@ -29,10 +29,9 @@ export const LOCALE_REGISTRY = {
   },
   zh: {
     key: 'zh',
-    active: false,
+    active: true,
     urlPrefix: 'zh',
     dictionaryKey: 'zh',
-    // Confirm this exact locale in Strapi Admin before changing active to true.
     strapiLocale: 'zh-CN',
     htmlLang: 'zh-Hans',
     hreflang: 'zh-Hans',
@@ -66,9 +65,15 @@ export const SITE_TO_STRAPI_LOCALE = Object.fromEntries(
   REGISTERED_LOCALES.map((locale) => [locale, LOCALE_REGISTRY[locale].strapiLocale])
 ) as { [TKey in LocaleKey]: (typeof LOCALE_REGISTRY)[TKey]['strapiLocale'] };
 
+const LOCALE_LABELS = {
+  en: 'EN',
+  tr: 'TR',
+  zh: '简体中文',
+} as const satisfies Record<LocaleKey, string>;
+
 export const LOCALE_OPTIONS = SUPPORTED_SITE_LOCALES.map((code) => ({
   code,
-  label: code.toUpperCase(),
+  label: LOCALE_LABELS[code],
 })) satisfies readonly { code: SiteLocale; label: string }[];
 
 export const LOCALE_STORAGE_KEY = 'creare_locale';

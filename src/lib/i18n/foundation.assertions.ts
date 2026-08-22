@@ -12,8 +12,8 @@ import { buildLocalizedStrapiPath } from '../strapi';
 
 assert.equal(isSiteLocale('en'), true);
 assert.equal(isSiteLocale('tr'), true);
+assert.equal(isSiteLocale('zh'), true);
 assert.equal(isSiteLocale('ru'), false);
-assert.equal(isSiteLocale('zh'), false);
 assert.equal(isRegisteredLocale('zh'), true);
 assert.equal(isSiteLocale('ar'), false);
 assert.equal(isSiteLocale('fr'), false);
@@ -48,7 +48,7 @@ assert.equal(getLocaleFromPathname('/tr/experiences/test'), 'tr');
 assert.equal(getLocaleFromPathname('/experiences/test'), 'en');
 assert.equal(getLocaleFromPathname('/travel'), 'en');
 assert.equal(getLocaleFromPathname('/trailing'), 'en');
-assert.equal(getLocaleFromPathname('/zh/experiences'), 'en');
+assert.equal(getLocaleFromPathname('/zh/experiences'), 'zh');
 assert.equal(getRegisteredLocaleFromPathname('/zh/experiences'), 'zh');
 
 assert.equal(isTurkishPathname('/travel'), false);

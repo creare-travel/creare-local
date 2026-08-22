@@ -335,7 +335,13 @@ export default function ContactPageClient({
       {/* Two-Column Layout */}
       <section className="px-6 sm:px-10 lg:px-16 pb-24" aria-label={copy.contactSectionAriaLabel}>
         <div className="w-full max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-[45%_55%] gap-16 lg:gap-24 items-start">
+          <div
+            className={`grid grid-cols-1 gap-16 lg:gap-24 items-start ${
+              locale === 'zh'
+                ? 'lg:grid-cols-[minmax(0,45fr)_minmax(0,55fr)]'
+                : 'lg:grid-cols-[45%_55%]'
+            }`}
+          >
             {/* Left Column — Contact Details */}
             <div className="flex flex-col gap-14">
               {/* Direct Line */}
