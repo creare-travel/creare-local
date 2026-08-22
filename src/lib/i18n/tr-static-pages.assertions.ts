@@ -95,8 +95,8 @@ function assertContactValidationParity(source: string): void {
   );
   assert.equal(
     /newErrors\.message\s*=/.test(validateBody),
-    false,
-    'Message must remain optional in EN and TR client-side validation'
+    true,
+    'Message must remain required across EN, TR, and ZH client-side validation'
   );
   assert.equal(
     /newErrors\.intent\s*=/.test(validateBody),
@@ -245,7 +245,11 @@ assert.equal(
 );
 assert.equal(contactSource.includes('trackFormStart'), true, 'Form analytics start preserved');
 assert.equal(contactSource.includes('trackFormSubmit'), true, 'Form analytics submit preserved');
-assert.equal(contactSource.includes('trackFormSuccess'), true, 'Form analytics success preserved');
+assert.equal(
+  contactSource.includes('trackContactSubmit'),
+  true,
+  'Contact analytics fires only after owner acceptance'
+);
 assert.equal(contactSource.includes('trackFormError'), true, 'Form analytics error preserved');
 assert.equal(
   contactSource.includes('aria-pressed={isSelected}'),

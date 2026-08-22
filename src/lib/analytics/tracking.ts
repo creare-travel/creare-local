@@ -205,21 +205,31 @@ export function trackFormSuccess(params: FormEventParams = {}) {
     content_context: params.content_context,
   });
 
-  pushDataLayerEvent({
-    event: 'contact_submit',
-    ...pageContext,
-    form_id: params.form_id ?? 'inquiry_form',
-    form_status: 'success',
-    experience_slug: resolvedSlug,
-    ...intelligence,
-  });
-
   trackEvent('form_success', {
     ...pageContext,
     experience_slug: resolvedSlug,
     source: params.source ?? 'contact_page',
     form_id: params.form_id ?? 'inquiry_form',
     ...intelligence,
+  });
+}
+
+export function trackContactSubmit(params: FormEventParams = {}) {
+  const pageContext = getPageContext(params.page_path);
+  const resolvedSlug =
+    params.experience_slug !== undefined ? params.experience_slug : getExperienceSlug();
+
+  pushDataLayerEvent({
+    event: 'contact_submit',
+    ...pageContext,
+    form_id: params.form_id ?? 'inquiry_form',
+    form_status: 'success',
+    experience_slug: resolvedSlug,
+    ...buildIntelligenceParams({
+      intent_level: 'high',
+      slug: resolvedSlug,
+      content_context: params.content_context,
+    }),
   });
 }
 

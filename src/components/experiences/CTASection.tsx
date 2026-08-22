@@ -7,6 +7,7 @@ import { trackCtaClick } from '@/lib/analytics/tracking';
 import { buildExperienceInquiryHref } from '@/lib/inquiry';
 import { useLanguage } from '@/context/LanguageContext';
 import { localizePathname } from '@/lib/i18n/pathname';
+import { buildWhatsAppHref } from '@/lib/contact/channels';
 
 interface CTASectionProps {
   heading?: string;
@@ -37,6 +38,11 @@ export default function CTASection({
   const btnClass = dark
     ? 'border border-white/60 text-white hover:bg-white hover:text-black'
     : 'bg-black text-white hover:bg-neutral-800';
+  const whatsAppLabel = {
+    en: 'Contact via WhatsApp',
+    tr: 'WhatsApp üzerinden iletişime geçin',
+    zh: '通过 WhatsApp 联系',
+  }[locale];
 
   // Preserve experience context when routing into the shared contact form flow.
   const resolvedHref =
@@ -85,15 +91,15 @@ export default function CTASection({
         {experienceTitle && (
           <div className="mt-5">
             <OutboundLink
-              href={`https://wa.me/+905412203000?text=I'm interested in ${encodeURIComponent(experienceTitle)}`}
+              href={buildWhatsAppHref(locale, experienceTitle)}
               target="_blank"
               rel="noopener noreferrer"
               className={`motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase ${dark ? 'text-white/40 hover:text-white/70' : 'text-neutral-400 hover:text-neutral-600'}`}
-              aria-label="Contact via WhatsApp"
+              aria-label={whatsAppLabel}
               trackingLabel="experience_whatsapp_contact"
               trackingSource="experience_cta_section"
             >
-              Contact via WhatsApp
+              {whatsAppLabel}
             </OutboundLink>
           </div>
         )}

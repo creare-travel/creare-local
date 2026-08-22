@@ -1,23 +1,38 @@
 'use client';
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import OutboundLink from '@/components/analytics/OutboundLink';
+import WeChatContact from '@/components/contact/WeChatContact';
 import { buildCloudinaryUrl } from '@/lib/cloudinary';
 import {
+  buildWhatsAppHref,
+  CONTACT_EMAIL,
+  CONTACT_PHONE_DISPLAY,
+  CONTACT_PHONE_HREF,
+  getGoogleAppointmentUrl,
+  getWeChatConfig,
+} from '@/lib/contact/channels';
+import {
+  trackContactSubmit,
   trackFormStart,
   trackFormSubmit,
-  trackFormSuccess,
   trackFormError,
   getExperienceSlug,
 } from '@/lib/analytics/tracking';
 import type { LocaleKey } from '@/lib/i18n/config';
-import { DEFAULT_SITE_LOCALE } from '@/lib/i18n/config';
+import {
+  INQUIRY_INTENT_LABELS,
+  INQUIRY_INTENTS,
+  INQUIRY_LIMITS,
+  type InquiryIntent,
+} from '@/lib/inquiry';
 
 interface FormData {
   name: string;
   email: string;
   message: string;
+  website: string;
 }
 
 interface FormErrors {
@@ -56,6 +71,7 @@ const contactCopy = {
       'Ferko Signature Plaza in Şişli, Istanbul, home of CREARE Travel Consultancy Limited Co.',
     successTitle: 'Thank you.',
     successMessage: 'We have received your inquiry and will be in touch shortly.',
+    successReference: 'Reference',
     formAriaLabel: 'Private inquiry form',
     nameLabel: 'NAME',
     namePlaceholder: 'Name',
@@ -92,6 +108,9 @@ const contactCopy = {
     locationScope: 'Istanbul • Bodrum • International',
     contactSectionAriaLabel: 'Contact information and inquiry form',
     capabilitySectionAriaLabel: 'Global execution capability',
+    phoneAriaLabel: 'Call CREARE at +90 541 220 3000',
+    whatsappAriaLabel: 'Contact CREARE via WhatsApp',
+    emailAriaLabel: 'Email CREARE at direct@crearetravel.com',
   },
   tr: {
     heroTitle: 'Özel Talepler',
@@ -114,6 +133,7 @@ const contactCopy = {
       'CREARE Travel Consultancy Limited Co. adresinin bulunduğu Şişli, İstanbul’daki Ferko Signature Plaza',
     successTitle: 'Teşekkür ederiz.',
     successMessage: 'Talebinizi aldık. Sizinle en kısa sürede iletişime geçeceğiz.',
+    successReference: 'Referans',
     formAriaLabel: 'Özel talep formu',
     nameLabel: 'AD SOYAD',
     namePlaceholder: 'Adınız ve soyadınız',
@@ -147,8 +167,11 @@ const contactCopy = {
     roots: 'İstanbul ve Bodrum kökleriyle.',
     scope: 'Deneyim kapsamı ve zaman planı gizlilik içinde görüşülür.',
     locationScope: 'İstanbul • Bodrum • Uluslararası',
-    contactSectionAriaLabel: 'Contact information and inquiry form',
-    capabilitySectionAriaLabel: 'Global execution capability',
+    contactSectionAriaLabel: 'İletişim bilgileri ve özel talep formu',
+    capabilitySectionAriaLabel: 'Küresel uygulama kapasitesi',
+    phoneAriaLabel: 'CREARE’yi +90 541 220 3000 numarasından arayın',
+    whatsappAriaLabel: 'CREARE ile WhatsApp üzerinden iletişime geçin',
+    emailAriaLabel: 'CREARE’ye direct@crearetravel.com adresinden e-posta gönderin',
   },
   zh: {
     heroTitle: '私享咨询',
@@ -170,6 +193,7 @@ const contactCopy = {
     imageAlt: 'CREARE Travel Consultancy Limited Co. 所在的伊斯坦布尔 Şişli Ferko Signature Plaza',
     successTitle: '谢谢。',
     successMessage: '我们已收到您的咨询，将很快与您联系。',
+    successReference: '参考编号',
     formAriaLabel: '私享咨询表单',
     nameLabel: '姓名',
     namePlaceholder: '您的姓名',
@@ -199,6 +223,9 @@ const contactCopy = {
     locationScope: '伊斯坦布尔 • 博德鲁姆 • 全球',
     contactSectionAriaLabel: '联系信息与咨询表单',
     capabilitySectionAriaLabel: '全球执行能力',
+    phoneAriaLabel: '致电 CREARE：+90 541 220 3000',
+    whatsappAriaLabel: '通过 WhatsApp 联系 CREARE',
+    emailAriaLabel: '发送邮件至 direct@crearetravel.com 联系 CREARE',
   },
 } as const;
 
@@ -206,22 +233,32 @@ function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-export default function ContactPageClient({
-  locale = 'en',
-  successRedirectHref = '/thank-you',
-}: ContactPageClientProps) {
-  const router = useRouter();
+export default function ContactPageClient({ locale = 'en' }: ContactPageClientProps) {
+  const pathname = usePathname();
   const copy = contactCopy[locale];
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     message: '',
+    website: '',
   });
-  const [selectedIntents, setSelectedIntents] = useState<string[]>([]);
+  const [selectedIntents, setSelectedIntents] = useState<InquiryIntent[]>([]);
   const [formStatus, setFormStatus] = useState<FormStatus>('idle');
   const [errors, setErrors] = useState<FormErrors>({});
+  const [referenceId, setReferenceId] = useState<string | null>(null);
   const hasFired = useRef(false);
   const isSubmitting = useRef(false);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
+  const whatsappHref = buildWhatsAppHref(locale);
+  const appointmentUrl = getGoogleAppointmentUrl();
+  const weChatConfig = getWeChatConfig();
+
+  useEffect(() => {
+    if (formStatus === 'success' || formStatus === 'error') resultRef.current?.focus();
+  }, [formStatus]);
 
   // Fire form_start once on first field focus
   const handleFormFocus = () => {
@@ -238,7 +275,7 @@ export default function ContactPageClient({
     }
   };
 
-  const toggleIntent = (intent: string) => {
+  const toggleIntent = (intent: InquiryIntent) => {
     setSelectedIntents((prev) =>
       prev.includes(intent) ? prev.filter((i) => i !== intent) : [...prev, intent]
     );
@@ -254,8 +291,19 @@ export default function ContactPageClient({
     } else if (!validateEmail(formData.email)) {
       newErrors.email = copy.invalidEmail;
     }
+    if (!formData.message.trim()) {
+      newErrors.message = copy.requiredMessage;
+    }
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const firstInvalid = newErrors.name
+      ? nameRef
+      : newErrors.email
+        ? emailRef
+        : newErrors.message
+          ? messageRef
+          : null;
+    if (firstInvalid) requestAnimationFrame(() => firstInvalid.current?.focus());
+    return firstInvalid === null;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -266,12 +314,14 @@ export default function ContactPageClient({
     isSubmitting.current = true;
     setFormStatus('loading');
     setErrors({});
+    setReferenceId(null);
 
     // Fire form_submit when submission begins
     trackFormSubmit({ source: 'contact_page', form_id: 'inquiry_form' });
 
     const experience_slug = getExperienceSlug();
-    const intent = selectedIntents.join(', ');
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 12000);
 
     try {
       const response = await fetch('/api/contact', {
@@ -281,40 +331,41 @@ export default function ContactPageClient({
           name: formData.name,
           email: formData.email,
           message: formData.message,
-          intent,
+          website: formData.website,
+          intent: selectedIntents,
           experience_slug,
+          locale,
+          page_path: pathname,
         }),
+        signal: controller.signal,
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data?.error || copy.genericFailure);
+        throw new Error(`request_${response.status}`);
       }
 
-      // Fire form_success ONLY on confirmed API success (response.ok)
-      trackFormSuccess({ source: 'contact_page', form_id: 'inquiry_form' });
+      const data = (await response.json()) as { referenceId?: unknown };
+      if (typeof data.referenceId !== 'string') throw new Error('invalid_response');
 
+      trackContactSubmit({ source: 'contact_page', form_id: 'inquiry_form' });
+
+      setReferenceId(data.referenceId);
+      setFormData({ name: '', email: '', message: '', website: '' });
+      setSelectedIntents([]);
       setFormStatus('success');
-
-      if (successRedirectHref) {
-        router.push(successRedirectHref);
-      }
-    } catch (err) {
-      const rawErrorMessage = err instanceof Error ? err.message : copy.genericFailure;
-      const errorMessage = locale === DEFAULT_SITE_LOCALE ? rawErrorMessage : copy.genericFailure;
-
-      // Fire form_error on failure
+    } catch (error) {
+      const errorCode =
+        error instanceof DOMException && error.name === 'AbortError' ? 'timeout' : 'request_failed';
       trackFormError({
         source: 'contact_page',
         form_id: 'inquiry_form',
-        error_message: errorMessage,
+        error_message: errorCode,
       });
 
       setFormStatus('error');
-      setErrors({
-        general: errorMessage,
-      });
+      setErrors({ general: copy.genericFailure });
     } finally {
+      window.clearTimeout(timeout);
       isSubmitting.current = false;
     }
   };
@@ -335,13 +386,7 @@ export default function ContactPageClient({
       {/* Two-Column Layout */}
       <section className="px-6 sm:px-10 lg:px-16 pb-24" aria-label={copy.contactSectionAriaLabel}>
         <div className="w-full max-w-7xl mx-auto">
-          <div
-            className={`grid grid-cols-1 gap-16 lg:gap-24 items-start ${
-              locale === 'zh'
-                ? 'lg:grid-cols-[minmax(0,45fr)_minmax(0,55fr)]'
-                : 'lg:grid-cols-[45%_55%]'
-            }`}
-          >
+          <div className="grid grid-cols-1 gap-16 lg:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] lg:gap-24 items-start">
             {/* Left Column — Contact Details */}
             <div className="flex flex-col gap-14">
               {/* Direct Line */}
@@ -349,9 +394,15 @@ export default function ContactPageClient({
                 <p className="text-white/35 font-body text-[10px] tracking-[0.25em] uppercase mb-4">
                   {copy.directLineLabel}
                 </p>
-                <p className="text-white font-body font-bold mb-3 text-[clamp(1.5rem,3vw,28px)]">
-                  +90 541 220 3000
-                </p>
+                <OutboundLink
+                  href={CONTACT_PHONE_HREF}
+                  aria-label={copy.phoneAriaLabel}
+                  className="motion-link mb-3 inline-flex min-h-11 items-center text-white font-body font-bold text-[clamp(1.5rem,3vw,28px)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                  trackingLabel="contact_phone"
+                  trackingSource="contact_page"
+                >
+                  {CONTACT_PHONE_DISPLAY}
+                </OutboundLink>
                 <p className="text-white/35 font-body text-sm">{copy.directLineDescription}</p>
               </div>
 
@@ -360,10 +411,20 @@ export default function ContactPageClient({
                 <p className="text-white/35 font-body text-[10px] tracking-[0.25em] uppercase mb-4">
                   {copy.privateMessageLabel}
                 </p>
-                <p className="text-white font-body font-bold text-lg leading-relaxed">WhatsApp</p>
-                <p className="text-white font-body font-bold text-lg leading-relaxed mb-3">
-                  WeChat
-                </p>
+                <div className="flex flex-col items-start mb-3">
+                  <OutboundLink
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={copy.whatsappAriaLabel}
+                    className="motion-link inline-flex min-h-11 items-center text-white font-body font-bold text-lg hover:text-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                    trackingLabel="contact_whatsapp"
+                    trackingSource="contact_page"
+                  >
+                    WhatsApp
+                  </OutboundLink>
+                  <WeChatContact locale={locale} config={weChatConfig} />
+                </div>
                 <p className="text-white/35 font-body text-sm">{copy.privateMessageDescription}</p>
               </div>
 
@@ -372,7 +433,15 @@ export default function ContactPageClient({
                 <p className="text-white/35 font-body text-[10px] tracking-[0.25em] uppercase mb-4">
                   {copy.emailLabel}
                 </p>
-                <p className="text-white font-body text-base mb-3">direct@crearetravel.com</p>
+                <OutboundLink
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  aria-label={copy.emailAriaLabel}
+                  className="motion-link mb-3 inline-flex min-h-11 items-center text-white font-body text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                  trackingLabel="contact_email"
+                  trackingSource="contact_page"
+                >
+                  {CONTACT_EMAIL}
+                </OutboundLink>
                 <p className="text-white/35 font-body text-xs leading-relaxed">
                   {copy.emailDescription}
                 </p>
@@ -398,7 +467,7 @@ export default function ContactPageClient({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={copy.mapsAriaLabel}
-                    className="motion-link text-blue-400 font-body text-sm hover:text-blue-300"
+                    className="motion-link inline-flex min-h-11 items-center text-blue-400 font-body text-sm hover:text-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
                     trackingLabel="contact_google_maps"
                     trackingSource="contact_page"
                   >
@@ -406,13 +475,19 @@ export default function ContactPageClient({
                   </OutboundLink>
                 </p>
                 <p className="text-white font-body text-sm mb-6">{copy.locationDescription}</p>
-                <button
-                  type="button"
-                  aria-label={copy.meetingButtonAriaLabel}
-                  className="motion-button-editorial border border-white bg-black px-6 py-3 font-body text-sm tracking-wide text-white hover:bg-white hover:text-black"
-                >
-                  {copy.meetingButtonLabel}
-                </button>
+                {appointmentUrl && (
+                  <OutboundLink
+                    href={appointmentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={copy.meetingButtonAriaLabel}
+                    className="motion-button-editorial inline-flex min-h-11 items-center border border-white bg-black px-6 py-3 font-body text-sm tracking-wide text-white hover:bg-white hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                    trackingLabel="contact_google_appointment"
+                    trackingSource="contact_page"
+                  >
+                    {copy.meetingButtonLabel}
+                  </OutboundLink>
+                )}
               </div>
 
               {/* Building Photo */}
@@ -438,7 +513,13 @@ export default function ContactPageClient({
             {/* Right Column — Form */}
             <div>
               {formStatus === 'success' ? (
-                <div className="py-20">
+                <div
+                  ref={resultRef}
+                  tabIndex={-1}
+                  role="status"
+                  aria-live="polite"
+                  className="py-20 outline-none"
+                >
                   <div className="w-8 h-px bg-white/30 mb-10" />
                   <h2 className="font-display font-light text-white text-3xl mb-6">
                     {copy.successTitle}
@@ -446,6 +527,11 @@ export default function ContactPageClient({
                   <p className="text-white/50 font-body text-sm leading-loose">
                     {copy.successMessage}
                   </p>
+                  {referenceId && (
+                    <p className="mt-4 text-white font-body text-sm">
+                      {copy.successReference}: <strong>{referenceId}</strong>
+                    </p>
+                  )}
                 </div>
               ) : (
                 <form
@@ -457,7 +543,13 @@ export default function ContactPageClient({
                 >
                   {/* General error */}
                   {errors.general && (
-                    <div role="alert" className="border border-red-500/30 bg-red-500/10 px-4 py-3">
+                    <div
+                      ref={resultRef}
+                      tabIndex={-1}
+                      role="alert"
+                      aria-live="assertive"
+                      className="border border-red-500/30 bg-red-500/10 px-4 py-3 outline-none"
+                    >
                       <p className="text-red-400 font-body text-xs">{errors.general}</p>
                     </div>
                   )}
@@ -474,10 +566,13 @@ export default function ContactPageClient({
                       </span>
                     </label>
                     <input
+                      ref={nameRef}
                       id="name"
                       name="name"
                       type="text"
                       required
+                      maxLength={INQUIRY_LIMITS.name}
+                      autoComplete="name"
                       aria-required="true"
                       aria-invalid={!!errors.name}
                       aria-describedby={errors.name ? 'name-error' : undefined}
@@ -485,7 +580,7 @@ export default function ContactPageClient({
                       onChange={handleChange}
                       placeholder={copy.namePlaceholder}
                       disabled={formStatus === 'loading'}
-                      className="bg-transparent border-0 border-b border-white/20 focus:border-white/50 outline-none text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] w-full disabled:opacity-50"
+                      className="min-h-11 bg-transparent border-0 border-b border-white/20 focus:border-white/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] w-full disabled:opacity-50"
                     />
 
                     {errors.name && (
@@ -511,10 +606,13 @@ export default function ContactPageClient({
                       </span>
                     </label>
                     <input
+                      ref={emailRef}
                       id="email"
                       name="email"
                       type="email"
                       required
+                      maxLength={INQUIRY_LIMITS.email}
+                      autoComplete="email"
                       aria-required="true"
                       aria-invalid={!!errors.email}
                       aria-describedby={errors.email ? 'email-error' : undefined}
@@ -522,7 +620,7 @@ export default function ContactPageClient({
                       onChange={handleChange}
                       placeholder={copy.emailPlaceholder}
                       disabled={formStatus === 'loading'}
-                      className="bg-transparent border-0 border-b border-white/20 focus:border-white/50 outline-none text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] w-full disabled:opacity-50"
+                      className="min-h-11 bg-transparent border-0 border-b border-white/20 focus:border-white/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] w-full disabled:opacity-50"
                     />
 
                     {errors.email && (
@@ -542,7 +640,7 @@ export default function ContactPageClient({
                       {copy.intentLabel}
                     </legend>
                     <div className="flex flex-wrap gap-3">
-                      {copy.intents.map((intent) => {
+                      {INQUIRY_INTENTS.map((intent) => {
                         const isSelected = selectedIntents.includes(intent);
                         return (
                           <button
@@ -551,13 +649,13 @@ export default function ContactPageClient({
                             aria-pressed={isSelected}
                             onClick={() => toggleIntent(intent)}
                             disabled={formStatus === 'loading'}
-                            className={`motion-button-editorial rounded-full px-4 py-2 font-body text-sm disabled:opacity-50 ${
+                            className={`motion-button-editorial min-h-11 rounded-full px-4 py-2 font-body text-sm disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
                               isSelected
                                 ? 'border border-white text-white'
                                 : 'border border-white/25 text-white/70 hover:border-white/50 hover:text-white'
                             }`}
                           >
-                            {intent}
+                            {INQUIRY_INTENT_LABELS[locale][intent]}
                           </button>
                         );
                       })}
@@ -570,12 +668,19 @@ export default function ContactPageClient({
                       htmlFor="message"
                       className="text-white/40 font-body text-[10px] tracking-[0.25em] uppercase"
                     >
-                      {copy.messageLabel}
+                      {copy.messageLabel}{' '}
+                      <span className="text-white/25" aria-hidden="true">
+                        *
+                      </span>
                     </label>
                     <textarea
+                      ref={messageRef}
                       id="message"
                       name="message"
                       rows={5}
+                      required
+                      aria-required="true"
+                      maxLength={INQUIRY_LIMITS.message}
                       value={formData.message}
                       onChange={handleChange}
                       aria-invalid={!!errors.message}
@@ -584,7 +689,7 @@ export default function ContactPageClient({
                       }
                       placeholder={copy.messagePlaceholder}
                       disabled={formStatus === 'loading'}
-                      className="bg-transparent border-0 border-b border-white/20 focus:border-white/50 outline-none text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] w-full resize-none disabled:opacity-50"
+                      className="bg-transparent border-0 border-b border-white/20 focus:border-white/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white text-white font-body text-sm py-3 placeholder:text-white/25 transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] w-full resize-none disabled:opacity-50"
                     />
 
                     {errors.message && (
@@ -602,13 +707,29 @@ export default function ContactPageClient({
                     </p>
                   </div>
 
+                  <div
+                    className="absolute left-[-10000px] top-auto h-px w-px overflow-hidden"
+                    aria-hidden="true"
+                  >
+                    <label htmlFor="website">Website</label>
+                    <input
+                      id="website"
+                      name="website"
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={formData.website}
+                      onChange={handleChange}
+                    />
+                  </div>
+
                   {/* Submit */}
                   <div className="flex flex-col gap-3 pt-2">
                     <button
                       type="submit"
                       aria-label={copy.submitAriaLabel}
                       disabled={formStatus === 'loading'}
-                      className="motion-link text-white font-body text-sm tracking-[0.2em] uppercase text-left hover:text-white/70 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
+                      className="motion-link min-h-11 text-white font-body text-sm tracking-[0.2em] uppercase text-left hover:text-white/70 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
                     >
                       {formStatus === 'loading' ? (
                         <>

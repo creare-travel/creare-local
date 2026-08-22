@@ -12,7 +12,13 @@ function getCommitSha() {
 
 export function GET() {
   const strapiConfigured = Boolean(process.env.NEXT_PUBLIC_STRAPI_URL?.trim());
-  const sendGridConfigured = getMailConfig().ok;
+  let resendConfigured = false;
+  try {
+    getMailConfig();
+    resendConfigured = true;
+  } catch {
+    resendConfigured = false;
+  }
 
   return NextResponse.json(
     {
@@ -22,7 +28,7 @@ export function GET() {
       timestamp: new Date().toISOString(),
       commitSha: getCommitSha(),
       strapiConfigured,
-      sendGridConfigured,
+      resendConfigured,
     },
     {
       headers: {

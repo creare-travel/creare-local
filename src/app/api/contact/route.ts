@@ -1,54 +1,65 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { type InquirySubmissionInput, validateInquirySubmission } from '@/lib/inquiry';
+import { MailConfigurationError } from '@/lib/email/config';
 import { submitInquiry } from '@/lib/email/submitInquiry';
+import { generateInquiryReference, parseInquirySubmission } from '@/lib/inquiry';
 
-/**
- * POST /api/contact
- * Accepts contact form submissions and sends transactional emails via SendGrid.
- */
+const MAX_REQUEST_BYTES = 16_384;
+
 export async function POST(request: NextRequest) {
+  const referenceId = generateInquiryReference();
+
   try {
-    const body: InquirySubmissionInput = await request.json();
-    const validationError = validateInquirySubmission(body);
-    if (validationError) {
-      return NextResponse.json({ success: false, error: validationError }, { status: 400 });
+    const contentLength = Number(request.headers.get('content-length') || '0');
+    if (contentLength > MAX_REQUEST_BYTES) {
+      return NextResponse.json({ success: false, error: 'Request is too large.' }, { status: 413 });
     }
 
-    await submitInquiry(body);
+    const rawBody = await request.text();
+    if (new TextEncoder().encode(rawBody).byteLength > MAX_REQUEST_BYTES) {
+      return NextResponse.json({ success: false, error: 'Request is too large.' }, { status: 413 });
+    }
 
-    return NextResponse.json({ success: true }, { status: 200 });
-  } catch (err) {
-    if (err instanceof SyntaxError) {
+    let body: unknown;
+    try {
+      body = JSON.parse(rawBody);
+    } catch {
       return NextResponse.json({ success: false, error: 'Invalid request.' }, { status: 400 });
     }
 
-    const error = err as Error;
-    console.error('[/api/contact] Inquiry processing error:', error);
-
-    if (error.message.startsWith('Mail service is not configured.')) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Contact form is temporarily unavailable. Please try again later.',
-        },
-        { status: 503 }
-      );
+    const validation = parseInquirySubmission(body);
+    if (!validation.ok) {
+      console.warn('[contact] rejected', {
+        referenceId,
+        reason: validation.honeypot ? 'honeypot' : 'validation',
+      });
+      return NextResponse.json({ success: false, error: 'Invalid request.' }, { status: 400 });
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      return NextResponse.json(
-        {
-          success: false,
-          error: error.message,
-          stack: error.stack,
-        },
-        { status: 500 }
-      );
-    }
+    const result = await submitInquiry(validation.data, {
+      referenceId,
+      timestamp: new Date().toISOString(),
+    });
+
+    console.info('[contact] owner accepted', {
+      referenceId,
+      provider: 'resend',
+      providerMessageId: result.ownerMessageId,
+      acknowledgement: result.acknowledgement,
+      acknowledgementMessageId: result.acknowledgementMessageId,
+    });
+
+    return NextResponse.json({ success: true, referenceId }, { status: 200 });
+  } catch (error) {
+    const configurationFailure = error instanceof MailConfigurationError;
+    console.error('[contact] owner delivery failed', {
+      referenceId,
+      provider: 'resend',
+      status: configurationFailure ? 'configuration_error' : 'request_failed',
+    });
 
     return NextResponse.json(
-      { success: false, error: 'An error occurred. Please try again.' },
-      { status: 500 }
+      { success: false, error: 'Contact form is temporarily unavailable.' },
+      { status: configurationFailure ? 503 : 502 }
     );
   }
 }

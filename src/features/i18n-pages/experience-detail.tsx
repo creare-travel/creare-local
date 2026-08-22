@@ -33,6 +33,7 @@ import {
 import { buildExperienceDetailGraph } from '@/lib/schema-builder';
 import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
+import { buildWhatsAppHref } from '@/lib/contact/channels';
 
 const GOVERNED_TABLE_TO_FARM_HERO_URL = buildCloudinaryUrl(
   'creare/experiences/table-to-farm-bodrum/hero/main',
@@ -1147,7 +1148,7 @@ function StrapiExperiencePage({
             />
             <div className="mt-5">
               <OutboundLink
-                href={`https://wa.me/+905412203000?text=I'm interested in ${encodeURIComponent(item.title)}`}
+                href={buildWhatsAppHref(locale, item.title)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase text-white/40 hover:text-white/70"
@@ -1189,7 +1190,7 @@ function StrapiExperiencePage({
             />
             <div className="mt-5">
               <OutboundLink
-                href={`https://wa.me/+905412203000?text=I'm interested in ${encodeURIComponent(item.title)}`}
+                href={buildWhatsAppHref(locale, item.title)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase text-neutral-400 hover:text-neutral-600"

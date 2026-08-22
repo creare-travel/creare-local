@@ -26,7 +26,7 @@ npm install
 cp .env.local.example .env.local
 ```
 
-Open `.env.local` and fill in your values. The app will run with mock/placeholder values for most services — only `SENDGRID_API_KEY` and `CONTACT_EMAIL` are needed for the contact form to actually send emails.
+Open `.env.local` and fill in your values. The app will run with mock/placeholder values for most services — `RESEND_API_KEY`, `CONTACT_FROM_EMAIL`, and a contact recipient are needed for the contact form to send emails.
 
 ### 3. Start the Development Server
 
@@ -40,18 +40,19 @@ Open [http://localhost:4028](http://localhost:4028) in your browser.
 
 ### Required Environment Variables
 
-| Variable                        | Required  | Description                                                    |
-| ------------------------------- | --------- | -------------------------------------------------------------- |
-| `SENDGRID_API_KEY`              | For email | SendGrid API key for contact form emails.                      |
-| `CONTACT_EMAIL`                 | For email | Verified sender/recipient email for SendGrid.                  |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Optional  | Supabase project URL.                                          |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Optional  | Supabase anonymous key.                                        |
+| Variable                        | Required  | Description                                         |
+| ------------------------------- | --------- | --------------------------------------------------- |
+| `RESEND_API_KEY`                | For email | Server-only Resend API key for contact form emails. |
+| `CONTACT_FROM_EMAIL`            | For email | Verified `crearetravel.com` sender email.           |
+| `CONTACT_TO_EMAIL`              | For email | Owner recipient; falls back to `CONTACT_EMAIL`.     |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Optional  | Supabase project URL.                               |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Optional  | Supabase anonymous key.                             |
 
 All other variables (`OPENAI_API_KEY`, `STRIPE_*`, etc.) are optional and only needed if those features are in use.
 
 ### Mock / Fallback Behaviour
 
-- **SendGrid** — If `SENDGRID_API_KEY` is a mock value, contact form submissions will return an API error. The UI handles this gracefully with an error state.
+- **Resend** — If `RESEND_API_KEY` is missing or invalid, contact submissions preserve the form values and show a localized error state.
 
 ---
 
