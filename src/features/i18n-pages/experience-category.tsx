@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { getExperienceEditorialSupplement } from '@/data/experience-editorial';
 import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
@@ -150,29 +151,33 @@ export async function renderExperienceCategoryPage(
             </p>
           </div>
           <ul className="divide-y divide-white/10">
-            {experiences.map((item) => (
-              <li key={item.id}>
-                <Link
-                  href={localizePathname(`/experiences/${item.slug}`, locale)}
-                  className="group -mx-2 flex flex-col justify-between gap-4 px-2 py-8 transition-colors hover:bg-white/[0.02] sm:flex-row sm:items-center"
-                  aria-label={`${dictionary.common.enter} ${item.title}`}
-                >
-                  <div className="flex-1">
-                    <h2 className="mb-2 font-display text-lg font-light text-white transition-colors group-hover:text-white/78">
-                      {item.title}
-                    </h2>
-                    {item.short_description ? (
-                      <p className="max-w-2xl font-body text-sm leading-relaxed text-white/42">
-                        {item.short_description}
-                      </p>
-                    ) : null}
-                  </div>
-                  <span className="shrink-0 font-body text-[0.62rem] uppercase tracking-[0.22em] text-white/35 transition-colors group-hover:text-white/62">
-                    {dictionary.culturalWorlds.viewExperience} &rarr;
-                  </span>
-                </Link>
-              </li>
-            ))}
+            {experiences.map((item) => {
+              const editorial = getExperienceEditorialSupplement(item.slug as string, locale);
+
+              return (
+                <li key={item.id}>
+                  <Link
+                    href={localizePathname(`/experiences/${item.slug}`, locale)}
+                    className="group -mx-2 flex flex-col justify-between gap-4 px-2 py-8 transition-colors hover:bg-white/[0.02] sm:flex-row sm:items-center"
+                    aria-label={`${dictionary.common.enter} ${item.title}`}
+                  >
+                    <div className="flex-1">
+                      <h2 className="mb-2 font-display text-lg font-light text-white transition-colors group-hover:text-white/78">
+                        {item.title}
+                      </h2>
+                      {editorial.shortDescription ? (
+                        <p className="max-w-2xl font-body text-sm leading-relaxed text-white/42">
+                          {editorial.shortDescription}
+                        </p>
+                      ) : null}
+                    </div>
+                    <span className="shrink-0 font-body text-[0.62rem] uppercase tracking-[0.22em] text-white/35 transition-colors group-hover:text-white/62">
+                      {dictionary.culturalWorlds.viewExperience} &rarr;
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </section>
       ) : null}

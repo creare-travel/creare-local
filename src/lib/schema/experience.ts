@@ -5,15 +5,15 @@ import { buildPlaceSchema } from './place';
 import type { SchemaNode, StrapiExperience, StrapiOntologyEntity } from './types';
 import {
   buildCanonicalUrl,
-  experienceIds,
   extractParagraphs,
   getPrimaryDescription,
   getSafeAdditionalTypeUrl,
-  insightIds,
   normalizeEnumValue,
   normalizeSameAs,
 } from './utils';
 import { buildWebPageSchema } from './webpage';
+import { DEFAULT_SITE_LOCALE, LOCALE_REGISTRY, type SiteLocale } from '@/lib/i18n/config';
+import { localizePathname } from '@/lib/i18n/pathname';
 
 interface RelatedInsightReference {
   slug?: string;
@@ -21,8 +21,32 @@ interface RelatedInsightReference {
   excerpt?: string;
 }
 
+interface ExperienceDetailGraphOptions {
+  locale?: SiteLocale;
+  heroAltText?: string;
+  labels?: {
+    home: string;
+    experiences: string;
+  };
+}
+
+function buildLocalizedExperienceIds(slug: string, locale: SiteLocale) {
+  const canonical = buildCanonicalUrl(localizePathname(`/experiences/${slug}`, locale));
+  return {
+    canonical,
+    webpage: `${canonical}#webpage`,
+    service: `${canonical}#service`,
+    image: `${canonical}#image`,
+    sequence: `${canonical}#encounter-sequence`,
+    place: `${canonical}#place`,
+    breadcrumbs: `${canonical}#breadcrumbs`,
+  };
+}
+
 function getLocation(experience: StrapiExperience): string | undefined {
-  return experience.destination?.name || experience.location_label || undefined;
+  return (
+    experience.location || experience.destination?.name || experience.location_label || undefined
+  );
 }
 
 function normalizeOptionalText(value?: string | null) {
@@ -161,19 +185,24 @@ function getExperienceDescription(experience: StrapiExperience): string {
 export function buildExperienceDetailGraph(
   experience: StrapiExperience,
   slug: string,
-  relatedInsights: RelatedInsightReference[] = []
+  relatedInsights: RelatedInsightReference[] = [],
+  options: ExperienceDetailGraphOptions = {}
 ): SchemaNode[] {
-  const ids = experienceIds(slug);
+  const locale = options.locale ?? DEFAULT_SITE_LOCALE;
+  const ids = buildLocalizedExperienceIds(slug, locale);
   const title = experience.title || 'Experience';
   const description = getExperienceDescription(experience);
-  const imageObject = buildImageObjectSchema(experience.cover_image, {
+  const baseImageObject = buildImageObjectSchema(experience.cover_image, {
     id: ids.image,
     fallbackName: title,
     representativeOfPage: true,
   });
+  const imageObject = baseImageObject
+    ? { ...baseImageObject, description: options.heroAltText ?? baseImageObject.description }
+    : undefined;
   const locationName = getLocation(experience);
   const destinationUrl = experience.destination?.slug
-    ? buildCanonicalUrl(`/cultural-worlds/${experience.destination.slug}`)
+    ? buildCanonicalUrl(localizePathname(`/cultural-worlds/${experience.destination.slug}`, locale))
     : undefined;
   const placeNode = locationName
     ? buildPlaceSchema({
@@ -221,11 +250,13 @@ export function buildExperienceDetailGraph(
   const relatedInsightMentions = relatedInsights
     .filter((insight) => insight.slug && insight.title)
     .map((insight) => {
-      const ids = insightIds(insight.slug as string);
+      const canonical = buildCanonicalUrl(
+        localizePathname(`/insights/${insight.slug as string}`, locale)
+      );
       return {
         '@type': 'Article',
-        '@id': ids.article,
-        url: ids.canonical,
+        '@id': `${canonical}#article`,
+        url: canonical,
         name: insight.title,
         description: insight.excerpt,
       };
@@ -272,6 +303,7 @@ export function buildExperienceDetailGraph(
     mentions: relatedInsightMentions.length > 0 ? relatedInsightMentions : undefined,
     additionalProperty: additionalProperties.length > 0 ? additionalProperties : undefined,
     hasPart: encounterSequenceNode ? [{ '@id': ids.sequence }] : undefined,
+    inLanguage: LOCALE_REGISTRY[locale].jsonLdLanguage,
   };
 
   const webpageNode = buildWebPageSchema({
@@ -283,6 +315,7 @@ export function buildExperienceDetailGraph(
     breadcrumbId: ids.breadcrumbs,
     mainEntity: { '@id': ids.service },
     about: aboutThings.length > 0 ? aboutThings : undefined,
+    inLanguage: LOCALE_REGISTRY[locale].jsonLdLanguage,
   });
 
   if (destinationUrl) {
@@ -300,8 +333,14 @@ export function buildExperienceDetailGraph(
 
   const breadcrumbNode = buildBreadcrumbListSchema(
     [
-      { name: 'Home', url: buildCanonicalUrl('/') },
-      { name: 'Experiences', url: buildCanonicalUrl('/experiences') },
+      {
+        name: options.labels?.home ?? 'Home',
+        url: buildCanonicalUrl(localizePathname('/', locale)),
+      },
+      {
+        name: options.labels?.experiences ?? 'Experiences',
+        url: buildCanonicalUrl(localizePathname('/experiences', locale)),
+      },
       { name: title, url: ids.canonical, slugFallback: slug },
     ],
     ids.breadcrumbs

@@ -11,6 +11,10 @@ import GallerySection from '@/components/experiences/GallerySection';
 import InquireCTA from '@/components/experiences/InquireCTA';
 import { insights as staticInsights, isCanonicalCulturalWorldSlug } from '@/data/insights';
 import {
+  findExperienceEditorialSupplement,
+  getExperienceEditorialSupplement,
+} from '@/data/experience-editorial';
+import {
   filterPublicExperiences,
   filterPublicInsights,
   isPublicExperienceRecord,
@@ -115,6 +119,7 @@ interface StrapiExperienceDetail {
   documentId?: string;
   title: string;
   short_description?: string;
+  one_line_hook?: string;
   description?: StrapiRichTextNode[] | string;
   wow_moment?: string;
   differentiator?: string;
@@ -128,6 +133,7 @@ interface StrapiExperienceDetail {
   // New fields
   category?: string;
   tier?: string;
+  location?: string;
   location_label?: string;
   destination?: StrapiDestination;
   duration?: string;
@@ -135,6 +141,8 @@ interface StrapiExperienceDetail {
   group_size?: string;
   program?: StrapiRichTextNode[] | string;
   audience?: StrapiRichTextNode[] | string;
+  highlights?: StrapiRichTextNode[] | string;
+  experience_flow?: StrapiRichTextNode[] | string;
   cta_enabled?: boolean;
   cta_text?: string;
   cta_label?: string | null;
@@ -371,11 +379,19 @@ function extractNodeText(node: StrapiRichTextNode): string {
 }
 
 function normalizeProgramStep(step: string): string {
-  return step.replace(/^\s*\d{1,2}\s*[—-]\s*/, '').trim();
+  return step.replace(/^\s*\d{1,2}\s*[.—-]\s*/, '').trim();
+}
+
+function formatExperienceCategory(value: string) {
+  const normalized = value.trim().toLowerCase();
+  if (normalized === 'signature') return 'SIGNATURE™';
+  if (normalized === 'lab') return 'LAB™';
+  if (normalized === 'black') return 'BLACK™';
+  return value;
 }
 
 function getExperienceLocation(item: StrapiExperienceDetail) {
-  return item.destination?.name || item.location_label || null;
+  return item.location || item.destination?.name || item.location_label || null;
 }
 
 function getExperienceImageUrl(item: StrapiExperienceDetail) {
@@ -422,7 +438,10 @@ export function buildLocalizedExperienceDetailMetadata({
   image?: string | null;
   availableLocales?: readonly SiteLocale[];
 }): Metadata {
-  return buildLocaleOwnedMetadata({
+  const editorial = findExperienceEditorialSupplement(slug, locale);
+  const description = getExperienceDescription(item);
+
+  const metadata = buildLocaleOwnedMetadata({
     locale,
     copyLocale: locale,
     route: {
@@ -431,13 +450,25 @@ export function buildLocalizedExperienceDetailMetadata({
       slug,
     },
     title: item.seo_title ?? item.title,
-    description: getExperienceDescription(item),
+    description,
     image: image ?? undefined,
-    imageAlt: item.title,
+    imageAlt: editorial?.heroAltText ?? item.title,
     robots: { index: true, follow: true },
     titleMode: item.seo_title ? 'absolute' : 'templated',
     availableLocales,
   });
+
+  if (!editorial || !metadata.openGraph) {
+    return metadata;
+  }
+
+  return {
+    ...metadata,
+    openGraph: {
+      ...metadata.openGraph,
+      description: editorial.openGraphDescription,
+    },
+  };
 }
 
 function normalizeOptionalText(value?: string | null) {
@@ -639,11 +670,14 @@ function StrapiExperiencePage({
   locale: SiteLocale;
 }) {
   const dictionary = getDictionary(locale);
+  const editorial = getExperienceEditorialSupplement(canonicalSlug, locale);
   const coverUrl = getGovernedExperienceImageUrl(item, canonicalSlug);
-  const coverAlt = item.cover_image?.alternativeText ?? item.title;
+  const coverAlt = editorial.heroAltText;
   const locationDisplay = getExperienceLocation(item);
   const programItems = extractParagraphs(item.program).map(normalizeProgramStep).filter(Boolean);
   const audienceItems = extractParagraphs(item.audience);
+  const standardInclusions = extractParagraphs(item.highlights);
+  const optionalLayers = extractParagraphs(item.experience_flow);
   const cmsRelatedExperiences = normalizeRelationArray<StrapiExperienceDetail>(
     item.related_experiences
   )
@@ -658,7 +692,9 @@ function StrapiExperiencePage({
     cmsRelatedInsights.length === 0 ? buildStaticReverseLinkedInsights(canonicalSlug, locale) : [];
   const relatedInsights =
     cmsRelatedInsights.length > 0 ? cmsRelatedInsights : fallbackRelatedInsights;
-  const categoryLabel = item.category || item.tier || item.intent_level || '';
+  const categoryLabel = formatExperienceCategory(
+    item.category || item.tier || item.intent_level || ''
+  );
   const groupSize = item.group_size || (item.max_guests ? String(item.max_guests) : '');
   const currentNavIndex = navigationItems.findIndex(
     (experience) => experience.slug === canonicalSlug
@@ -671,13 +707,20 @@ function StrapiExperiencePage({
   const wowMoment = normalizeOptionalText(item.wow_moment);
   const differentiator = normalizeOptionalText(item.differentiator);
   const visibleCtaLabel = resolveExperienceCtaLabel(item, dictionary.home.cta.label);
-  const experienceSchemaGraph = buildExperienceDetailGraph(item, canonicalSlug, relatedInsights);
+  const experienceSchemaGraph = buildExperienceDetailGraph(item, canonicalSlug, relatedInsights, {
+    locale,
+    heroAltText: editorial.heroAltText,
+    labels: {
+      home: dictionary.common.home,
+      experiences: dictionary.experiences.title,
+    },
+  });
   const coverBlurDataUrl = coverUrl
     ? buildCinematicBlurDataUrl(coverUrl, { atmosphere: 'dark', profile: 'hero' })
     : undefined;
 
   // Build info bar items — only include if value exists
-  const infoItems: { label: string; value: string; isLocation?: boolean }[] = [];
+  const infoItems: { label: string; value: string; note?: string; isLocation?: boolean }[] = [];
   if (categoryLabel)
     infoItems.push({ label: dictionary.experiences.category, value: categoryLabel });
   if (locationDisplay)
@@ -688,13 +731,16 @@ function StrapiExperiencePage({
     });
   if (item.duration)
     infoItems.push({ label: dictionary.experiences.duration, value: item.duration });
-  if (groupSize) infoItems.push({ label: dictionary.experiences.groupSize, value: groupSize });
+  if (groupSize)
+    infoItems.push({
+      label: dictionary.experiences.groupSize,
+      value: groupSize,
+      note: editorial.groupSizeNote || undefined,
+    });
 
   return (
     <main className="bg-white min-h-screen">
-      {locale === DEFAULT_SITE_LOCALE && (
-        <JsonLd id="experience-detail-jsonld" schema={experienceSchemaGraph} />
-      )}
+      <JsonLd id="experience-detail-jsonld" schema={experienceSchemaGraph} />
       <ExperienceViewTracker slug={canonicalSlug} title={item.title} category={categoryLabel} />
 
       {/* ── HERO / COVER ── */}
@@ -728,9 +774,9 @@ function StrapiExperiencePage({
             >
               {item.title}
             </h1>
-            {item.short_description && (
+            {editorial.shortDescription && (
               <p className="mt-5 font-body text-white/60 text-sm leading-relaxed max-w-xl">
-                {item.short_description}
+                {editorial.shortDescription}
               </p>
             )}
           </div>
@@ -749,9 +795,9 @@ function StrapiExperiencePage({
             >
               {item.title}
             </h1>
-            {item.short_description && (
+            {editorial.shortDescription && (
               <p className="mt-5 font-body text-white/50 text-sm leading-relaxed max-w-xl">
-                {item.short_description}
+                {editorial.shortDescription}
               </p>
             )}
           </div>
@@ -822,6 +868,11 @@ function StrapiExperiencePage({
                         {infoItem.value}
                       </p>
                     )}
+                    {infoItem.note ? (
+                      <p className="mt-2 font-body text-xs leading-relaxed text-neutral-500">
+                        {infoItem.note}
+                      </p>
+                    ) : null}
                   </div>
                 ))}
               </div>
@@ -831,7 +882,7 @@ function StrapiExperiencePage({
       )}
 
       {/* ── SHORT DESCRIPTION (no cover fallback) ── */}
-      {item.short_description && !coverUrl && (
+      {editorial.shortDescription && !coverUrl && (
         <section className="py-16 bg-white" aria-label="Experience overview">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="max-w-2xl">
@@ -842,7 +893,7 @@ function StrapiExperiencePage({
                 className="font-display font-light text-neutral-800 leading-relaxed"
                 style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)' }}
               >
-                {item.short_description}
+                {editorial.shortDescription}
               </p>
             </div>
           </div>
@@ -942,6 +993,55 @@ function StrapiExperiencePage({
                   </li>
                 ))}
               </ol>
+              {editorial.programmeNote ? (
+                <p className="mt-8 border-t border-neutral-200 pt-6 font-body text-xs leading-relaxed text-neutral-500">
+                  {editorial.programmeNote}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {standardInclusions.length > 0 && (
+        <section
+          className="py-20 md:py-24 bg-white"
+          aria-label={dictionary.experiences.standardInclusions}
+        >
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+            <div className="max-w-2xl border-t border-neutral-200 pt-10">
+              <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
+                {dictionary.experiences.standardInclusions}
+              </h2>
+              {typeof item.highlights === 'string' ? (
+                <p className="font-body text-sm text-neutral-700 leading-relaxed">
+                  {item.highlights}
+                </p>
+              ) : item.highlights ? (
+                renderRichText(item.highlights)
+              ) : null}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {optionalLayers.length > 0 && (
+        <section
+          className="py-20 md:py-24 bg-neutral-50"
+          aria-label={dictionary.experiences.optionalLayers}
+        >
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+            <div className="max-w-2xl">
+              <h2 className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-8">
+                {dictionary.experiences.optionalLayers}
+              </h2>
+              {typeof item.experience_flow === 'string' ? (
+                <p className="font-body text-sm text-neutral-700 leading-relaxed">
+                  {item.experience_flow}
+                </p>
+              ) : item.experience_flow ? (
+                renderRichText(item.experience_flow)
+              ) : null}
             </div>
           </div>
         </section>
@@ -971,6 +1071,19 @@ function StrapiExperiencePage({
         </section>
       )}
 
+      {item.one_line_hook ? (
+        <section
+          className="bg-[#EDEAE4] py-16 md:py-20"
+          aria-label={dictionary.experiences.closingCopy}
+        >
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+            <p className="max-w-3xl font-display text-xl font-light leading-relaxed text-neutral-800 md:text-2xl">
+              {item.one_line_hook}
+            </p>
+          </div>
+        </section>
+      ) : null}
+
       {/* ── GALLERY ── */}
       {item.gallery && item.gallery.length > 0 && <GallerySection images={item.gallery} />}
 
@@ -986,7 +1099,11 @@ function StrapiExperiencePage({
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10">
                     {cmsRelatedExperiences.map((experience, index) => {
                       const imageUrl = getExperienceImageUrl(experience);
-                      const imageAlt = experience.cover_image?.alternativeText ?? experience.title;
+                      const relatedEditorial = getExperienceEditorialSupplement(
+                        experience.slug as string,
+                        locale
+                      );
+                      const imageAlt = relatedEditorial.heroAltText;
                       const relatedLocation =
                         experience.destination?.name || experience.location_label || null;
 
@@ -995,7 +1112,7 @@ function StrapiExperiencePage({
                           key={experience.id}
                           href={localizePathname(`/experiences/${experience.slug}`, locale)}
                           className="group block"
-                          aria-label={`View adjacent experience: ${experience.title}`}
+                          aria-label={`${dictionary.experiences.adjacentExperiences}: ${experience.title}`}
                         >
                           {imageUrl ? (
                             <div className="relative aspect-[4/3] overflow-hidden mb-5 bg-neutral-100">
@@ -1018,9 +1135,9 @@ function StrapiExperiencePage({
                           <h3 className="motion-copy-fade font-display font-light text-neutral-900 leading-snug mb-2">
                             {experience.title}
                           </h3>
-                          {experience.short_description && (
+                          {relatedEditorial.shortDescription && (
                             <p className="font-body text-sm text-neutral-600 leading-relaxed">
-                              {experience.short_description}
+                              {relatedEditorial.shortDescription}
                             </p>
                           )}
                         </Link>
@@ -1041,7 +1158,7 @@ function StrapiExperiencePage({
                         key={insight.id}
                         href={localizePathname(`/insights/${insight.slug}`, locale)}
                         className="group block border-b border-neutral-200/80 pb-6 last:border-b-0 last:pb-0"
-                        aria-label={`Read further cultural context: ${insight.title}`}
+                        aria-label={`${dictionary.experiences.furtherCulturalReading}: ${insight.title}`}
                       >
                         {insight.destination?.name && (
                           <p className="font-body text-[0.58rem] tracking-[0.18em] text-neutral-400 uppercase mb-2">
@@ -1078,7 +1195,7 @@ function StrapiExperiencePage({
                   <Link
                     href={localizePathname(`/experiences/${prevExperience.slug}`, locale)}
                     className="group flex flex-col gap-2 text-left motion-link hover:opacity-80"
-                    aria-label={`Previous experience: ${prevExperience.title}`}
+                    aria-label={`${dictionary.experiences.previousExperience}: ${prevExperience.title}`}
                   >
                     <span className="font-body text-[0.58rem] tracking-[0.3em] text-white/40 uppercase">
                       {dictionary.experiences.previousExperience}
@@ -1103,7 +1220,7 @@ function StrapiExperiencePage({
                   <Link
                     href={localizePathname(`/experiences/${nextExperience.slug}`, locale)}
                     className="group flex flex-col gap-2 text-right motion-link hover:opacity-80"
-                    aria-label={`Next experience: ${nextExperience.title}`}
+                    aria-label={`${dictionary.experiences.nextExperience}: ${nextExperience.title}`}
                   >
                     <span className="font-body text-[0.58rem] tracking-[0.3em] text-white/40 uppercase">
                       {dictionary.experiences.nextExperience}
@@ -1130,16 +1247,19 @@ function StrapiExperiencePage({
         <section className="py-24 md:py-32 bg-neutral-950" aria-label="Call to action">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
             <p className="font-body text-[0.6rem] tracking-[0.35em] text-white/40 uppercase mb-6">
-              {dictionary.culturalWorlds.byIntroductionOnly}
+              CREARE
             </p>
             <p
               className="font-display font-light text-white leading-tight mb-10"
               style={{ fontSize: 'clamp(1.6rem, 3vw, 2.8rem)' }}
             >
-              {dictionary.culturalWorlds.accessLimited}
+              {editorial.ctaHeading}
+            </p>
+            <p className="font-body text-sm text-white/60 leading-relaxed max-w-md mx-auto mb-8">
+              {editorial.ctaSupportingText}
             </p>
             <p className="font-body text-[0.6rem] tracking-[0.2em] text-white/40 uppercase mb-6">
-              {dictionary.culturalWorlds.accessLimited}
+              {editorial.ctaAccessLine}
             </p>
             <InquireCTA
               experienceSlug={canonicalSlug}
@@ -1171,17 +1291,13 @@ function StrapiExperiencePage({
               className="font-display font-light text-neutral-900 leading-snug tracking-tight mb-6"
               style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)' }}
             >
-              {locale === DEFAULT_SITE_LOCALE
-                ? `Reserve ${item.title}`
-                : dictionary.home.contact.title}
+              {editorial.ctaHeading}
             </h2>
             <p className="font-body text-sm text-neutral-600 leading-relaxed max-w-md mx-auto mb-10">
-              {locale === DEFAULT_SITE_LOCALE
-                ? 'This experience is arranged privately. Availability is limited. Begin with a conversation.'
-                : dictionary.common.beginPrivateConversation}
+              {editorial.ctaSupportingText}
             </p>
             <p className="font-body text-[0.6rem] tracking-[0.2em] text-neutral-400/70 uppercase mb-6">
-              {dictionary.culturalWorlds.accessLimited}
+              {editorial.ctaAccessLine}
             </p>
             <InquireCTA
               experienceSlug={canonicalSlug}
@@ -1252,6 +1368,7 @@ export async function generateExperienceDetailMetadata({
 
   const strapiItem = result.item;
   const canonicalSlug = result.canonicalSlug;
+  const editorial = getExperienceEditorialSupplement(canonicalSlug, locale);
   const availableLocales = await resolveActiveLocaleAvailability(async (candidateLocale) => {
     if (candidateLocale === locale) return true;
     const candidate = await resolveExperienceDetailBySlug(canonicalSlug, candidateLocale);
@@ -1268,7 +1385,8 @@ export async function generateExperienceDetailMetadata({
 
   const ogTitle = strapiItem.seo_title ?? `${strapiItem.title} — CREARE`;
   const pageTitle = preserveTerminalBrandTitle(strapiItem.seo_title ?? strapiItem.title);
-  const ogDescription = getExperienceDescription(strapiItem);
+  const metaDescription = getExperienceDescription(strapiItem);
+  const ogDescription = editorial.openGraphDescription;
   const coverUrl = getGovernedExperienceImageUrl(strapiItem, canonicalSlug);
 
   if (locale !== DEFAULT_SITE_LOCALE) {
@@ -1283,7 +1401,7 @@ export async function generateExperienceDetailMetadata({
 
   return {
     title: pageTitle,
-    description: ogDescription,
+    description: metaDescription,
     alternates,
     robots: { index: true, follow: true },
     openGraph: {
@@ -1303,7 +1421,7 @@ export async function generateExperienceDetailMetadata({
                 url: coverUrl,
                 width: 1200,
                 height: 630,
-                alt: strapiItem.cover_image?.alternativeText ?? strapiItem.title,
+                alt: editorial.heroAltText,
               },
             ],
           }
@@ -1316,7 +1434,7 @@ export async function generateExperienceDetailMetadata({
       ...(coverUrl
         ? {
             image: coverUrl,
-            imageAlt: strapiItem.cover_image?.alternativeText ?? strapiItem.title,
+            imageAlt: editorial.heroAltText,
           }
         : {}),
     }),

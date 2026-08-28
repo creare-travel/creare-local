@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
+import { getExperienceEditorialSupplement } from '@/data/experience-editorial';
 import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
@@ -314,6 +315,7 @@ export async function renderExperiencesPage(locale: SiteLocale = DEFAULT_SITE_LO
           <ul className="divide-y divide-white/10">
             {publishedExperiences.map((item) => {
               const href = localizePathname(`/experiences/${item.slug}`, locale);
+              const editorial = getExperienceEditorialSupplement(item.slug as string, locale);
 
               return (
                 <li key={item.id}>
@@ -325,9 +327,9 @@ export async function renderExperiencesPage(locale: SiteLocale = DEFAULT_SITE_LO
                       <h3 className="mb-2 font-display text-lg font-light text-white transition-colors group-hover:text-white/78">
                         {item.title}
                       </h3>
-                      {item.short_description && (
+                      {editorial.shortDescription && (
                         <p className="max-w-2xl font-body text-sm leading-relaxed text-white/42">
-                          {item.short_description}
+                          {editorial.shortDescription}
                         </p>
                       )}
                     </div>

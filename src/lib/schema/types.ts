@@ -66,6 +66,7 @@ export interface StrapiExperience {
   title?: string;
   slug?: string;
   short_description?: string;
+  one_line_hook?: string;
   description?: StrapiRichTextNode[] | string;
   wow_moment?: string;
   differentiator?: string;
@@ -77,12 +78,15 @@ export interface StrapiExperience {
   tier?: string;
   series?: string | null;
   location_label?: string;
+  location?: string;
   destination?: StrapiDestination | null;
   duration?: string;
   max_guests?: string | number;
   group_size?: string;
   program?: StrapiRichTextNode[] | string;
   audience?: StrapiRichTextNode[] | string;
+  highlights?: StrapiRichTextNode[] | string;
+  experience_flow?: StrapiRichTextNode[] | string;
   cta_enabled?: boolean;
   cta_text?: string;
   cta_label?: string | null;

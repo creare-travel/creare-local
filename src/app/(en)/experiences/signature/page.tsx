@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
+import { getExperienceEditorialSupplement } from '@/data/experience-editorial';
 import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import {
@@ -141,7 +142,7 @@ function getGeoMetadataLine(exp: StrapiExperience) {
 
 function renderExperienceCard(exp: StrapiExperience, options?: { compact?: boolean }) {
   const coverUrl = getSeriesImage(exp);
-  const coverAlt = exp.cover_image?.alternativeText ?? exp.title;
+  const coverAlt = getExperienceEditorialSupplement(exp.slug, DEFAULT_SITE_LOCALE).heroAltText;
   const compact = options?.compact ?? false;
   const geoMetadata = getGeoMetadataLine(exp);
   const href = exp.slug ? `/experiences/${exp.slug}` : null;

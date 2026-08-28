@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
 import AppImage from '@/components/ui/AppImage';
+import { getExperienceEditorialSupplement } from '@/data/experience-editorial';
 import { filterPublicExperiences } from '@/lib/canonical-gates';
 import { buildCanonicalUrl, buildExperienceListingGraph, listingIds } from '@/lib/schema-builder';
 import { buildExperienceInquiryHref } from '@/lib/inquiry';
@@ -125,15 +126,18 @@ export default async function LabPage() {
       { name: 'Experiences', url: buildCanonicalUrl('/experiences') },
       { name: 'LAB Experiences', url: ids.canonical },
     ],
-    items: labExperiences.map((exp) => ({
-      title: exp.title,
-      slug: exp.slug,
-      url: exp.slug ? buildCanonicalUrl(`/experiences/${exp.slug}`) : undefined,
-      description: exp.short_description,
-      image: exp.cover_image ?? undefined,
-      category: exp.category,
-      destinationName: exp.destination?.name ?? exp.location_label ?? null,
-    })),
+    items: labExperiences.map((exp) => {
+      const editorial = getExperienceEditorialSupplement(exp.slug, DEFAULT_SITE_LOCALE);
+      return {
+        title: exp.title,
+        slug: exp.slug,
+        url: exp.slug ? buildCanonicalUrl(`/experiences/${exp.slug}`) : undefined,
+        description: editorial.shortDescription,
+        image: exp.cover_image ?? undefined,
+        category: exp.category,
+        destinationName: exp.destination?.name ?? exp.location_label ?? null,
+      };
+    }),
   });
 
   return (
@@ -383,13 +387,14 @@ export default async function LabPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-20 lg:gap-x-14 lg:gap-y-16">
                 {labExperiences.map((exp) => {
+                  const editorial = getExperienceEditorialSupplement(exp.slug, DEFAULT_SITE_LOCALE);
                   const rawUrl =
                     exp.cover_image?.formats?.medium?.url ??
                     exp.cover_image?.formats?.small?.url ??
                     exp.cover_image?.url ??
                     null;
                   const coverUrl = rawUrl ? mediaUrl(rawUrl) : null;
-                  const coverAlt = exp.cover_image?.alternativeText ?? exp.title;
+                  const coverAlt = editorial.heroAltText;
                   const location = exp.destination?.name ?? exp.location_label;
                   const geoMetadata = getGeoMetadataLine(exp);
                   const href = exp.slug ? `/experiences/${exp.slug}` : null;
@@ -432,9 +437,9 @@ export default async function LabPage() {
                         <p className="font-body text-[0.7rem] text-neutral-500 mb-2">{location}</p>
                       )}
 
-                      {exp.short_description && (
+                      {editorial.shortDescription && (
                         <p className="font-body text-sm text-neutral-500 leading-relaxed">
-                          {exp.short_description}
+                          {editorial.shortDescription}
                         </p>
                       )}
 
