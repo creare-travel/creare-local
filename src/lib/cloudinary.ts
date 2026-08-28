@@ -1,13 +1,7 @@
 import type { ImageLoaderProps } from 'next/image';
 
 export type CloudinaryDeliveryProfile =
-  | 'default'
-  | 'hero'
-  | 'card'
-  | 'cardPortrait'
-  | 'editorial'
-  | 'editorialWide'
-  | 'square';
+  'default' | 'hero' | 'card' | 'cardPortrait' | 'editorial' | 'editorialWide' | 'square';
 
 type CloudinaryFormat = 'auto' | 'webp' | 'avif' | 'jpg' | 'png';
 type CloudinaryCrop = 'fill' | 'limit' | 'fit' | 'crop' | 'scale';
