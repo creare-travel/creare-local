@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { renderHomePage } from '@/features/i18n-pages/home';
-import { renderExperiencesPage } from '@/features/i18n-pages/experiences';
 import {
-  buildExperienceCategoryMetadata,
+  generateExperiencesMetadata,
+  renderExperiencesPage,
+} from '@/features/i18n-pages/experiences';
+import {
+  generateExperienceCategoryMetadata,
   renderExperienceCategoryPage,
   type ExperienceCategory,
 } from '@/features/i18n-pages/experience-category';
@@ -148,12 +151,12 @@ export async function generateMetadata({ params }: GenericLocalePageProps): Prom
   if (extra) return { title: { absolute: '404' }, robots: { index: false, follow: false } };
 
   if (!family) return buildListingMetadata(locale, 'home');
-  if (!slug && family === 'experiences') return buildListingMetadata(locale, 'experiences');
+  if (!slug && family === 'experiences') return generateExperiencesMetadata(locale);
   if (!slug && family === 'cultural-worlds') return buildListingMetadata(locale, 'cultural-worlds');
   if (!slug && family === 'insights') return buildListingMetadata(locale, 'insights');
 
   if (family === 'experiences' && slug && EXPERIENCE_CATEGORIES.has(slug as ExperienceCategory)) {
-    return buildExperienceCategoryMetadata(slug as ExperienceCategory, locale);
+    return generateExperienceCategoryMetadata(slug as ExperienceCategory, locale);
   }
   if (family === 'experiences' && slug) {
     return generateExperienceDetailMetadata({ locale, params: Promise.resolve({ slug }) });

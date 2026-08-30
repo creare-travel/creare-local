@@ -27,6 +27,9 @@ interface ExperienceDetailGraphOptions {
   labels?: {
     home: string;
     experiences: string;
+    programme?: string;
+    wowMoment?: string;
+    differentiator?: string;
   };
 }
 
@@ -154,7 +157,8 @@ function buildAudienceSchema(experience: StrapiExperience): SchemaNode | undefin
 
 function buildEncounterSequenceNode(
   experience: StrapiExperience,
-  sequenceId: string
+  sequenceId: string,
+  programmeLabel = 'Program structure'
 ): SchemaNode | undefined {
   const programItems = extractParagraphs(experience.program);
   if (!programItems.length) return undefined;
@@ -162,7 +166,7 @@ function buildEncounterSequenceNode(
   return {
     '@id': sequenceId,
     '@type': 'ItemList',
-    name: `${experience.title} program structure`,
+    name: `${experience.title} — ${programmeLabel}`,
     itemListElement: programItems.map((step, index) => ({
       '@type': 'ListItem',
       position: index + 1,
@@ -213,7 +217,11 @@ export function buildExperienceDetailGraph(
         addressCountry: 'TR',
       })
     : undefined;
-  const encounterSequenceNode = buildEncounterSequenceNode(experience, ids.sequence);
+  const encounterSequenceNode = buildEncounterSequenceNode(
+    experience,
+    ids.sequence,
+    options.labels?.programme
+  );
   const aboutThings = buildAboutThings(experience);
   const additionalProperties = [
     buildPropertyValue(
@@ -234,7 +242,7 @@ export function buildExperienceDetailGraph(
       ? {
           '@type': 'PropertyValue',
           propertyID: 'wow_moment',
-          name: 'Wow Moment',
+          name: options.labels?.wowMoment ?? 'Wow Moment',
           value: normalizeOptionalText(experience.wow_moment),
         }
       : null,
@@ -242,7 +250,7 @@ export function buildExperienceDetailGraph(
       ? {
           '@type': 'PropertyValue',
           propertyID: 'differentiator',
-          name: 'Differentiator',
+          name: options.labels?.differentiator ?? 'Differentiator',
           value: normalizeOptionalText(experience.differentiator),
         }
       : null,

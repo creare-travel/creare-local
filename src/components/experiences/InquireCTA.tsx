@@ -8,15 +8,11 @@ import { buildExperienceInquiryHref } from '@/lib/inquiry';
 
 interface InquireCTAProps {
   experienceSlug: string;
-  label?: string;
+  label: string;
   className?: string;
 }
 
-export default function InquireCTA({
-  experienceSlug,
-  label = 'INQUIRE PRIVATELY',
-  className = '',
-}: InquireCTAProps) {
+export default function InquireCTA({ experienceSlug, label, className = '' }: InquireCTAProps) {
   const pathname = usePathname();
   const { locale } = useLanguage();
   const href = buildExperienceInquiryHref(experienceSlug, locale);

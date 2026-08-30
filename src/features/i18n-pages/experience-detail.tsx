@@ -9,80 +9,28 @@ import AppImage from '@/components/ui/AppImage';
 import ExperienceViewTracker from '@/components/experiences/ExperienceViewTracker';
 import GallerySection from '@/components/experiences/GallerySection';
 import InquireCTA from '@/components/experiences/InquireCTA';
-import { insights as staticInsights, isCanonicalCulturalWorldSlug } from '@/data/insights';
 import {
-  findExperienceEditorialSupplement,
-  getExperienceEditorialSupplement,
-} from '@/data/experience-editorial';
-import {
-  filterPublicExperiences,
-  filterPublicInsights,
-  isPublicExperienceRecord,
-} from '@/lib/canonical-gates';
-import { buildCloudinaryUrl } from '@/lib/cloudinary';
-import { canUseEnglishFallback } from '@/lib/i18n/data-layer';
+  fetchPublishedExperienceBySlug,
+  fetchPublishedExperiences,
+  getCmsImageUrl,
+  normalizeRelationArray,
+  type CmsExperience,
+  type CmsRelatedInsight,
+  type CmsRichTextNode,
+  type ExperienceCategory,
+} from '@/lib/experiences/cms';
 import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { resolveActiveLocaleAvailability } from '@/lib/i18n/availability';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { buildLocalizedRouteTarget, localizePathname } from '@/lib/i18n/pathname';
-import {
-  buildLocaleOwnedMetadata,
-  buildRouteCanonicalAlternates,
-  buildRouteCanonicalUrl,
-  buildTwitterCard,
-  getOpenGraphLocale,
-  preserveTerminalBrandTitle,
-  SITE_NAME,
-} from '@/lib/seo';
+import { buildLocaleOwnedMetadata } from '@/lib/seo';
 import { buildExperienceDetailGraph } from '@/lib/schema-builder';
-import { fetchStrapi, isLocalAssetUrl, mediaUrl } from '@/lib/strapi';
+import { isLocalAssetUrl } from '@/lib/strapi';
 import { buildCinematicBlurDataUrl } from '@/lib/lqip';
 import { buildWhatsAppHref } from '@/lib/contact/channels';
 
-const GOVERNED_TABLE_TO_FARM_HERO_URL = buildCloudinaryUrl(
-  'creare/experiences/table-to-farm-bodrum/hero/main',
-  { profile: 'hero' }
-);
-
 // ── Strapi types ──────────────────────────────────────────────────────────────
-interface StrapiRichTextNode {
-  type: string;
-  children?: StrapiRichTextNode[];
-  text?: string;
-  bold?: boolean;
-  italic?: boolean;
-  underline?: boolean;
-}
-
-interface StrapiImageFormat {
-  url: string;
-  width: number;
-  height: number;
-}
-
-interface StrapiCoverImage {
-  url: string;
-  name?: string;
-  alternativeText?: string;
-  caption?: string;
-  formats?: {
-    large?: StrapiImageFormat;
-    medium?: StrapiImageFormat;
-    small?: StrapiImageFormat;
-  };
-}
-
-interface StrapiGalleryImage {
-  url: string;
-  alternativeText?: string;
-  width?: number;
-  height?: number;
-}
-
-interface StrapiDestination {
-  name?: string;
-  slug?: string;
-}
+type StrapiRichTextNode = CmsRichTextNode;
 
 interface StrapiExperienceNavigationItem {
   id: number;
@@ -93,72 +41,8 @@ interface StrapiExperienceNavigationItem {
   publishedAt?: string | null;
 }
 
-interface StrapiRelatedInsight {
-  id: number;
-  slug?: string;
-  title?: string;
-  excerpt?: string;
-  visibility_status?: string | null;
-  publishedAt?: string | null;
-  cover_image?: StrapiCoverImage | null;
-  destination?: StrapiDestination | null;
-}
-
-interface StrapiOntologyEntity {
-  name?: string;
-  slug?: string;
-  description?: string;
-  same_as?: string[];
-  semantic_tags?: string[];
-  external_reference_url?: string;
-  confidence_score?: number;
-}
-
-interface StrapiExperienceDetail {
-  id: number;
-  documentId?: string;
-  title: string;
-  short_description?: string;
-  one_line_hook?: string;
-  description?: StrapiRichTextNode[] | string;
-  wow_moment?: string;
-  differentiator?: string;
-  experience_type?: string | null;
-  intent_level?: string;
-  slug?: string;
-  cover_image?: StrapiCoverImage;
-  gallery?: StrapiGalleryImage[];
-  seo_title?: string;
-  seo_description?: string;
-  // New fields
-  category?: string;
-  tier?: string;
-  location?: string;
-  location_label?: string;
-  destination?: StrapiDestination;
-  duration?: string;
-  max_guests?: string | number;
-  group_size?: string;
-  program?: StrapiRichTextNode[] | string;
-  audience?: StrapiRichTextNode[] | string;
-  highlights?: StrapiRichTextNode[] | string;
-  experience_flow?: StrapiRichTextNode[] | string;
-  cta_enabled?: boolean;
-  cta_text?: string;
-  cta_label?: string | null;
-  geo_experience_type?: string;
-  mood?: string;
-  audience_segment?: string;
-  intensity?: string;
-  mood_entity?: StrapiOntologyEntity;
-  audience_entity?: StrapiOntologyEntity;
-  experience_type_entity?: StrapiOntologyEntity;
-  intensity_entity?: StrapiOntologyEntity;
-  related_experiences?: StrapiExperienceDetail[] | { data?: Record<string, unknown>[] };
-  related_insights?: StrapiRelatedInsight[] | { data?: Record<string, unknown>[] };
-  visibility_status?: string | null;
-  publishedAt?: string | null;
-}
+type StrapiRelatedInsight = CmsRelatedInsight;
+type StrapiExperienceDetail = CmsExperience;
 
 type StrapiExperienceResult =
   | {
@@ -176,76 +60,15 @@ interface ResolvedExperienceDetail {
   canonicalSlug: string;
 }
 
-function flattenItem<T>(raw: Record<string, unknown>): T {
-  if (raw?.attributes && typeof raw.attributes === 'object') {
-    return { id: raw.id, ...(raw.attributes as object) } as T;
-  }
-
-  return raw as T;
-}
-
-function normalizeRelationArray<T>(value: unknown): T[] {
-  if (Array.isArray(value)) {
-    return value.map((item) =>
-      item && typeof item === 'object' ? flattenItem<T>(item as Record<string, unknown>) : item
-    ) as T[];
-  }
-
-  if (value && typeof value === 'object' && Array.isArray((value as { data?: unknown[] }).data)) {
-    return ((value as { data: unknown[] }).data ?? []).map((item) =>
-      item && typeof item === 'object' ? flattenItem<T>(item as Record<string, unknown>) : item
-    ) as T[];
-  }
-
-  return [];
-}
-
-function normalizeSingleRelation<T>(value: unknown): T | null {
-  if (!value || typeof value !== 'object') return null;
-
-  if ('data' in (value as Record<string, unknown>)) {
-    const data = (value as { data?: unknown }).data;
-    if (!data || Array.isArray(data) || typeof data !== 'object') return null;
-    return flattenItem<T>(data as Record<string, unknown>);
-  }
-
-  return flattenItem<T>(value as Record<string, unknown>);
-}
-
 async function fetchExperienceNavigationItems(
   category: string | null | undefined,
   locale: SiteLocale
 ): Promise<StrapiExperienceNavigationItem[]> {
-  const params = new URLSearchParams({
-    'filters[visibility_status][$eqi]': 'active',
-    'fields[0]': 'slug',
-    'fields[1]': 'title',
-    'fields[2]': 'category',
-    'fields[3]': 'visibility_status',
-    'fields[4]': 'publishedAt',
-    'sort[0]': 'publishedAt:asc',
-    'sort[1]': 'title:asc',
-    'pagination[pageSize]': '200',
-  });
-
-  if (category) {
-    params.set('filters[category][$eqi]', category);
-  }
-
-  const json = await fetchStrapi(`/api/experiences?${params.toString()}`, { locale });
-  const items: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
-
-  return items
-    .map((item) => flattenItem<StrapiExperienceNavigationItem>(item))
-    .filter(
-      (item) =>
-        typeof item.slug === 'string' &&
-        item.slug.length > 0 &&
-        typeof item.title === 'string' &&
-        item.title.length > 0 &&
-        item.visibility_status?.toLowerCase() === 'active' &&
-        Boolean(item.publishedAt)
-    );
+  const normalizedCategory =
+    category === 'signature' || category === 'lab' || category === 'black'
+      ? (category as ExperienceCategory)
+      : undefined;
+  return fetchPublishedExperiences(locale, normalizedCategory);
 }
 
 async function fetchStrapiExperienceBySlug(
@@ -253,74 +76,13 @@ async function fetchStrapiExperienceBySlug(
   locale: SiteLocale
 ): Promise<StrapiExperienceResult> {
   try {
-    const params = new URLSearchParams({
-      'filters[slug][$eq]': slug,
-      'populate[cover_image]': 'true',
-      'populate[gallery]': 'true',
-      'populate[destination]': 'true',
-      'populate[related_experiences][populate][cover_image]': 'true',
-      'populate[related_experiences][populate][destination]': 'true',
-      'populate[related_insights][populate][cover_image]': 'true',
-      'populate[mood_entity][fields][0]': 'name',
-      'populate[mood_entity][fields][1]': 'slug',
-      'populate[mood_entity][fields][2]': 'description',
-      'populate[mood_entity][fields][3]': 'same_as',
-      'populate[mood_entity][fields][4]': 'external_reference_url',
-      'populate[mood_entity][fields][5]': 'confidence_score',
-      'populate[audience_entity][fields][0]': 'name',
-      'populate[audience_entity][fields][1]': 'slug',
-      'populate[audience_entity][fields][2]': 'description',
-      'populate[audience_entity][fields][3]': 'same_as',
-      'populate[audience_entity][fields][4]': 'external_reference_url',
-      'populate[audience_entity][fields][5]': 'confidence_score',
-      'populate[experience_type_entity][fields][0]': 'name',
-      'populate[experience_type_entity][fields][1]': 'slug',
-      'populate[experience_type_entity][fields][2]': 'description',
-      'populate[experience_type_entity][fields][3]': 'same_as',
-      'populate[experience_type_entity][fields][4]': 'external_reference_url',
-      'populate[experience_type_entity][fields][5]': 'confidence_score',
-      'populate[intensity_entity][fields][0]': 'name',
-      'populate[intensity_entity][fields][1]': 'slug',
-      'populate[intensity_entity][fields][2]': 'description',
-      'populate[intensity_entity][fields][3]': 'same_as',
-      'populate[intensity_entity][fields][4]': 'external_reference_url',
-      'populate[intensity_entity][fields][5]': 'confidence_score',
-    });
-
-    const json = await fetchStrapi(`/api/experiences?${params.toString()}`, { locale });
-    const items: StrapiExperienceDetail[] = Array.isArray(json?.data) ? json.data : [];
-    const item = items[0];
-    if (!item) {
-      return { status: 'not_found' };
-    }
-    if (!isPublicExperienceRecord(item)) {
-      return { status: 'not_found' };
-    }
-
-    const cmsRelatedExperiences = filterPublicExperiences(
-      normalizeRelationArray<StrapiExperienceDetail>(item.related_experiences)
-    ).map((experience) => ({
-      ...experience,
-      cover_image: normalizeSingleRelation<StrapiCoverImage>(experience.cover_image) ?? undefined,
-      destination: normalizeSingleRelation<StrapiDestination>(experience.destination) ?? undefined,
-    }));
-    const cmsRelatedInsights = filterPublicInsights(
-      normalizeRelationArray<StrapiRelatedInsight>(item.related_insights)
-    ).map((insight) => ({
-      ...insight,
-      cover_image: normalizeSingleRelation<StrapiCoverImage>(insight.cover_image) ?? undefined,
-      destination: normalizeSingleRelation<StrapiDestination>(insight.destination) ?? undefined,
-    }));
+    const item = await fetchPublishedExperienceBySlug(slug, locale);
+    if (!item) return { status: 'not_found' };
     const navigationItems = await fetchExperienceNavigationItems(item.category, locale);
 
     return {
       status: 'ok',
-      item: {
-        ...item,
-        destination: normalizeSingleRelation<StrapiDestination>(item.destination) ?? undefined,
-        related_experiences: cmsRelatedExperiences,
-        related_insights: cmsRelatedInsights,
-      },
+      item,
       navigationItems,
     };
   } catch (error) {
@@ -382,47 +144,29 @@ function normalizeProgramStep(step: string): string {
   return step.replace(/^\s*\d{1,2}\s*[.—-]\s*/, '').trim();
 }
 
-function formatExperienceCategory(value: string) {
-  const normalized = value.trim().toLowerCase();
-  if (normalized === 'signature') return 'SIGNATURE™';
-  if (normalized === 'lab') return 'LAB™';
-  if (normalized === 'black') return 'BLACK™';
-  return value;
-}
-
 function getExperienceLocation(item: StrapiExperienceDetail) {
-  return item.location || item.destination?.name || item.location_label || null;
+  return item.location || item.destination?.name || null;
 }
 
 function getExperienceImageUrl(item: StrapiExperienceDetail) {
-  const rawUrl =
-    item.cover_image?.formats?.large?.url ||
-    item.cover_image?.formats?.medium?.url ||
-    item.cover_image?.formats?.small?.url ||
-    item.cover_image?.url;
-
-  return rawUrl ? mediaUrl(rawUrl) : null;
-}
-
-function getGovernedExperienceImageUrl(item: StrapiExperienceDetail, slug: string) {
-  if (slug === 'table-to-farm-bodrum') {
-    return GOVERNED_TABLE_TO_FARM_HERO_URL;
-  }
-
-  return getExperienceImageUrl(item);
+  return getCmsImageUrl(item.cover_image);
 }
 
 export type ExperienceDetailMetadataItem = Pick<
   StrapiExperienceDetail,
-  'title' | 'seo_title' | 'seo_description' | 'short_description' | 'description'
+  | 'title'
+  | 'seo_title'
+  | 'seo_description'
+  | 'short_description'
+  | 'description'
+  | 'og_description'
+  | 'hero_alt_text'
 >;
 
 function getExperienceDescription(item: ExperienceDetailMetadataItem) {
-  if (item.seo_description) return item.seo_description;
-  if (item.short_description) return item.short_description;
-
-  const paragraphs = extractParagraphs(item.description);
-  return paragraphs[0] ?? '';
+  const description = normalizeOptionalText(item.seo_description);
+  if (!description) throw new Error('Missing CMS Experience SEO description');
+  return description;
 }
 
 export function buildLocalizedExperienceDetailMetadata({
@@ -438,7 +182,12 @@ export function buildLocalizedExperienceDetailMetadata({
   image?: string | null;
   availableLocales?: readonly SiteLocale[];
 }): Metadata {
-  const editorial = findExperienceEditorialSupplement(slug, locale);
+  const seoTitle = normalizeOptionalText(item.seo_title);
+  const ogDescription = normalizeOptionalText(item.og_description);
+  const heroAltText = normalizeOptionalText(item.hero_alt_text);
+  if (!seoTitle) throw new Error('Missing CMS Experience SEO title');
+  if (!ogDescription) throw new Error('Missing CMS Experience Open Graph description');
+  if (!heroAltText) throw new Error('Missing CMS Experience hero alt text');
   const description = getExperienceDescription(item);
 
   const metadata = buildLocaleOwnedMetadata({
@@ -449,25 +198,23 @@ export function buildLocalizedExperienceDetailMetadata({
       locale,
       slug,
     },
-    title: item.seo_title ?? item.title,
+    title: seoTitle,
     description,
     image: image ?? undefined,
-    imageAlt: editorial?.heroAltText ?? item.title,
+    imageAlt: heroAltText,
     robots: { index: true, follow: true },
-    titleMode: item.seo_title ? 'absolute' : 'templated',
+    titleMode: 'absolute',
     availableLocales,
   });
 
-  if (!editorial || !metadata.openGraph) {
-    return metadata;
-  }
-
   return {
     ...metadata,
-    openGraph: {
-      ...metadata.openGraph,
-      description: editorial.openGraphDescription,
-    },
+    openGraph: metadata.openGraph
+      ? { ...metadata.openGraph, description: ogDescription }
+      : metadata.openGraph,
+    twitter: metadata.twitter
+      ? { ...metadata.twitter, description: ogDescription }
+      : metadata.twitter,
   };
 }
 
@@ -476,15 +223,10 @@ function normalizeOptionalText(value?: string | null) {
   return trimmed ? trimmed : undefined;
 }
 
-function resolveExperienceCtaLabel(
-  experience: StrapiExperienceDetail,
-  fallbackLabel: string
-): string {
-  return (
-    normalizeOptionalText(experience.cta_label) ??
-    normalizeOptionalText(experience.cta_text) ??
-    fallbackLabel
-  );
+function resolveExperienceCtaLabel(experience: StrapiExperienceDetail): string {
+  const label = normalizeOptionalText(experience.cta_label);
+  if (!label) throw new Error(`Missing CMS CTA label for ${experience.slug}`);
+  return label;
 }
 
 const MAX_RELATED_INSIGHTS = 3;
@@ -496,17 +238,6 @@ const EXPERIENCE_SLUG_CANONICAL_MAP: Record<string, string> = {
   'imperial-flavors': 'imperial-flavors',
   'imperial-flavors-culinary-atelier': 'imperial-flavors',
 };
-
-const STATIC_INSIGHT_MATCH_DENYLIST: Record<string, Set<string>> = {
-  'floating-salon-d-opera': new Set(['bodrum-beyond-the-coast-where-the-aegean-slows-down']),
-  'silk-road-istanbul': new Set(['cappadocia-without-balloons-a-different-kind-of-silence']),
-};
-
-function normalizeExperienceSlugForInsightGraph(slug?: string | null) {
-  if (!slug) return undefined;
-
-  return EXPERIENCE_SLUG_CANONICAL_MAP[slug] ?? slug;
-}
 
 function getExperienceAliasCandidates(slug: string) {
   const normalizedSlug = slug.trim();
@@ -554,55 +285,6 @@ const resolveExperienceDetailBySlug = cache(async function resolveExperienceDeta
 
   return lastNotFound ? { status: 'not_found' } : { status: 'not_found' };
 });
-
-function toTitleCase(value: string) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-function buildStaticReverseLinkedInsights(
-  currentExperienceSlug: string,
-  locale: SiteLocale
-): StrapiRelatedInsight[] {
-  if (!canUseEnglishFallback(locale)) return [];
-
-  const normalizedCurrentSlug = normalizeExperienceSlugForInsightGraph(currentExperienceSlug);
-  if (!normalizedCurrentSlug) return [];
-
-  const deniedSlugs = STATIC_INSIGHT_MATCH_DENYLIST[normalizedCurrentSlug] ?? new Set<string>();
-  const matchedInsights = staticInsights.filter((insight) => {
-    if (!insight.relatedExperiences.length || deniedSlugs.has(insight.slug)) {
-      return false;
-    }
-
-    return insight.relatedExperiences.some((relatedExperienceSlug) => {
-      const normalizedRelatedSlug = normalizeExperienceSlugForInsightGraph(relatedExperienceSlug);
-      return normalizedRelatedSlug === normalizedCurrentSlug;
-    });
-  });
-
-  const seen = new Set<string>();
-
-  return matchedInsights
-    .filter((insight) => {
-      if (seen.has(insight.slug)) return false;
-      seen.add(insight.slug);
-      return true;
-    })
-    .slice(0, MAX_RELATED_INSIGHTS)
-    .map((insight, index) => ({
-      id: -(index + 1),
-      slug: insight.slug,
-      title: insight.title,
-      excerpt: insight.description,
-      destination:
-        insight.culturalWorldSlug && isCanonicalCulturalWorldSlug(insight.culturalWorldSlug)
-          ? {
-              slug: insight.culturalWorldSlug,
-              name: toTitleCase(insight.location),
-            }
-          : null,
-    }));
-}
 
 // ── Rich text renderer ────────────────────────────────────────────────────────
 function renderRichText(nodes: StrapiRichTextNode[]): React.ReactNode {
@@ -670,9 +352,8 @@ function StrapiExperiencePage({
   locale: SiteLocale;
 }) {
   const dictionary = getDictionary(locale);
-  const editorial = getExperienceEditorialSupplement(canonicalSlug, locale);
-  const coverUrl = getGovernedExperienceImageUrl(item, canonicalSlug);
-  const coverAlt = editorial.heroAltText;
+  const coverUrl = getExperienceImageUrl(item);
+  const coverAlt = item.hero_alt_text as string;
   const locationDisplay = getExperienceLocation(item);
   const programItems = extractParagraphs(item.program).map(normalizeProgramStep).filter(Boolean);
   const audienceItems = extractParagraphs(item.audience);
@@ -688,14 +369,16 @@ function StrapiExperiencePage({
   const cmsRelatedInsights = normalizeRelationArray<StrapiRelatedInsight>(item.related_insights)
     .filter((insight) => insight.slug && insight.title)
     .slice(0, MAX_RELATED_INSIGHTS);
-  const fallbackRelatedInsights =
-    cmsRelatedInsights.length === 0 ? buildStaticReverseLinkedInsights(canonicalSlug, locale) : [];
-  const relatedInsights =
-    cmsRelatedInsights.length > 0 ? cmsRelatedInsights : fallbackRelatedInsights;
-  const categoryLabel = formatExperienceCategory(
-    item.category || item.tier || item.intent_level || ''
-  );
-  const groupSize = item.group_size || (item.max_guests ? String(item.max_guests) : '');
+  const relatedInsights = cmsRelatedInsights;
+  const categoryLabel =
+    item.category === 'signature'
+      ? dictionary.common.protected.signature
+      : item.category === 'lab'
+        ? dictionary.common.protected.lab
+        : item.category === 'black'
+          ? dictionary.common.protected.black
+          : item.category || '';
+  const groupSize = item.group_size || '';
   const currentNavIndex = navigationItems.findIndex(
     (experience) => experience.slug === canonicalSlug
   );
@@ -706,13 +389,16 @@ function StrapiExperiencePage({
       : null;
   const wowMoment = normalizeOptionalText(item.wow_moment);
   const differentiator = normalizeOptionalText(item.differentiator);
-  const visibleCtaLabel = resolveExperienceCtaLabel(item, dictionary.home.cta.label);
+  const visibleCtaLabel = resolveExperienceCtaLabel(item);
   const experienceSchemaGraph = buildExperienceDetailGraph(item, canonicalSlug, relatedInsights, {
     locale,
-    heroAltText: editorial.heroAltText,
+    heroAltText: item.hero_alt_text,
     labels: {
       home: dictionary.common.home,
       experiences: dictionary.experiences.title,
+      programme: dictionary.experiences.programme,
+      wowMoment: dictionary.experiences.wowMoment,
+      differentiator: dictionary.experiences.differentiator,
     },
   });
   const coverBlurDataUrl = coverUrl
@@ -735,7 +421,7 @@ function StrapiExperiencePage({
     infoItems.push({
       label: dictionary.experiences.groupSize,
       value: groupSize,
-      note: editorial.groupSizeNote || undefined,
+      note: item.group_size_note || undefined,
     });
 
   return (
@@ -749,7 +435,7 @@ function StrapiExperiencePage({
           <div className="absolute inset-0 z-0">
             <AppImage
               src={coverUrl}
-              alt={coverAlt || 'Experience image'}
+              alt={coverAlt}
               fill
               priority
               blurDataURL={coverBlurDataUrl}
@@ -774,9 +460,9 @@ function StrapiExperiencePage({
             >
               {item.title}
             </h1>
-            {editorial.shortDescription && (
+            {item.short_description && (
               <p className="mt-5 font-body text-white/60 text-sm leading-relaxed max-w-xl">
-                {editorial.shortDescription}
+                {item.short_description}
               </p>
             )}
           </div>
@@ -795,9 +481,9 @@ function StrapiExperiencePage({
             >
               {item.title}
             </h1>
-            {editorial.shortDescription && (
+            {item.short_description && (
               <p className="mt-5 font-body text-white/50 text-sm leading-relaxed max-w-xl">
-                {editorial.shortDescription}
+                {item.short_description}
               </p>
             )}
           </div>
@@ -882,7 +568,7 @@ function StrapiExperiencePage({
       )}
 
       {/* ── SHORT DESCRIPTION (no cover fallback) ── */}
-      {editorial.shortDescription && !coverUrl && (
+      {item.short_description && !coverUrl && (
         <section className="py-16 bg-white" aria-label="Experience overview">
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
             <div className="max-w-2xl">
@@ -893,7 +579,7 @@ function StrapiExperiencePage({
                 className="font-display font-light text-neutral-800 leading-relaxed"
                 style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)' }}
               >
-                {editorial.shortDescription}
+                {item.short_description}
               </p>
             </div>
           </div>
@@ -993,9 +679,9 @@ function StrapiExperiencePage({
                   </li>
                 ))}
               </ol>
-              {editorial.programmeNote ? (
+              {item.programme_note ? (
                 <p className="mt-8 border-t border-neutral-200 pt-6 font-body text-xs leading-relaxed text-neutral-500">
-                  {editorial.programmeNote}
+                  {item.programme_note}
                 </p>
               ) : null}
             </div>
@@ -1099,13 +785,8 @@ function StrapiExperiencePage({
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10">
                     {cmsRelatedExperiences.map((experience, index) => {
                       const imageUrl = getExperienceImageUrl(experience);
-                      const relatedEditorial = getExperienceEditorialSupplement(
-                        experience.slug as string,
-                        locale
-                      );
-                      const imageAlt = relatedEditorial.heroAltText;
-                      const relatedLocation =
-                        experience.destination?.name || experience.location_label || null;
+                      const imageAlt = experience.hero_alt_text as string;
+                      const relatedLocation = experience.location || experience.destination?.name;
 
                       return (
                         <Link
@@ -1135,9 +816,9 @@ function StrapiExperiencePage({
                           <h3 className="motion-copy-fade font-display font-light text-neutral-900 leading-snug mb-2">
                             {experience.title}
                           </h3>
-                          {relatedEditorial.shortDescription && (
+                          {experience.short_description && (
                             <p className="font-body text-sm text-neutral-600 leading-relaxed">
-                              {relatedEditorial.shortDescription}
+                              {experience.short_description}
                             </p>
                           )}
                         </Link>
@@ -1243,83 +924,43 @@ function StrapiExperiencePage({
       )}
 
       {/* ── CTA ── */}
-      {item.cta_enabled ? (
-        <section className="py-24 md:py-32 bg-neutral-950" aria-label="Call to action">
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-            <p className="font-body text-[0.6rem] tracking-[0.35em] text-white/40 uppercase mb-6">
-              CREARE
-            </p>
-            <p
-              className="font-display font-light text-white leading-tight mb-10"
-              style={{ fontSize: 'clamp(1.6rem, 3vw, 2.8rem)' }}
+      <section className="bg-[#E8E0D5] py-24 md:py-32" aria-label="Call to action">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
+          <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-6">
+            {dictionary.common.protected.creare}
+          </p>
+          <h2
+            className="font-display font-light text-neutral-900 leading-snug tracking-tight mb-6"
+            style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)' }}
+          >
+            {item.cta_heading}
+          </h2>
+          <p className="font-body text-sm text-neutral-600 leading-relaxed max-w-md mx-auto mb-10">
+            {item.cta_supporting_text}
+          </p>
+          <p className="font-body text-[0.6rem] tracking-[0.2em] text-neutral-400/70 uppercase mb-6">
+            {item.cta_access_line}
+          </p>
+          <InquireCTA
+            experienceSlug={canonicalSlug}
+            label={visibleCtaLabel}
+            className="bg-black text-white hover:bg-neutral-800"
+          />
+          <div className="mt-5">
+            <OutboundLink
+              href={buildWhatsAppHref(locale, item.title)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase text-neutral-400 hover:text-neutral-600"
+              aria-label={dictionary.common.contactViaWhatsApp}
+              trackingLabel="experience_whatsapp_contact"
+              trackingSource="experience_detail_page"
             >
-              {editorial.ctaHeading}
-            </p>
-            <p className="font-body text-sm text-white/60 leading-relaxed max-w-md mx-auto mb-8">
-              {editorial.ctaSupportingText}
-            </p>
-            <p className="font-body text-[0.6rem] tracking-[0.2em] text-white/40 uppercase mb-6">
-              {editorial.ctaAccessLine}
-            </p>
-            <InquireCTA
-              experienceSlug={canonicalSlug}
-              label={visibleCtaLabel}
-              className="border border-white/30 text-white hover:bg-white hover:text-neutral-900"
-            />
-            <div className="mt-5">
-              <OutboundLink
-                href={buildWhatsAppHref(locale, item.title)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase text-white/40 hover:text-white/70"
-                aria-label={dictionary.common.contactViaWhatsApp}
-                trackingLabel="experience_whatsapp_contact"
-                trackingSource="experience_detail_page"
-              >
-                {dictionary.common.contactViaWhatsApp}
-              </OutboundLink>
-            </div>
+              {dictionary.common.contactViaWhatsApp}
+            </OutboundLink>
           </div>
-        </section>
-      ) : (
-        <section className="bg-[#E8E0D5] py-24 md:py-32" aria-label="Call to action">
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
-            <p className="font-body text-[0.6rem] tracking-[0.3em] text-neutral-400 uppercase mb-6">
-              CREARE
-            </p>
-            <h2
-              className="font-display font-light text-neutral-900 leading-snug tracking-tight mb-6"
-              style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)' }}
-            >
-              {editorial.ctaHeading}
-            </h2>
-            <p className="font-body text-sm text-neutral-600 leading-relaxed max-w-md mx-auto mb-10">
-              {editorial.ctaSupportingText}
-            </p>
-            <p className="font-body text-[0.6rem] tracking-[0.2em] text-neutral-400/70 uppercase mb-6">
-              {editorial.ctaAccessLine}
-            </p>
-            <InquireCTA
-              experienceSlug={canonicalSlug}
-              label={visibleCtaLabel}
-              className="bg-black text-white hover:bg-neutral-800"
-            />
-            <div className="mt-5">
-              <OutboundLink
-                href={buildWhatsAppHref(locale, item.title)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="motion-link inline-block font-body text-[0.58rem] tracking-[0.2em] uppercase text-neutral-400 hover:text-neutral-600"
-                aria-label={dictionary.common.contactViaWhatsApp}
-                trackingLabel="experience_whatsapp_contact"
-                trackingSource="experience_detail_page"
-              >
-                {dictionary.common.contactViaWhatsApp}
-              </OutboundLink>
-            </div>
-          </div>
-        </section>
-      )}
+        </div>
+      </section>
     </main>
   );
 }
@@ -1368,77 +1009,18 @@ export async function generateExperienceDetailMetadata({
 
   const strapiItem = result.item;
   const canonicalSlug = result.canonicalSlug;
-  const editorial = getExperienceEditorialSupplement(canonicalSlug, locale);
   const availableLocales = await resolveActiveLocaleAvailability(async (candidateLocale) => {
     if (candidateLocale === locale) return true;
     const candidate = await resolveExperienceDetailBySlug(canonicalSlug, candidateLocale);
     return candidate.status === 'ok';
   });
-  const alternates = buildRouteCanonicalAlternates(
-    {
-      family: 'experience-detail',
-      locale,
-      slug: canonicalSlug,
-    },
-    availableLocales
-  );
-
-  const ogTitle = strapiItem.seo_title ?? `${strapiItem.title} — CREARE`;
-  const pageTitle = preserveTerminalBrandTitle(strapiItem.seo_title ?? strapiItem.title);
-  const metaDescription = getExperienceDescription(strapiItem);
-  const ogDescription = editorial.openGraphDescription;
-  const coverUrl = getGovernedExperienceImageUrl(strapiItem, canonicalSlug);
-
-  if (locale !== DEFAULT_SITE_LOCALE) {
-    return buildLocalizedExperienceDetailMetadata({
-      locale,
-      slug: canonicalSlug,
-      item: strapiItem,
-      image: coverUrl,
-      availableLocales,
-    });
-  }
-
-  return {
-    title: pageTitle,
-    description: metaDescription,
-    alternates,
-    robots: { index: true, follow: true },
-    openGraph: {
-      title: ogTitle,
-      description: ogDescription,
-      url: buildRouteCanonicalUrl({
-        family: 'experience-detail',
-        locale,
-        slug: canonicalSlug,
-      }),
-      siteName: SITE_NAME,
-      locale: getOpenGraphLocale(locale),
-      ...(coverUrl
-        ? {
-            images: [
-              {
-                url: coverUrl,
-                width: 1200,
-                height: 630,
-                alt: editorial.heroAltText,
-              },
-            ],
-          }
-        : {}),
-      type: 'website',
-    },
-    twitter: buildTwitterCard({
-      title: ogTitle,
-      description: ogDescription,
-      ...(coverUrl
-        ? {
-            image: coverUrl,
-            imageAlt: editorial.heroAltText,
-          }
-        : {}),
-    }),
-  };
+  return buildLocalizedExperienceDetailMetadata({
+    locale,
+    slug: canonicalSlug,
+    item: strapiItem,
+    image: getExperienceImageUrl(strapiItem),
+    availableLocales,
+  });
 }
 
 export async function generateMetadata({

@@ -17,7 +17,7 @@ export interface StrapiImageFormat {
 export interface StrapiImage {
   url?: string;
   name?: string;
-  alternativeText?: string;
+  alternativeText?: string | null;
   alt?: string;
   caption?: string;
   width?: number;
@@ -83,13 +83,20 @@ export interface StrapiExperience {
   duration?: string;
   max_guests?: string | number;
   group_size?: string;
+  group_size_note?: string;
   program?: StrapiRichTextNode[] | string;
+  programme_note?: string;
   audience?: StrapiRichTextNode[] | string;
   highlights?: StrapiRichTextNode[] | string;
   experience_flow?: StrapiRichTextNode[] | string;
   cta_enabled?: boolean;
   cta_text?: string;
   cta_label?: string | null;
+  cta_heading?: string;
+  cta_supporting_text?: string;
+  cta_access_line?: string;
+  og_description?: string;
+  hero_alt_text?: string;
   geo_experience_type?: string | null;
   mood?: string | null;
   audience_segment?: string | null;

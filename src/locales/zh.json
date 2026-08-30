@@ -162,39 +162,6 @@
     "backToInsights": "← 洞见",
     "accessNotListed": "通达并非列在清单上，而是被精心构筑。"
   },
-  "signature": {
-    "label": "SIGNATURE™",
-    "title": "精心策划的文化体验。",
-    "description1": "经设计与验证，等待亲历。",
-    "description2": "SIGNATURE™ 将对目的地的深度理解、文化语境与清晰的创作结构结合，让每一次相遇都像被精心构筑，而非简单拼接。",
-    "cta": "探索 →",
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "lab": {
-    "label": "LAB™",
-    "title": "与你共同构筑。",
-    "description1": "从零开始打造的定制文化体验。",
-    "description2": "LAB™ 从一次对话开始，通过研究、在地知识与创意指导逐步成形，直到恰当的通达方式成为可能。",
-    "cta": "探索 →",
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "black": {
-    "label": "BLACK™",
-    "title": "不对公众开放。",
-    "description1": "对地点、收藏与时刻的私享通达。",
-    "description2": "BLACK™ 专为依赖信任、审慎与非公开关系的安排而设；这些安排不面向公开传播，也不进入常规咨询流程。",
-    "cta": "申请私享通达 →",
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
   "philosophy": {
     "hero": {
       "line1": "我们相信，最非凡的体验无法购买。",

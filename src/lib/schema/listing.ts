@@ -6,6 +6,7 @@ interface CollectionPageInput {
   id: string;
   url: string;
   name: string;
+  inLanguage?: string;
   description?: string;
   breadcrumbId?: string;
   mainEntityId?: string;
@@ -14,6 +15,7 @@ interface CollectionPageInput {
 interface ItemListInput {
   id: string;
   name: string;
+  inLanguage?: string;
   items: SchemaNode[];
 }
 
@@ -23,6 +25,7 @@ interface ExperienceListingGraphInput {
   breadcrumbId: string;
   path: string;
   title: string;
+  inLanguage: string;
   description?: string;
   items: ListingItemInput[];
   breadcrumbs: BreadcrumbItemInput[];
@@ -33,6 +36,7 @@ export function buildCollectionPageSchema(input: CollectionPageInput): SchemaNod
     '@id': input.id,
     '@type': 'CollectionPage',
     name: input.name,
+    inLanguage: input.inLanguage,
     description: input.description,
     url: input.url,
     breadcrumb: input.breadcrumbId ? { '@id': input.breadcrumbId } : undefined,
@@ -45,6 +49,7 @@ export function buildItemListSchema(input: ItemListInput): SchemaNode {
     '@id': input.id,
     '@type': 'ItemList',
     name: input.name,
+    inLanguage: input.inLanguage,
     itemListElement: input.items,
   };
 }
@@ -102,6 +107,7 @@ export function buildExperienceListingGraph(input: ExperienceListingGraphInput):
       ? buildItemListSchema({
           id: input.itemListId,
           name: `${input.title} list`,
+          inLanguage: input.inLanguage,
           items: listItems,
         })
       : null;
@@ -110,6 +116,7 @@ export function buildExperienceListingGraph(input: ExperienceListingGraphInput):
     id: input.pageId,
     url: input.path,
     name: input.title,
+    inLanguage: input.inLanguage,
     description: input.description,
     breadcrumbId: input.breadcrumbId,
     mainEntityId: itemList ? input.itemListId : undefined,

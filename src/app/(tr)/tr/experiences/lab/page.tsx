@@ -1,10 +1,13 @@
 import {
-  buildExperienceCategoryMetadata,
+  generateExperienceCategoryMetadata,
   renderExperienceCategoryPage,
 } from '@/features/i18n-pages/experience-category';
 
 export const dynamic = 'force-dynamic';
-export const metadata = buildExperienceCategoryMetadata('lab', 'tr');
+
+export function generateMetadata() {
+  return generateExperienceCategoryMetadata('lab', 'tr');
+}
 
 export default function TurkishLabExperiencesPage() {
   return renderExperienceCategoryPage('lab', 'tr');

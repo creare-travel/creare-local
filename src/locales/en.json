@@ -162,39 +162,6 @@
     "backToInsights": "← Insights",
     "accessNotListed": "Access is not listed. It is composed."
   },
-  "signature": {
-    "label": "SIGNATURE™",
-    "title": "Curated cultural experiences.",
-    "description1": "Designed, tested, and ready to be lived.",
-    "description2": "Signature brings together place intelligence, cultural context, and a clear authored structure so that each encounter feels composed rather than assembled.",
-    "cta": "Explore →",
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "lab": {
-    "label": "LAB™",
-    "title": "Built with you.",
-    "description1": "Custom cultural experiences, developed from scratch.",
-    "description2": "LAB begins with conversation, then builds through research, local knowledge, and creative direction until the right form of access becomes possible.",
-    "cta": "Discover →",
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "black": {
-    "label": "BLACK™",
-    "title": "Not publicly available.",
-    "description1": "Private access to places, collections, and moments.",
-    "description2": "BLACK is reserved for arrangements that depend on trust, discretion, and relationships not intended for open circulation or standard inquiry paths.",
-    "cta": "Request Private Access →",
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
   "philosophy": {
     "hero": {
       "line1": "We believe that the most extraordinary experiences cannot be purchased.",

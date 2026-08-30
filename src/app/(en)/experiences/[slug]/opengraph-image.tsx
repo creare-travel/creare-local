@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { getExperienceBySlug } from '@/lib/experiences';
+import { fetchPublishedExperienceBySlug, getCmsImageUrl } from '@/lib/experiences/cms';
 
 export const runtime = 'edge';
 export const alt = 'Creare Experience';
@@ -12,12 +12,13 @@ interface Props {
 
 export default async function ExperienceOgImage({ params }: Props) {
   const { slug } = await params;
-  const experience = getExperienceBySlug(slug);
+  const experience = await fetchPublishedExperienceBySlug(slug, 'en');
+  if (!experience) throw new Error(`Missing published EN Experience for OG image: ${slug}`);
 
-  const title = experience?.title ?? 'Private Experience';
-  const location = experience?.location ?? 'Turkey';
-  const category = experience?.category ?? 'SIGNATURE';
-  const heroImage = experience?.heroImage;
+  const title = experience.title;
+  const location = experience.location || experience.destination?.name || 'Turkey';
+  const category = experience.category?.toUpperCase() ?? 'SIGNATURE';
+  const heroImage = getCmsImageUrl(experience.cover_image);
 
   return new ImageResponse(
     <div

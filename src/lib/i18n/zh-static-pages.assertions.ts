@@ -70,7 +70,8 @@ assert.equal(philosophySource.includes('通达不是商品，而是一份托付�
 assert.equal(philosophySource.includes('人与地方、宾客与文化世界'), true);
 assert.equal(homeSource.includes("discovery: '首页体验体系探索'"), true);
 assert.equal(heroSource.includes("sectionLabel: '主视觉 — 以艺术之法构筑体验'"), true);
-assert.equal(collectionsSource.includes("'BLACK™ 私享通达'"), true);
+assert.equal(collectionsSource.includes('fetchExperienceCategoryPages'), true);
+assert.equal(collectionsSource.includes("'BLACK™ 私享通达'"), false);
 
 ['CREARE', 'SIGNATURE™', 'LAB™', 'BLACK™'].forEach((term) => {
   assert.equal(JSON.stringify(zhDictionary).includes(term), true, `${term} must remain protected`);

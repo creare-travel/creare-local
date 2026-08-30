@@ -42,7 +42,7 @@ export function buildImageObjectSchema(
   const asset = resolveImageAsset(image);
   if (!asset) return undefined;
 
-  const alternativeText = getPrimaryDescription(image?.alternativeText, image?.alt);
+  const alternativeText = getPrimaryDescription(image?.alternativeText ?? undefined, image?.alt);
   const caption = getPrimaryDescription(image?.caption);
 
   return {

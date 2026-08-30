@@ -162,39 +162,6 @@
     "backToInsights": "← Yazılar",
     "accessNotListed": "Erişim listelenmez. Özenle oluşturulur."
   },
-  "signature": {
-    "label": "SIGNATURE™",
-    "title": "Özenle kurgulanmış kültürel deneyimler.",
-    "description1": "Tasarlanmış, denenmiş ve deneyimlenmeye hazır.",
-    "description2": "SIGNATURE™, destinasyon bilgisi, kültürel bağlam ve özenle oluşturulmuş bir yapıyı bir araya getirir; böylece her deneyim sonradan birleştirilmiş değil, baştan sona tasarlanmış hissi verir.",
-    "cta": "Keşfedin →",
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "lab": {
-    "label": "LAB™",
-    "title": "Sizinle birlikte oluşturulur.",
-    "description1": "Sıfırdan geliştirilen, size özel kültürel deneyimler.",
-    "description2": "LAB™, bir görüşmeyle başlar; araştırma, yerel bilgi ve yaratıcı yönlendirmeyle gelişir ve doğru erişim biçimi mümkün hale gelene kadar şekillenir.",
-    "cta": "Keşfedin →",
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "black": {
-    "label": "BLACK™",
-    "title": "Herkese açık değildir.",
-    "description1": "Mekânlara, koleksiyonlara ve özel anlara ayrıcalıklı erişim.",
-    "description2": "BLACK™, güvene, gizliliğe ve herkese açık olmayan bağlantılara dayanan özel düzenlemeler için ayrılmıştır; standart talep süreçlerinin dışında şekillenir.",
-    "cta": "Özel Erişim Talep Edin →",
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
   "philosophy": {
     "hero": {
       "line1": "",

@@ -1,21 +1,13 @@
-import type { Metadata } from 'next';
-import { renderExperiencesPage } from '@/features/i18n-pages/experiences';
-import { getDictionary } from '@/lib/i18n/dictionaries';
-import { buildLocaleOwnedMetadata } from '@/lib/seo';
+import {
+  generateExperiencesMetadata,
+  renderExperiencesPage,
+} from '@/features/i18n-pages/experiences';
 
-const dictionary = getDictionary('tr');
+export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = buildLocaleOwnedMetadata({
-  locale: 'tr',
-  copyLocale: 'tr',
-  route: {
-    family: 'experiences',
-    locale: 'tr',
-  },
-  title: dictionary.home.hero.eyebrow,
-  description: dictionary.home.collections.eyebrow,
-  robots: { index: true, follow: true },
-});
+export function generateMetadata() {
+  return generateExperiencesMetadata('tr');
+}
 
 export default function TurkishExperiencesPage() {
   return renderExperiencesPage('tr');

@@ -2,9 +2,12 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import enDictionary from '@/locales/en.json';
-import trDictionary from '@/locales/tr.json';
 import zhDictionary from '@/locales/zh.json';
-import { buildExperienceCategoryMetadata } from '@/features/i18n-pages/experience-category';
+import {
+  buildExperienceCategoryMetadata,
+  type ExperienceCategory,
+} from '@/features/i18n-pages/experience-category';
+import type { CmsExperienceCategoryPage } from '@/lib/experiences/cms';
 import {
   DEFAULT_SITE_LOCALE,
   LOCALE_OPTIONS,
@@ -111,11 +114,46 @@ assert.equal(getOpenGraphLocale('en'), 'en_US');
 assert.equal(getOpenGraphLocale('tr'), 'tr_TR');
 assert.equal(getOpenGraphLocale('zh'), 'zh_CN');
 
+function makeCategoryPage(
+  category: ExperienceCategory,
+  locale: 'tr' | 'zh'
+): CmsExperienceCategoryPage {
+  const label = `${locale}-${category}`;
+
+  return {
+    id: 1,
+    key: category,
+    display_order: 1,
+    eyebrow: label,
+    hero_title: `${label} hero`,
+    hero_subtitle: `${label} subtitle`,
+    introduction: `${label} introduction`,
+    supporting_content: `${label} supporting content`,
+    list_eyebrow: `${label} list eyebrow`,
+    list_title: `${label} list title`,
+    cta_heading: `${label} CTA heading`,
+    cta_supporting_text: `${label} CTA supporting text`,
+    cta_access_line: `${label} CTA access line`,
+    cta_label: `${label} CTA label`,
+    hero_image: { url: '/uploads/category-hero.jpg' },
+    hero_alt_text: `${label} hero alt`,
+    card_title: `${label} card title`,
+    card_description: `${label} card description`,
+    card_distinction: `${label} card distinction`,
+    card_image: { url: '/uploads/category-card.jpg' },
+    card_alt_text: `${label} card alt`,
+    seo_title: `${label} | CREARE`,
+    seo_description: `${label} SEO description`,
+    og_description: `${label} Open Graph description`,
+    publishedAt: '2026-01-01T00:00:00.000Z',
+  };
+}
+
 for (const category of ['signature', 'lab', 'black'] as const) {
-  const metadata = buildExperienceCategoryMetadata(category, 'tr');
-  const copy = trDictionary[category];
-  assert.equal(metadata.title, `${copy.label} — ${copy.title}`);
-  assert.equal(metadata.description, `${copy.description1} ${copy.description2}`);
+  const trPage = makeCategoryPage(category, 'tr');
+  const metadata = buildExperienceCategoryMetadata(category, 'tr', trPage);
+  assert.equal(metadata.title, trPage.seo_title);
+  assert.equal(metadata.description, trPage.seo_description);
   assert.equal(
     metadata.alternates?.canonical,
     `https://crearetravel.com/tr/experiences/${category}`
@@ -130,10 +168,10 @@ for (const category of ['signature', 'lab', 'black'] as const) {
   assert.equal(metadata.openGraph?.url, `https://crearetravel.com/tr/experiences/${category}`);
   assert.equal(String(metadata.title).includes('Creare — Creare'), false);
 
-  const zhMetadata = buildExperienceCategoryMetadata(category, 'zh');
-  const zhCopy = zhDictionary[category];
-  assert.equal(zhMetadata.title, `${zhCopy.label} — ${zhCopy.title}`);
-  assert.equal(zhMetadata.description, `${zhCopy.description1} ${zhCopy.description2}`);
+  const zhPage = makeCategoryPage(category, 'zh');
+  const zhMetadata = buildExperienceCategoryMetadata(category, 'zh', zhPage);
+  assert.equal(zhMetadata.title, zhPage.seo_title);
+  assert.equal(zhMetadata.description, zhPage.seo_description);
   assert.equal(
     zhMetadata.alternates?.canonical,
     `https://crearetravel.com/zh/experiences/${category}`

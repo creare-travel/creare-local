@@ -1,261 +1,95 @@
-import React from 'react';
 import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
-import { DEFAULT_SITE_LOCALE, type LocaleKey, type SiteLocale } from '@/lib/i18n/config';
-import { getExperienceCategoryTarget, type ExperienceCategoryPath } from '@/lib/i18n/static-routes';
+import { fetchExperienceCategoryPages, getCmsImageUrl } from '@/lib/experiences/cms';
+import { DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
+import { getExperienceCategoryTarget } from '@/lib/i18n/static-routes';
 import type { Dictionary } from '@/lib/i18n/types';
 
-interface CollectionFeature {
-  label: string;
-  title: string;
-  description: string;
-  href: ExperienceCategoryPath;
-  image: string;
-  alt: string;
-  imageRight?: boolean;
-  subduedCta?: boolean;
-}
-
-interface LocalizedCollectionFeature extends CollectionFeature {
-  cta: string;
-}
-
-const collectionFeatures: CollectionFeature[] = [
-  {
-    label: 'SIGNATURE™',
-    title: 'Curated cultural experiences.',
-    description:
-      'Designed, tested, and ready to be lived. Signature brings together place intelligence, cultural context, and a clear authored structure so that each encounter feels composed rather than assembled.',
-    href: '/experiences/signature',
-    image:
-      'https://res.cloudinary.com/djr97wm0n/image/upload/dpr_auto/cs_srgb/q_auto:best/creare-signature-image.jpg',
-    alt: 'Ancient stone courtyard of a historic Ottoman palace with ornate architectural details and warm afternoon light',
-    imageRight: true,
-  },
-  {
-    label: 'LAB™',
-    title: 'Built with you.',
-    description:
-      'Custom cultural experiences, developed from scratch. LAB begins with conversation, then builds through research, local knowledge, and creative direction until the right form of access becomes possible.',
-    href: '/experiences/lab',
-    image: 'https://res.cloudinary.com/djr97wm0n/image/upload/v1780534781/creare-lab-image.jpg',
-    alt: 'Craftsman hand holding a fine pencil drawing precise architectural lines on white drafting paper — tailor-made from scratch',
-  },
-  {
-    label: 'BLACK™',
-    title: 'Not publicly available.',
-    description:
-      'Private access to places, collections, and moments. BLACK is reserved for arrangements that depend on trust, discretion, and relationships not intended for open circulation or standard inquiry paths.',
-    href: '/experiences/black',
-    image:
-      'https://res.cloudinary.com/djr97wm0n/image/upload/v1780566766/creare-black-private-access-key.jpg',
-    alt: 'Single antique key resting on a pure black matte surface with dramatic side lighting — symbol of limited exclusive access',
-    imageRight: true,
-    subduedCta: true,
-  },
-];
-
-const COLLECTION_ACCESSIBILITY = {
-  en: {
-    sections: ['SIGNATURE experiences', 'LAB experiences', 'BLACK private access'],
-    images: collectionFeatures.map((feature) => feature.alt),
-  },
-  tr: {
-    sections: ['SIGNATURE experiences', 'LAB experiences', 'BLACK private access'],
-    images: collectionFeatures.map((feature) => feature.alt),
-  },
-  zh: {
-    sections: ['SIGNATURE™ 体验', 'LAB™ 体验', 'BLACK™ 私享通达'],
-    images: [
-      '一座历史悠久的奥斯曼宫殿石砌庭院，建筑细节华美，沐浴在午后暖光中',
-      '工匠手持精细铅笔，在白色绘图纸上勾勒精准的建筑线条——从零开始量身构筑',
-      '一把古董钥匙置于纯黑哑光表面，侧光勾勒其轮廓——象征有限而专属的通达',
-    ],
-  },
-} as const satisfies Record<LocaleKey, { sections: readonly string[]; images: readonly string[] }>;
-
 interface CollectionsSectionProps {
-  dictionary?: Dictionary;
+  dictionary: Dictionary;
   locale?: SiteLocale;
 }
 
-function getLocalizedFeatures(dictionary?: Dictionary): LocalizedCollectionFeature[] {
-  if (!dictionary) {
-    return [
-      { ...collectionFeatures[0], cta: 'Explore →' },
-      { ...collectionFeatures[1], cta: 'Discover →' },
-      { ...collectionFeatures[2], cta: 'Request Private Access →' },
-    ];
-  }
-
-  return [
-    {
-      ...collectionFeatures[0],
-      label: dictionary.signature.label,
-      title: dictionary.signature.title,
-      description: `${dictionary.signature.description1} ${dictionary.signature.description2}`,
-      cta: dictionary.signature.cta,
-    },
-    {
-      ...collectionFeatures[1],
-      label: dictionary.lab.label,
-      title: dictionary.lab.title,
-      description: `${dictionary.lab.description1} ${dictionary.lab.description2}`,
-      cta: dictionary.lab.cta,
-    },
-    {
-      ...collectionFeatures[2],
-      label: dictionary.black.label,
-      title: dictionary.black.title,
-      description: `${dictionary.black.description1} ${dictionary.black.description2}`,
-      cta: dictionary.black.cta,
-    },
-  ];
-}
-
-export default function CollectionsSection({
+export default async function CollectionsSection({
   dictionary,
   locale = DEFAULT_SITE_LOCALE,
 }: CollectionsSectionProps) {
-  const accessibility = COLLECTION_ACCESSIBILITY[locale];
-  const localizedFeatures = getLocalizedFeatures(dictionary).map((feature, index) => ({
-    ...feature,
-    href: getExperienceCategoryTarget(feature.href, locale),
-    alt: accessibility.images[index],
-  }));
+  const pages = await fetchExperienceCategoryPages(locale);
+  const features = pages.map((page) => {
+    const image = getCmsImageUrl(page.card_image);
+    if (!image) throw new Error(`Missing ${locale}:${page.key} homepage card image`);
+
+    return {
+      ...page,
+      image,
+      href: getExperienceCategoryTarget(`/experiences/${page.key}`, locale),
+      cta: `${dictionary.common.enter} →`,
+    };
+  });
 
   return (
     <div className="w-full bg-neutral-50">
       <div className="mx-auto max-w-7xl px-6 pt-16 sm:px-10 sm:pt-18 lg:px-16 lg:pt-20">
         <p className="font-body text-[0.66rem] font-medium uppercase tracking-[0.18em] text-neutral-600">
-          {dictionary?.home.collections.eyebrow ?? 'Three ways CREARE composes an encounter.'}
+          {dictionary.home.collections.eyebrow}
         </p>
       </div>
-      <section
-        className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:px-10 sm:pt-12 md:pb-36 md:pt-16 lg:px-16 lg:pt-18"
-        aria-label={accessibility.sections[0]}
-      >
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-20 xl:gap-28">
-          <div className="mb-2 lg:mb-0 lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
-            <p className="mb-5 font-body text-[0.58rem] font-bold uppercase tracking-[0.26em] text-neutral-500 sm:mb-6 sm:text-[0.6rem] sm:tracking-[0.3em]">
-              {localizedFeatures[0].label}
-            </p>
-            <p className="mb-8 font-display text-[clamp(1.55rem,7.3vw,2.4rem)] font-light leading-[1.18] tracking-[-0.015em] text-neutral-900 sm:mb-10 sm:text-[clamp(1.7rem,2.8vw,2.4rem)] sm:leading-[1.1] sm:tracking-tight">
-              {localizedFeatures[0].title}
-            </p>
-            <p className="mb-10 max-w-sm font-body text-[0.95rem] leading-[1.9] text-neutral-500 sm:mb-12 sm:max-w-xs sm:text-sm sm:leading-relaxed">
-              {localizedFeatures[0].description}
-            </p>
-            <Link
-              href={localizedFeatures[0].href}
-              className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
-              aria-label={`${localizedFeatures[0].cta} ${localizedFeatures[0].label}`}
-            >
-              <span className="relative inline-block">
-                {localizedFeatures[0].cta}
-                <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
-              </span>
-            </Link>
-          </div>
-          <div className="group overflow-hidden lg:w-7/12 xl:w-8/12">
-            <div>
-              <AppImage
-                src={localizedFeatures[0].image}
-                alt={localizedFeatures[0].alt}
-                width={1200}
-                height={780}
-                deliveryProfile="hero"
-                className="motion-media-drift h-auto w-full object-cover"
-                sizes="(max-width: 1024px) 100vw, 66vw"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section
-        className="mx-auto max-w-7xl border-t border-neutral-200/80 px-6 pb-28 pt-16 sm:px-10 md:pb-48 md:pt-20 lg:px-16"
-        aria-label={accessibility.sections[1]}
-      >
-        <div className="flex flex-col gap-10 lg:flex-row-reverse lg:items-center lg:gap-20 xl:gap-28">
-          <div className="group mb-2 lg:mb-0 lg:w-7/12 xl:w-8/12">
-            <div className="w-full overflow-hidden">
-              <AppImage
-                src={localizedFeatures[1].image}
-                alt={localizedFeatures[1].alt}
-                width={1200}
-                height={780}
-                deliveryProfile="hero"
-                className="motion-media-drift h-auto w-full object-cover"
-                sizes="(max-width: 1024px) 100vw, 66vw"
-              />
-            </div>
-          </div>
-          <div className="lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
-            <p className="mb-5 font-body text-[0.58rem] font-bold uppercase tracking-[0.26em] text-neutral-500 sm:mb-6 sm:text-[0.6rem] sm:tracking-[0.3em]">
-              {localizedFeatures[1].label}
-            </p>
-            <p className="mb-8 font-display text-[clamp(1.55rem,7.3vw,2.4rem)] font-light leading-[1.18] tracking-[-0.015em] text-neutral-900 sm:mb-10 sm:text-[clamp(1.7rem,2.8vw,2.4rem)] sm:leading-[1.1] sm:tracking-tight">
-              {localizedFeatures[1].title}
-            </p>
-            <p className="mb-10 max-w-sm font-body text-[0.95rem] leading-[1.9] text-neutral-500 sm:mb-12 sm:max-w-xs sm:text-sm sm:leading-relaxed">
-              {localizedFeatures[1].description}
-            </p>
-            <Link
-              href={localizedFeatures[1].href}
-              className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
-              aria-label={`${localizedFeatures[1].cta} ${localizedFeatures[1].label}`}
+      {features.map((feature, index) => {
+        const imageFirst = index === 1;
+        return (
+          <section
+            key={feature.key}
+            className={`mx-auto max-w-7xl px-6 sm:px-10 lg:px-16 ${
+              index === 0
+                ? 'pb-24 pt-10 sm:pt-12 md:pb-36 md:pt-16 lg:pt-18'
+                : index === features.length - 1
+                  ? 'border-t border-neutral-200/80 pb-36 pt-20 md:pb-56 md:pt-36'
+                  : 'border-t border-neutral-200/80 pb-28 pt-16 md:pb-48 md:pt-20'
+            }`}
+            aria-label={`${feature.eyebrow} ${dictionary.experiences.title}`}
+          >
+            <div
+              className={`flex flex-col gap-10 lg:items-center lg:gap-20 xl:gap-28 ${
+                imageFirst ? 'lg:flex-row-reverse' : 'lg:flex-row'
+              }`}
             >
-              <span className="relative inline-block">
-                {localizedFeatures[1].cta}
-                <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
-              </span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="mx-auto max-w-7xl border-t border-neutral-200/80 px-6 pb-36 pt-20 sm:px-10 md:pb-56 md:pt-36 lg:px-16"
-        aria-label={accessibility.sections[2]}
-      >
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-20 xl:gap-28">
-          <div className="mb-2 lg:mb-0 lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
-            <p className="mb-5 font-body text-[0.58rem] font-bold uppercase tracking-[0.26em] text-neutral-500 sm:mb-6 sm:text-[0.6rem] sm:tracking-[0.3em]">
-              {localizedFeatures[2].label}
-            </p>
-            <p className="mb-8 font-display text-[clamp(1.55rem,7.3vw,2.4rem)] font-light leading-[1.18] tracking-[-0.015em] text-neutral-900 sm:mb-10 sm:text-[clamp(1.7rem,2.8vw,2.4rem)] sm:leading-[1.1] sm:tracking-tight">
-              {localizedFeatures[2].title}
-            </p>
-            <p className="mb-10 max-w-sm font-body text-[0.95rem] leading-[1.9] text-neutral-500 sm:mb-12 sm:max-w-xs sm:text-sm sm:leading-relaxed">
-              {localizedFeatures[2].description}
-            </p>
-            <Link
-              href={localizedFeatures[2].href}
-              className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
-              aria-label={`${localizedFeatures[2].cta} ${localizedFeatures[2].label}`}
-            >
-              <span className="relative inline-block">
-                {localizedFeatures[2].cta}
-                <span className="absolute left-0 -bottom-px h-px w-0 bg-neutral-800 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
-              </span>
-            </Link>
-          </div>
-          <div className="group lg:w-7/12 xl:w-8/12">
-            <div className="w-full overflow-hidden">
-              <AppImage
-                src={localizedFeatures[2].image}
-                alt={localizedFeatures[2].alt}
-                width={1200}
-                height={780}
-                deliveryProfile="hero"
-                className="motion-media-drift h-auto w-full object-cover"
-                sizes="(max-width: 1024px) 100vw, 66vw"
-              />
+              <div className="mb-2 lg:mb-0 lg:w-5/12 lg:flex-shrink-0 xl:w-4/12">
+                <p className="mb-5 font-body text-[0.58rem] font-bold uppercase tracking-[0.26em] text-neutral-500 sm:mb-6 sm:text-[0.6rem] sm:tracking-[0.3em]">
+                  {feature.eyebrow}
+                </p>
+                <p className="mb-8 font-display text-[clamp(1.55rem,7.3vw,2.4rem)] font-light leading-[1.18] text-neutral-900 sm:mb-10 sm:text-[clamp(1.7rem,2.8vw,2.4rem)] sm:leading-[1.1]">
+                  {feature.card_title}
+                </p>
+                <p className="mb-10 max-w-sm font-body text-[0.95rem] leading-[1.9] text-neutral-500 sm:mb-12 sm:max-w-xs sm:text-sm sm:leading-relaxed">
+                  {feature.card_description}
+                </p>
+                <Link
+                  href={feature.href}
+                  className="group/cta motion-link inline-flex min-h-11 items-center font-body text-[0.6rem] uppercase tracking-[0.22em] text-neutral-600 hover:text-neutral-900 sm:tracking-[0.28em]"
+                  aria-label={`${feature.cta} ${feature.eyebrow}`}
+                >
+                  <span className="relative inline-block">
+                    {feature.cta}
+                    <span className="absolute -bottom-px left-0 h-px w-0 bg-neutral-800 transition-[width,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] group-hover/cta:w-full" />
+                  </span>
+                </Link>
+              </div>
+              <div className="group overflow-hidden lg:w-7/12 xl:w-8/12">
+                <AppImage
+                  src={feature.image}
+                  alt={feature.card_alt_text}
+                  width={1200}
+                  height={780}
+                  deliveryProfile="hero"
+                  className="motion-media-drift h-auto w-full object-cover"
+                  sizes="(max-width: 1024px) 100vw, 66vw"
+                />
+              </div>
             </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        );
+      })}
     </div>
   );
 }

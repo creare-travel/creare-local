@@ -179,33 +179,24 @@ const trExperienceDetailMetadata = buildLocalizedExperienceDetailMetadata({
     title: 'Beylerbeyi 1869',
     seo_title: 'Beylerbeyi 1869 | CREARE',
     seo_description: 'Beylerbeyi deneyimi için onaylı Türkçe SEO açıklaması.',
+    og_description: 'Beylerbeyi deneyimi için onaylı Türkçe sosyal açıklama.',
+    hero_alt_text: 'Beylerbeyi deneyimi kapak görseli',
     short_description: 'Beylerbeyi deneyimi için kısa Türkçe açıklama.',
     description: 'Beylerbeyi deneyimi için gövde metni.',
   },
   image: DEFAULT_OG_IMAGE,
 });
-const trExperienceFallbackMetadata = buildLocalizedExperienceDetailMetadata({
-  locale: 'tr',
-  slug: 'imperial-flavors',
-  item: {
-    title: 'İmparatorluk Lezzetleri',
-    short_description: 'İmparatorluk lezzetleri için kısa Türkçe açıklama.',
-    description: 'İmparatorluk lezzetleri için gövde metni.',
-  },
-});
-const trExperienceRichTextFallbackMetadata = buildLocalizedExperienceDetailMetadata({
-  locale: 'tr',
-  slug: 'open-studio-istanbul',
-  item: {
-    title: 'Açık Stüdyo İstanbul',
-    description: [
-      {
-        type: 'paragraph',
-        children: [{ type: 'text', text: 'İlk Türkçe rich-text paragrafı.' }],
-      },
-    ],
-  },
-});
+assertThrows('TR Experience metadata rejects legacy short-description fallback', () =>
+  buildLocalizedExperienceDetailMetadata({
+    locale: 'tr',
+    slug: 'imperial-flavors',
+    item: {
+      title: 'Imperial Flavors™',
+      short_description: 'İmparatorluk lezzetleri için kısa Türkçe açıklama.',
+      description: 'İmparatorluk lezzetleri için gövde metni.',
+    },
+  })
+);
 const trInsightDetailMetadata = buildLocalizedInsightDetailMetadata({
   locale: 'tr',
   slug: 'private-life-of-istanbul',
@@ -572,26 +563,6 @@ assert.equal(
   'TR experience detail uses SEO description before fallback copy'
 );
 assert.equal(
-  titleValue(trExperienceFallbackMetadata),
-  'İmparatorluk Lezzetleri',
-  'TR experience detail falls back to localized title'
-);
-assert.equal(
-  trExperienceFallbackMetadata.description,
-  'İmparatorluk lezzetleri için kısa Türkçe açıklama.',
-  'TR experience detail falls back to localized short description'
-);
-assert.equal(
-  trExperienceRichTextFallbackMetadata.description,
-  'İlk Türkçe rich-text paragrafı.',
-  'TR experience detail extracts localized rich-text paragraph instead of raw JSON'
-);
-assert.equal(
-  String(trExperienceRichTextFallbackMetadata.description).includes('"type"'),
-  false,
-  'TR experience detail description does not expose raw rich-text JSON'
-);
-assert.equal(
   trExperienceDetailAlternates.canonical,
   `${SITE_URL}/tr/experiences/beylerbeyi-1869`,
   'TR experience detail canonical keeps localized slug identity'
@@ -613,8 +584,8 @@ assert.equal(
 );
 assert.equal(
   trExperienceDetailTwitter.description,
-  trExperienceDetailMetadata.description,
-  'TR experience detail Twitter description follows localized metadata description'
+  'Beylerbeyi deneyimi için onaylı Türkçe sosyal açıklama.',
+  'TR experience detail Twitter description follows localized CMS Open Graph copy'
 );
 assert.equal(
   titleValue(trInsightDetailMetadata),
