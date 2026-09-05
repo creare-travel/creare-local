@@ -5,6 +5,9 @@ import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 interface CulturalWorldsDiscoveryRailProps {
   heading: React.ReactNode;
   children: React.ReactNode;
+  previousLabel: string;
+  nextLabel: string;
+  railLabel: string;
 }
 
 function ArrowIcon({ direction }: { direction: 'left' | 'right' }) {
@@ -38,17 +41,22 @@ function ArrowIcon({ direction }: { direction: 'left' | 'right' }) {
 export default function CulturalWorldsDiscoveryRail({
   heading,
   children,
+  previousLabel,
+  nextLabel,
+  railLabel,
 }: CulturalWorldsDiscoveryRailProps) {
   const railId = useId();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [hasOverflow, setHasOverflow] = useState(false);
 
   const syncControls = useCallback(() => {
     const node = scrollRef.current;
     if (!node) return;
 
     const maxScrollLeft = Math.max(node.scrollWidth - node.clientWidth, 0);
+    setHasOverflow(maxScrollLeft > 8);
     setCanScrollLeft(node.scrollLeft > 8);
     setCanScrollRight(node.scrollLeft < maxScrollLeft - 8);
   }, []);
@@ -90,9 +98,10 @@ export default function CulturalWorldsDiscoveryRail({
     const gap = Number.parseFloat(gapValue) || 0;
     const distance = (firstCard?.getBoundingClientRect().width ?? node.clientWidth * 0.8) + gap;
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     node.scrollBy({
       left: direction === 'right' ? distance : -distance,
-      behavior: 'smooth',
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
     });
   }, []);
 
@@ -103,31 +112,40 @@ export default function CulturalWorldsDiscoveryRail({
     <div>
       <div className="mb-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>{heading}</div>
-        <div className="flex items-center justify-end gap-2 self-end sm:self-auto">
-          <button
-            type="button"
-            aria-controls={railId}
-            aria-label="Scroll cultural worlds left"
-            onClick={() => scrollByCard('left')}
-            disabled={!canScrollLeft}
-            className={`${controlClassName} ${canScrollLeft ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
-          >
-            <ArrowIcon direction="left" />
-          </button>
-          <button
-            type="button"
-            aria-controls={railId}
-            aria-label="Scroll cultural worlds right"
-            onClick={() => scrollByCard('right')}
-            disabled={!canScrollRight}
-            className={controlClassName}
-          >
-            <ArrowIcon direction="right" />
-          </button>
-        </div>
+        {hasOverflow ? (
+          <div className="flex items-center justify-end gap-2 self-end sm:self-auto">
+            <button
+              type="button"
+              aria-controls={railId}
+              aria-label={previousLabel}
+              onClick={() => scrollByCard('left')}
+              disabled={!canScrollLeft}
+              className={controlClassName}
+            >
+              <ArrowIcon direction="left" />
+            </button>
+            <button
+              type="button"
+              aria-controls={railId}
+              aria-label={nextLabel}
+              onClick={() => scrollByCard('right')}
+              disabled={!canScrollRight}
+              className={controlClassName}
+            >
+              <ArrowIcon direction="right" />
+            </button>
+          </div>
+        ) : null}
       </div>
 
-      <div ref={scrollRef} id={railId} className="atlas-scroll overflow-x-auto pb-4">
+      <div
+        ref={scrollRef}
+        id={railId}
+        role="region"
+        aria-label={railLabel}
+        tabIndex={hasOverflow ? 0 : -1}
+        className="atlas-scroll overflow-x-auto pb-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+      >
         <div className="flex snap-x snap-mandatory gap-6 lg:gap-6">{children}</div>
       </div>
     </div>

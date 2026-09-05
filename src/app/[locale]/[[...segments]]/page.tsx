@@ -14,7 +14,10 @@ import {
   generateExperienceDetailMetadata,
   renderExperienceDetailPage,
 } from '@/features/i18n-pages/experience-detail';
-import { renderCulturalWorldsPage } from '@/features/i18n-pages/cultural-worlds';
+import {
+  generateCulturalWorldsMetadata,
+  renderCulturalWorldsPage,
+} from '@/features/i18n-pages/cultural-worlds';
 import {
   generateCulturalWorldDetailMetadata,
   renderCulturalWorldDetailPage,
@@ -76,7 +79,7 @@ async function resolveParams(params: GenericLocalePageProps['params']) {
 
 function buildListingMetadata(
   locale: SiteLocale,
-  family: 'home' | 'experiences' | 'cultural-worlds' | 'insights'
+  family: 'home' | 'experiences' | 'insights'
 ): Metadata {
   const dictionary = getDictionary(locale);
   const path = family === 'home' ? '/' : `/${family}`;
@@ -102,19 +105,6 @@ function buildListingMetadata(
       title: dictionary.home.hero.eyebrow,
       description: dictionary.home.collections.eyebrow,
       robots: { index: true, follow: true },
-      availableLocales,
-    });
-  }
-
-  if (family === 'cultural-worlds') {
-    return buildLocaleOwnedMetadata({
-      locale,
-      copyLocale: locale,
-      route: { family, locale },
-      title: dictionary.culturalWorlds.atlasTitle,
-      description: dictionary.culturalWorlds.geography,
-      robots: { index: true, follow: true },
-      titleMode: 'absolute',
       availableLocales,
     });
   }
@@ -152,7 +142,7 @@ export async function generateMetadata({ params }: GenericLocalePageProps): Prom
 
   if (!family) return buildListingMetadata(locale, 'home');
   if (!slug && family === 'experiences') return generateExperiencesMetadata(locale);
-  if (!slug && family === 'cultural-worlds') return buildListingMetadata(locale, 'cultural-worlds');
+  if (!slug && family === 'cultural-worlds') return generateCulturalWorldsMetadata(locale);
   if (!slug && family === 'insights') return buildListingMetadata(locale, 'insights');
 
   if (family === 'experiences' && slug && EXPERIENCE_CATEGORIES.has(slug as ExperienceCategory)) {

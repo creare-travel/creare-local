@@ -12,9 +12,9 @@ import type { SiteLocale } from './config';
 
 const locales: SiteLocale[] = ['en', 'tr', 'zh'];
 const expectedCategoryMedia = {
-  signature: 69,
-  lab: 70,
-  black: 71,
+  signature: 'jnawy5gg74i77hu48up6if6u',
+  lab: 'sgemlcbkw6jog0qoqzaq81qq',
+  black: 'nfdnq25vgjcpglwxmxvjdh34',
 } as const;
 const obsoleteTurkishTitles = [
   'İpek Yolu: İstanbul™',
@@ -44,25 +44,9 @@ function assertText(value: unknown, identity: string) {
 }
 
 function collectCategoryCopy(page: CmsExperienceCategoryPage) {
-  return [
-    page.eyebrow,
-    page.hero_title,
-    page.hero_subtitle,
-    page.introduction,
-    page.supporting_content,
-    page.list_eyebrow,
-    page.list_title,
-    page.cta_heading,
-    page.cta_supporting_text,
-    page.cta_access_line,
-    page.cta_label,
-    page.card_title,
-    page.card_description,
-    page.card_distinction,
-    page.seo_title,
-    page.seo_description,
-    page.og_description,
-  ].join('\n');
+  return Object.values(page)
+    .filter((value): value is string => typeof value === 'string')
+    .join('\n');
 }
 
 function assertExperienceContract(item: CmsExperience, locale: SiteLocale) {
@@ -134,14 +118,27 @@ async function main() {
         fetchPublishedExperiences(locale),
       ]);
 
-      assert.equal(landing.hero_image.id, 68, `${locale} landing media identity`);
+      assert.equal(
+        landing.hero_image.documentId,
+        'njdkfdg7f2bab84crz5lss2e',
+        `${locale} landing media identity`
+      );
       assert.equal(categories.length, 3, `${locale} category count`);
       assert.equal(experiences.length, 14, `${locale} Experience count`);
       assert.equal(new Set(experiences.map((item) => item.slug)).size, 14);
+      assert.deepEqual(
+        {
+          signature: experiences.filter((item) => item.category === 'signature').length,
+          lab: experiences.filter((item) => item.category === 'lab').length,
+          black: experiences.filter((item) => item.category === 'black').length,
+        },
+        { signature: 11, lab: 3, black: 0 },
+        `${locale} category inventory`
+      );
 
       for (const category of categories) {
-        assert.equal(category.hero_image.id, expectedCategoryMedia[category.key]);
-        assert.equal(category.card_image.id, expectedCategoryMedia[category.key]);
+        assert.equal(category.hero_image.documentId, expectedCategoryMedia[category.key]);
+        assert.equal(category.card_image.documentId, expectedCategoryMedia[category.key]);
         for (const claim of prohibitedBlackClaims) {
           assert.equal(
             collectCategoryCopy(category).toLowerCase().includes(claim),
@@ -185,7 +182,8 @@ async function main() {
 
   console.info('Experience CMS assertions passed:');
   console.info('- CMS inventories: EN 14 / TR 14 / ZH 14');
-  console.info('- Landing/category media: 68 / 69 / 70 / 71');
+  console.info('- Category inventories per locale: SIGNATURE 11 / LAB 3 / BLACK 0');
+  console.info('- Landing/category media identity: stable documentId fields');
   console.info('- Official title parity: 42/42');
   console.info('- Experience supplement fallback references: 0');
   console.info('- Frontend-owned category dictionary sections: 0');

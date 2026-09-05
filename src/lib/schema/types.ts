@@ -32,6 +32,8 @@ export interface StrapiImage {
 
 export interface StrapiDestination {
   id?: number;
+  documentId?: string;
+  locale?: string;
   name?: string;
   slug?: string;
   highlight?: string;
@@ -40,6 +42,7 @@ export interface StrapiDestination {
   meta_title?: string;
   meta_description?: string;
   visibility_status?: string;
+  publishedAt?: string | null;
   cover_image?: StrapiImage | null;
 }
 

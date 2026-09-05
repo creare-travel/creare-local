@@ -19,6 +19,12 @@ interface CulturalSectionInput {
 }
 
 interface CulturalWorldCollectionInput {
+  canonicalPath: string;
+  title: string;
+  description: string;
+  homeLabel: string;
+  homePath: string;
+  inLanguage: string;
   items: Array<
     StrapiDestination & {
       title?: string;
@@ -38,15 +44,15 @@ interface CulturalWorldDetailInput {
 export function buildCulturalWorldCollectionGraph(
   input: CulturalWorldCollectionInput
 ): SchemaNode[] {
-  const canonical = buildCanonicalUrl('/cultural-worlds');
+  const canonical = buildCanonicalUrl(input.canonicalPath);
   const breadcrumbId = `${canonical}#breadcrumbs`;
   const collectionId = `${canonical}#collection`;
   const itemListId = `${canonical}#itemlist`;
 
   const breadcrumb = buildBreadcrumbListSchema(
     [
-      { name: 'Home', url: buildCanonicalUrl('/') },
-      { name: 'Cultural Worlds', url: canonical },
+      { name: input.homeLabel, url: buildCanonicalUrl(input.homePath) },
+      { name: input.title, url: canonical },
     ],
     breadcrumbId
   );
@@ -56,12 +62,12 @@ export function buildCulturalWorldCollectionGraph(
     .map((item, index) => ({
       '@type': 'ListItem',
       position: index + 1,
-      url: buildCanonicalUrl(`/cultural-worlds/${item.slug}`),
+      url: buildCanonicalUrl(`${input.canonicalPath}/${item.slug}`),
       name: item.name,
       description: item.highlight || item.short_description || item.description,
       image: buildImageObjectSchema(item.cover_image, {
-        id: `${buildCanonicalUrl(`/cultural-worlds/${item.slug}`)}#image`,
-        fallbackName: item.name || 'Cultural World',
+        id: `${buildCanonicalUrl(`${input.canonicalPath}/${item.slug}`)}#image`,
+        fallbackName: item.name || input.title,
       }),
     }));
 
@@ -69,7 +75,8 @@ export function buildCulturalWorldCollectionGraph(
     itemListElements.length > 0
       ? buildItemListSchema({
           id: itemListId,
-          name: 'Cultural Worlds list',
+          name: input.title,
+          inLanguage: input.inLanguage,
           items: itemListElements,
         })
       : null;
@@ -77,9 +84,9 @@ export function buildCulturalWorldCollectionGraph(
   const collectionPage = buildCollectionPageSchema({
     id: collectionId,
     url: canonical,
-    name: 'Cultural Worlds',
-    description:
-      'Each destination is a world unto itself. Private cultural access shaped by history, ritual, and meaning.',
+    name: input.title,
+    inLanguage: input.inLanguage,
+    description: input.description,
     breadcrumbId,
     mainEntityId: itemList ? itemListId : undefined,
   });

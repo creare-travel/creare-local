@@ -165,6 +165,54 @@ export interface CmsExperienceCategoryPage {
   seo_title: string;
   seo_description: string;
   og_description: string;
+  signature_positioning_title?: string | null;
+  signature_positioning_body_1?: string | null;
+  signature_positioning_body_2?: string | null;
+  signature_positioning_body_3?: string | null;
+  signature_composition_title?: string | null;
+  signature_composition_body?: string | null;
+  signature_distinction_body?: string | null;
+  signature_inquiry_title?: string | null;
+  signature_inquiry_body?: string | null;
+  lab_definition_body?: string | null;
+  lab_context_title?: string | null;
+  lab_context_body?: string | null;
+  lab_principles_eyebrow?: string | null;
+  lab_principles_title?: string | null;
+  lab_principle_1_title?: string | null;
+  lab_principle_1_body?: string | null;
+  lab_principle_2_title?: string | null;
+  lab_principle_2_body?: string | null;
+  lab_principle_3_title?: string | null;
+  lab_principle_3_body?: string | null;
+  lab_audience_title?: string | null;
+  lab_audience_body_1?: string | null;
+  lab_audience_body_2?: string | null;
+  lab_process_eyebrow?: string | null;
+  lab_process_title?: string | null;
+  lab_process_step_1_title?: string | null;
+  lab_process_step_1_body?: string | null;
+  lab_process_step_2_title?: string | null;
+  lab_process_step_2_body?: string | null;
+  lab_process_step_3_title?: string | null;
+  lab_process_step_3_body?: string | null;
+  lab_process_step_4_title?: string | null;
+  lab_process_step_4_body?: string | null;
+  lab_closing_body?: string | null;
+  black_context_title?: string | null;
+  black_context_body?: string | null;
+  black_process_eyebrow?: string | null;
+  black_process_title?: string | null;
+  black_process_step_1_title?: string | null;
+  black_process_step_1_body?: string | null;
+  black_process_step_2_title?: string | null;
+  black_process_step_2_body?: string | null;
+  black_process_step_3_title?: string | null;
+  black_process_step_3_body?: string | null;
+  black_process_step_4_title?: string | null;
+  black_process_step_4_body?: string | null;
+  black_conditions_title?: string | null;
+  black_conditions_body?: string | null;
   publishedAt?: string | null;
 }
 
@@ -187,6 +235,7 @@ const LANDING_REQUIRED_FIELDS = [
 ] as const;
 
 const CATEGORY_REQUIRED_FIELDS = [
+  'documentId',
   'eyebrow',
   'hero_title',
   'hero_subtitle',
@@ -207,6 +256,87 @@ const CATEGORY_REQUIRED_FIELDS = [
   'seo_description',
   'og_description',
 ] as const;
+
+const CATEGORY_QUERY_FIELDS = [
+  'key',
+  'display_order',
+  'eyebrow',
+  'hero_title',
+  'hero_subtitle',
+  'introduction',
+  'supporting_content',
+  'list_eyebrow',
+  'list_title',
+  'cta_heading',
+  'cta_supporting_text',
+  'cta_access_line',
+  'cta_label',
+  'hero_alt_text',
+  'card_title',
+  'card_description',
+  'card_distinction',
+  'card_alt_text',
+  'seo_title',
+  'seo_description',
+  'og_description',
+] as const;
+
+const CATEGORY_EDITORIAL_REQUIRED_FIELDS = {
+  signature: [
+    'signature_positioning_title',
+    'signature_positioning_body_1',
+    'signature_positioning_body_2',
+    'signature_positioning_body_3',
+    'signature_composition_title',
+    'signature_composition_body',
+    'signature_distinction_body',
+    'signature_inquiry_title',
+    'signature_inquiry_body',
+  ],
+  lab: [
+    'lab_definition_body',
+    'lab_context_title',
+    'lab_context_body',
+    'lab_principles_eyebrow',
+    'lab_principles_title',
+    'lab_principle_1_title',
+    'lab_principle_1_body',
+    'lab_principle_2_title',
+    'lab_principle_2_body',
+    'lab_principle_3_title',
+    'lab_principle_3_body',
+    'lab_audience_title',
+    'lab_audience_body_1',
+    'lab_audience_body_2',
+    'lab_process_eyebrow',
+    'lab_process_title',
+    'lab_process_step_1_title',
+    'lab_process_step_1_body',
+    'lab_process_step_2_title',
+    'lab_process_step_2_body',
+    'lab_process_step_3_title',
+    'lab_process_step_3_body',
+    'lab_process_step_4_title',
+    'lab_process_step_4_body',
+    'lab_closing_body',
+  ],
+  black: [
+    'black_context_title',
+    'black_context_body',
+    'black_process_eyebrow',
+    'black_process_title',
+    'black_process_step_1_title',
+    'black_process_step_1_body',
+    'black_process_step_2_title',
+    'black_process_step_2_body',
+    'black_process_step_3_title',
+    'black_process_step_3_body',
+    'black_process_step_4_title',
+    'black_process_step_4_body',
+    'black_conditions_title',
+    'black_conditions_body',
+  ],
+} as const satisfies Record<ExperienceCategory, readonly string[]>;
 
 const EXPERIENCE_REQUIRED_FIELDS = [
   'title',
@@ -337,53 +467,62 @@ export async function fetchExperienceLanding(locale: SiteLocale): Promise<CmsExp
 export async function fetchExperienceCategoryPages(
   locale: SiteLocale
 ): Promise<CmsExperienceCategoryPage[]> {
+  return Promise.all(
+    (['signature', 'lab', 'black'] as const).map((category) =>
+      fetchExperienceCategoryPageRecord(category, locale)
+    )
+  );
+}
+
+async function fetchExperienceCategoryPageRecord(
+  category: ExperienceCategory,
+  locale: SiteLocale
+): Promise<CmsExperienceCategoryPage> {
   const params = new URLSearchParams({
     status: 'published',
-    'sort[0]': 'display_order:asc',
+    'filters[key][$eq]': category,
     'populate[hero_image]': 'true',
     'populate[card_image]': 'true',
-    'pagination[pageSize]': '10',
+    'pagination[pageSize]': '1',
   });
+  [...CATEGORY_QUERY_FIELDS, ...CATEGORY_EDITORIAL_REQUIRED_FIELDS[category]].forEach(
+    (field, index) => params.set(`fields[${index}]`, field)
+  );
+
   const json = await fetchStrapi(`/api/experience-category-pages?${params.toString()}`, {
     locale,
   });
-  const rawItems: Record<string, unknown>[] = Array.isArray(json?.data) ? json.data : [];
-  const pages = rawItems.map((raw) => flattenItem<CmsExperienceCategoryPage>(raw));
-
-  for (const page of pages) {
-    assertRequiredTextFields(
-      page as unknown as Record<string, unknown>,
-      CATEGORY_REQUIRED_FIELDS,
-      `${locale}:experience-category:${page.key}`
-    );
-    assertRequiredImage(page.hero_image, `${locale}:experience-category:${page.key}`, 'hero_image');
-    assertRequiredImage(page.card_image, `${locale}:experience-category:${page.key}`, 'card_image');
+  const raw = Array.isArray(json?.data) ? json.data[0] : null;
+  if (!raw || typeof raw !== 'object') {
+    throw new Error(`Missing published ${category} Experience Category page for ${locale}`);
   }
 
-  const keys = pages.map((page) => page.key);
-  if (
-    pages.length !== 3 ||
-    !['signature', 'lab', 'black'].every((key) => keys.includes(key as ExperienceCategory))
-  ) {
-    throw new Error(`Expected three published Experience Category pages for ${locale}`);
-  }
+  const page = flattenItem<CmsExperienceCategoryPage>(raw as Record<string, unknown>);
+  assertRequiredTextFields(
+    page as unknown as Record<string, unknown>,
+    CATEGORY_REQUIRED_FIELDS,
+    `${locale}:experience-category:${category}`
+  );
+  assertRequiredTextFields(
+    page as unknown as Record<string, unknown>,
+    CATEGORY_EDITORIAL_REQUIRED_FIELDS[category],
+    `${locale}:experience-category:${category}:editorial`
+  );
+  assertRequiredImage(page.hero_image, `${locale}:experience-category:${category}`, 'hero_image');
+  assertRequiredImage(page.card_image, `${locale}:experience-category:${category}`, 'card_image');
 
-  return pages.map((page) => ({
+  return {
     ...page,
     hero_image: normalizeImage(page.hero_image) as CmsImage,
     card_image: normalizeImage(page.card_image) as CmsImage,
-  }));
+  };
 }
 
 export async function fetchExperienceCategoryPage(
   category: ExperienceCategory,
   locale: SiteLocale
 ): Promise<CmsExperienceCategoryPage> {
-  const pages = await fetchExperienceCategoryPages(locale);
-  const page = pages.find((candidate) => candidate.key === category);
-  if (!page)
-    throw new Error(`Missing published ${category} Experience Category page for ${locale}`);
-  return page;
+  return fetchExperienceCategoryPageRecord(category, locale);
 }
 
 export async function fetchPublishedExperiences(
