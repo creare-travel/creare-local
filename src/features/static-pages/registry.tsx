@@ -10,11 +10,7 @@ import {
 import type { LocaleKey, SiteLocale } from '@/lib/i18n/config';
 
 export type LocalizedStaticPagePath =
-  | '/contact'
-  | '/philosophy'
-  | '/privacy'
-  | '/cookies'
-  | '/terms';
+  '/contact' | '/philosophy' | '/privacy' | '/cookies' | '/terms';
 
 type StaticPageRenderer = (locale: LocaleKey) => ReactNode | Promise<ReactNode>;
 

@@ -15,12 +15,7 @@ import {
 export type LocaleSwitchFamily = 'cultural-worlds' | 'experiences' | 'insights';
 
 export type LocaleSwitchRouteKind =
-  | 'home'
-  | 'listing'
-  | 'detail'
-  | 'category'
-  | 'static'
-  | 'unknown';
+  'home' | 'listing' | 'detail' | 'category' | 'static' | 'unknown';
 
 export interface LocalizedRouteClassification {
   currentLocale: SiteLocale;
