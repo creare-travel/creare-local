@@ -5,8 +5,8 @@
 import type { Metadata } from 'next';
 import {
   DEFAULT_SITE_LOCALE,
+  ACTIVE_SITE_LOCALES,
   LOCALE_REGISTRY,
-  SUPPORTED_SITE_LOCALES,
   isRegisteredLocale,
   isSiteLocale,
   type LocaleKey,
@@ -36,7 +36,7 @@ export type CanonicalRouteFamily =
 
 export interface RouteCanonicalOptions {
   family: CanonicalRouteFamily;
-  locale: SiteLocale;
+  locale: LocaleKey;
   slug?: string;
 }
 
@@ -50,7 +50,7 @@ export type SupportedMetadataPageType = 'website' | 'article';
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og/default.jpg`;
 export const DEFAULT_OG_IMAGE_ALT = 'Creare — Private Cultural Experiences Composed as Art';
 
-export const ACTIVE_HREFLANGS = SUPPORTED_SITE_LOCALES.map(
+export const ACTIVE_HREFLANGS = ACTIVE_SITE_LOCALES.map(
   (locale) => LOCALE_REGISTRY[locale].hreflang
 );
 
@@ -134,7 +134,7 @@ function normalizeSlugSegment(slug: string | undefined, family: CanonicalRouteFa
 }
 
 function getCanonicalRoutePath({ family, locale, slug }: RouteCanonicalOptions): string {
-  if (!isSiteLocale(locale)) {
+  if (!isRegisteredLocale(locale)) {
     throw new Error(`Unsupported canonical locale: ${String(locale)}`);
   }
 
@@ -193,7 +193,7 @@ export function assertRouteCanonicalOwnership(
 
 export function buildRouteCanonicalAlternates(
   options: RouteCanonicalOptions,
-  availableLocales: readonly SiteLocale[] = SUPPORTED_SITE_LOCALES
+  availableLocales: readonly SiteLocale[] = ACTIVE_SITE_LOCALES
 ) {
   const languages = Object.fromEntries(
     availableLocales.map((locale) => [
@@ -214,7 +214,7 @@ export function buildRouteCanonicalAlternates(
 
 export function buildLocalizedLanguageAlternates(
   path: string,
-  availableLocales: readonly SiteLocale[] = SUPPORTED_SITE_LOCALES
+  availableLocales: readonly SiteLocale[] = ACTIVE_SITE_LOCALES
 ): Record<string, string> {
   const languages = Object.fromEntries(
     availableLocales.map((locale) => [
@@ -234,7 +234,7 @@ export function buildLanguageAlternatesFromLocalizedPaths(
   paths: Readonly<Partial<Record<SiteLocale, string>>>
 ): Record<string, string> {
   const languages = Object.fromEntries(
-    SUPPORTED_SITE_LOCALES.flatMap((locale) => {
+    ACTIVE_SITE_LOCALES.flatMap((locale) => {
       const path = paths[locale];
       return path ? [[LOCALE_REGISTRY[locale].hreflang, canonicalUrl(path)]] : [];
     })
@@ -322,7 +322,7 @@ export function buildOpenGraph(options: {
   path: string;
   image?: string;
   imageAlt?: string;
-  locale?: SiteLocale;
+  locale?: LocaleKey;
   type?: SupportedMetadataPageType;
 }) {
   const imageUrl = resolveOgImage(options.image);

@@ -41,7 +41,7 @@ staticPaths.forEach((path) => {
     `${path} must have a locale-owned ZH renderer`
   );
   assert.equal(isStaticPathAvailableForLocale(path, 'zh'), true);
-  assert.deepEqual(getAvailableStaticRouteLocales(path), ['en', 'tr', 'zh']);
+  assert.deepEqual(getAvailableStaticRouteLocales(path), ['en', 'tr', 'zh', 'ru']);
 });
 
 const chineseLegalPages = [

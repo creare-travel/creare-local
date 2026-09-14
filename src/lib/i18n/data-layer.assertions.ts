@@ -44,10 +44,15 @@ assert.ok(slugFilterPath.includes('populate%5Bcover_image%5D=true'));
 assert.equal(canUseEnglishFallback('en'), true);
 assert.equal(canUseEnglishFallback('tr'), false);
 assert.equal(canUseEnglishFallback('zh'), false);
+assert.equal(canUseEnglishFallback('ru'), false);
 
 const destinationZhPath = buildLocaleAwareStrapiPath('/api/destinations?populate=*', 'zh');
 assertSingleLocale(destinationZhPath, 'zh-CN');
 assert.ok(destinationZhPath.includes('locale=zh-CN'));
+
+const destinationRuPath = buildLocaleAwareStrapiPath('/api/destinations?populate=*', 'ru');
+assertSingleLocale(destinationRuPath, 'ru-RU');
+assert.ok(destinationRuPath.includes('locale=ru-RU'));
 
 const relatedExperiencePath = buildLocaleAwareStrapiPath(
   '/api/experiences?filters[slug][$in][0]=imperial-flavors&filters[visibility_status][$eqi]=active',
@@ -93,7 +98,7 @@ assert.equal(absoluteUrlPath.includes('locale=en'), false);
 assert.equal(isSiteLocale('en'), true);
 assert.equal(isSiteLocale('tr'), true);
 assert.equal(isSiteLocale('zh'), true);
-assert.equal(isSiteLocale('ru'), false);
+assert.equal(isSiteLocale('ru'), true);
 assert.equal(isSiteLocale('ar'), false);
 assert.equal(isSiteLocale('fr'), false);
 assert.equal(isSiteLocale(''), false);
@@ -104,9 +109,9 @@ assert.equal(isSiteLocale(undefined), false);
 const runTypeOnlyLocaleAssertions = process.env.RUN_TYPE_ONLY_LOCALE_ASSERTIONS === 'true';
 if (runTypeOnlyLocaleAssertions) {
   // @ts-expect-error Unsupported locales cannot enter typed path builders.
-  buildLocaleAwareStrapiPath('/api/experiences', 'ru');
+  buildLocaleAwareStrapiPath('/api/experiences', 'ar');
   // @ts-expect-error Unsupported locales cannot enter typed fallback checks.
-  canUseEnglishFallback('ru');
+  canUseEnglishFallback('ar');
 }
 
 console.info('Locale-aware Strapi data layer assertions passed.');

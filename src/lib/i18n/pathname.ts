@@ -1,8 +1,8 @@
 import {
   DEFAULT_SITE_LOCALE,
+  ACTIVE_SITE_LOCALES,
   LOCALE_REGISTRY,
   REGISTERED_LOCALES,
-  SUPPORTED_SITE_LOCALES,
   type LocaleKey,
   type SiteLocale,
 } from './config';
@@ -15,7 +15,7 @@ const PREFIX_TO_LOCALE = new Map<string, LocaleKey>(
 );
 
 const ACTIVE_PREFIX_TO_LOCALE = new Map<string, SiteLocale>(
-  SUPPORTED_SITE_LOCALES.flatMap((locale) => {
+  ACTIVE_SITE_LOCALES.flatMap((locale) => {
     const prefix = LOCALE_REGISTRY[locale].urlPrefix;
     return prefix ? [[prefix, locale] as const] : [];
   })

@@ -1,4 +1,4 @@
-import { getStrapiLocale, type SiteLocale } from '@/lib/i18n/config';
+import { getStrapiLocale, type LocaleKey, type SiteLocale } from '@/lib/i18n/config';
 
 const DEFAULT_DEV_STRAPI_BASE = 'http://localhost:1337';
 const IS_DEVELOPMENT = process.env.NODE_ENV !== 'production';
@@ -37,7 +37,7 @@ export function isLocalAssetUrl(url?: string) {
   }
 }
 
-export function buildLocalizedStrapiPath(path: string, siteLocale: SiteLocale): string {
+export function buildLocalizedStrapiPath(path: string, siteLocale: LocaleKey): string {
   const hashIndex = path.indexOf('#');
   const pathWithoutHash = hashIndex >= 0 ? path.slice(0, hashIndex) : path;
   const hash = hashIndex >= 0 ? path.slice(hashIndex) : '';

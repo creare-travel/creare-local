@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import type { SiteLocale } from '@/lib/i18n/config';
+import type { LocaleKey } from '@/lib/i18n/config';
 import type { WeChatConfig } from '@/lib/contact/channels';
 
 const copy: Record<
-  SiteLocale,
+  LocaleKey,
   { open: string; title: string; account: string; copy: string; copied: string; close: string }
 > = {
   en: {
@@ -32,13 +32,21 @@ const copy: Record<
     copied: '已复制',
     close: '关闭 WeChat 联系方式',
   },
+  ru: {
+    open: 'Открыть контакт WeChat',
+    title: 'WeChat',
+    account: 'WeChat ID',
+    copy: 'Скопировать ID',
+    copied: 'Скопировано',
+    close: 'Закрыть контакт WeChat',
+  },
 };
 
 export default function WeChatContact({
   locale,
   config,
 }: {
-  locale: SiteLocale;
+  locale: LocaleKey;
   config: WeChatConfig | null;
 }) {
   const [isOpen, setIsOpen] = useState(false);

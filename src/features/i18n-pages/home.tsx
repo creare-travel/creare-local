@@ -61,6 +61,10 @@ const HOMEPAGE_STATIC_ACCESSIBILITY = {
     discovery: '首页体验体系探索',
     contact: '首页联系行动',
   },
+  ru: {
+    discovery: 'Обзор системы опыта на главной странице',
+    contact: 'Призыв к связи на главной странице',
+  },
 } as const satisfies Record<LocaleKey, { discovery: string; contact: string }>;
 
 export function renderHomePage(locale: SiteLocale = DEFAULT_SITE_LOCALE) {

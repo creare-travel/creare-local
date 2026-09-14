@@ -11,7 +11,7 @@ import { getAvailableStaticRouteLocales } from './static-routes';
 import { buildCulturalWorldCollectionGraph } from '../schema-builder';
 import { buildLocaleOwnedMetadata } from '../seo';
 
-const locales: SiteLocale[] = ['en', 'tr', 'zh'];
+const locales: SiteLocale[] = ['en', 'tr', 'zh', 'ru'];
 const expectedPageDocumentId = 'gvtccto0fawypsik8jclk970';
 const expectedCategoryDocumentIds: Record<ExperienceCategory, string> = {
   signature: 'kxmwpgar8qiqhs3m5rd3t8d1',
@@ -22,6 +22,7 @@ const expectedPrinciples = {
   en: ['Clarity', 'Structure', 'Precision'],
   tr: ['Netlik', 'Yapı', 'Hassasiyet'],
   zh: ['清晰', '结构', '精准'],
+  ru: ['Ясность', 'Структура', 'Точность'],
 } as const;
 
 const culturalWorldSource = readFileSync(
@@ -56,7 +57,7 @@ assert.equal(
 assert.deepEqual(getAvailableStaticRouteLocales('/cultural-worlds'), locales);
 assert.deepEqual(getAvailableStaticRouteLocales('/experiences/signature'), locales);
 assert.equal(LOCALE_REGISTRY.zh.strapiLocale, 'zh-CN');
-assert.equal('ru' in LOCALE_REGISTRY, false);
+assert.equal('ru' in LOCALE_REGISTRY, true);
 
 function metadataTitle(metadata: Awaited<ReturnType<typeof buildLocaleOwnedMetadata>>) {
   if (typeof metadata.title === 'string') return metadata.title;
@@ -94,7 +95,7 @@ async function main() {
           metadata.alternates?.canonical,
           `https://crearetravel.com${localizePathname(`/experiences/${category.key}`, locale)}`
         );
-        assert.equal('ru' in (metadata.alternates?.languages ?? {}), false);
+        assert.equal('ru' in (metadata.alternates?.languages ?? {}), true);
       }
 
       const lab = categories.find((category) => category.key === 'lab');
@@ -120,7 +121,7 @@ async function main() {
         culturalMetadata.alternates?.canonical,
         `https://crearetravel.com${localizePathname('/cultural-worlds', locale)}`
       );
-      assert.equal('ru' in (culturalMetadata.alternates?.languages ?? {}), false);
+      assert.equal('ru' in (culturalMetadata.alternates?.languages ?? {}), true);
 
       const graph = buildCulturalWorldCollectionGraph({
         canonicalPath: localizePathname('/cultural-worlds', locale),

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import enDictionary from '@/locales/en.json';
+import ruDictionary from '@/locales/ru.json';
 import trDictionary from '@/locales/tr.json';
 import zhDictionary from '@/locales/zh.json';
 import { assertDictionaryActivationReady } from './dictionary-readiness';
@@ -242,9 +243,11 @@ function walkFiles(directory: string): string[] {
 const enKeys = flattenKeys(enDictionary).sort();
 const trKeys = flattenKeys(trDictionary).sort();
 const zhKeys = flattenKeys(zhDictionary).sort();
+const ruKeys = flattenKeys(ruDictionary).sort();
 
 assert.deepEqual(trKeys, enKeys, 'EN and TR dictionary structures must match recursively');
 assert.deepEqual(zhKeys, enKeys, 'EN and ZH dictionary structures must match recursively');
+assert.deepEqual(ruKeys, enKeys, 'EN and RU dictionary structures must match recursively');
 assert.doesNotThrow(() =>
   assertDictionaryActivationReady('en', enDictionary as JsonObject, enDictionary as JsonObject)
 );
@@ -255,6 +258,11 @@ assert.doesNotThrow(
   () =>
     assertDictionaryActivationReady('zh', enDictionary as JsonObject, zhDictionary as JsonObject),
   'Complete ZH dictionary must pass content readiness independently of locale activation'
+);
+assert.doesNotThrow(
+  () =>
+    assertDictionaryActivationReady('ru', enDictionary as JsonObject, ruDictionary as JsonObject),
+  'Complete RU dictionary must pass content readiness independently of locale activation'
 );
 
 approvedKeys.forEach(assertApprovedString);
@@ -280,6 +288,11 @@ protectedTermKeys.forEach((key) => {
     getValue(trDictionary, key),
     getValue(enDictionary, key),
     `Protected term changed: ${key}`
+  );
+  assert.equal(
+    getValue(ruDictionary, key),
+    getValue(enDictionary, key),
+    `Protected term changed in RU: ${key}`
   );
 });
 

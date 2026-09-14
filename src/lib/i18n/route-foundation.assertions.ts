@@ -26,8 +26,10 @@ function walkFiles(directory: string): string[] {
 assert.equal(getLocaleFromPathname('/experiences/test'), 'en');
 assert.equal(getLocaleFromPathname('/tr/experiences/test'), 'tr');
 assert.equal(getLocaleFromPathname('/zh/experiences/test'), 'zh');
+assert.equal(getLocaleFromPathname('/ru/experiences/test'), 'ru');
 assert.equal(getStrapiLocale('tr'), 'tr-TR');
 assert.equal(getStrapiLocale('zh'), 'zh-CN');
+assert.equal(getStrapiLocale('ru'), 'ru-RU');
 assert.equal(
   buildLocaleAwareStrapiPath('/api/experiences?filters[slug][$eq]=test', 'tr'),
   '/api/experiences?filters%5Bslug%5D%5B%24eq%5D=test&locale=tr-TR'
@@ -65,15 +67,17 @@ assert.equal(getLocaleFromPathname('/trailing'), 'en');
 assert.equal(isSiteLocale('en'), true);
 assert.equal(isSiteLocale('tr'), true);
 assert.equal(isSiteLocale('zh'), true);
-['ru', 'ar', 'fr', '', null, undefined, 'de', 'english'].forEach((locale) => {
+assert.equal(isSiteLocale('ru'), true);
+['ar', 'fr', '', null, undefined, 'de', 'english'].forEach((locale) => {
   assert.equal(
     isSiteLocale(locale),
     false,
-    `Unsupported locale must be rejected: ${String(locale)}`
+    `Inactive or unsupported locale must be rejected: ${String(locale)}`
   );
 });
 assert.equal(canUseEnglishFallback('tr'), false);
 assert.equal(canUseEnglishFallback('zh'), false);
+assert.equal(canUseEnglishFallback('ru'), false);
 
 const relatedContentLocale = 'tr' satisfies SiteLocale;
 assert.equal(getStrapiLocale(relatedContentLocale), 'tr-TR');

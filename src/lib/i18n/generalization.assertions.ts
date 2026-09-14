@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import enDictionary from '@/locales/en.json';
+import ruDictionary from '@/locales/ru.json';
 import zhDictionary from '@/locales/zh.json';
 import {
   buildExperienceCategoryMetadata,
@@ -10,12 +11,14 @@ import {
 import type { CmsExperienceCategoryPage } from '@/lib/experiences/cms';
 import {
   DEFAULT_SITE_LOCALE,
+  ACTIVE_SITE_LOCALES,
   LOCALE_OPTIONS,
   LOCALE_REGISTRY,
   REGISTERED_LOCALES,
   SUPPORTED_SITE_LOCALES,
   getGenericRouteLocale,
   getLocaleDescriptor,
+  getTechnicalRouteLocale,
 } from './config';
 import { canUseEnglishFallback } from './data-layer';
 import { assertDictionaryActivationReady, type DictionaryJson } from './dictionary-readiness';
@@ -35,17 +38,19 @@ import {
 import { getActiveAvailableLocales } from './availability';
 
 const defaultLocales = REGISTERED_LOCALES.filter((locale) => LOCALE_REGISTRY[locale].isDefault);
-const activePrefixes = SUPPORTED_SITE_LOCALES.map((locale) => LOCALE_REGISTRY[locale].urlPrefix);
+const activePrefixes = ACTIVE_SITE_LOCALES.map((locale) => LOCALE_REGISTRY[locale].urlPrefix);
 
-assert.deepEqual(REGISTERED_LOCALES, ['en', 'tr', 'zh']);
-assert.deepEqual(SUPPORTED_SITE_LOCALES, ['en', 'tr', 'zh']);
+assert.deepEqual(REGISTERED_LOCALES, ['en', 'tr', 'zh', 'ru']);
+assert.deepEqual(SUPPORTED_SITE_LOCALES, ['en', 'tr', 'zh', 'ru']);
+assert.deepEqual(ACTIVE_SITE_LOCALES, ['en', 'tr', 'zh', 'ru']);
 assert.deepEqual(defaultLocales, [DEFAULT_SITE_LOCALE]);
 assert.equal(new Set(activePrefixes).size, activePrefixes.length);
 assert.deepEqual(
   LOCALE_OPTIONS.map((option) => option.code),
-  ['en', 'tr', 'zh']
+  ['en', 'tr', 'zh', 'ru']
 );
 assert.equal(LOCALE_OPTIONS.find((option) => option.code === 'zh')?.label, '简体中文');
+assert.equal(LOCALE_OPTIONS.find((option) => option.code === 'ru')?.label, 'Русский');
 
 assert.deepEqual(getLocaleDescriptor('zh'), {
   key: 'zh',
@@ -62,14 +67,40 @@ assert.deepEqual(getLocaleDescriptor('zh'), {
   routeMode: 'generic',
 });
 assert.equal(getGenericRouteLocale('zh'), 'zh');
+assert.deepEqual(getLocaleDescriptor('ru'), {
+  key: 'ru',
+  active: true,
+  urlPrefix: 'ru',
+  dictionaryKey: 'ru',
+  strapiLocale: 'ru-RU',
+  htmlLang: 'ru',
+  hreflang: 'ru',
+  ogLocale: 'ru_RU',
+  jsonLdLanguage: 'ru',
+  direction: 'ltr',
+  isDefault: false,
+  routeMode: 'generic',
+});
+assert.equal(getTechnicalRouteLocale('ru'), 'ru');
+assert.equal(getGenericRouteLocale('ru'), 'ru');
 assert.equal(getLocaleFromPathname('/zh/experiences/signature'), 'zh');
+assert.equal(getLocaleFromPathname('/ru/experiences/signature'), 'ru');
 assert.equal(getRegisteredLocaleFromPathname('/zh/experiences/signature'), 'zh');
+assert.equal(getRegisteredLocaleFromPathname('/ru/experiences/signature'), 'ru');
 assert.equal(localizePathname('/experiences/signature', 'zh'), '/zh/experiences/signature');
+assert.equal(localizePathname('/experiences/signature', 'ru'), '/ru/experiences/signature');
 
 assert.equal(isStaticPathAvailableForLocale('/experiences/signature', 'en'), true);
 assert.equal(isStaticPathAvailableForLocale('/experiences/signature', 'tr'), true);
 assert.equal(isStaticPathAvailableForLocale('/experiences/signature', 'zh'), true);
-assert.deepEqual(getAvailableStaticRouteLocales('/experiences/signature'), ['en', 'tr', 'zh']);
+assert.equal(isStaticPathAvailableForLocale('/experiences/signature', 'ru'), true);
+assert.deepEqual(getAvailableStaticRouteLocales('/experiences/signature'), [
+  'en',
+  'tr',
+  'zh',
+  'ru',
+]);
+assert.equal(isStaticPathAvailableForLocale('/insights', 'ru'), false);
 
 const collectionAlternates = buildLocalizedLanguageAlternates(
   '/experiences/signature',
@@ -79,9 +110,11 @@ assert.deepEqual(collectionAlternates, {
   en: 'https://crearetravel.com/experiences/signature',
   tr: 'https://crearetravel.com/tr/experiences/signature',
   'zh-Hans': 'https://crearetravel.com/zh/experiences/signature',
+  ru: 'https://crearetravel.com/ru/experiences/signature',
   'x-default': 'https://crearetravel.com/experiences/signature',
 });
 assert.equal('zh-Hans' in collectionAlternates, true);
+assert.equal('ru' in collectionAlternates, true);
 assert.equal(
   Object.values(collectionAlternates).some((url) => url.includes('/zh')),
   true
@@ -113,6 +146,11 @@ assert.equal(
 assert.equal(getOpenGraphLocale('en'), 'en_US');
 assert.equal(getOpenGraphLocale('tr'), 'tr_TR');
 assert.equal(getOpenGraphLocale('zh'), 'zh_CN');
+assert.equal(getOpenGraphLocale('ru'), 'ru_RU');
+assert.equal(
+  buildRouteCanonicalUrl({ family: 'experience-category', locale: 'ru', slug: 'lab' }),
+  'https://crearetravel.com/ru/experiences/lab'
+);
 
 function makeCategoryPage(
   category: ExperienceCategory,
@@ -162,6 +200,7 @@ for (const category of ['signature', 'lab', 'black'] as const) {
     en: `https://crearetravel.com/experiences/${category}`,
     tr: `https://crearetravel.com/tr/experiences/${category}`,
     'zh-Hans': `https://crearetravel.com/zh/experiences/${category}`,
+    ru: `https://crearetravel.com/ru/experiences/${category}`,
     'x-default': `https://crearetravel.com/experiences/${category}`,
   });
   assert.equal(metadata.openGraph?.locale, 'tr_TR');
@@ -184,11 +223,19 @@ for (const category of ['signature', 'lab', 'black'] as const) {
 assert.equal(canUseEnglishFallback('en'), true);
 assert.equal(canUseEnglishFallback('tr'), false);
 assert.equal(canUseEnglishFallback('zh'), false);
+assert.equal(canUseEnglishFallback('ru'), false);
 assert.doesNotThrow(() =>
   assertDictionaryActivationReady(
     'zh',
     enDictionary as DictionaryJson,
     zhDictionary as DictionaryJson
+  )
+);
+assert.doesNotThrow(() =>
+  assertDictionaryActivationReady(
+    'ru',
+    enDictionary as DictionaryJson,
+    ruDictionary as DictionaryJson
   )
 );
 
@@ -211,3 +258,5 @@ assert.equal(genericRouteSource.includes('renderInsightDetailPage'), true);
 assert.equal(sitemapSource.includes("createLocalizedStaticEntries('/experiences/signature'"), true);
 assert.equal(sitemapSource.includes("createLocalizedStaticEntries('/experiences/lab'"), true);
 assert.equal(sitemapSource.includes("createLocalizedStaticEntries('/experiences/black'"), true);
+assert.equal(sitemapSource.includes('ACTIVE_SITE_LOCALES.map'), true);
+assert.equal(sitemapSource.includes('SUPPORTED_SITE_LOCALES.map'), false);

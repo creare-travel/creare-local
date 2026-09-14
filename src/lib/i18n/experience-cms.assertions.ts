@@ -10,19 +10,12 @@ import {
 } from '@/lib/experiences/cms';
 import type { SiteLocale } from './config';
 
-const locales: SiteLocale[] = ['en', 'tr', 'zh'];
+const locales: SiteLocale[] = ['en', 'tr', 'zh', 'ru'];
 const expectedCategoryMedia = {
   signature: 'jnawy5gg74i77hu48up6if6u',
   lab: 'sgemlcbkw6jog0qoqzaq81qq',
   black: 'nfdnq25vgjcpglwxmxvjdh34',
 } as const;
-const obsoleteTurkishTitles = [
-  'İpek Yolu: İstanbul™',
-  'İmparatorluk Lezzetleri™',
-  'Kokteyl Atölyesi™',
-  'Beylerbeyi 1869™ — İmparatorluğun Kırılma Anı',
-  'Performansın İzinde™',
-];
 const prohibitedBlackClaims = [
   'invitation-only',
   'by invitation',
@@ -160,31 +153,28 @@ async function main() {
     enInventory.experiences.map((item) => [item.slug, item.title] as const)
   );
 
+  const enSlugs = enInventory.experiences.map((item) => item.slug).sort();
   for (const inventory of inventories) {
+    assert.deepEqual(
+      inventory.experiences.map((item) => item.slug).sort(),
+      enSlugs,
+      `${inventory.locale}: Experience family parity`
+    );
+    if (inventory.locale === 'en') continue;
     for (const item of inventory.experiences) {
-      assert.equal(
+      assert.notEqual(
         item.title,
         officialTitleBySlug.get(item.slug),
-        `${inventory.locale}:${item.slug}`
+        `${inventory.locale}:${item.slug}: localized title`
       );
     }
   }
 
-  const trInventory = inventories.find((inventory) => inventory.locale === 'tr');
-  assert.ok(trInventory);
-  for (const obsoleteTitle of obsoleteTurkishTitles) {
-    assert.equal(
-      trInventory.experiences.some((item) => item.title === obsoleteTitle),
-      false,
-      `Obsolete TR title resurfaced: ${obsoleteTitle}`
-    );
-  }
-
   console.info('Experience CMS assertions passed:');
-  console.info('- CMS inventories: EN 14 / TR 14 / ZH 14');
+  console.info('- CMS inventories: EN 14 / TR 14 / ZH 14 / RU 14');
   console.info('- Category inventories per locale: SIGNATURE 11 / LAB 3 / BLACK 0');
   console.info('- Landing/category media identity: stable documentId fields');
-  console.info('- Official title parity: 42/42');
+  console.info('- Localized title and family parity: 56/56');
   console.info('- Experience supplement fallback references: 0');
   console.info('- Frontend-owned category dictionary sections: 0');
   console.info('- Prohibited BLACK claims: 0');

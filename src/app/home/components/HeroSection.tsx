@@ -26,6 +26,10 @@ const HOMEPAGE_HERO_ACCESSIBILITY = {
     sectionLabel: '主视觉 — 以艺术之法构筑体验',
     imageAlt: '夕阳下的塞尔苏斯图书馆与奥古斯都之门，建筑沐浴在温暖光线中',
   },
+  ru: {
+    sectionLabel: 'Главный экран — опыт, созданный как искусство',
+    imageAlt: 'Библиотека Цельса и ворота Августа на закате в теплом архитектурном свете',
+  },
 } as const satisfies Record<LocaleKey, { sectionLabel: string; imageAlt: string }>;
 const HOMEPAGE_HERO_DESKTOP_WIDTHS = [1080, 1440, 1920] as const;
 const HOMEPAGE_HERO_MOBILE_COMPACT_WIDTH = 475;

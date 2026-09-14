@@ -70,6 +70,29 @@ const ZH_STATIC_METADATA = {
   },
 } as const;
 
+const RU_STATIC_METADATA = {
+  '/philosophy': {
+    title: 'Философия',
+    description: 'Самые необыкновенные впечатления нельзя купить — их можно только выстроить.',
+  },
+  '/contact': {
+    title: 'Частные запросы',
+    description: 'Для стратегических проектов, индивидуальных заказов и частного сотрудничества.',
+  },
+  '/privacy': {
+    title: 'Политика конфиденциальности',
+    description: 'Как CREARE собирает, использует и защищает предоставленную вами информацию.',
+  },
+  '/cookies': {
+    title: 'Политика использования файлов cookie',
+    description: 'Как CREARE использует файлы cookie для работы и улучшения сайта.',
+  },
+  '/terms': {
+    title: 'Условия использования',
+    description: 'Условия использования сайта, каналов связи и услуг CREARE.',
+  },
+} as const;
+
 async function resolveParams(params: GenericLocalePageProps['params']) {
   const { locale: localeKey, segments = [] } = await params;
   const locale = getGenericRouteLocale(localeKey);
@@ -138,7 +161,9 @@ export async function generateMetadata({ params }: GenericLocalePageProps): Prom
   const staticRoutePath = getStaticRoutePath(segments);
   if (staticRoutePath && !isStaticPathAvailableForLocale(staticRoutePath, locale)) notFound();
   const [family, slug, extra] = segments;
-  if (extra) return { title: { absolute: '404' }, robots: { index: false, follow: false } };
+  if (extra || (locale === 'ru' && family === 'insights')) {
+    return { title: { absolute: '404' }, robots: { index: false, follow: false } };
+  }
 
   if (!family) return buildListingMetadata(locale, 'home');
   if (!slug && family === 'experiences') return generateExperiencesMetadata(locale);
@@ -171,6 +196,19 @@ export async function generateMetadata({ params }: GenericLocalePageProps): Prom
     }
   }
 
+  if (!slug && locale === 'ru') {
+    const staticMetadata = RU_STATIC_METADATA[`/${family}` as keyof typeof RU_STATIC_METADATA];
+    if (staticMetadata) {
+      return buildLocalizedStaticPageMetadata({
+        locale,
+        path: localizePathname(`/${family}`, locale),
+        title: staticMetadata.title,
+        description: staticMetadata.description,
+        imageAlt: `${staticMetadata.title} — CREARE`,
+      });
+    }
+  }
+
   return { title: { absolute: '404' }, robots: { index: false, follow: false } };
 }
 
@@ -179,7 +217,7 @@ export default async function GenericLocalizedPage({ params }: GenericLocalePage
   const staticRoutePath = getStaticRoutePath(segments);
   if (staticRoutePath && !isStaticPathAvailableForLocale(staticRoutePath, locale)) notFound();
   const [family, slug, extra] = segments;
-  if (extra) notFound();
+  if (extra || (locale === 'ru' && family === 'insights')) notFound();
 
   if (!family) return renderHomePage(locale);
   if (!slug && family === 'experiences') return renderExperiencesPage(locale);

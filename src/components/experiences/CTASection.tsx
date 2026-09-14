@@ -42,6 +42,7 @@ export default function CTASection({
     en: 'Contact via WhatsApp',
     tr: 'WhatsApp üzerinden iletişime geçin',
     zh: '通过 WhatsApp 联系',
+    ru: 'Связаться через WhatsApp',
   }[locale];
 
   // Preserve experience context when routing into the shared contact form flow.

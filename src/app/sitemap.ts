@@ -6,7 +6,7 @@ import {
   isPublicInsightRecord,
 } from '@/lib/canonical-gates';
 import { insights as localInsights } from '@/data/insights';
-import { DEFAULT_SITE_LOCALE, SUPPORTED_SITE_LOCALES, type SiteLocale } from '@/lib/i18n/config';
+import { ACTIVE_SITE_LOCALES, DEFAULT_SITE_LOCALE, type SiteLocale } from '@/lib/i18n/config';
 import { localizePathname } from '@/lib/i18n/pathname';
 import {
   SITE_URL,
@@ -259,19 +259,19 @@ async function fetchCanonicalInsightRecords(locale: SiteLocale): Promise<Sitemap
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [culturalWorldInventories, experienceInventories, insightInventories] = await Promise.all([
     Promise.all(
-      SUPPORTED_SITE_LOCALES.map(async (locale) => ({
+      ACTIVE_SITE_LOCALES.map(async (locale) => ({
         locale,
         records: await fetchActiveCulturalWorldRecords(locale),
       }))
     ),
     Promise.all(
-      SUPPORTED_SITE_LOCALES.map(async (locale) => ({
+      ACTIVE_SITE_LOCALES.map(async (locale) => ({
         locale,
         records: await fetchCanonicalExperienceRecords(locale),
       }))
     ),
     Promise.all(
-      SUPPORTED_SITE_LOCALES.map(async (locale) => ({
+      ACTIVE_SITE_LOCALES.map(async (locale) => ({
         locale,
         records: await fetchCanonicalInsightRecords(locale),
       }))

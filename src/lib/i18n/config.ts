@@ -41,11 +41,25 @@ export const LOCALE_REGISTRY = {
     isDefault: false,
     routeMode: 'generic',
   },
+  ru: {
+    key: 'ru',
+    active: true,
+    urlPrefix: 'ru',
+    dictionaryKey: 'ru',
+    strapiLocale: 'ru-RU',
+    htmlLang: 'ru',
+    hreflang: 'ru',
+    ogLocale: 'ru_RU',
+    jsonLdLanguage: 'ru',
+    direction: 'ltr',
+    isDefault: false,
+    routeMode: 'generic',
+  },
 } as const;
 
 export type LocaleKey = keyof typeof LOCALE_REGISTRY;
 
-type ActiveLocaleKey = {
+export type ActiveLocaleKey = {
   [TKey in LocaleKey]: (typeof LOCALE_REGISTRY)[TKey]['active'] extends true ? TKey : never;
 }[LocaleKey];
 
@@ -57,7 +71,8 @@ export type LocaleDescriptor = (typeof LOCALE_REGISTRY)[LocaleKey];
 export const DEFAULT_SITE_LOCALE = 'en' as const satisfies SiteLocale;
 
 export const REGISTERED_LOCALES = Object.keys(LOCALE_REGISTRY) as LocaleKey[];
-export const SUPPORTED_SITE_LOCALES = REGISTERED_LOCALES.filter(
+export const SUPPORTED_SITE_LOCALES = REGISTERED_LOCALES;
+export const ACTIVE_SITE_LOCALES = REGISTERED_LOCALES.filter(
   (locale): locale is SiteLocale => LOCALE_REGISTRY[locale].active
 );
 
@@ -69,9 +84,10 @@ const LOCALE_LABELS = {
   en: 'EN',
   tr: 'TR',
   zh: '简体中文',
+  ru: 'Русский',
 } as const satisfies Record<LocaleKey, string>;
 
-export const LOCALE_OPTIONS = SUPPORTED_SITE_LOCALES.map((code) => ({
+export const LOCALE_OPTIONS = ACTIVE_SITE_LOCALES.map((code) => ({
   code,
   label: LOCALE_LABELS[code],
 })) satisfies readonly { code: SiteLocale; label: string }[];
@@ -97,14 +113,18 @@ export function getLocaleDescriptor<TKey extends LocaleKey>(
 }
 
 export function getActiveLocaleDescriptors(): LocaleDescriptor[] {
-  return SUPPORTED_SITE_LOCALES.map((locale) => LOCALE_REGISTRY[locale]);
+  return ACTIVE_SITE_LOCALES.map((locale) => LOCALE_REGISTRY[locale]);
+}
+
+export function getTechnicalRouteLocale(value: unknown): LocaleKey | null {
+  if (!isRegisteredLocale(value)) return null;
+  return LOCALE_REGISTRY[value].routeMode === 'generic' ? value : null;
 }
 
 export function getGenericRouteLocale(value: unknown): SiteLocale | null {
-  if (!isRegisteredLocale(value)) return null;
-  const descriptor: { active: boolean; routeMode: string } = LOCALE_REGISTRY[value];
-  if (!descriptor.active || descriptor.routeMode !== 'generic') return null;
-  return value as SiteLocale;
+  const locale = getTechnicalRouteLocale(value);
+  if (!locale || !LOCALE_REGISTRY[locale].active) return null;
+  return locale as SiteLocale;
 }
 
 export function getStrapiLocale<TKey extends LocaleKey>(

@@ -1,22 +1,24 @@
-import type { SiteLocale } from '@/lib/i18n/config';
+import type { LocaleKey } from '@/lib/i18n/config';
 
 export const CONTACT_PHONE_DISPLAY = '+90 541 220 3000';
 export const CONTACT_PHONE_HREF = 'tel:+905412203000';
 export const CONTACT_EMAIL = 'direct@crearetravel.com';
 
-const WHATSAPP_MESSAGES: Record<SiteLocale, string> = {
+const WHATSAPP_MESSAGES: Record<LocaleKey, string> = {
   en: 'Hello CREARE, I would like to make a private inquiry.',
   tr: 'Merhaba CREARE, özel bir talepte bulunmak istiyorum.',
   zh: '您好 CREARE，我想进行私享咨询。',
+  ru: 'Здравствуйте, CREARE. Я хотел(а) бы обсудить частный запрос.',
 };
 
-export function buildWhatsAppHref(locale: SiteLocale, experienceTitle?: string): string {
+export function buildWhatsAppHref(locale: LocaleKey, experienceTitle?: string): string {
   const baseMessage = WHATSAPP_MESSAGES[locale];
   const contextualMessage = experienceTitle
     ? {
         en: `${baseMessage} I am interested in ${experienceTitle}.`,
         tr: `${baseMessage} ${experienceTitle} hakkında görüşmek istiyorum.`,
         zh: `${baseMessage} 我对 ${experienceTitle} 感兴趣。`,
+        ru: `${baseMessage} Меня интересует ${experienceTitle}.`,
       }[locale]
     : baseMessage;
   return `https://wa.me/905412203000?text=${encodeURIComponent(contextualMessage)}`;

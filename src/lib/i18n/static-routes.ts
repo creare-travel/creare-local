@@ -1,18 +1,24 @@
 import {
   DEFAULT_SITE_LOCALE,
-  SUPPORTED_SITE_LOCALES,
+  ACTIVE_SITE_LOCALES,
   type LocaleKey,
   type SiteLocale,
 } from './config';
 import { localizePathname, stripLocalePrefix } from './pathname';
 
 export type PrimaryNavigationKey =
-  'culturalWorlds' | 'experiences' | 'insights' | 'philosophy' | 'contact';
+  | 'culturalWorlds'
+  | 'experiences'
+  | 'insights'
+  | 'philosophy'
+  | 'contact';
 
 export type FooterNavigationKey = PrimaryNavigationKey;
 export type LegalNavigationKey = 'privacy' | 'cookies' | 'terms';
 export type ExperienceCategoryPath =
-  '/experiences/signature' | '/experiences/lab' | '/experiences/black';
+  | '/experiences/signature'
+  | '/experiences/lab'
+  | '/experiences/black';
 
 export type RouteAvailability =
   | 'available'
@@ -35,18 +41,27 @@ const ACTIVE_STATIC_AVAILABILITY = {
   en: 'available',
   tr: 'available',
   zh: 'available',
+  ru: 'available',
+} as const satisfies Record<LocaleKey, RouteAvailability>;
+
+const NO_RU_AVAILABILITY = {
+  en: 'available',
+  tr: 'available',
+  zh: 'available',
+  ru: 'unavailable',
 } as const satisfies Record<LocaleKey, RouteAvailability>;
 
 const ENGLISH_ONLY_AVAILABILITY = {
   en: 'available',
   tr: 'unavailable',
   zh: 'unavailable',
+  ru: 'unavailable',
 } as const satisfies Record<LocaleKey, RouteAvailability>;
 
 export const PRIMARY_NAVIGATION_ROUTES: ReadonlyArray<NavigationRoute<PrimaryNavigationKey>> = [
   { key: 'culturalWorlds', path: '/cultural-worlds', availability: ACTIVE_STATIC_AVAILABILITY },
   { key: 'experiences', path: '/experiences', availability: ACTIVE_STATIC_AVAILABILITY },
-  { key: 'insights', path: '/insights', availability: ACTIVE_STATIC_AVAILABILITY },
+  { key: 'insights', path: '/insights', availability: NO_RU_AVAILABILITY },
   { key: 'philosophy', path: '/philosophy', availability: ACTIVE_STATIC_AVAILABILITY },
   { key: 'contact', path: '/contact', availability: ACTIVE_STATIC_AVAILABILITY },
 ];
@@ -113,7 +128,7 @@ export function isStaticPathAvailableForLocale(pathname: string, locale: LocaleK
 export function getAvailableStaticRouteLocales(pathname: string): SiteLocale[] {
   const policy = getStaticRoutePolicy(pathname);
   if (!policy) return [];
-  return SUPPORTED_SITE_LOCALES.filter((locale) => isRouteAvailableForLocale(policy, locale));
+  return ACTIVE_SITE_LOCALES.filter((locale) => isRouteAvailableForLocale(policy, locale));
 }
 
 export function getPrimaryNavigationRoutes(locale: SiteLocale) {

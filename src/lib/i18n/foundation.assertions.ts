@@ -13,8 +13,9 @@ import { buildLocalizedStrapiPath } from '../strapi';
 assert.equal(isSiteLocale('en'), true);
 assert.equal(isSiteLocale('tr'), true);
 assert.equal(isSiteLocale('zh'), true);
-assert.equal(isSiteLocale('ru'), false);
+assert.equal(isSiteLocale('ru'), true);
 assert.equal(isRegisteredLocale('zh'), true);
+assert.equal(isRegisteredLocale('ru'), true);
 assert.equal(isSiteLocale('ar'), false);
 assert.equal(isSiteLocale('fr'), false);
 assert.equal(isSiteLocale(''), false);
@@ -25,6 +26,7 @@ assert.equal(isSiteLocale('random'), false);
 assert.equal(getStrapiLocale('en'), 'en');
 assert.equal(getStrapiLocale('tr'), 'tr-TR');
 assert.equal(getStrapiLocale('zh'), 'zh-CN');
+assert.equal(getStrapiLocale('ru'), 'ru-RU');
 
 assert.equal(normalizePathname('/'), '/');
 assert.equal(normalizePathname(''), '/');
@@ -50,6 +52,8 @@ assert.equal(getLocaleFromPathname('/travel'), 'en');
 assert.equal(getLocaleFromPathname('/trailing'), 'en');
 assert.equal(getLocaleFromPathname('/zh/experiences'), 'zh');
 assert.equal(getRegisteredLocaleFromPathname('/zh/experiences'), 'zh');
+assert.equal(getLocaleFromPathname('/ru/experiences'), 'ru');
+assert.equal(getRegisteredLocaleFromPathname('/ru/experiences'), 'ru');
 
 assert.equal(isTurkishPathname('/travel'), false);
 assert.equal(isTurkishPathname('/trailing'), false);
@@ -68,6 +72,7 @@ assert.equal(localizePathname('/tr/experiences/test', 'tr'), '/tr/experiences/te
 assert.equal(localizePathname('/tr/tr/experiences/test', 'tr'), '/tr/experiences/test');
 assert.equal(localizePathname('/tr/tr/experiences/test', 'en'), '/experiences/test');
 assert.equal(localizePathname('/experiences/signature', 'zh'), '/zh/experiences/signature');
+assert.equal(localizePathname('/experiences/signature', 'ru'), '/ru/experiences/signature');
 
 assert.equal(
   buildLocalizedStrapiPath('/api/destinations?populate=deep', 'tr'),
@@ -95,6 +100,10 @@ assert.equal(
 assert.equal(
   buildLocalizedStrapiPath('/api/insights#section', 'en'),
   '/api/insights?locale=en#section'
+);
+assert.equal(
+  buildLocalizedStrapiPath('/api/insights?status=published', 'ru'),
+  '/api/insights?status=published&locale=ru-RU'
 );
 
 const absolutePath = buildLocalizedStrapiPath(

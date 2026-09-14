@@ -657,12 +657,14 @@ assert.deepEqual(enLanguages, {
   en: `${SITE_URL}/experiences`,
   tr: `${SITE_URL}/tr/experiences`,
   'zh-Hans': `${SITE_URL}/zh/experiences`,
+  ru: `${SITE_URL}/ru/experiences`,
   'x-default': `${SITE_URL}/experiences`,
 });
 assert.deepEqual(trLanguages, {
   en: `${SITE_URL}/`,
   tr: `${SITE_URL}/tr`,
   'zh-Hans': `${SITE_URL}/zh`,
+  ru: `${SITE_URL}/ru`,
   'x-default': `${SITE_URL}/`,
 });
 

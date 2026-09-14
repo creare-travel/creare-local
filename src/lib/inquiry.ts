@@ -1,5 +1,5 @@
 import { isValidEmail } from '@/lib/email/config';
-import type { SiteLocale } from '@/lib/i18n/config';
+import type { LocaleKey, SiteLocale } from '@/lib/i18n/config';
 import { localizePathname } from '@/lib/i18n/pathname';
 
 export const INQUIRY_LIMITS = {
@@ -20,7 +20,7 @@ export const INQUIRY_INTENTS = [
 
 export type InquiryIntent = (typeof INQUIRY_INTENTS)[number];
 
-export const INQUIRY_INTENT_LABELS: Record<SiteLocale, Record<InquiryIntent, string>> = {
+export const INQUIRY_INTENT_LABELS: Record<LocaleKey, Record<InquiryIntent, string>> = {
   en: {
     private_travel: 'Private Travel',
     corporate_brand: 'Corporate & Brand Experience',
@@ -42,6 +42,13 @@ export const INQUIRY_INTENT_LABELS: Record<SiteLocale, Record<InquiryIntent, str
     ultra_private_access: '超私密通达',
     long_term_collaboration: '长期合作',
   },
+  ru: {
+    private_travel: 'Частные путешествия',
+    corporate_brand: 'Корпоративные и брендовые программы',
+    cultural_experience: 'Культурные впечатления',
+    ultra_private_access: 'Доступ в особо закрытом формате',
+    long_term_collaboration: 'Долгосрочное сотрудничество',
+  },
 };
 
 export interface InquirySubmissionInput {
@@ -56,7 +63,8 @@ export interface InquirySubmissionInput {
 }
 
 export type InquiryValidationResult =
-  { ok: true; data: InquirySubmissionInput } | { ok: false; error: string; honeypot: boolean };
+  | { ok: true; data: InquirySubmissionInput }
+  | { ok: false; error: string; honeypot: boolean };
 
 const SITE_LOCALES: readonly SiteLocale[] = ['en', 'tr', 'zh'];
 

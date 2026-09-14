@@ -7,10 +7,15 @@ import {
   chinesePrivacyContent,
   chineseTermsContent,
 } from '@/features/static-pages/chinese';
-import type { LocaleKey, SiteLocale } from '@/lib/i18n/config';
+import { RussianLegalPage, RussianPhilosophyPage } from '@/features/static-pages/russian';
+import type { LocaleKey } from '@/lib/i18n/config';
 
 export type LocalizedStaticPagePath =
-  '/contact' | '/philosophy' | '/privacy' | '/cookies' | '/terms';
+  | '/contact'
+  | '/philosophy'
+  | '/privacy'
+  | '/cookies'
+  | '/terms';
 
 type StaticPageRenderer = (locale: LocaleKey) => ReactNode | Promise<ReactNode>;
 
@@ -25,6 +30,13 @@ const GENERIC_STATIC_PAGE_RENDERERS: Partial<
     '/cookies': () => <ChineseLegalPage content={chineseCookiesContent} />,
     '/terms': () => <ChineseLegalPage content={chineseTermsContent} />,
   },
+  ru: {
+    '/contact': () => <ContactPageClient locale="ru" successRedirectHref={null} />,
+    '/philosophy': () => <RussianPhilosophyPage />,
+    '/privacy': () => <RussianLegalPage page="privacy" />,
+    '/cookies': () => <RussianLegalPage page="cookies" />,
+    '/terms': () => <RussianLegalPage page="terms" />,
+  },
 };
 
 export function hasLocalizedStaticPageRenderer(
@@ -35,7 +47,7 @@ export function hasLocalizedStaticPageRenderer(
 }
 
 export async function renderRegisteredStaticPage(
-  locale: SiteLocale,
+  locale: LocaleKey,
   path: LocalizedStaticPagePath
 ): Promise<ReactNode | null> {
   const renderer = GENERIC_STATIC_PAGE_RENDERERS[locale]?.[path];

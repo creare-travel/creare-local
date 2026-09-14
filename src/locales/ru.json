@@ -1,50 +1,186 @@
 {
   "lang": "ru",
+  "global": {
+    "nav": {
+      "culturalWorlds": "Культурные миры",
+      "experiences": "Впечатления",
+      "insights": "Публикации",
+      "philosophy": "Философия",
+      "contact": "Контакты"
+    },
+    "footer": {
+      "culturalWorlds": "КУЛЬТУРНЫЕ МИРЫ",
+      "experiences": "ВПЕЧАТЛЕНИЯ",
+      "insights": "ПУБЛИКАЦИИ",
+      "philosophy": "ФИЛОСОФИЯ",
+      "contact": "КОНТАКТЫ",
+      "privacy": "Конфиденциальность",
+      "cookies": "Файлы cookie",
+      "terms": "Условия"
+    }
+  },
+  "common": {
+    "relatedInsights": "Связанные публикации",
+    "relatedExperiences": "Связанные впечатления",
+    "relatedEssays": "Связанные эссе",
+    "inquirePrivately": "Отправить частный запрос",
+    "beginPrivateConversation": "Начать личный разговор",
+    "read": "Читать",
+    "enter": "Открыть",
+    "home": "Главная",
+    "privacy": "Конфиденциальность",
+    "cookies": "Файлы cookie",
+    "terms": "Условия",
+    "contactViaWhatsApp": "Связаться через WhatsApp",
+    "contactCreareUpper": "СВЯЗАТЬСЯ С CREARE",
+    "protected": {
+      "creare": "CREARE",
+      "signature": "SIGNATURE™",
+      "lab": "LAB™",
+      "black": "BLACK™"
+    }
+  },
+  "accessibility": {
+    "returnHome": "CREARE — вернуться на главную",
+    "selectLanguage": "Выбрать язык",
+    "languageOptions": "Варианты языка",
+    "mainNavigation": "Основная навигация",
+    "mobileNavigation": "Мобильная навигация",
+    "openNavigationMenu": "Открыть меню навигации",
+    "closeNavigationMenu": "Закрыть меню навигации",
+    "legalLinks": "Правовая информация",
+    "privateInquiry": "Отправить частный запрос о впечатлениях CREARE"
+  },
   "nav": {
-    "experiences": "",
-    "philosophy": "",
-    "contact": ""
+    "experiences": "Впечатления",
+    "philosophy": "Философия",
+    "contact": "Контакты"
   },
   "footer": {
-    "tagline_1": "",
-    "tagline_2": "",
-    "tagline_3": "",
-    "philosophy": "",
-    "contact": "",
-    "copyright": "\u00a9 2026 CREARE",
-    "sitemap": "",
-    "privacy": "",
-    "cookies": "",
-    "terms": ""
+    "tagline_1": "Творческий интеллект.",
+    "tagline_2": "Стратегическая реализация.",
+    "tagline_3": "Точно выстроенные впечатления.",
+    "philosophy": "НАША ФИЛОСОФИЯ",
+    "contact": "КОНТАКТЫ",
+    "copyright": "© 2026 CREARE",
+    "sitemap": "Карта сайта",
+    "privacy": "Конфиденциальность",
+    "cookies": "Файлы cookie",
+    "terms": "Условия"
   },
   "home": {
     "hero": {
-      "title": "",
-      "subtitle": ""
+      "eyebrow": "Кураторские культурные впечатления",
+      "title": "Впечатления.",
+      "subtitle": "Выстроенные как искусство."
     },
     "cta": {
-      "label": ""
+      "label": "ОТПРАВИТЬ ЧАСТНЫЙ ЗАПРОС",
+      "labelWithArrow": "Отправить частный запрос →",
+      "approach": "Наш подход к созданию впечатлений →",
+      "contact": "Связаться с CREARE →"
+    },
+    "collections": {
+      "eyebrow": "Три способа, которыми CREARE выстраивает встречу."
+    },
+    "mainParagraph": {
+      "paragraph1": "CREARE строится не вокруг пакетных путешествий, а вокруг культурного доступа, смысловой драматургии и тщательно выстроенной встречи.",
+      "paragraph2": "SIGNATURE™, LAB™ и BLACK™ обозначают три формата работы: кураторские культурные впечатления, индивидуальные проекты и запросы на частный доступ, каждый из которых рассматривается с учетом контекста, доверия и глубинной логики места.",
+      "paragraph3": "Цель не в том, чтобы быстрее перемещаться между местами, а в том, чтобы понять, что придает им смысл: кто бережно сохраняет их, какие местные знания позволяют их прочитать и при каких условиях встреча становится чем-то большим, чем просто прибытие."
+    },
+    "contact": {
+      "title": "Начнем разговор."
     }
+  },
+  "culturalWorlds": {
+    "title": "Культурные миры",
+    "explore": "Исследовать культурные миры",
+    "atlasTitle": "CREARE — Культурный атлас",
+    "geography": "География доступа, памяти и встреч.",
+    "atlas": "Атлас",
+    "context": "Контекст",
+    "coreCharacteristics": "Ключевые характеристики",
+    "whatDefines": "Что определяет этот мир.",
+    "culturalSystems": "Культурные системы",
+    "culturalSystemsSubheading": "Культурные системы, формирующие этот мир.",
+    "connectedCulturalSystem": "Связанная культурная система",
+    "viewExperience": "Открыть программу",
+    "byIntroductionOnly": "Только по представлению",
+    "accessLimited": "Доступ ограничен.",
+    "emptyState": "Культурные миры скоро появятся здесь…"
+  },
+  "experiences": {
+    "title": "Впечатления",
+    "subtitle": "",
+    "threeWays": "Три способа войти",
+    "collection": "Коллекция",
+    "category": "Категория",
+    "location": "Место",
+    "duration": "Продолжительность",
+    "groupSize": "Размер группы",
+    "overview": "Обзор",
+    "intentLevel": "Характер программы",
+    "wowMoment": "Ключевой момент",
+    "differentiator": "Отличительная черта",
+    "experience": "Программа",
+    "programme": "Ход программы",
+    "whoThisIsFor": "Для кого",
+    "standardInclusions": "Стандартное наполнение",
+    "optionalLayers": "Дополнительные возможности",
+    "closingCopy": "Заключение",
+    "adjacentExperiences": "Связанные впечатления",
+    "furtherCulturalReading": "Дополнительное чтение о культуре",
+    "previousExperience": "Предыдущая программа",
+    "nextExperience": "Следующая программа"
+  },
+  "experienceDetail": {
+    "category": "Категория",
+    "location": "Место",
+    "duration": "Продолжительность",
+    "groupSize": "Размер группы",
+    "overview": "Обзор",
+    "intentLevel": "Характер программы",
+    "wowMoment": "Ключевой момент",
+    "differentiator": "Отличительная черта",
+    "experience": "Программа",
+    "programme": "Ход программы",
+    "whoThisIsFor": "Для кого",
+    "adjacentExperiences": "Связанные впечатления",
+    "furtherCulturalReading": "Дополнительное чтение о культуре",
+    "previousExperience": "Предыдущая программа",
+    "nextExperience": "Следующая программа"
+  },
+  "insights": {
+    "title": "Публикации",
+    "subtitle": "Эссе о культуре, доступе и личной встрече",
+    "featuredEssays": "Избранные эссе",
+    "culturalWorldEssays": "Эссе о культурных мирах",
+    "editorialEssays": "Редакционные эссе",
+    "furtherReading": "Дальнейшее чтение",
+    "readEssay": "Читать эссе",
+    "readEssayWithArrow": "Читать эссе →",
+    "backToInsights": "← Публикации",
+    "accessNotListed": "Доступ не выставляют напоказ. Его создают."
   },
   "philosophy": {
     "hero": {
-      "line1": "",
-      "line2": ""
+      "line1": "Мы верим, что самые необыкновенные впечатления нельзя купить.",
+      "line2": "Их можно только выстроить."
     },
     "section1": {
-      "title": "",
+      "title": "За пределами маршрута",
       "body": ""
     },
     "section2": {
-      "title": "",
+      "title": "Композиция",
       "body": ""
     },
     "section3": {
-      "title": "",
+      "title": "Доступ как ответственность",
       "body": ""
     },
     "section4": {
-      "title": "",
+      "title": "Клиент",
       "body": ""
     }
   },
@@ -58,28 +194,6 @@
       "submit": ""
     }
   },
-  "experiences": {
-    "title": "",
-    "subtitle": ""
-  },
-  "signature": {
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "lab": {
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
-  "black": {
-    "hero": {
-      "title": "",
-      "subtitle": ""
-    }
-  },
   "editorial": {
     "title": "",
     "subtitle": ""
@@ -88,19 +202,25 @@
     "title": "",
     "subtitle": ""
   },
+  "notFound": {
+    "title": "Страница не найдена",
+    "message": "Запрошенная страница не существует. Вернемся к началу.",
+    "goBack": "Назад",
+    "backHome": "На главную"
+  },
   "sitemap": {
     "breadcrumb_home": "ГЛАВНАЯ",
     "breadcrumb_current": "КАРТА САЙТА",
-    "experiences": "ОПЫТ",
+    "experiences": "ВПЕЧАТЛЕНИЯ",
     "creare": "CREARE",
-    "legal": "ПРАВОВОЕ",
+    "legal": "ПРАВОВАЯ ИНФОРМАЦИЯ",
     "lab": "LAB™",
     "signature": "SIGNATURE™",
     "black": "BLACK™",
     "philosophy": "Наша философия",
-    "contact": "Контакт",
+    "contact": "Контакты",
     "privacy": "Конфиденциальность",
-    "cookies": "Куки",
+    "cookies": "Файлы cookie",
     "terms": "Условия"
   }
 }
