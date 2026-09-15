@@ -7,18 +7,12 @@ import {
 import { localizePathname, stripLocalePrefix } from './pathname';
 
 export type PrimaryNavigationKey =
-  | 'culturalWorlds'
-  | 'experiences'
-  | 'insights'
-  | 'philosophy'
-  | 'contact';
+  'culturalWorlds' | 'experiences' | 'insights' | 'philosophy' | 'contact';
 
 export type FooterNavigationKey = PrimaryNavigationKey;
 export type LegalNavigationKey = 'privacy' | 'cookies' | 'terms';
 export type ExperienceCategoryPath =
-  | '/experiences/signature'
-  | '/experiences/lab'
-  | '/experiences/black';
+  '/experiences/signature' | '/experiences/lab' | '/experiences/black';
 
 export type RouteAvailability =
   | 'available'

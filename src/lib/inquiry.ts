@@ -63,8 +63,7 @@ export interface InquirySubmissionInput {
 }
 
 export type InquiryValidationResult =
-  | { ok: true; data: InquirySubmissionInput }
-  | { ok: false; error: string; honeypot: boolean };
+  { ok: true; data: InquirySubmissionInput } | { ok: false; error: string; honeypot: boolean };
 
 const SITE_LOCALES: readonly SiteLocale[] = ['en', 'tr', 'zh'];
 

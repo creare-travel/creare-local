@@ -1,18 +1,10 @@
 export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID?.trim() ?? '';
 
 export type GTMInitialEventName =
-  | 'page_view'
-  | 'experience_view'
-  | 'inquiry_click'
-  | 'contact_submit'
-  | 'outbound_click';
+  'page_view' | 'experience_view' | 'inquiry_click' | 'contact_submit' | 'outbound_click';
 
 export type GTMLegacyEventName =
-  | 'form_start'
-  | 'form_submit'
-  | 'form_success'
-  | 'form_error'
-  | 'cultural_world_view';
+  'form_start' | 'form_submit' | 'form_success' | 'form_error' | 'cultural_world_view';
 
 export type GTMEventName = GTMInitialEventName | GTMLegacyEventName;
 
