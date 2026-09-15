@@ -17,6 +17,7 @@ export const metadata: Metadata = buildLocaleOwnedMetadata({
   title: dictionary.insights.title,
   description: dictionary.insights.subtitle,
   robots: { index: true, follow: true },
+  availableLocales: ['en', 'tr', 'zh'],
 });
 
 export default function TurkishInsightsPage() {

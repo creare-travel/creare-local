@@ -1,4 +1,3 @@
-import Script from 'next/script';
 import { cleanSchemaObject, dedupeGraphById, SCHEMA_CONTEXT } from '@/lib/schema-builder';
 import type { SchemaNode } from '@/lib/schema-builder';
 
@@ -33,11 +32,16 @@ export default function JsonLd({ id, schema }: JsonLdProps) {
     return null;
   }
 
+  const serializedPayload = JSON.stringify(payload)
+    .replace(/</g, '\\u003c')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+
   return (
-    <Script
+    <script
       id={id}
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(payload) }}
+      dangerouslySetInnerHTML={{ __html: serializedPayload }}
     />
   );
 }

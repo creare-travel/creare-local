@@ -12,7 +12,6 @@ import {
   buildTwitterCard,
   DEFAULT_OG_IMAGE,
   DEFAULT_OG_IMAGE_ALT,
-  preserveTerminalBrandTitle,
   stripBrandSuffix,
 } from '@/lib/seo';
 import { buildCanonicalUrl, buildInsightDetailGraph } from '@/lib/schema-builder';
@@ -195,6 +194,7 @@ export function buildLocalizedInsightDetailMetadata({
   const title = stripBrandSuffix(insight.seo_title || insight.title) || 'Not Found';
   const description = insight.seo_description || insight.excerpt || '';
   const imageUrl = getInsightMetadataImageUrl(insight);
+  const searchTitle = getInsightSearchTitle(locale, slug, insight);
 
   return buildLocaleOwnedMetadata({
     locale,
@@ -204,12 +204,12 @@ export function buildLocalizedInsightDetailMetadata({
       locale,
       slug,
     },
-    title: insight.seo_title || insight.title,
+    title: searchTitle.title,
     description,
     image: imageUrl,
     imageAlt: insight.cover_image?.alternativeText ?? title,
     type: 'article',
-    titleMode: insight.seo_title ? 'absolute' : 'templated',
+    titleMode: searchTitle.titleMode,
     availableLocales,
   });
 }
@@ -218,6 +218,32 @@ const LEGACY_ISTANBUL_INSIGHT_SLUG = 'the-private-life-of-istanbul';
 const CANONICAL_ISTANBUL_INSIGHT_SLUG = 'private-life-of-istanbul';
 const canonicalInsightSlug = (slug: string | undefined): string | undefined =>
   slug === LEGACY_ISTANBUL_INSIGHT_SLUG ? CANONICAL_ISTANBUL_INSIGHT_SLUG : slug;
+
+const INSIGHT_SEARCH_TITLE_OVERRIDES: Partial<Record<SiteLocale, Record<string, string>>> = {
+  en: {
+    'what-exclusive-travel-actually-means': 'What Exclusive Travel Really Means',
+  },
+  tr: {
+    'why-most-luxury-travel-is-actually-mass-tourism':
+      'Lüks Seyahat Ne Zaman Kitle Turizmine Dönüşür?',
+  },
+};
+
+function getInsightSearchTitle(
+  locale: SiteLocale,
+  slug: string,
+  insight: InsightDetailMetadataItem
+) {
+  const override = INSIGHT_SEARCH_TITLE_OVERRIDES[locale]?.[slug];
+  const fallbackTitle = insight.seo_title || insight.title || 'Not Found';
+
+  return override
+    ? { title: override, titleMode: 'templated' as const }
+    : {
+        title: fallbackTitle,
+        titleMode: insight.seo_title ? ('absolute' as const) : ('templated' as const),
+      };
+}
 
 async function fetchInsight(slug: string, locale: SiteLocale): Promise<StrapiInsight | null> {
   if (!slug) return null;
@@ -509,8 +535,6 @@ export async function generateInsightDetailMetadata({
     return buildInsightNotFoundMetadata(locale);
   }
 
-  // SEO fallbacks: seo_title || title, seo_description || excerpt
-  const title = stripBrandSuffix(insight.seo_title || insight.title) || 'Not Found';
   const description = insight.seo_description || insight.excerpt || '';
   const availableLocales = await resolveActiveLocaleAvailability(async (candidateLocale) => {
     if (candidateLocale === locale) return true;
@@ -534,18 +558,21 @@ export async function generateInsightDetailMetadata({
     });
   }
 
+  const searchTitle = getInsightSearchTitle(locale, canonicalSlug, insight);
+
   return {
-    title: preserveTerminalBrandTitle(insight.seo_title || title),
+    title:
+      searchTitle.titleMode === 'absolute' ? { absolute: searchTitle.title } : searchTitle.title,
     description,
     alternates,
     openGraph: buildOpenGraph({
-      title,
+      title: searchTitle.title,
       description,
       path: `/insights/${canonicalSlug}`,
       type: 'article',
     }),
     twitter: buildTwitterCard({
-      title,
+      title: searchTitle.title,
       description,
       image: DEFAULT_OG_IMAGE,
       imageAlt: DEFAULT_OG_IMAGE_ALT,

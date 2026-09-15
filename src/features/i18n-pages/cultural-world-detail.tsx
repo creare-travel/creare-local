@@ -24,6 +24,7 @@ import {
 import { getCulturalWorldContext } from '@/lib/cultural-world-context';
 import {
   DEFAULT_METADATA,
+  DEFAULT_OG_IMAGE,
   DEFAULT_OG_IMAGE_ALT,
   buildLocaleOwnedMetadata,
   buildRouteCanonicalAlternates,
@@ -39,7 +40,6 @@ const FALLBACK_DESCRIPTION =
 const IMAGE_FALLBACK = '/assets/images/creare-image-placeholder.jpg';
 const INHERITED_EN_SOCIAL_DESCRIPTION =
   'Private cultural access. Thoughtfully designed encounters.';
-const INHERITED_EN_OG_IMAGE_PATH = '/opengraph-image?282b2b8eda0907e3';
 const canonicalInsightSlug = (slug?: string) =>
   slug === 'the-private-life-of-istanbul' ? 'private-life-of-istanbul' : slug;
 
@@ -701,7 +701,7 @@ export async function generateCulturalWorldDetailMetadata({
       locale: getOpenGraphLocale(locale),
       images: [
         {
-          url: INHERITED_EN_OG_IMAGE_PATH,
+          url: DEFAULT_OG_IMAGE,
           width: 1200,
           height: 630,
           alt: DEFAULT_OG_IMAGE_ALT,

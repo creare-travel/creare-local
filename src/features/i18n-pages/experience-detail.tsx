@@ -183,12 +183,15 @@ export function buildLocalizedExperienceDetailMetadata({
   availableLocales?: readonly SiteLocale[];
 }): Metadata {
   const seoTitle = normalizeOptionalText(item.seo_title);
+  const experienceTitle = normalizeOptionalText(item.title);
   const ogDescription = normalizeOptionalText(item.og_description);
   const heroAltText = normalizeOptionalText(item.hero_alt_text);
   if (!seoTitle) throw new Error('Missing CMS Experience SEO title');
+  if (!experienceTitle) throw new Error('Missing CMS Experience title');
   if (!ogDescription) throw new Error('Missing CMS Experience Open Graph description');
   if (!heroAltText) throw new Error('Missing CMS Experience hero alt text');
   const description = getExperienceDescription(item);
+  const useCompactSearchTitle = seoTitle.length > 65;
 
   const metadata = buildLocaleOwnedMetadata({
     locale,
@@ -198,12 +201,12 @@ export function buildLocalizedExperienceDetailMetadata({
       locale,
       slug,
     },
-    title: seoTitle,
+    title: useCompactSearchTitle ? experienceTitle : seoTitle,
     description,
     image: image ?? undefined,
     imageAlt: heroAltText,
     robots: { index: true, follow: true },
-    titleMode: 'absolute',
+    titleMode: useCompactSearchTitle ? 'templated' : 'absolute',
     availableLocales,
   });
 

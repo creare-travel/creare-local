@@ -82,9 +82,5 @@ export function buildWebSiteSchema(): SchemaNode {
     url: SITE_URL,
     description: 'Private cultural access. Thoughtfully designed encounters.',
     publisher: { '@id': ORGANIZATION_ID },
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${SITE_URL}/experiences`,
-    },
   };
 }

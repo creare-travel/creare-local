@@ -2,38 +2,34 @@ import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import {
-  DEFAULT_METADATA,
   DEFAULT_OG_IMAGE,
   DEFAULT_OG_IMAGE_ALT,
-  SITE_URL,
   buildMetadataAlternates,
+  buildOpenGraph,
+  buildTwitterCard,
 } from '@/lib/seo';
 
+const PAGE_TITLE = 'Terms of Use';
+const PAGE_DESCRIPTION =
+  'CREARE terms of use — the terms and conditions governing use of our website and private engagements.';
+
 export const metadata: Metadata = {
-  title: 'Terms of Use',
-  description:
-    'CREARE terms of use — the terms and conditions governing use of our website and private engagements.',
+  title: PAGE_TITLE,
+  description: PAGE_DESCRIPTION,
   alternates: buildMetadataAlternates('/terms'),
-  openGraph: {
-    type: 'website',
-    title: DEFAULT_METADATA.defaultTitle,
-    description: 'Private cultural access. Thoughtfully designed encounters.',
-    url: SITE_URL,
-    images: [
-      {
-        url: '/opengraph-image?282b2b8eda0907e3',
-        width: 1200,
-        height: 630,
-        alt: DEFAULT_OG_IMAGE_ALT,
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: DEFAULT_METADATA.defaultTitle,
-    description: 'Private cultural access. Thoughtfully designed encounters.',
-    images: [DEFAULT_OG_IMAGE],
-  },
+  openGraph: buildOpenGraph({
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    path: '/terms',
+    image: DEFAULT_OG_IMAGE,
+    imageAlt: DEFAULT_OG_IMAGE_ALT,
+  }),
+  twitter: buildTwitterCard({
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    image: DEFAULT_OG_IMAGE,
+    imageAlt: DEFAULT_OG_IMAGE_ALT,
+  }),
 };
 
 interface PolicySection {

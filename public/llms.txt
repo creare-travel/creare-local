@@ -1,0 +1,18 @@
+# CREARE
+
+> CREARE is an experience design studio creating private cultural encounters in Türkiye.
+
+## Primary sections
+- [English home](https://crearetravel.com/)
+- [Turkish home](https://crearetravel.com/tr)
+- [Simplified Chinese home](https://crearetravel.com/zh)
+- [Russian home](https://crearetravel.com/ru)
+- [Experiences](https://crearetravel.com/experiences)
+- [Cultural destinations](https://crearetravel.com/cultural-worlds)
+- [Philosophy](https://crearetravel.com/philosophy)
+- [Contact](https://crearetravel.com/contact)
+
+## Discovery
+- [XML sitemap](https://crearetravel.com/sitemap.xml)
+- Russian Insights are not published in the current release.
+- Canonical URLs and localized hreflang links in page metadata are authoritative.
