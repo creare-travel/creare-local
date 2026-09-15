@@ -65,7 +65,7 @@ export interface InquirySubmissionInput {
 export type InquiryValidationResult =
   { ok: true; data: InquirySubmissionInput } | { ok: false; error: string; honeypot: boolean };
 
-const SITE_LOCALES: readonly SiteLocale[] = ['en', 'tr', 'zh'];
+const SITE_LOCALES: readonly SiteLocale[] = ['en', 'tr', 'zh', 'ru'];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);

@@ -49,6 +49,8 @@ assert.deepEqual(
   LOCALE_OPTIONS.map((option) => option.code),
   ['en', 'tr', 'zh', 'ru']
 );
+assert.equal(LOCALE_OPTIONS.find((option) => option.code === 'en')?.label, 'English');
+assert.equal(LOCALE_OPTIONS.find((option) => option.code === 'tr')?.label, 'Türkçe');
 assert.equal(LOCALE_OPTIONS.find((option) => option.code === 'zh')?.label, '简体中文');
 assert.equal(LOCALE_OPTIONS.find((option) => option.code === 'ru')?.label, 'Русский');
 

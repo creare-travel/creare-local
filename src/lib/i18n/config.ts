@@ -81,8 +81,8 @@ export const SITE_TO_STRAPI_LOCALE = Object.fromEntries(
 ) as { [TKey in LocaleKey]: (typeof LOCALE_REGISTRY)[TKey]['strapiLocale'] };
 
 const LOCALE_LABELS = {
-  en: 'EN',
-  tr: 'TR',
+  en: 'English',
+  tr: 'Türkçe',
   zh: '简体中文',
   ru: 'Русский',
 } as const satisfies Record<LocaleKey, string>;
