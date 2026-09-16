@@ -77,7 +77,7 @@ Analyze the supplied PageSpeed measurements conservatively.
 Rules:
 - Do not invent causes that are not supported by the metrics.
 - Distinguish measured facts from hypotheses.
-- Compare EN/TR/ZH before calling a problem global.
+- Compare EN/TR/ZH/RU before calling a problem global.
 - Preserve CREARE visual quality; never recommend broad refactors from one noisy lab run.
 - Prioritize LCP, CLS, blocking time, and cross-locale anomalies.
 - Treat one lab run as a signal, not proof of a regression.
