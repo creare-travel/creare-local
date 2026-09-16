@@ -86,6 +86,7 @@ Rules:
 
 let agentAnalysis = null;
 let agentError = null;
+const model = process.env.WEBOPS_MODEL || 'gpt-5.6-luna';
 
 if (process.env.OPENAI_API_KEY) {
   try {
@@ -96,7 +97,7 @@ if (process.env.OPENAI_API_KEY) {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        model: process.env.WEBOPS_MODEL || 'gpt-5',
+        model,
         store: false,
         instructions,
         input: JSON.stringify({ report, deterministic }, null, 2),
@@ -122,7 +123,7 @@ const analysis = {
   deterministic,
   agent: {
     enabled: Boolean(process.env.OPENAI_API_KEY),
-    model: process.env.WEBOPS_MODEL || 'gpt-5',
+    model,
     analysis: agentAnalysis,
     error: agentError,
   },
