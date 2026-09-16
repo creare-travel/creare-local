@@ -19,10 +19,11 @@ const apiUrl = `https://api.github.com/repos/${owner}/${repo}/issues/${issueNumb
 
 const measurements = state.measurements
   .map((item) => {
+    const evidence = `${item.evidenceCount ?? '-'} / ${item.requestedSamples ?? '-'}`;
     if (item.status === 'error') {
-      return `| ${item.target} | ${item.strategy} | - | - | - | - | ERROR |`;
+      return `| ${item.target} | ${item.strategy} | ${evidence} | - | - | - | - | ERROR |`;
     }
-    return `| ${item.target} | ${item.strategy} | ${item.scores?.performance ?? '-'} | ${Math.round(item.metrics?.lcpMs ?? 0)}ms | ${(item.metrics?.cls ?? 0).toFixed(3)} | ${Math.round(item.metrics?.tbtMs ?? 0)}ms | ${String(item.status).toUpperCase()} |`;
+    return `| ${item.target} | ${item.strategy} | ${evidence} | ${item.scores?.performance ?? '-'} | ${Math.round(item.metrics?.lcpMs ?? 0)}ms | ${(item.metrics?.cls ?? 0).toFixed(3)} | ${Math.round(item.metrics?.tbtMs ?? 0)}ms | ${String(item.status).toUpperCase()} |`;
   })
   .join('\n');
 
@@ -33,6 +34,10 @@ const recommendations = state.recommendations.length
 const integrations = state.integrations
   .map((item) => `- **${item.name}:** ${item.status}`)
   .join('\n');
+
+const measurementPolicy = state.measurements.some((item) => item.requestedSamples)
+  ? '- Measurement decisions use repeated PageSpeed samples and median aggregation.\n'
+  : '';
 
 const body = `# CREARE WebOps Status
 
@@ -47,11 +52,11 @@ const body = `# CREARE WebOps Status
 - Automatic merge: **DISABLED**
 - Human approval: **REQUIRED**
 - Remediation: **PR → preview → human approval → production**
-
+${measurementPolicy}
 ## Measurements
 
-| Target | Device | Perf | LCP | CLS | TBT | Result |
-|---|---|---:|---:|---:|---:|---|
+| Target | Device | Evidence | Perf | LCP | CLS | TBT | Result |
+|---|---|---:|---:|---:|---:|---:|---|
 ${measurements}
 
 ## Recommended next actions
