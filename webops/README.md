@@ -43,6 +43,12 @@ Optional for measurements, required for AI interpretation. When absent, WebOps s
 
 Recommended value: `gpt-5.6-luna` for scheduled high-volume analysis. If the repository variable is unset, the code currently falls back to `gpt-5.6-luna`.
 
+## OpenAI API project policy
+
+Use a dedicated OpenAI API project named `CREARE WebOps` rather than the Default project when possible. This isolates WebOps API keys, usage, budgets/spend limits, and model permissions from unrelated API work.
+
+OpenAI API billing is separate from ChatGPT subscriptions. The API account/project must have billing or credits configured independently before agent analysis can run successfully.
+
 ## Current thresholds
 
 Mobile and desktop currently alert on:
