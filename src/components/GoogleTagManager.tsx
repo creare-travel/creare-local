@@ -32,7 +32,7 @@ export default function GoogleTagManager() {
 
   return (
     <>
-      <Script id="gtm-init" strategy="afterInteractive">
+      <Script id="gtm-init" strategy="lazyOnload">
         {buildGtmScript(GTM_ID)}
       </Script>
       <RouteChangeTracker />
