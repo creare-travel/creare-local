@@ -10,6 +10,7 @@ CREARE WebOps continuously measures production performance and turns raw PageSpe
 - Compares locales to detect page/locale-specific anomalies.
 - Optionally sends the complete measurement set to the CREARE WebOps Agent through the OpenAI Responses API.
 - Publishes a GitHub Actions summary and retains JSON/Markdown evidence for 90 days.
+- Shows `Europe/Istanbul` time first in human-facing summaries while retaining canonical UTC timestamps in evidence.
 
 ## Automatic triggers
 
