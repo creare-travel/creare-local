@@ -5,7 +5,7 @@ CREARE WebOps measures production health, produces conservative AI-assisted oper
 ## Current scope
 
 - EN / TR / ZH / RU homepages
-- mobile + desktop PageSpeed measurements
+- mobile + desktop PageSpeed measurements with adaptive confirmation sampling
 - Performance, Accessibility, Best Practices, SEO, FCP, LCP, CLS, TBT, Speed Index, TTI
 - deterministic thresholds before AI reasoning
 - cross-locale anomaly comparison
@@ -37,8 +37,9 @@ WebOps runs:
 
 - every day at `06:00 UTC` / `09:00 Europe/Istanbul`
 - after a successful production deployment event
-- on WebOps-related pull requests for validation
+- on WebOps-related pull requests for validation; successful CI creates the approval handoff immediately
 - manually through GitHub Actions `workflow_dispatch`
+- the ChatGPT WebOps supervisor runs once daily at `10:00 Europe/Istanbul`, after the `09:00` audit, to continue non-destructive work that still needs diagnosis / preview review
 
 ## Safety and approval
 
@@ -74,7 +75,9 @@ OpenAI API usage is billed separately from ChatGPT subscriptions. CREARE WebOps 
 - locale performance gap >= 15 points
 - slowest locale LCP >= 2x fastest locale LCP
 
-A single lab run is treated as a signal, not proof of regression.
+A single lab run is treated as a signal, not proof of regression. Daily measurement is adaptive: each target gets one baseline sample; only a baseline ALERT requests up to two additional independent PSI analyses and uses their median for confirmation. Cached analyses with the same `analysisUTCTimestamp` do not count as independent evidence. Even unique lab runs can vary materially, so a site-code remediation requires trace/resource evidence plus preview or focused verification.
+
+A plausible change is not considered a fix until verification shows a material improvement in the target metric without a meaningful regression. If Preview does not improve the target metric, the proposal should be closed rather than merged.
 
 ## Integrations
 
