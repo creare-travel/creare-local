@@ -17,7 +17,6 @@ WebOps runs automatically in these cases:
 
 - Daily at `06:00 UTC` through GitHub Actions cron.
 - After a successful Production deployment status event when GitHub receives it from the deployment provider.
-- When WebOps code or its workflow changes on `main`.
 - On pull requests that change `webops/**` or `.github/workflows/creare-webops.yml`.
 
 It can also be started manually through GitHub Actions `workflow_dispatch`.
