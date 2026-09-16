@@ -4,7 +4,7 @@ CREARE WebOps continuously measures production performance and turns raw PageSpe
 
 ## V1 scope
 
-- Measures EN, TR, and ZH homepages on mobile and desktop.
+- Measures EN, TR, ZH, and RU homepages on mobile and desktop.
 - Captures Performance, Accessibility, Best Practices, SEO, FCP, LCP, CLS, TBT, Speed Index, and TTI.
 - Applies deterministic thresholds before any AI reasoning.
 - Compares locales to detect page/locale-specific anomalies.
@@ -65,7 +65,7 @@ V1 does not call Strapi or Cloudinary directly. They are upstream production dep
 
 Planned extensions should treat them as separate data sources:
 
-- Strapi: publishing events, content freshness, missing fields, broken references, locale parity, unpublished/draft anomalies.
+- Strapi: publishing events, content freshness, missing fields, broken references, EN/TR/ZH/RU locale parity, unpublished/draft anomalies.
 - Cloudinary: asset weight, dimensions, format, responsive delivery, transformation quality, cache behavior, oversized LCP assets.
 
 A Strapi or Cloudinary event may trigger a WebOps audit, but WebOps should not automatically mutate CMS content or media in observation mode.
@@ -95,7 +95,7 @@ CrUX / GA4 / GSC --/
 
 ## Documentation rule
 
-The Google Drive document `CREARE Automation — WebOps Agent Manual` inside `CREARE AUTOMATION — SECURE` is the operational source of truth. Every material WebOps capability, trigger, integration, safety-boundary, or runbook change should update that document in the same development cycle.
+The Google Drive document `CREARE Automation — WebOps Agent Manual` inside `CREARE AUTOMATION — SECURE` is the operational source of truth. Every material WebOps capability, trigger, integration, safety-boundary, locale-scope, or runbook change should update that document in the same development cycle.
 
 ## Next phases
 
@@ -103,4 +103,4 @@ V2: persistent metrics store, baseline/regression history, incident lifecycle, n
 
 V3: Codex remediation workflow that opens a branch/PR after a confirmed regression; human approval remains required.
 
-V4: CrUX, GA4, Search Console, Vercel runtime, Strapi, Cloudinary, crawl/indexability, hreflang, schema, i18n parity, and GEO checks under the same WebOps control plane.
+V4: CrUX, GA4, Search Console, Vercel runtime, Strapi, Cloudinary, crawl/indexability, hreflang, schema, EN/TR/ZH/RU i18n parity, and GEO checks under the same WebOps control plane.
