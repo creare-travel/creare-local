@@ -5,6 +5,19 @@ import { WEBOPS_CONFIG } from './config.mjs';
 const reportPath = path.resolve('webops/output/latest.json');
 const report = JSON.parse(await fs.readFile(reportPath, 'utf8'));
 
+function formatIstanbulTime(date) {
+  return new Intl.DateTimeFormat('tr-TR', {
+    timeZone: 'Europe/Istanbul',
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(date);
+}
+
 function deterministicFindings(results) {
   const findings = [];
   const grouped = new Map();
@@ -117,9 +130,14 @@ if (process.env.OPENAI_API_KEY) {
   }
 }
 
+const generatedDate = new Date();
+const generatedAtUtc = generatedDate.toISOString();
+const generatedAtIstanbul = formatIstanbulTime(generatedDate);
+
 const analysis = {
   schemaVersion: 1,
-  generatedAt: new Date().toISOString(),
+  generatedAt: generatedAtUtc,
+  generatedAtIstanbul,
   deterministic,
   agent: {
     enabled: Boolean(process.env.OPENAI_API_KEY),
@@ -138,7 +156,8 @@ const summary = [
   '# CREARE WebOps',
   '',
   `**Status:** ${deterministic.status.toUpperCase()}`,
-  `**Generated:** ${analysis.generatedAt}`,
+  `**Generated (Istanbul):** ${analysis.generatedAtIstanbul} (Europe/Istanbul)`,
+  `**UTC:** ${analysis.generatedAt}`,
   '',
   '## Measurements',
   '',
