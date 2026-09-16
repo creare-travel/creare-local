@@ -2,12 +2,6 @@ name: CREARE WebOps
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'webops/**'
-      - '.github/workflows/creare-webops.yml'
   pull_request:
     paths:
       - 'webops/**'
