@@ -93,7 +93,11 @@ Rules:
 - Compare EN/TR/ZH/RU before calling a problem global.
 - Preserve CREARE visual quality; never recommend broad refactors from one noisy lab run.
 - Prioritize LCP, CLS, blocking time, and cross-locale anomalies.
+- Read result.evidenceState. Only confirmed-alert is eligible to become a remediation candidate; baseline-pass is monitor-only and alert-not-confirmed must not trigger a fix.
+- Unique PSI analysis timestamps prevent cached duplicates, but independent lab runs can still vary materially.
 - Treat one lab run as a signal, not proof of a regression.
+- Before recommending site-code remediation, require trace/resource evidence for the suspected cause. A proposed fix is not successful unless preview or focused verification shows a material improvement in the target metric without a meaningful regression.
+- If a preview does not improve the target metric, recommend rejecting/closing that proposal rather than shipping it.
 - Return a compact operational report with sections: STATUS, FACTS, HYPOTHESES, NEXT ACTION.
 - If results are healthy, say so and recommend monitoring rather than optimization churn.`;
 
@@ -161,13 +165,13 @@ const summary = [
   '',
   '## Measurements',
   '',
-  '| Target | Device | Perf | LCP | CLS | TBT | Result |',
-  '|---|---|---:|---:|---:|---:|---|',
+  '| Target | Device | Evidence | Perf | LCP | CLS | TBT | Result |',
+  '|---|---|---|---:|---:|---:|---:|---|',
   ...report.results.map((item) => {
     if (item.status === 'error') {
-      return `| ${item.target} | ${item.strategy} | - | - | - | - | ERROR |`;
+      return `| ${item.target} | ${item.strategy} | ${item.evidenceCount ?? 0}/${item.requestedSamples ?? 0} | - | - | - | - | ERROR |`;
     }
-    return `| ${item.target} | ${item.strategy} | ${item.scores.performance} | ${Math.round(item.metrics.lcpMs ?? 0)}ms | ${(item.metrics.cls ?? 0).toFixed(3)} | ${Math.round(item.metrics.tbtMs ?? 0)}ms | ${item.status.toUpperCase()} |`;
+    return `| ${item.target} | ${item.strategy} | ${item.evidenceCount ?? 0}/${item.requestedSamples ?? 0} (${item.evidenceState ?? 'n/a'}) | ${item.scores.performance} | ${Math.round(item.metrics.lcpMs ?? 0)}ms | ${(item.metrics.cls ?? 0).toFixed(3)} | ${Math.round(item.metrics.tbtMs ?? 0)}ms | ${item.status.toUpperCase()} |`;
   }),
   '',
   '## Deterministic findings',
