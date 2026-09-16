@@ -3,10 +3,13 @@ import path from 'node:path';
 import { WEBOPS_CONFIG } from './config.mjs';
 
 const PSI_ENDPOINT = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
-const SAMPLE_COUNT = Number(process.env.WEBOPS_SAMPLES || 3);
+const MAX_SAMPLE_COUNT = Number(process.env.WEBOPS_SAMPLES || 3);
 const MAX_RETRIES = Number(process.env.WEBOPS_RETRIES || 2);
 const RETRY_BASE_MS = Number(process.env.WEBOPS_RETRY_BASE_MS || 1500);
-const MIN_EVIDENCE = Math.min(SAMPLE_COUNT, Number(process.env.WEBOPS_MIN_EVIDENCE || 2));
+const MIN_ALERT_EVIDENCE = Math.min(
+  MAX_SAMPLE_COUNT,
+  Number(process.env.WEBOPS_MIN_EVIDENCE || 2),
+);
 const SAMPLE_GAP_MS = Number(process.env.WEBOPS_SAMPLE_GAP_MS || 15000);
 
 function metricValue(audits, id) {
@@ -97,7 +100,7 @@ async function runPsiWithRetry(target, strategy) {
   throw lastError;
 }
 
-function aggregateSamples(target, strategy, samples, sampleErrors, rawSampleCount) {
+function aggregateSamples(target, strategy, samples, sampleErrors, rawSampleCount, requestedSamples) {
   return {
     target: target.id,
     locale: target.locale,
@@ -123,7 +126,8 @@ function aggregateSamples(target, strategy, samples, sampleErrors, rawSampleCoun
     evidenceCount: samples.length,
     rawSampleCount,
     duplicateSampleCount: rawSampleCount - samples.length,
-    requestedSamples: SAMPLE_COUNT,
+    requestedSamples,
+    maximumSamples: MAX_SAMPLE_COUNT,
     sampleErrors,
     samples: samples.map((sample, index) => ({
       sample: index + 1,
@@ -154,58 +158,110 @@ function evaluate(result) {
   return { ...result, status: violations.length ? 'alert' : 'pass', violations };
 }
 
+function errorResult(target, strategy, samples, rawSamples, sampleErrors, requestedSamples, reason) {
+  return {
+    target: target.id,
+    locale: target.locale,
+    url: target.url,
+    strategy,
+    status: 'error',
+    evidenceState: 'insufficient-evidence',
+    evidenceCount: samples.length,
+    rawSampleCount: rawSamples.length,
+    duplicateSampleCount: rawSamples.length - samples.length,
+    requestedSamples,
+    maximumSamples: MAX_SAMPLE_COUNT,
+    sampleErrors,
+    error: reason,
+  };
+}
+
 const results = [];
 for (const target of WEBOPS_CONFIG.targets) {
   for (const strategy of WEBOPS_CONFIG.strategies) {
     const rawSamples = [];
     const sampleErrors = [];
 
-    for (let sample = 1; sample <= SAMPLE_COUNT; sample += 1) {
+    try {
+      rawSamples.push(await runPsiWithRetry(target, strategy));
+    } catch (error) {
+      sampleErrors.push({ sample: 1, error: error instanceof Error ? error.message : String(error) });
+    }
+
+    let samples = getIndependentSamples(rawSamples);
+    if (!samples.length) {
+      results.push(errorResult(
+        target,
+        strategy,
+        samples,
+        rawSamples,
+        sampleErrors,
+        1,
+        `No independent PageSpeed evidence for ${target.id}/${strategy}`,
+      ));
+      continue;
+    }
+
+    const baseline = evaluate(aggregateSamples(target, strategy, samples, sampleErrors, rawSamples.length, 1));
+
+    if (baseline.status === 'pass' || MAX_SAMPLE_COUNT <= 1) {
+      results.push({
+        ...baseline,
+        evidenceState: baseline.status === 'pass' ? 'baseline-pass' : 'baseline-alert',
+        confirmationTriggered: false,
+      });
+      continue;
+    }
+
+    for (let sample = 2; sample <= MAX_SAMPLE_COUNT; sample += 1) {
+      await sleep(SAMPLE_GAP_MS);
       try {
         rawSamples.push(await runPsiWithRetry(target, strategy));
       } catch (error) {
         sampleErrors.push({ sample, error: error instanceof Error ? error.message : String(error) });
       }
-      if (sample < SAMPLE_COUNT) await sleep(SAMPLE_GAP_MS);
     }
 
-    const samples = getIndependentSamples(rawSamples);
-
-    if (samples.length < MIN_EVIDENCE) {
-      results.push({
-        target: target.id,
-        locale: target.locale,
-        url: target.url,
+    samples = getIndependentSamples(rawSamples);
+    if (samples.length < MIN_ALERT_EVIDENCE) {
+      results.push(errorResult(
+        target,
         strategy,
-        status: 'error',
-        evidenceCount: samples.length,
-        rawSampleCount: rawSamples.length,
-        duplicateSampleCount: rawSamples.length - samples.length,
-        requestedSamples: SAMPLE_COUNT,
+        samples,
+        rawSamples,
         sampleErrors,
-        error: `Insufficient independent evidence for ${target.id}/${strategy}: ${samples.length}/${SAMPLE_COUNT} unique PSI analyses`,
-      });
+        MAX_SAMPLE_COUNT,
+        `Insufficient independent evidence to confirm alert for ${target.id}/${strategy}: ${samples.length}/${MIN_ALERT_EVIDENCE} required`,
+      ));
       continue;
     }
 
-    results.push(
-      evaluate(aggregateSamples(target, strategy, samples, sampleErrors, rawSamples.length)),
+    const confirmed = evaluate(
+      aggregateSamples(target, strategy, samples, sampleErrors, rawSamples.length, MAX_SAMPLE_COUNT),
     );
+    results.push({
+      ...confirmed,
+      evidenceState: confirmed.status === 'alert' ? 'confirmed-alert' : 'alert-not-confirmed',
+      confirmationTriggered: true,
+    });
   }
 }
 
 const output = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   generatedAt: new Date().toISOString(),
   gitSha: process.env.GITHUB_SHA ?? null,
   repository: process.env.GITHUB_REPOSITORY ?? null,
   measurementPolicy: {
-    sampleCount: SAMPLE_COUNT,
-    minimumEvidence: MIN_EVIDENCE,
+    mode: 'adaptive-confirmation',
+    baselineSamples: 1,
+    maximumSamples: MAX_SAMPLE_COUNT,
+    minimumAlertEvidence: MIN_ALERT_EVIDENCE,
     transientRetries: MAX_RETRIES,
     sampleGapMs: SAMPLE_GAP_MS,
     independentEvidence: 'unique PageSpeed analysisUTCTimestamp',
-    aggregation: 'median',
+    aggregation: 'median after baseline alert',
+    costPolicy: 'PASS stops after baseline; ALERT collects additional independent evidence',
   },
   results,
 };
