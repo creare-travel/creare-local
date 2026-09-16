@@ -43,6 +43,7 @@ jobs:
           node --check webops/analyze.mjs
           node --check webops/build-control-state.mjs
           node --check webops/publish-control-status.mjs
+          node --check webops/publish-pr-approval.mjs
 
       - name: Measure production PageSpeed
         id: measure
@@ -85,3 +86,9 @@ jobs:
             webops/output/summary.md
           retention-days: 90
           if-no-files-found: error
+
+      - name: Publish approval handoff
+        if: github.event_name == 'pull_request' && success()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node webops/publish-pr-approval.mjs
