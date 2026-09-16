@@ -10,7 +10,17 @@ CREARE WebOps continuously measures production performance and turns raw PageSpe
 - Compares locales to detect page/locale-specific anomalies.
 - Optionally sends the complete measurement set to the CREARE WebOps Agent through the OpenAI Responses API.
 - Publishes a GitHub Actions summary and retains JSON/Markdown evidence for 90 days.
-- Runs daily, manually, and after successful production deployment status events when GitHub receives them.
+
+## Automatic triggers
+
+WebOps runs automatically in these cases:
+
+- Daily at `06:00 UTC` through GitHub Actions cron.
+- After a successful Production deployment status event when GitHub receives it from the deployment provider.
+- When WebOps code or its workflow changes on `main`.
+- On pull requests that change `webops/**` or `.github/workflows/creare-webops.yml`.
+
+It can also be started manually through GitHub Actions `workflow_dispatch`.
 
 ## Safety model
 
@@ -22,17 +32,17 @@ A single Lighthouse/PageSpeed run is treated as a signal, not proof of regressio
 
 `PAGESPEED_API_KEY`
 
-Recommended for reliable PageSpeed Insights API quota. The measurement script can attempt requests without it, but production automation should configure the key.
+Required for reliable production automation. Anonymous PageSpeed Insights quota can return HTTP 429 and must not be relied on for scheduled WebOps runs.
 
 `OPENAI_API_KEY`
 
-Optional. When absent, WebOps still performs deterministic threshold and locale analysis. When present, the agent adds a CREARE-specific operational interpretation.
+Optional for measurements, required for AI interpretation. When absent, WebOps still performs deterministic threshold and locale analysis. When present, the agent adds a CREARE-specific operational interpretation.
 
-## Optional GitHub variable
+## GitHub variable
 
 `WEBOPS_MODEL`
 
-Defaults to `gpt-5` when unset.
+Recommended value: `gpt-5.6-luna` for scheduled high-volume analysis. If the repository variable is unset, the code currently falls back to `gpt-5.6-luna`.
 
 ## Current thresholds
 
@@ -50,10 +60,21 @@ Locale anomaly signals:
 
 These are initial operating thresholds and should be calibrated after observing real production variance.
 
+## Strapi and Cloudinary
+
+V1 does not call Strapi or Cloudinary directly. They are upstream production dependencies whose effects are observed through the rendered website and PageSpeed metrics.
+
+Planned extensions should treat them as separate data sources:
+
+- Strapi: publishing events, content freshness, missing fields, broken references, locale parity, unpublished/draft anomalies.
+- Cloudinary: asset weight, dimensions, format, responsive delivery, transformation quality, cache behavior, oversized LCP assets.
+
+A Strapi or Cloudinary event may trigger a WebOps audit, but WebOps should not automatically mutate CMS content or media in observation mode.
+
 ## Architecture
 
 ```text
-GitHub/Vercel deployment event or daily schedule
+GitHub / deployment / schedule / manual trigger
                     |
                     v
           PageSpeed Insights API
@@ -66,7 +87,16 @@ GitHub/Vercel deployment event or daily schedule
                     |
                     v
  GitHub summary + 90-day evidence artifact
+
+Future inputs:
+Strapi events ----\
+Cloudinary events -+--> CREARE WebOps control plane
+CrUX / GA4 / GSC --/
 ```
+
+## Documentation rule
+
+The Google Drive document `CREARE Automation — WebOps Agent Manual` inside `CREARE AUTOMATION — SECURE` is the operational source of truth. Every material WebOps capability, trigger, integration, safety-boundary, or runbook change should update that document in the same development cycle.
 
 ## Next phases
 
@@ -74,4 +104,4 @@ V2: persistent metrics store, baseline/regression history, incident lifecycle, n
 
 V3: Codex remediation workflow that opens a branch/PR after a confirmed regression; human approval remains required.
 
-V4: CrUX, GA4, Search Console, Vercel runtime, crawl/indexability, hreflang, schema, i18n parity, and GEO checks under the same WebOps control plane.
+V4: CrUX, GA4, Search Console, Vercel runtime, Strapi, Cloudinary, crawl/indexability, hreflang, schema, i18n parity, and GEO checks under the same WebOps control plane.
