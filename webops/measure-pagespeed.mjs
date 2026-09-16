@@ -7,6 +7,7 @@ const SAMPLE_COUNT = Number(process.env.WEBOPS_SAMPLES || 3);
 const MAX_RETRIES = Number(process.env.WEBOPS_RETRIES || 2);
 const RETRY_BASE_MS = Number(process.env.WEBOPS_RETRY_BASE_MS || 1500);
 const MIN_EVIDENCE = Math.min(SAMPLE_COUNT, Number(process.env.WEBOPS_MIN_EVIDENCE || 2));
+const SAMPLE_GAP_MS = Number(process.env.WEBOPS_SAMPLE_GAP_MS || 15000);
 
 function metricValue(audits, id) {
   return audits?.[id]?.numericValue ?? null;
@@ -21,6 +22,16 @@ function median(values) {
   if (!clean.length) return null;
   const middle = Math.floor(clean.length / 2);
   return clean.length % 2 ? clean[middle] : (clean[middle - 1] + clean[middle]) / 2;
+}
+
+function getIndependentSamples(samples) {
+  const seen = new Set();
+  return samples.filter((sample) => {
+    const key = sample.fetchedAt;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 async function runPsiOnce(target, strategy) {
@@ -86,7 +97,7 @@ async function runPsiWithRetry(target, strategy) {
   throw lastError;
 }
 
-function aggregateSamples(target, strategy, samples, sampleErrors) {
+function aggregateSamples(target, strategy, samples, sampleErrors, rawSampleCount) {
   return {
     target: target.id,
     locale: target.locale,
@@ -110,6 +121,8 @@ function aggregateSamples(target, strategy, samples, sampleErrors) {
     },
     lighthouseVersion: samples.at(-1)?.lighthouseVersion ?? null,
     evidenceCount: samples.length,
+    rawSampleCount,
+    duplicateSampleCount: rawSampleCount - samples.length,
     requestedSamples: SAMPLE_COUNT,
     sampleErrors,
     samples: samples.map((sample, index) => ({
@@ -144,16 +157,19 @@ function evaluate(result) {
 const results = [];
 for (const target of WEBOPS_CONFIG.targets) {
   for (const strategy of WEBOPS_CONFIG.strategies) {
-    const samples = [];
+    const rawSamples = [];
     const sampleErrors = [];
 
     for (let sample = 1; sample <= SAMPLE_COUNT; sample += 1) {
       try {
-        samples.push(await runPsiWithRetry(target, strategy));
+        rawSamples.push(await runPsiWithRetry(target, strategy));
       } catch (error) {
         sampleErrors.push({ sample, error: error instanceof Error ? error.message : String(error) });
       }
+      if (sample < SAMPLE_COUNT) await sleep(SAMPLE_GAP_MS);
     }
+
+    const samples = getIndependentSamples(rawSamples);
 
     if (samples.length < MIN_EVIDENCE) {
       results.push({
@@ -163,14 +179,18 @@ for (const target of WEBOPS_CONFIG.targets) {
         strategy,
         status: 'error',
         evidenceCount: samples.length,
+        rawSampleCount: rawSamples.length,
+        duplicateSampleCount: rawSamples.length - samples.length,
         requestedSamples: SAMPLE_COUNT,
         sampleErrors,
-        error: `Insufficient repeated evidence for ${target.id}/${strategy}: ${samples.length}/${SAMPLE_COUNT} successful samples`,
+        error: `Insufficient independent evidence for ${target.id}/${strategy}: ${samples.length}/${SAMPLE_COUNT} unique PSI analyses`,
       });
       continue;
     }
 
-    results.push(evaluate(aggregateSamples(target, strategy, samples, sampleErrors)));
+    results.push(
+      evaluate(aggregateSamples(target, strategy, samples, sampleErrors, rawSamples.length)),
+    );
   }
 }
 
@@ -183,6 +203,8 @@ const output = {
     sampleCount: SAMPLE_COUNT,
     minimumEvidence: MIN_EVIDENCE,
     transientRetries: MAX_RETRIES,
+    sampleGapMs: SAMPLE_GAP_MS,
+    independentEvidence: 'unique PageSpeed analysisUTCTimestamp',
     aggregation: 'median',
   },
   results,
