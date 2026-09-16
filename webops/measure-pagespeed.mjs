@@ -3,16 +3,28 @@ import path from 'node:path';
 import { WEBOPS_CONFIG } from './config.mjs';
 
 const PSI_ENDPOINT = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
+const SAMPLE_COUNT = Number(process.env.WEBOPS_SAMPLES || 3);
+const MAX_RETRIES = Number(process.env.WEBOPS_RETRIES || 2);
+const RETRY_BASE_MS = Number(process.env.WEBOPS_RETRY_BASE_MS || 1500);
+const MIN_EVIDENCE = Math.min(SAMPLE_COUNT, Number(process.env.WEBOPS_MIN_EVIDENCE || 2));
 
 function metricValue(audits, id) {
   return audits?.[id]?.numericValue ?? null;
 }
 
-async function runPsi(target, strategy) {
-  const params = new URLSearchParams({
-    url: target.url,
-    strategy,
-  });
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function median(values) {
+  const clean = values.filter((value) => Number.isFinite(value)).sort((a, b) => a - b);
+  if (!clean.length) return null;
+  const middle = Math.floor(clean.length / 2);
+  return clean.length % 2 ? clean[middle] : (clean[middle - 1] + clean[middle]) / 2;
+}
+
+async function runPsiOnce(target, strategy) {
+  const params = new URLSearchParams({ url: target.url, strategy });
 
   for (const category of WEBOPS_CONFIG.categories) {
     params.append('category', category);
@@ -28,7 +40,9 @@ async function runPsi(target, strategy) {
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`PSI ${response.status} for ${target.id}/${strategy}: ${body.slice(0, 500)}`);
+    const error = new Error(`PSI ${response.status} for ${target.id}/${strategy}: ${body.slice(0, 500)}`);
+    error.status = response.status;
+    throw error;
   }
 
   const data = await response.json();
@@ -36,10 +50,6 @@ async function runPsi(target, strategy) {
   const audits = data.lighthouseResult?.audits ?? {};
 
   return {
-    target: target.id,
-    locale: target.locale,
-    url: target.url,
-    strategy,
     fetchedAt: data.analysisUTCTimestamp ?? new Date().toISOString(),
     finalUrl: data.lighthouseResult?.finalUrl ?? target.url,
     scores: {
@@ -57,6 +67,57 @@ async function runPsi(target, strategy) {
       ttiMs: metricValue(audits, 'interactive'),
     },
     lighthouseVersion: data.lighthouseResult?.lighthouseVersion ?? null,
+  };
+}
+
+async function runPsiWithRetry(target, strategy) {
+  let lastError;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
+    try {
+      return await runPsiOnce(target, strategy);
+    } catch (error) {
+      lastError = error;
+      const status = error?.status;
+      const transient = status === 429 || (status >= 500 && status <= 599);
+      if (!transient || attempt === MAX_RETRIES) throw error;
+      await sleep(RETRY_BASE_MS * (attempt + 1));
+    }
+  }
+  throw lastError;
+}
+
+function aggregateSamples(target, strategy, samples, sampleErrors) {
+  return {
+    target: target.id,
+    locale: target.locale,
+    url: target.url,
+    strategy,
+    fetchedAt: samples.at(-1)?.fetchedAt ?? new Date().toISOString(),
+    finalUrl: samples.at(-1)?.finalUrl ?? target.url,
+    scores: {
+      performance: Math.round(median(samples.map((sample) => sample.scores.performance)) ?? 0),
+      accessibility: Math.round(median(samples.map((sample) => sample.scores.accessibility)) ?? 0),
+      bestPractices: Math.round(median(samples.map((sample) => sample.scores.bestPractices)) ?? 0),
+      seo: Math.round(median(samples.map((sample) => sample.scores.seo)) ?? 0),
+    },
+    metrics: {
+      fcpMs: median(samples.map((sample) => sample.metrics.fcpMs)),
+      lcpMs: median(samples.map((sample) => sample.metrics.lcpMs)),
+      cls: median(samples.map((sample) => sample.metrics.cls)),
+      tbtMs: median(samples.map((sample) => sample.metrics.tbtMs)),
+      speedIndexMs: median(samples.map((sample) => sample.metrics.speedIndexMs)),
+      ttiMs: median(samples.map((sample) => sample.metrics.ttiMs)),
+    },
+    lighthouseVersion: samples.at(-1)?.lighthouseVersion ?? null,
+    evidenceCount: samples.length,
+    requestedSamples: SAMPLE_COUNT,
+    sampleErrors,
+    samples: samples.map((sample, index) => ({
+      sample: index + 1,
+      fetchedAt: sample.fetchedAt,
+      scores: sample.scores,
+      metrics: sample.metrics,
+    })),
   };
 }
 
@@ -83,26 +144,47 @@ function evaluate(result) {
 const results = [];
 for (const target of WEBOPS_CONFIG.targets) {
   for (const strategy of WEBOPS_CONFIG.strategies) {
-    try {
-      results.push(evaluate(await runPsi(target, strategy)));
-    } catch (error) {
+    const samples = [];
+    const sampleErrors = [];
+
+    for (let sample = 1; sample <= SAMPLE_COUNT; sample += 1) {
+      try {
+        samples.push(await runPsiWithRetry(target, strategy));
+      } catch (error) {
+        sampleErrors.push({ sample, error: error instanceof Error ? error.message : String(error) });
+      }
+    }
+
+    if (samples.length < MIN_EVIDENCE) {
       results.push({
         target: target.id,
         locale: target.locale,
         url: target.url,
         strategy,
         status: 'error',
-        error: error instanceof Error ? error.message : String(error),
+        evidenceCount: samples.length,
+        requestedSamples: SAMPLE_COUNT,
+        sampleErrors,
+        error: `Insufficient repeated evidence for ${target.id}/${strategy}: ${samples.length}/${SAMPLE_COUNT} successful samples`,
       });
+      continue;
     }
+
+    results.push(evaluate(aggregateSamples(target, strategy, samples, sampleErrors)));
   }
 }
 
 const output = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   generatedAt: new Date().toISOString(),
   gitSha: process.env.GITHUB_SHA ?? null,
   repository: process.env.GITHUB_REPOSITORY ?? null,
+  measurementPolicy: {
+    sampleCount: SAMPLE_COUNT,
+    minimumEvidence: MIN_EVIDENCE,
+    transientRetries: MAX_RETRIES,
+    aggregation: 'median',
+  },
   results,
 };
 
