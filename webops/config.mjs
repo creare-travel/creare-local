@@ -4,6 +4,7 @@ export const WEBOPS_CONFIG = {
     { id: 'home-en', locale: 'en', url: 'https://crearetravel.com/' },
     { id: 'home-tr', locale: 'tr', url: 'https://crearetravel.com/tr' },
     { id: 'home-zh', locale: 'zh', url: 'https://crearetravel.com/zh' },
+    { id: 'home-ru', locale: 'ru', url: 'https://crearetravel.com/ru' },
   ],
   strategies: ['mobile', 'desktop'],
   categories: ['performance', 'accessibility', 'best-practices', 'seo'],
