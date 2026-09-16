@@ -1,0 +1,24 @@
+{
+  "id": "measurement-reliability-v2",
+  "status": "pending-approval",
+  "scope": "webops-tooling",
+  "productionSiteChange": false,
+  "title": "Strengthen PageSpeed evidence before remediation",
+  "proposedChange": [
+    "Run three PageSpeed samples per locale/device instead of one.",
+    "Retry transient PSI/Lighthouse 5xx failures before marking a measurement error.",
+    "Use the median sample for performance, LCP, CLS and TBT decisions.",
+    "Require repeated evidence before promoting a finding to a remediation approval request."
+  ],
+  "reason": "The latest run showed large lab variability and a transient TR mobile PSI 500. A single sample is not reliable enough to justify production code changes.",
+  "expectedImpact": "Fewer false alarms and safer, evidence-based remediation decisions across EN/TR/ZH/RU.",
+  "risk": "Longer workflow runtime and additional PageSpeed API usage. No production website mutation.",
+  "rollback": "Revert the WebOps tooling PR and return to one sample per locale/device.",
+  "verification": [
+    "Run the full EN/TR/ZH/RU x mobile/desktop matrix.",
+    "Confirm three samples are stored for each target when PSI succeeds.",
+    "Confirm a transient 5xx is retried.",
+    "Confirm Control Center reports median values and evidence count.",
+    "Confirm production writes and automatic merge remain disabled."
+  ]
+}
