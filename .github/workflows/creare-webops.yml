@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 concurrency:
   group: creare-webops-${{ github.event_name }}-${{ github.ref || github.run_id }}
@@ -40,6 +41,8 @@ jobs:
           node --check webops/config.mjs
           node --check webops/measure-pagespeed.mjs
           node --check webops/analyze.mjs
+          node --check webops/build-control-state.mjs
+          node --check webops/publish-control-status.mjs
 
       - name: Measure production PageSpeed
         id: measure
@@ -55,6 +58,17 @@ jobs:
           WEBOPS_MODEL: ${{ vars.WEBOPS_MODEL }}
         run: node webops/analyze.mjs
 
+      - name: Build Control Center state
+        if: always()
+        run: node webops/build-control-state.mjs
+
+      - name: Publish persistent WebOps status
+        if: always() && github.event_name != 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          WEBOPS_STATUS_ISSUE: '3'
+        run: node webops/publish-control-status.mjs
+
       - name: Publish run summary
         if: always()
         run: cat webops/output/summary.md >> "$GITHUB_STEP_SUMMARY"
@@ -67,6 +81,7 @@ jobs:
           path: |
             webops/output/latest.json
             webops/output/analysis.json
+            webops/output/control-center.json
             webops/output/summary.md
           retention-days: 90
           if-no-files-found: error

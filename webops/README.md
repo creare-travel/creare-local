@@ -1,113 +1,100 @@
-# CREARE WebOps Agent V1
+# CREARE WebOps
 
-CREARE WebOps continuously measures production performance and turns raw PageSpeed data into conservative operational findings.
+CREARE WebOps measures production health, produces conservative AI-assisted operational findings, and exposes a lightweight control state for the CREARE Control Center.
 
-## V1 scope
+## Current scope
 
-- Measures EN, TR, ZH, and RU homepages on mobile and desktop.
-- Captures Performance, Accessibility, Best Practices, SEO, FCP, LCP, CLS, TBT, Speed Index, and TTI.
-- Applies deterministic thresholds before any AI reasoning.
-- Compares locales to detect page/locale-specific anomalies.
-- Optionally sends the complete measurement set to the CREARE WebOps Agent through the OpenAI Responses API.
-- Publishes a GitHub Actions summary and retains JSON/Markdown evidence for 90 days.
-- Shows `Europe/Istanbul` time first in human-facing summaries while retaining canonical UTC timestamps in evidence.
+- EN / TR / ZH / RU homepages
+- mobile + desktop PageSpeed measurements
+- Performance, Accessibility, Best Practices, SEO, FCP, LCP, CLS, TBT, Speed Index, TTI
+- deterministic thresholds before AI reasoning
+- cross-locale anomaly comparison
+- OpenAI WebOps Agent interpretation
+- Istanbul-local human-facing timestamps with canonical UTC retained
+- 90-day evidence artifacts
+
+## Control Center v2
+
+V2 deliberately avoids a new database or a second standalone dashboard.
+
+The current pipeline builds `webops/output/control-center.json` after every audit and updates the persistent GitHub issue **CREARE WebOps Status (#3)**. That issue is the lightweight durable feed for the existing CREARE Control Center / Finance dashboard.
+
+The local Control Center will read this feed and display:
+
+- current WebOps status
+- latest EN/TR/ZH/RU measurements
+- deterministic findings
+- agent recommendations
+- automation schedule
+- integration status
+- pending production changes
+
+Future modules such as Google Tag Manager, GA4, Search Console, Strapi and Cloudinary will appear in the same Control Center instead of separate dashboards.
 
 ## Automatic triggers
 
-WebOps runs automatically in these cases:
+WebOps runs:
 
-- Daily at `06:00 UTC` through GitHub Actions cron.
-- After a successful Production deployment status event when GitHub receives it from the deployment provider.
-- On pull requests that change `webops/**` or `.github/workflows/creare-webops.yml`.
+- every day at `06:00 UTC` / `09:00 Europe/Istanbul`
+- after a successful production deployment event
+- on WebOps-related pull requests for validation
+- manually through GitHub Actions `workflow_dispatch`
 
-It can also be started manually through GitHub Actions `workflow_dispatch`.
+## Safety and approval
 
-## Safety model
+Operating mode: `observe-and-propose`.
 
-V1 is observation-only. It does not modify production code, merge pull requests, block deployments, or automatically remediate issues.
+- production writes: disabled
+- automatic merge: disabled
+- automatic CMS/media writes: disabled
+- human approval: required
+- remediation path: `detect → diagnose → propose → PR → preview/tests → human approval → production → verify`
 
-A single Lighthouse/PageSpeed run is treated as a signal, not proof of regression. Recommendations should prefer narrow diagnosis over broad refactors and preserve CREARE visual quality.
+Agent recommendations are not production changes. Any future automated remediation must be represented as a GitHub pull request so the diff and preview can be reviewed before merge.
 
-## Required GitHub secrets
+## Required configuration
 
-`PAGESPEED_API_KEY`
+GitHub Secrets:
 
-Required for reliable production automation. Anonymous PageSpeed Insights quota can return HTTP 429 and must not be relied on for scheduled WebOps runs.
+- `PAGESPEED_API_KEY`
+- `OPENAI_API_KEY` for AI interpretation
 
-`OPENAI_API_KEY`
+GitHub Variable:
 
-Optional for measurements, required for AI interpretation. When absent, WebOps still performs deterministic threshold and locale analysis. When present, the agent adds a CREARE-specific operational interpretation.
+- `WEBOPS_MODEL` — recommended `gpt-5.6-luna`; code fallback is also `gpt-5.6-luna`
 
-## GitHub variable
-
-`WEBOPS_MODEL`
-
-Recommended value: `gpt-5.6-luna` for scheduled high-volume analysis. If the repository variable is unset, the code currently falls back to `gpt-5.6-luna`.
-
-## OpenAI API project policy
-
-Use a dedicated OpenAI API project named `CREARE WebOps` rather than the Default project when possible. This isolates WebOps API keys, usage, budgets/spend limits, and model permissions from unrelated API work.
-
-OpenAI API billing is separate from ChatGPT subscriptions. The API account/project must have billing or credits configured independently before agent analysis can run successfully.
+OpenAI API usage is billed separately from ChatGPT subscriptions. CREARE WebOps uses its dedicated OpenAI project and low-cost operating configuration.
 
 ## Current thresholds
 
-Mobile and desktop currently alert on:
+- Performance < 90
+- LCP > 2500 ms
+- CLS > 0.10
+- TBT > 200 ms
+- locale performance gap >= 15 points
+- slowest locale LCP >= 2x fastest locale LCP
 
-- Performance below 90
-- LCP above 2500 ms
-- CLS above 0.10
-- TBT above 200 ms
+A single lab run is treated as a signal, not proof of regression.
 
-Locale anomaly signals:
+## Integrations
 
-- Performance gap of 15+ points
-- Slowest LCP at least 2x fastest LCP
+Active now:
 
-These are initial operating thresholds and should be calibrated after observing real production variance.
+- GitHub Actions
+- Vercel deployment events
+- PageSpeed Insights
+- OpenAI WebOps Agent
 
-## Strapi and Cloudinary
+Planned Control Center modules:
 
-V1 does not call Strapi or Cloudinary directly. They are upstream production dependencies whose effects are observed through the rendered website and PageSpeed metrics.
-
-Planned extensions should treat them as separate data sources:
-
-- Strapi: publishing events, content freshness, missing fields, broken references, EN/TR/ZH/RU locale parity, unpublished/draft anomalies.
-- Cloudinary: asset weight, dimensions, format, responsive delivery, transformation quality, cache behavior, oversized LCP assets.
-
-A Strapi or Cloudinary event may trigger a WebOps audit, but WebOps should not automatically mutate CMS content or media in observation mode.
-
-## Architecture
-
-```text
-GitHub / deployment / schedule / manual trigger
-                    |
-                    v
-          PageSpeed Insights API
-                    |
-                    v
-       deterministic WebOps rules
-                    |
-                    v
-       CREARE WebOps Agent (optional)
-                    |
-                    v
- GitHub summary + 90-day evidence artifact
-
-Future inputs:
-Strapi events ----\
-Cloudinary events -+--> CREARE WebOps control plane
-CrUX / GA4 / GSC --/
-```
+- Google Tag Manager
+- Google Analytics 4
+- Google Search Console
+- Strapi
+- Cloudinary
+- CrUX
+- crawl / indexability / canonical / hreflang / schema / GEO checks
 
 ## Documentation rule
 
-The Google Drive document `CREARE Automation — WebOps Agent Manual` inside `CREARE AUTOMATION — SECURE` is the operational source of truth. Every material WebOps capability, trigger, integration, safety-boundary, locale-scope, or runbook change should update that document in the same development cycle.
-
-## Next phases
-
-V2: persistent metrics store, baseline/regression history, incident lifecycle, notifications.
-
-V3: Codex remediation workflow that opens a branch/PR after a confirmed regression; human approval remains required.
-
-V4: CrUX, GA4, Search Console, Vercel runtime, Strapi, Cloudinary, crawl/indexability, hreflang, schema, EN/TR/ZH/RU i18n parity, and GEO checks under the same WebOps control plane.
+The Google Drive document `CREARE Automation — WebOps Agent Manual` inside `CREARE AUTOMATION — SECURE` remains the operational source of truth and must be updated with material WebOps changes.
