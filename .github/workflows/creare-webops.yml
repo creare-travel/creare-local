@@ -1,0 +1,62 @@
+name: CREARE WebOps
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'
+  deployment_status:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: creare-webops-production
+  cancel-in-progress: false
+
+jobs:
+  production-audit:
+    if: >-
+      github.event_name != 'deployment_status' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Measure production PageSpeed
+        id: measure
+        continue-on-error: true
+        env:
+          PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
+        run: node webops/measure-pagespeed.mjs
+
+      - name: Analyze with CREARE WebOps Agent
+        if: always()
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          WEBOPS_MODEL: ${{ vars.WEBOPS_MODEL }}
+        run: node webops/analyze.mjs
+
+      - name: Publish run summary
+        if: always()
+        run: cat webops/output/summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Archive WebOps evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: creare-webops-${{ github.run_id }}
+          path: |
+            webops/output/latest.json
+            webops/output/analysis.json
+            webops/output/summary.md
+          retention-days: 90
+          if-no-files-found: error
