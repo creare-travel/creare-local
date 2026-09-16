@@ -6,6 +6,8 @@ const PSI_ENDPOINT = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed
 const SAMPLE_COUNT = Number(process.env.WEBOPS_SAMPLES || 3);
 const MAX_RETRIES = Number(process.env.WEBOPS_RETRIES || 2);
 const RETRY_BASE_MS = Number(process.env.WEBOPS_RETRY_BASE_MS || 1500);
+const SAMPLE_GAP_MS = Number(process.env.WEBOPS_SAMPLE_GAP_MS || 8000);
+const UNIQUE_SAMPLE_ATTEMPTS = Number(process.env.WEBOPS_UNIQUE_SAMPLE_ATTEMPTS || 4);
 const MIN_EVIDENCE = Math.min(SAMPLE_COUNT, Number(process.env.WEBOPS_MIN_EVIDENCE || 2));
 
 function metricValue(audits, id) {
@@ -21,6 +23,27 @@ function median(values) {
   if (!clean.length) return null;
   const middle = Math.floor(clean.length / 2);
   return clean.length % 2 ? clean[middle] : (clean[middle - 1] + clean[middle]) / 2;
+}
+
+function lcpDiagnostics(audits) {
+  const elementAudit = audits?.['largest-contentful-paint-element'];
+  const elementItem = elementAudit?.details?.items?.[0]?.items?.[0] ?? elementAudit?.details?.items?.[0];
+  const node = elementItem?.node ?? null;
+  const discovery = audits?.['lcp-discovery-insight'];
+  const breakdown = audits?.['lcp-breakdown-insight'];
+
+  return {
+    element: node
+      ? {
+          snippet: node.snippet ?? null,
+          nodeLabel: node.nodeLabel ?? null,
+          selector: node.selector ?? null,
+        }
+      : null,
+    elementDisplayValue: elementAudit?.displayValue ?? null,
+    discoveryDisplayValue: discovery?.displayValue ?? null,
+    breakdownDisplayValue: breakdown?.displayValue ?? null,
+  };
 }
 
 async function runPsiOnce(target, strategy) {
@@ -66,6 +89,9 @@ async function runPsiOnce(target, strategy) {
       speedIndexMs: metricValue(audits, 'speed-index'),
       ttiMs: metricValue(audits, 'interactive'),
     },
+    diagnostics: {
+      lcp: lcpDiagnostics(audits),
+    },
     lighthouseVersion: data.lighthouseResult?.lighthouseVersion ?? null,
   };
 }
@@ -84,6 +110,19 @@ async function runPsiWithRetry(target, strategy) {
     }
   }
   throw lastError;
+}
+
+async function runIndependentSample(target, strategy, seenTimestamps) {
+  let lastTimestamp = null;
+  for (let attempt = 1; attempt <= UNIQUE_SAMPLE_ATTEMPTS; attempt += 1) {
+    const result = await runPsiWithRetry(target, strategy);
+    lastTimestamp = result.fetchedAt;
+    if (!seenTimestamps.has(result.fetchedAt)) return result;
+    if (attempt < UNIQUE_SAMPLE_ATTEMPTS) await sleep(SAMPLE_GAP_MS);
+  }
+  throw new Error(
+    `PSI returned cached duplicate analysis for ${target.id}/${strategy} (${lastTimestamp}); independent evidence was not obtained`
+  );
 }
 
 function aggregateSamples(target, strategy, samples, sampleErrors) {
@@ -108,8 +147,16 @@ function aggregateSamples(target, strategy, samples, sampleErrors) {
       speedIndexMs: median(samples.map((sample) => sample.metrics.speedIndexMs)),
       ttiMs: median(samples.map((sample) => sample.metrics.ttiMs)),
     },
+    diagnostics: {
+      lcp: samples.map((sample, index) => ({
+        sample: index + 1,
+        fetchedAt: sample.fetchedAt,
+        ...sample.diagnostics.lcp,
+      })),
+    },
     lighthouseVersion: samples.at(-1)?.lighthouseVersion ?? null,
     evidenceCount: samples.length,
+    distinctAnalysisCount: new Set(samples.map((sample) => sample.fetchedAt)).size,
     requestedSamples: SAMPLE_COUNT,
     sampleErrors,
     samples: samples.map((sample, index) => ({
@@ -146,10 +193,14 @@ for (const target of WEBOPS_CONFIG.targets) {
   for (const strategy of WEBOPS_CONFIG.strategies) {
     const samples = [];
     const sampleErrors = [];
+    const seenTimestamps = new Set();
 
     for (let sample = 1; sample <= SAMPLE_COUNT; sample += 1) {
       try {
-        samples.push(await runPsiWithRetry(target, strategy));
+        if (sample > 1) await sleep(SAMPLE_GAP_MS);
+        const result = await runIndependentSample(target, strategy, seenTimestamps);
+        seenTimestamps.add(result.fetchedAt);
+        samples.push(result);
       } catch (error) {
         sampleErrors.push({ sample, error: error instanceof Error ? error.message : String(error) });
       }
@@ -163,9 +214,10 @@ for (const target of WEBOPS_CONFIG.targets) {
         strategy,
         status: 'error',
         evidenceCount: samples.length,
+        distinctAnalysisCount: seenTimestamps.size,
         requestedSamples: SAMPLE_COUNT,
         sampleErrors,
-        error: `Insufficient repeated evidence for ${target.id}/${strategy}: ${samples.length}/${SAMPLE_COUNT} successful samples`,
+        error: `Insufficient independent evidence for ${target.id}/${strategy}: ${samples.length}/${SAMPLE_COUNT} distinct analyses`,
       });
       continue;
     }
@@ -175,7 +227,7 @@ for (const target of WEBOPS_CONFIG.targets) {
 }
 
 const output = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   generatedAt: new Date().toISOString(),
   gitSha: process.env.GITHUB_SHA ?? null,
   repository: process.env.GITHUB_REPOSITORY ?? null,
@@ -183,6 +235,9 @@ const output = {
     sampleCount: SAMPLE_COUNT,
     minimumEvidence: MIN_EVIDENCE,
     transientRetries: MAX_RETRIES,
+    sampleGapMs: SAMPLE_GAP_MS,
+    uniqueSampleAttempts: UNIQUE_SAMPLE_ATTEMPTS,
+    distinctAnalysisTimestampRequired: true,
     aggregation: 'median',
   },
   results,
