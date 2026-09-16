@@ -10,7 +10,7 @@ import {
   pushDataLayerEvent,
 } from '@/lib/analytics/gtm';
 
-const GTM_FALLBACK_DELAY_MS = 5000;
+const GTM_FALLBACK_DELAY_MS = 8000;
 let gtmLoadRequested = false;
 
 function requestGtmLoad() {
