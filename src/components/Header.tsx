@@ -3,18 +3,35 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import LanguageSelector from '@/components/LanguageSelector';
-import { useLanguage } from '@/context/LanguageContext';
-import { getDictionary } from '@/lib/i18n/dictionaries';
-import { localizePathname } from '@/lib/i18n/pathname';
-import { getPrimaryNavigationRoutes } from '@/lib/i18n/static-routes';
 
-export default function Header() {
+interface HeaderNavLink {
+  label: string;
+  href: string;
+}
+
+interface HeaderProps {
+  navLinks: HeaderNavLink[];
+  homeHref: string;
+  mainNavigationLabel: string;
+  returnHomeLabel: string;
+  openNavigationMenuLabel: string;
+  closeNavigationMenuLabel: string;
+  mobileNavigationLabel: string;
+}
+
+export default function Header({
+  navLinks,
+  homeHref,
+  mainNavigationLabel,
+  returnHomeLabel,
+  openNavigationMenuLabel,
+  closeNavigationMenuLabel,
+  mobileNavigationLabel,
+}: HeaderProps) {
   const [scrollDensity, setScrollDensity] = useState(0);
   const [headerState, setHeaderState] = useState<'hero' | 'light'>('hero');
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
-  const { locale } = useLanguage();
-  const dictionary = getDictionary(locale);
 
   useEffect(() => {
     let ticking = false;
@@ -56,10 +73,6 @@ export default function Header() {
     setMobileOpen(false);
   }, [pathname]);
 
-  const navLinks = getPrimaryNavigationRoutes(locale).map((route) => ({
-    label: dictionary.global.nav[route.key],
-    href: route.href,
-  }));
 
   const lightSurface = headerState === 'light';
   const logoTone = lightSurface ? 'text-[#1f1b18]' : 'text-white/88';
@@ -103,12 +116,12 @@ export default function Header() {
     >
       <nav
         className="max-w-7xl mx-auto flex h-16 items-center justify-between px-6 pt-[max(env(safe-area-inset-top),0px)] sm:px-10 lg:px-16"
-        aria-label={dictionary.accessibility.mainNavigation}
+        aria-label={mainNavigationLabel}
       >
         <Link
-          href={localizePathname('/', locale)}
+          href={homeHref}
           className="group flex flex-shrink-0 items-center"
-          aria-label={dictionary.accessibility.returnHome}
+          aria-label={returnHomeLabel}
         >
           <span
             className={`font-body text-sm font-semibold uppercase tracking-[0.24em] transition-colors duration-[var(--motion-hover)] ease-[var(--ease-luxury)] ${
@@ -144,8 +157,8 @@ export default function Header() {
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={
             mobileOpen
-              ? dictionary.accessibility.closeNavigationMenu
-              : dictionary.accessibility.openNavigationMenu
+              ? closeNavigationMenuLabel
+              : openNavigationMenuLabel
           }
           aria-expanded={mobileOpen}
         >
@@ -194,7 +207,7 @@ export default function Header() {
               borderTopColor: mobileMenuBorder,
             }}
             role="navigation"
-            aria-label={dictionary.accessibility.mobileNavigation}
+            aria-label={mobileNavigationLabel}
           >
             {navLinks?.map((item) => (
               <Link
