@@ -8,10 +8,14 @@ import { getDictionary } from '@/lib/i18n/dictionaries';
 import { localizePathname } from '@/lib/i18n/pathname';
 import { getPrimaryNavigationRoutes } from '@/lib/i18n/static-routes';
 
-export default function Header() {
+export default function Header({
+  snapshot,
+}: { snapshot?: { state: 'hero' | 'light'; mobileOpen: boolean } } = {}) {
   const [scrollDensity, setScrollDensity] = useState(0);
-  const [headerState, setHeaderState] = useState<'hero' | 'light'>('hero');
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [liveHeaderState, setHeaderState] = useState<'hero' | 'light'>('hero');
+  const [liveMobileOpen, setMobileOpen] = useState(false);
+  const headerState = snapshot?.state ?? liveHeaderState;
+  const mobileOpen = snapshot?.mobileOpen ?? liveMobileOpen;
   const pathname = usePathname();
   const { locale } = useLanguage();
   const dictionary = getDictionary(locale);
@@ -134,7 +138,7 @@ export default function Header() {
               />
             </Link>
           ))}
-          <LanguageSelector />
+          <LanguageSelector snapshotOpen={Boolean(snapshot)} />
         </div>
 
         <button
@@ -208,7 +212,7 @@ export default function Header() {
               </Link>
             ))}
             <div className="pt-5">
-              <LanguageSelector />
+              <LanguageSelector snapshotOpen={Boolean(snapshot)} />
             </div>
           </div>
         </>

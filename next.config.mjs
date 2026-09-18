@@ -84,10 +84,26 @@ const nextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
-        { source: '/', destination: '/api/home-shell/en' },
-        { source: '/tr', destination: '/api/home-shell/tr' },
-        { source: '/zh', destination: '/api/home-shell/zh' },
-        { source: '/ru', destination: '/api/home-shell/ru' },
+        {
+          source: '/',
+          missing: [{ type: 'header', key: 'rsc' }],
+          destination: '/api/home-shell/en',
+        },
+        {
+          source: '/tr',
+          missing: [{ type: 'header', key: 'rsc' }],
+          destination: '/api/home-shell/tr',
+        },
+        {
+          source: '/zh',
+          missing: [{ type: 'header', key: 'rsc' }],
+          destination: '/api/home-shell/zh',
+        },
+        {
+          source: '/ru',
+          missing: [{ type: 'header', key: 'rsc' }],
+          destination: '/api/home-shell/ru',
+        },
       ],
       afterFiles: [],
       fallback: [],

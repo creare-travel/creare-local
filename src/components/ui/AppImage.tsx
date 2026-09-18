@@ -111,6 +111,8 @@ const AppImage = memo(function AppImage({
   }, [atmosphere, className, isLoaded, onClick]);
 
   const commonProps = {
+    'data-app-image': '',
+    'data-fallback-src': fallbackSrc,
     src: normalizedAsset.src,
     alt: alt || 'Image',
     className: imageClassName,

@@ -28,6 +28,7 @@ export default function HomeHeroInquiryLink({
   return (
     <Link
       href={href}
+      data-home-inquiry-label={label}
       prefetch={false}
       onClick={() =>
         trackCtaClick({

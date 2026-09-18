@@ -1,183 +1,185 @@
 (() => {
   const locale = document.documentElement.dataset.locale || 'en';
-  const homeByLocale = { en: '/', tr: '/tr', zh: '/zh', ru: '/ru' };
-  const languageLabels = { en: 'English', tr: 'Türkçe', zh: '简体中文', ru: 'Русский' };
-  const header = document.querySelector('header[data-header-state]');
-  const topHeaderStyle = header?.getAttribute('style') || '';
+  const homes = { en: '/', tr: '/tr', zh: '/zh', ru: '/ru' };
+  let header = document.querySelector('header[data-header-state]');
+  let mobileOpen = false;
+  let state = '';
+  let languageButton = null;
+  let oldOverflow = '';
+  const mobileButton = () => header?.querySelector('button[aria-expanded]:not([aria-haspopup])');
 
-  function setHeaderTone(lightSurface) {
-    if (!header) return;
-    const y = window.scrollY;
-    const density = Math.min(y / 80, 1);
-    header.dataset.headerState = lightSurface ? 'light' : 'hero';
-    header.style.backgroundColor = lightSurface
-      ? `rgba(247,246,244,${(0.78 + density * 0.16).toFixed(3)})`
-      : `rgba(0,0,0,${(0.012 + density * 0.032).toFixed(3)})`;
-    header.style.backdropFilter = `blur(${lightSurface ? 6 : 0.5 + density * 3.5}px)`;
-    header.style.boxShadow = lightSurface ? '0 10px 34px rgba(0,0,0,.04)' : 'none';
-    header.style.borderColor = lightSurface ? 'rgba(0,0,0,.05)' : 'rgba(255,255,255,.025)';
-
-    const tone = lightSurface ? '#1f1b18' : 'rgba(255,255,255,.88)';
-    header.querySelectorAll('a, button').forEach((element) => {
-      element.style.color = tone;
-    });
+  function closeLanguage(restore = false) {
+    if (!languageButton) return;
+    const button = languageButton;
+    button.setAttribute('aria-expanded', 'false');
+    button.querySelector('svg')?.classList.remove('rotate-180');
+    button.parentElement.querySelector('[role="listbox"]').hidden = true;
+    languageButton = null;
+    if (restore) button.focus();
   }
 
-  function syncHeader() {
+  function syncHeader(force = false) {
     if (!header) return;
-    const lightSurface = window.scrollY >= window.innerHeight * 0.75;
-    if (!lightSurface && window.scrollY < 2 && topHeaderStyle) {
-      header.setAttribute('style', topHeaderStyle);
-      header.querySelectorAll('a, button').forEach((element) => {
-        element.style.color = '';
+    const nextState = window.scrollY < innerHeight * 0.75 ? 'hero' : 'light';
+    if (force || state !== nextState) {
+      closeLanguage();
+      const template = document.getElementById('home-header-' + nextState + '-' + (mobileOpen ? 'open' : 'closed'));
+      const replacement = template?.content.querySelector('header')?.cloneNode(true);
+      if (!replacement) return;
+      replacement.querySelectorAll('[role="listbox"]').forEach(list => { list.hidden = true; });
+      replacement.querySelectorAll('button[aria-haspopup]').forEach(button => {
+        button.setAttribute('aria-expanded', 'false');
+        button.querySelector('svg')?.classList.remove('rotate-180');
       });
-      header.dataset.headerState = 'hero';
-      return;
+      header.replaceWith(replacement);
+      header = replacement;
+      state = nextState;
     }
-    setHeaderTone(lightSurface);
+    const density = Math.min(window.scrollY / 80, 1);
+    header.style.backgroundColor = state === 'light'
+      ? 'rgba(247,246,244,' + (density * 0.18).toFixed(3) + ')'
+      : 'rgba(0,0,0,' + (0.012 + density * 0.032).toFixed(3) + ')';
+    header.style.backdropFilter = 'blur(' + (state === 'light' ? density * 3 : 0.5 + density * 3.5).toFixed(2) + 'px)';
+    header.style.boxShadow = state === 'light' ? '0 10px 34px rgba(0,0,0,' + (density * 0.04).toFixed(3) + ')' : 'none';
   }
 
-  let scrollQueued = false;
-  addEventListener(
-    'scroll',
-    () => {
-      if (scrollQueued) return;
-      scrollQueued = true;
-      requestAnimationFrame(() => {
-        syncHeader();
-        scrollQueued = false;
-      });
-    },
-    { passive: true }
-  );
+  function setMobile(open, restore = false) {
+    if (open && !mobileOpen) oldOverflow = document.body.style.overflow;
+    mobileOpen = open;
+    document.body.style.overflow = open ? 'hidden' : oldOverflow;
+    syncHeader(true);
+    if (restore) mobileButton()?.focus();
+  }
+
+  let queued = false;
+  addEventListener('scroll', () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => { syncHeader(); queued = false; });
+  }, { passive: true });
+  addEventListener('resize', () => {
+    if (innerWidth >= 1024 && mobileOpen) setMobile(false);
+    syncHeader();
+  });
   syncHeader();
 
-  function closeMenus() {
-    document.querySelectorAll('[data-static-menu]').forEach((element) => element.remove());
-    document.querySelectorAll('button[aria-expanded="true"]').forEach((element) => {
-      element.setAttribute('aria-expanded', 'false');
-    });
-    document.body.style.overflow = '';
+  function openLanguage(button, focus = false) {
+    const alreadyOpen = languageButton === button;
+    closeLanguage();
+    if (alreadyOpen) return;
+    languageButton = button;
+    const list = button.parentElement.querySelector('[role="listbox"]');
+    if (!list) return;
+    list.hidden = false;
+    button.setAttribute('aria-expanded', 'true');
+    button.querySelector('svg')?.classList.add('rotate-180');
+    if (focus) (list.querySelector('[aria-selected="true"] button') || list.querySelector('button'))?.focus();
   }
 
-  addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeMenus();
-  });
-
-  document.querySelectorAll('button[aria-label="Select language"]').forEach((button) => {
-    button.addEventListener('click', (event) => {
-      event.stopPropagation();
-      if (document.querySelector('[data-static-menu="language"]')) {
-        closeMenus();
+  document.addEventListener('click', event => {
+    if (!(event.target instanceof Element)) return;
+    const button = event.target.closest('button');
+    if (button && header?.contains(button)) {
+      if (button.matches('[aria-haspopup]')) { openLanguage(button); return; }
+      const option = button.closest('[role="option"]');
+      if (option) {
+        const code = Object.keys(homes)[Array.from(option.parentElement.children).indexOf(option)];
+        closeLanguage();
+        if (code && code !== locale) {
+          try { localStorage.setItem('creare_locale', code); } catch {}
+          location.assign(homes[code] + location.search + location.hash);
+        }
         return;
       }
-
-      closeMenus();
-      button.setAttribute('aria-expanded', 'true');
-      const menu = document.createElement('div');
-      menu.dataset.staticMenu = 'language';
-      menu.setAttribute('role', 'menu');
-      menu.style.cssText =
-        'position:absolute;right:0;top:calc(100% + 14px);min-width:150px;background:rgba(10,10,10,.96);border:1px solid rgba(255,255,255,.12);padding:10px;z-index:80;backdrop-filter:blur(12px)';
-
-      for (const code of ['en', 'tr', 'zh', 'ru']) {
-        const link = document.createElement('a');
-        link.href = homeByLocale[code];
-        link.textContent = languageLabels[code];
-        link.setAttribute('role', 'menuitem');
-        link.style.cssText =
-          'display:block;padding:9px 12px;color:rgba(255,255,255,.82);font-size:12px;text-decoration:none;letter-spacing:.08em';
-        menu.appendChild(link);
-      }
-      button.parentElement?.appendChild(menu);
-    });
+      if (button.matches('[aria-expanded]:not([aria-haspopup])')) { setMobile(!mobileOpen, true); return; }
+      if (button.matches('.fixed.inset-0')) { setMobile(false, true); return; }
+    }
+    if (!event.target.closest('[role="listbox"]')) closeLanguage();
   });
 
-  document.querySelectorAll('button[aria-expanded]:not([aria-haspopup])').forEach((button) => {
-    button.addEventListener('click', (event) => {
-      event.stopPropagation();
-      if (document.querySelector('[data-static-menu="mobile"]')) {
-        closeMenus();
-        return;
-      }
-
-      closeMenus();
-      button.setAttribute('aria-expanded', 'true');
-      document.body.style.overflow = 'hidden';
-      const overlay = document.createElement('div');
-      overlay.dataset.staticMenu = 'mobile';
-      overlay.setAttribute('role', 'navigation');
-      overlay.style.cssText =
-        'position:fixed;inset:64px 0 0;background:#050505;z-index:49;padding:36px 24px;overflow:auto';
-
-      const links = [...(header?.querySelectorAll('nav a') || [])].filter((link) => {
-        return link.textContent?.trim().toUpperCase() !== 'CREARE';
-      });
-      const seen = new Set();
-      for (const source of links) {
-        const href = source.getAttribute('href');
-        if (!href || seen.has(href)) continue;
-        seen.add(href);
-        const link = document.createElement('a');
-        link.href = href;
-        link.textContent = source.textContent?.trim() || href;
-        link.style.cssText =
-          'display:block;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.1);color:white;text-decoration:none;font-size:14px;letter-spacing:.08em;text-transform:uppercase';
-        overlay.appendChild(link);
-      }
-
-      const languages = document.createElement('div');
-      languages.style.cssText = 'display:flex;gap:18px;padding-top:28px;flex-wrap:wrap';
-      for (const code of ['en', 'tr', 'zh', 'ru']) {
-        const link = document.createElement('a');
-        link.href = homeByLocale[code];
-        link.textContent = languageLabels[code];
-        link.style.cssText =
-          'color:rgba(255,255,255,.65);text-decoration:none;font-size:12px';
-        languages.appendChild(link);
-      }
-      overlay.appendChild(languages);
-      document.body.appendChild(overlay);
-    });
-  });
-
-  document.addEventListener('click', (event) => {
-    if (!(event.target instanceof Element)) return;
-    if (event.target.closest('[data-static-menu],button[aria-expanded="true"]')) return;
-    closeMenus();
-  });
-
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event: 'page_view', page_path: location.pathname + location.search });
-
-  document.addEventListener('click', (event) => {
-    if (!(event.target instanceof Element)) return;
-    const link = event.target.closest('a');
-    if (!link) return;
-    const href = link.getAttribute('href') || '';
-    if (href.includes('/contact')) {
-      window.dataLayer.push({
-        event: 'inquiry_click',
-        cta_label: (link.textContent || 'Contact').trim().slice(0, 120),
-        inquiry_source: 'home_static_shell',
-        page_path: location.pathname,
-      });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      if (languageButton) closeLanguage(true);
+      else if (mobileOpen) setMobile(false, true);
+    }
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.matches('button[aria-haspopup]') && ['ArrowDown', 'ArrowUp'].includes(event.key)) {
+      event.preventDefault(); openLanguage(target, true); return;
+    }
+    const list = target.closest('[role="listbox"]');
+    if (list && ['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+      event.preventDefault();
+      const options = Array.from(list.querySelectorAll('button'));
+      let i = options.indexOf(document.activeElement);
+      i = event.key === 'Home' ? 0 : event.key === 'End' ? options.length - 1 : (i + (event.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length;
+      options[i]?.focus();
+    }
+    if (event.key === 'Tab' && mobileOpen) {
+      const focusable = Array.from(header.querySelectorAll('a, button')).filter(el => el.getClientRects().length && !el.closest('[hidden]'));
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    } else if (event.key === 'Tab' && languageButton) {
+      setTimeout(() => {
+        if (languageButton && !languageButton.parentElement.contains(document.activeElement)) closeLanguage();
+      }, 0);
     }
   });
 
-  const gtmId = 'GTM-K99ZH56G';
-  let gtmLoaded = false;
-  const loadGtm = () => {
-    if (gtmLoaded) return;
-    gtmLoaded = true;
+  document.querySelectorAll('img[data-app-image]').forEach(img => {
+    const loaded = () => {
+      img.classList.remove('opacity-0', 'scale-[1.012]', 'blur-[0.4px]');
+      img.classList.add('opacity-100', 'scale-100', 'blur-0');
+      img.style.backgroundImage = '';
+    };
+    const failed = () => {
+      if (img.dataset.fallbackUsed) return;
+      img.dataset.fallbackUsed = 'true';
+      img.removeAttribute('srcset');
+      img.src = img.dataset.fallbackSrc;
+    };
+    img.addEventListener('load', loaded);
+    img.addEventListener('error', failed);
+    if (img.complete) { if (img.naturalWidth) loaded(); else failed(); }
+  });
+
+  const gtmId = document.body.dataset.homeGtmId;
+  if (!gtmId) return;
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: 'page_view', page_path: location.pathname + location.search });
+  document.addEventListener('click', event => {
+    if (!(event.target instanceof Element)) return;
+    const link = event.target.closest('a[data-home-inquiry-label]');
+    if (!link) return;
+    window.dataLayer.push({
+      event: 'inquiry_click',
+      page_path: location.pathname,
+      page_title: document.title,
+      page_location: location.href,
+      cta_label: link.dataset.homeInquiryLabel,
+      inquiry_source: 'home_hero',
+      experience_slug: new URLSearchParams(location.search).get('exp') || 'direct',
+      session_origin: 'direct',
+      intent_level: 'medium',
+      cta_position: 'hero',
+    });
+  });
+  const events = ['pointerdown', 'touchstart', 'keydown', 'scroll'];
+  let loaded = false;
+  let timer;
+  function loadGtm() {
+    if (loaded) return;
+    loaded = true;
+    clearTimeout(timer);
+    events.forEach(name => removeEventListener(name, loadGtm));
     window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
     const script = document.createElement('script');
+    script.id = 'gtm-init';
     script.async = true;
-    script.src = `https://www.googletagmanager.com/gtm.js?id=${gtmId}`;
+    script.src = 'https://www.googletagmanager.com/gtm.js?id=' + encodeURIComponent(gtmId);
     document.head.appendChild(script);
-  };
-  ['pointerdown', 'touchstart', 'keydown', 'scroll'].forEach((eventName) => {
-    addEventListener(eventName, loadGtm, { once: true, passive: true });
-  });
-  setTimeout(loadGtm, 30000);
+  }
+  events.forEach(name => addEventListener(name, loadGtm, { once: true, passive: true }));
+  timer = setTimeout(loadGtm, 30000);
 })();

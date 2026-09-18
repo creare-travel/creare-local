@@ -79,7 +79,10 @@ export default function LocaleRootShell({ children, locale }: LocaleRootShellPro
   const globalSchemaGraph = [buildOrganizationSchema(), buildBrandSchema(), buildWebSiteSchema()];
 
   return (
-    <body className="bg-black text-white antialiased">
+    <body
+      className="bg-black text-white antialiased"
+      data-home-gtm-id={isGtmEnabled() ? GTM_ID : undefined}
+    >
       {isGtmEnabled() ? (
         <noscript>
           <iframe
