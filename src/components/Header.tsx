@@ -73,7 +73,6 @@ export default function Header({
     setMobileOpen(false);
   }, [pathname]);
 
-
   const lightSurface = headerState === 'light';
   const logoTone = lightSurface ? 'text-[#1f1b18]' : 'text-white/88';
   const navTone = lightSurface ? 'text-[#2c2825]/90' : 'text-white/85';
@@ -155,11 +154,7 @@ export default function Header({
             lightSurface ? 'hover:text-[#1f1b18]' : 'hover:text-white'
           } ${mobileTone}`}
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label={
-            mobileOpen
-              ? closeNavigationMenuLabel
-              : openNavigationMenuLabel
-          }
+          aria-label={mobileOpen ? closeNavigationMenuLabel : openNavigationMenuLabel}
           aria-expanded={mobileOpen}
         >
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
