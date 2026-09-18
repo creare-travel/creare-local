@@ -5,11 +5,14 @@ import { useLanguage, LOCALES } from '@/context/LanguageContext';
 import type { SiteLocale } from '@/lib/i18n/config';
 import { resolveLocaleSwitchTarget } from '@/lib/i18n/locale-switch';
 
-export default function LanguageSelector() {
+export default function LanguageSelector({
+  snapshotOpen = false,
+}: { snapshotOpen?: boolean } = {}) {
   const { locale, setLocale } = useLanguage();
   const pathname = usePathname();
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [liveOpen, setOpen] = useState(false);
+  const open = snapshotOpen || liveOpen;
   const [pendingLocale, setPendingLocale] = useState<SiteLocale | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const switchIdRef = useRef(0);
