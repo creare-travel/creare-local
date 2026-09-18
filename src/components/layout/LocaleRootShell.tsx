@@ -15,6 +15,9 @@ import {
 } from '@/lib/schema-builder';
 import { DEFAULT_METADATA, DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_ALT } from '@/lib/seo';
 import type { SiteLocale } from '@/lib/i18n/config';
+import { getDictionary } from '@/lib/i18n/dictionaries';
+import { localizePathname } from '@/lib/i18n/pathname';
+import { getPrimaryNavigationRoutes } from '@/lib/i18n/static-routes';
 
 const isMaintenanceMode = process.env.NEXT_PUBLIC_SITE_MODE === 'maintenance';
 
@@ -77,6 +80,11 @@ interface LocaleRootShellProps {
 
 export default function LocaleRootShell({ children, locale }: LocaleRootShellProps) {
   const globalSchemaGraph = [buildOrganizationSchema(), buildBrandSchema(), buildWebSiteSchema()];
+  const dictionary = getDictionary(locale);
+  const navLinks = getPrimaryNavigationRoutes(locale).map((route) => ({
+    label: dictionary.global.nav[route.key],
+    href: route.href,
+  }));
 
   return (
     <body className="bg-black text-white antialiased">
@@ -99,9 +107,17 @@ export default function LocaleRootShell({ children, locale }: LocaleRootShellPro
           <UnderConstruction />
         ) : (
           <>
-            <Header />
+            <Header
+              navLinks={navLinks}
+              homeHref={localizePathname('/', locale)}
+              mainNavigationLabel={dictionary.accessibility.mainNavigation}
+              returnHomeLabel={dictionary.accessibility.returnHome}
+              openNavigationMenuLabel={dictionary.accessibility.openNavigationMenu}
+              closeNavigationMenuLabel={dictionary.accessibility.closeNavigationMenu}
+              mobileNavigationLabel={dictionary.accessibility.mobileNavigation}
+            />
             {children}
-            <Footer />
+            <Footer locale={locale} />
           </>
         )}
       </LanguageProvider>
