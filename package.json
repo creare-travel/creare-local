@@ -54,7 +54,8 @@
     "google:discover:ga4": "node --import tsx scripts/google/discover-ga4-state.ts",
     "google:plan:gtm-outbound": "node --import tsx scripts/google/plan-gtm-outbound-layer.ts",
     "serve": "next start",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "prebuild": "node scripts/patch-next-hydration-defer.mjs"
   },
   "dependencies": {
     "@dhiwise/component-tagger": "^1.0.14",
