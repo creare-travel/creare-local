@@ -5,7 +5,7 @@ import { buildLocaleOwnedMetadata } from '@/lib/seo';
 
 const dictionary = getDictionary('tr');
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export const metadata: Metadata = buildLocaleOwnedMetadata({
   locale: 'tr',
