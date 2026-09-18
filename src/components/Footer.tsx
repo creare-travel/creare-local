@@ -1,13 +1,15 @@
-'use client';
 import React from 'react';
 import Link from 'next/link';
-import { useLanguage } from '@/context/LanguageContext';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { localizePathname } from '@/lib/i18n/pathname';
 import { getFooterNavigationRoutes, getLegalNavigationRoutes } from '@/lib/i18n/static-routes';
+import type { SiteLocale } from '@/lib/i18n/config';
 
-export default function Footer() {
-  const { locale } = useLanguage();
+interface FooterProps {
+  locale: SiteLocale;
+}
+
+export default function Footer({ locale }: FooterProps) {
   const dictionary = getDictionary(locale);
   const footerLinks = getFooterNavigationRoutes(locale);
   const legalLinks = getLegalNavigationRoutes(locale);
