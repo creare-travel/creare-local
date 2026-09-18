@@ -1,0 +1,29 @@
+name: Home shell regression
+
+on:
+  pull_request:
+    paths:
+      - 'src/app/api/home-shell/**'
+      - 'tests/home-shell-source.test.mjs'
+      - '.github/workflows/home-shell-regression.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/app/api/home-shell/**'
+      - 'tests/home-shell-source.test.mjs'
+      - '.github/workflows/home-shell-regression.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  anonymous-source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node --test tests/home-shell-source.test.mjs

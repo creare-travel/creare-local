@@ -56,7 +56,11 @@ export async function GET(
   const deploymentHost = process.env.VERCEL_URL;
   const localUrl = new URL(request.url);
   let origin: string;
-  if (deploymentHost && /^[a-zA-Z0-9.-]+\.vercel\.app$/.test(deploymentHost)) {
+  const isProduction = process.env.VERCEL_ENV === 'production';
+  if (isProduction) {
+    // Generated deployment URLs stay protected even when production domains are public.
+    origin = 'https://crearetravel.com';
+  } else if (deploymentHost && /^[a-zA-Z0-9.-]+\.vercel\.app$/.test(deploymentHost)) {
     origin = 'https://' + deploymentHost;
   } else if (
     !process.env.VERCEL &&
@@ -68,11 +72,13 @@ export async function GET(
   }
 
   const headers = new Headers({ 'x-creare-home-shell-source': '1' });
-  // Only Vercel's deployment access cookie is relevant to this public source.
-  const accessCookie = request.cookies.get('_vercel_jwt')?.value;
-  if (accessCookie) headers.set('cookie', '_vercel_jwt=' + accessCookie);
-  const bypass = request.headers.get('x-vercel-protection-bypass');
-  if (bypass) headers.set('x-vercel-protection-bypass', bypass);
+  // Preview credentials are sent only to that deployment, never to the public origin.
+  if (!isProduction && deploymentHost) {
+    const accessCookie = request.cookies.get('_vercel_jwt')?.value;
+    if (accessCookie) headers.set('cookie', '_vercel_jwt=' + accessCookie);
+    const bypass = request.headers.get('x-vercel-protection-bypass');
+    if (bypass) headers.set('x-vercel-protection-bypass', bypass);
+  }
 
   try {
     const upstream = await fetch(
