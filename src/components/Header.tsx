@@ -193,7 +193,7 @@ export default function Header({
           <button
             type="button"
             className={`fixed inset-0 z-0 transition-[background-color,backdrop-filter,opacity] duration-[var(--motion-standard)] ease-[var(--ease-luxury)] lg:hidden ${mobileOverlayTone}`}
-            aria-label={dictionary.accessibility.closeNavigationMenu}
+            aria-label={closeNavigationMenuLabel}
             onClick={() => setMobileOpen(false)}
           />
           <div
