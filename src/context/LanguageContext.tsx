@@ -13,8 +13,6 @@ export type Locale = SiteLocale;
 
 export const LOCALES = LOCALE_OPTIONS;
 
-type TranslationDict = Record<string, unknown>;
-
 interface LanguageContextValue {
   locale: Locale;
   setLocale: (locale: Locale) => void;
@@ -29,19 +27,6 @@ const LanguageContext = createContext<LanguageContextValue>({
   dir: 'ltr',
 });
 
-function getNestedValue(obj: TranslationDict, key: string): string {
-  const parts = key.split('.');
-  let current: unknown = obj;
-  for (const part of parts) {
-    if (current && typeof current === 'object' && part in (current as Record<string, unknown>)) {
-      current = (current as Record<string, unknown>)[part];
-    } else {
-      return key;
-    }
-  }
-  return typeof current === 'string' ? current : key;
-}
-
 interface LanguageProviderProps {
   children: React.ReactNode;
   initialLocale?: Locale;
@@ -51,17 +36,11 @@ export function LanguageProvider({ children, initialLocale }: LanguageProviderPr
   const pathname = usePathname();
   const pathnameLocale = getLocaleFromPathname(pathname ?? '/');
   const [locale, setLocaleState] = useState<Locale>(initialLocale ?? pathnameLocale);
-  const [translations, setTranslations] = useState<TranslationDict>({});
 
   useEffect(() => {
     setLocaleState(pathnameLocale);
   }, [pathnameLocale]);
 
-  useEffect(() => {
-    import(`../locales/${locale}.json`)
-      .then((mod) => setTranslations(mod.default as TranslationDict))
-      .catch(() => setTranslations({}));
-  }, [locale]);
 
   const setLocale = useCallback(
     (newLocale: Locale) => {
@@ -74,14 +53,7 @@ export function LanguageProvider({ children, initialLocale }: LanguageProviderPr
     [pathnameLocale]
   );
 
-  const t = useCallback(
-    (key: string): string => {
-      if (!translations || Object.keys(translations).length === 0) return key;
-      const val = getNestedValue(translations, key);
-      return val && val !== key ? val : key;
-    },
-    [translations]
-  );
+  const t = useCallback((key: string) => key, []);
 
   const dir = getLocaleDescriptor(locale).direction;
 
