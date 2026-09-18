@@ -3,7 +3,7 @@
   const homes = { en: '/', tr: '/tr', zh: '/zh', ru: '/ru' };
   let header = document.querySelector('header[data-header-state]');
   let mobileOpen = false;
-  let state = '';
+  let state = header?.dataset.headerState || 'hero';
   let languageButton = null;
   let oldOverflow = '';
   const mobileButton = () => header?.querySelector('button[aria-expanded]:not([aria-haspopup])');
@@ -68,8 +68,13 @@
     closeLanguage();
     if (alreadyOpen) return;
     languageButton = button;
-    const list = button.parentElement.querySelector('[role="listbox"]');
-    if (!list) return;
+    let list = button.parentElement.querySelector('[role="listbox"]');
+    if (!list) {
+      const template = document.getElementById('home-header-' + state + '-closed');
+      list = template?.content.querySelector('[role="listbox"]')?.cloneNode(true);
+      if (!list) return;
+      button.parentElement.appendChild(list);
+    }
     list.hidden = false;
     button.setAttribute('aria-expanded', 'true');
     button.querySelector('svg')?.classList.add('rotate-180');
