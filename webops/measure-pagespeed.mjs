@@ -16,6 +16,83 @@ function metricValue(audits, id) {
   return audits?.[id]?.numericValue ?? null;
 }
 
+function auditItems(audits, id) {
+  const items = audits?.[id]?.details?.items;
+  return Array.isArray(items) ? items : [];
+}
+
+function finiteOrNull(value) {
+  return Number.isFinite(value) ? value : null;
+}
+
+function topBy(items, key, limit = 8) {
+  return [...items]
+    .filter((item) => Number.isFinite(item?.[key]))
+    .sort((a, b) => b[key] - a[key])
+    .slice(0, limit);
+}
+
+function extractDiagnostics(audits) {
+  const diagnosticItem = auditItems(audits, 'diagnostics')[0] ?? {};
+
+  return {
+    mainThreadBreakdown: topBy(auditItems(audits, 'mainthread-work-breakdown'), 'duration').map(
+      (item) => ({
+        group: item.group ?? null,
+        label: item.groupLabel ?? null,
+        durationMs: finiteOrNull(item.duration),
+      }),
+    ),
+    bootupTime: topBy(auditItems(audits, 'bootup-time'), 'total').map((item) => ({
+      url: item.url ?? null,
+      totalMs: finiteOrNull(item.total),
+      scriptingMs: finiteOrNull(item.scripting),
+      parseCompileMs: finiteOrNull(item.scriptParseCompile),
+    })),
+    longTasks: topBy(auditItems(audits, 'long-tasks'), 'duration').map((item) => ({
+      url: item.url ?? null,
+      durationMs: finiteOrNull(item.duration),
+      startTimeMs: finiteOrNull(item.startTime),
+    })),
+    thirdPartySummary: topBy(
+      auditItems(audits, 'third-party-summary'),
+      'mainThreadTime',
+    ).map((item) => ({
+      entity: item.entity ?? null,
+      mainThreadTimeMs: finiteOrNull(item.mainThreadTime),
+      blockingTimeMs: finiteOrNull(item.blockingTime),
+      transferSizeBytes: finiteOrNull(item.transferSize),
+    })),
+    unusedJavaScript: topBy(
+      auditItems(audits, 'unused-javascript'),
+      'wastedBytes',
+    ).map((item) => ({
+      url: item.url ?? null,
+      totalBytes: finiteOrNull(item.totalBytes),
+      wastedBytes: finiteOrNull(item.wastedBytes),
+      wastedPercent: finiteOrNull(item.wastedPercent),
+    })),
+    legacyJavaScript: topBy(
+      auditItems(audits, 'legacy-javascript'),
+      'wastedBytes',
+    ).map((item) => ({
+      url: item.url ?? null,
+      wastedBytes: finiteOrNull(item.wastedBytes),
+    })),
+    taskSummary: {
+      numTasks: finiteOrNull(diagnosticItem.numTasks),
+      numTasksOver10ms: finiteOrNull(diagnosticItem.numTasksOver10ms),
+      numTasksOver25ms: finiteOrNull(diagnosticItem.numTasksOver25ms),
+      numTasksOver50ms: finiteOrNull(diagnosticItem.numTasksOver50ms),
+      numTasksOver100ms: finiteOrNull(diagnosticItem.numTasksOver100ms),
+      numTasksOver500ms: finiteOrNull(diagnosticItem.numTasksOver500ms),
+      mainDocumentTransferSizeBytes: finiteOrNull(diagnosticItem.mainDocumentTransferSize),
+      totalByteWeightBytes: finiteOrNull(diagnosticItem.totalByteWeight),
+      maxServerLatencyMs: finiteOrNull(diagnosticItem.maxServerLatency),
+    },
+  };
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -80,6 +157,7 @@ async function runPsiOnce(target, strategy) {
       speedIndexMs: metricValue(audits, 'speed-index'),
       ttiMs: metricValue(audits, 'interactive'),
     },
+    diagnostics: extractDiagnostics(audits),
     lighthouseVersion: data.lighthouseResult?.lighthouseVersion ?? null,
   };
 }
@@ -134,6 +212,7 @@ function aggregateSamples(target, strategy, samples, sampleErrors, rawSampleCoun
       fetchedAt: sample.fetchedAt,
       scores: sample.scores,
       metrics: sample.metrics,
+      diagnostics: sample.diagnostics,
     })),
   };
 }
@@ -248,7 +327,7 @@ for (const target of WEBOPS_CONFIG.targets) {
 }
 
 const output = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   generatedAt: new Date().toISOString(),
   gitSha: process.env.GITHUB_SHA ?? null,
   repository: process.env.GITHUB_REPOSITORY ?? null,
