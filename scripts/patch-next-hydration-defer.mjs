@@ -1,3 +1,4 @@
+// Guarded workaround for intermittent App Router hydration blocking on Next.js 15.1.11.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
