@@ -41,7 +41,6 @@ export function LanguageProvider({ children, initialLocale }: LanguageProviderPr
     setLocaleState(pathnameLocale);
   }, [pathnameLocale]);
 
-
   const setLocale = useCallback(
     (newLocale: Locale) => {
       localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
