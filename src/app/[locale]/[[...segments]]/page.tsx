@@ -39,7 +39,7 @@ import { localizePathname } from '@/lib/i18n/pathname';
 import { buildLocaleOwnedMetadata } from '@/lib/seo';
 import { buildLocalizedStaticPageMetadata } from '@/features/static-pages/metadata';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 interface GenericLocalePageProps {
   params: Promise<{ locale: string; segments?: string[] }>;

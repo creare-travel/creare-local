@@ -53,6 +53,8 @@ export function buildLocalizedStrapiPath(path: string, siteLocale: LocaleKey): s
 
 interface FetchStrapiOptions {
   locale?: SiteLocale;
+  revalidate?: number;
+  tags?: string[];
 }
 
 export async function fetchStrapi(path: string, options: FetchStrapiOptions = {}) {
@@ -60,9 +62,19 @@ export async function fetchStrapi(path: string, options: FetchStrapiOptions = {}
   const url = strapiUrl(localizedPath);
 
   try {
-    const res = await fetch(url, {
-      cache: 'no-store',
-    });
+    const res = await fetch(
+      url,
+      options.revalidate !== undefined
+        ? {
+            next: {
+              revalidate: options.revalidate,
+              tags: options.tags,
+            },
+          }
+        : {
+            cache: 'no-store',
+          }
+    );
 
     if (!res.ok) {
       const responseText = await res.text().catch(() => '');

@@ -8,6 +8,8 @@ import { fetchStrapi, mediaUrl } from '@/lib/strapi';
 
 export type ExperienceCategory = 'signature' | 'lab' | 'black';
 
+const EXPERIENCE_CATEGORY_REVALIDATE_SECONDS = 300;
+
 export interface CmsImageFormat {
   url?: string;
   width?: number;
@@ -491,6 +493,8 @@ async function fetchExperienceCategoryPageRecord(
 
   const json = await fetchStrapi(`/api/experience-category-pages?${params.toString()}`, {
     locale,
+    revalidate: EXPERIENCE_CATEGORY_REVALIDATE_SECONDS,
+    tags: [`experience-category:${locale}:${category}`],
   });
   const raw = Array.isArray(json?.data) ? json.data[0] : null;
   if (!raw || typeof raw !== 'object') {
