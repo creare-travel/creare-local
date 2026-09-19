@@ -89,8 +89,8 @@ assert.equal(getLocaleFromPathname('/zh/experiences/signature'), 'zh');
 assert.equal(getLocaleFromPathname('/ru/experiences/signature'), 'ru');
 assert.equal(getRegisteredLocaleFromPathname('/zh/experiences/signature'), 'zh');
 assert.equal(getRegisteredLocaleFromPathname('/ru/experiences/signature'), 'ru');
-assert.equal(localizePathname('/experiences/signature', 'zh'), '/zh/experiences/signature');
-assert.equal(localizePathname('/experiences/signature', 'ru'), '/ru/experiences/signature');
+assert.equal(localizePathname('/experiences/signature', 'zh'), '/zh/tiyan/signature');
+assert.equal(localizePathname('/experiences/signature', 'ru'), '/ru/vpechatleniya/signature');
 
 assert.equal(isStaticPathAvailableForLocale('/experiences/signature', 'en'), true);
 assert.equal(isStaticPathAvailableForLocale('/experiences/signature', 'tr'), true);
@@ -110,9 +110,9 @@ const collectionAlternates = buildLocalizedLanguageAlternates(
 );
 assert.deepEqual(collectionAlternates, {
   en: 'https://crearetravel.com/experiences/signature',
-  tr: 'https://crearetravel.com/tr/experiences/signature',
-  'zh-Hans': 'https://crearetravel.com/zh/experiences/signature',
-  ru: 'https://crearetravel.com/ru/experiences/signature',
+  tr: 'https://crearetravel.com/tr/deneyimler/signature',
+  'zh-Hans': 'https://crearetravel.com/zh/tiyan/signature',
+  ru: 'https://crearetravel.com/ru/vpechatleniya/signature',
   'x-default': 'https://crearetravel.com/experiences/signature',
 });
 assert.equal('zh-Hans' in collectionAlternates, true);
@@ -143,7 +143,7 @@ assert.equal(
 );
 assert.equal(
   buildRouteCanonicalUrl({ family: 'experience-category', locale: 'tr', slug: 'lab' }),
-  'https://crearetravel.com/tr/experiences/lab'
+  'https://crearetravel.com/tr/deneyimler/lab'
 );
 assert.equal(getOpenGraphLocale('en'), 'en_US');
 assert.equal(getOpenGraphLocale('tr'), 'tr_TR');
@@ -151,7 +151,7 @@ assert.equal(getOpenGraphLocale('zh'), 'zh_CN');
 assert.equal(getOpenGraphLocale('ru'), 'ru_RU');
 assert.equal(
   buildRouteCanonicalUrl({ family: 'experience-category', locale: 'ru', slug: 'lab' }),
-  'https://crearetravel.com/ru/experiences/lab'
+  'https://crearetravel.com/ru/vpechatleniya/lab'
 );
 
 function makeCategoryPage(
@@ -196,29 +196,26 @@ for (const category of ['signature', 'lab', 'black'] as const) {
   assert.equal(metadata.description, trPage.seo_description);
   assert.equal(
     metadata.alternates?.canonical,
-    `https://crearetravel.com/tr/experiences/${category}`
+    `https://crearetravel.com/tr/deneyimler/${category}`
   );
   assert.deepEqual(metadata.alternates?.languages, {
     en: `https://crearetravel.com/experiences/${category}`,
-    tr: `https://crearetravel.com/tr/experiences/${category}`,
-    'zh-Hans': `https://crearetravel.com/zh/experiences/${category}`,
-    ru: `https://crearetravel.com/ru/experiences/${category}`,
+    tr: `https://crearetravel.com/tr/deneyimler/${category}`,
+    'zh-Hans': `https://crearetravel.com/zh/tiyan/${category}`,
+    ru: `https://crearetravel.com/ru/vpechatleniya/${category}`,
     'x-default': `https://crearetravel.com/experiences/${category}`,
   });
   assert.equal(metadata.openGraph?.locale, 'tr_TR');
-  assert.equal(metadata.openGraph?.url, `https://crearetravel.com/tr/experiences/${category}`);
+  assert.equal(metadata.openGraph?.url, `https://crearetravel.com/tr/deneyimler/${category}`);
   assert.equal(String(metadata.title).includes('Creare — Creare'), false);
 
   const zhPage = makeCategoryPage(category, 'zh');
   const zhMetadata = buildExperienceCategoryMetadata(category, 'zh', zhPage);
   assert.equal(zhMetadata.title, zhPage.seo_title);
   assert.equal(zhMetadata.description, zhPage.seo_description);
-  assert.equal(
-    zhMetadata.alternates?.canonical,
-    `https://crearetravel.com/zh/experiences/${category}`
-  );
+  assert.equal(zhMetadata.alternates?.canonical, `https://crearetravel.com/zh/tiyan/${category}`);
   assert.equal(zhMetadata.openGraph?.locale, 'zh_CN');
-  assert.equal(zhMetadata.openGraph?.url, `https://crearetravel.com/zh/experiences/${category}`);
+  assert.equal(zhMetadata.openGraph?.url, `https://crearetravel.com/zh/tiyan/${category}`);
   assert.equal(String(zhMetadata.title).includes('Creare — Creare'), false);
 }
 

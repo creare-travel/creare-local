@@ -53,12 +53,9 @@ export default function PhilosophyPage() {
           </p>
           <h1 className="font-display font-light leading-[1.18] text-white text-[clamp(2rem,4.6vw,4.4rem)]">
             We believe that the most
-            <br />
-            extraordinary experiences
-            <br />
-            cannot be purchased.
-            <br />
-            <span className="text-white/60">They can only be composed.</span>
+            <br /> extraordinary experiences
+            <br /> cannot be purchased.
+            <br /> <span className="text-white/60">They can only be composed.</span>
           </h1>
         </div>
       </section>

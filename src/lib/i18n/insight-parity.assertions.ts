@@ -240,7 +240,7 @@ for (const slug of migrationSlugs) {
   selectedItems.forEach((item) => {
     assert.equal(
       localizePathname(`/experiences/${item.slug}`, 'tr'),
-      `/tr/experiences/${item.slug}`
+      `/tr/deneyimler/${item.slug}`
     );
     assert.match(item.title, /^TR EXPERIENCE/);
   });

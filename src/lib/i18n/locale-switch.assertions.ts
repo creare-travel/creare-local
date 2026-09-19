@@ -75,7 +75,7 @@ assert.equal(
 );
 assert.equal(
   buildLocaleSwitchCandidate('/experiences/silk-road-istanbul', 'tr'),
-  '/tr/experiences/silk-road-istanbul'
+  '/tr/deneyimler/silk-road-istanbul'
 );
 assert.equal(
   buildLocaleSwitchCandidate('/tr/experiences/silk-road-istanbul', 'en'),
@@ -111,7 +111,7 @@ assert.equal(classifyLocalizedRoute('/trailing').kind, 'unknown');
 EXPERIENCE_CATEGORY_ROUTES.forEach((path) => {
   assert.equal(
     finalizeLocaleSwitchTarget(createLocaleSwitchPlan(path, 'tr'), true).targetPath,
-    `/tr${path}`,
+    path.replace('/experiences', '/tr/deneyimler'),
     `EN to TR collection switch must preserve the collection route: ${path}`
   );
   assert.equal(
@@ -150,21 +150,21 @@ assert.equal(
   '/'
 );
 assert.equal(getLocaleFallbackPath('/cultural-worlds/missing-place', 'tr'), '/tr/cultural-worlds');
-assert.equal(getLocaleFallbackPath('/experiences/missing-experience', 'tr'), '/tr/experiences');
+assert.equal(getLocaleFallbackPath('/experiences/missing-experience', 'tr'), '/tr/deneyimler');
 assert.equal(getLocaleFallbackPath('/insights/missing-insight', 'tr'), '/tr/insights');
 assert.equal(
   finalizeLocaleSwitchTarget(
     createLocaleSwitchPlan('/experiences/silk-road-istanbul', 'tr', '?utm_source=selector-smoke'),
     true
   ).targetPath,
-  '/tr/experiences/silk-road-istanbul?utm_source=selector-smoke'
+  '/tr/deneyimler/silk-road-istanbul?utm_source=selector-smoke'
 );
 assert.equal(
   finalizeLocaleSwitchTarget(
     createLocaleSwitchPlan('/experiences/silk-road-istanbul', 'tr', '', '#overview'),
     true
   ).targetPath,
-  '/tr/experiences/silk-road-istanbul#overview'
+  '/tr/deneyimler/silk-road-istanbul#overview'
 );
 assert.equal(
   finalizeLocaleSwitchTarget(
@@ -176,7 +176,7 @@ assert.equal(
     ),
     false
   ).targetPath,
-  '/tr/experiences'
+  '/tr/deneyimler'
 );
 assert.throws(() => createLocaleSwitchPlan('/', 'fr' as SiteLocale), /Unsupported locale/);
 assert.equal(isSafeSameOriginUrl('https://external.example/tr', origin), false);
@@ -193,7 +193,7 @@ async function main() {
   });
   assert.equal(
     validEquivalent.targetPath,
-    '/tr/experiences/silk-road-istanbul?utm_source=selector-smoke#overview'
+    '/tr/deneyimler/silk-road-istanbul?utm_source=selector-smoke#overview'
   );
   assert.equal(validEquivalent.usedFallback, false);
 
@@ -205,7 +205,7 @@ async function main() {
     search: '?utm_source=selector-smoke',
     targetLocale: 'tr',
   });
-  assert.equal(missingEquivalent.targetPath, '/tr/experiences');
+  assert.equal(missingEquivalent.targetPath, '/tr/deneyimler');
   assert.equal(missingEquivalent.usedFallback, true);
 
   const externalRedirectProbe = async () => ({
@@ -219,7 +219,7 @@ async function main() {
     routeProbe: externalRedirectProbe,
     targetLocale: 'tr',
   });
-  assert.equal(externalRedirect.targetPath, '/tr/experiences');
+  assert.equal(externalRedirect.targetPath, '/tr/deneyimler');
   assert.equal(externalRedirect.usedFallback, true);
 
   const wrongLocaleTr = await resolveWithFinalUrl(
@@ -227,13 +227,13 @@ async function main() {
     'tr',
     `${origin}/experiences/silk-road-istanbul`
   );
-  assert.equal(wrongLocaleTr.targetPath, '/tr/experiences');
+  assert.equal(wrongLocaleTr.targetPath, '/tr/deneyimler');
   assert.equal(wrongLocaleTr.usedFallback, true);
 
   const wrongLocaleEn = await resolveWithFinalUrl(
-    '/tr/experiences/silk-road-istanbul',
+    '/tr/deneyimler/silk-road-istanbul',
     'en',
-    `${origin}/tr/experiences/silk-road-istanbul`
+    `${origin}/tr/deneyimler/silk-road-istanbul`
   );
   assert.equal(wrongLocaleEn.targetPath, '/experiences');
   assert.equal(wrongLocaleEn.usedFallback, true);
@@ -241,13 +241,13 @@ async function main() {
   const validTrRedirect = await resolveWithFinalUrl(
     '/experiences/silk-road-istanbul',
     'tr',
-    `${origin}/tr/experiences/canonical-silk-road`
+    `${origin}/tr/deneyimler/canonical-silk-road`
   );
-  assert.equal(validTrRedirect.targetPath, '/tr/experiences/canonical-silk-road');
+  assert.equal(validTrRedirect.targetPath, '/tr/deneyimler/canonical-silk-road');
   assert.equal(validTrRedirect.usedFallback, false);
 
   const validEnRedirect = await resolveWithFinalUrl(
-    '/tr/experiences/silk-road-istanbul',
+    '/tr/deneyimler/silk-road-istanbul',
     'en',
     `${origin}/experiences/canonical-silk-road`
   );
@@ -259,7 +259,7 @@ async function main() {
     'tr',
     `${origin}/travel`
   );
-  assert.equal(travelRedirect.targetPath, '/tr/experiences');
+  assert.equal(travelRedirect.targetPath, '/tr/deneyimler');
   assert.equal(travelRedirect.usedFallback, true);
 
   const trailingRedirect = await resolveWithFinalUrl(
@@ -267,7 +267,7 @@ async function main() {
     'tr',
     `${origin}/trailing`
   );
-  assert.equal(trailingRedirect.targetPath, '/tr/experiences');
+  assert.equal(trailingRedirect.targetPath, '/tr/deneyimler');
   assert.equal(trailingRedirect.usedFallback, true);
 
   const duplicateTrRedirect = await resolveWithFinalUrl(
@@ -275,7 +275,7 @@ async function main() {
     'tr',
     `${origin}/tr/tr/experiences/silk-road-istanbul`
   );
-  assert.equal(duplicateTrRedirect.targetPath, '/tr/experiences');
+  assert.equal(duplicateTrRedirect.targetPath, '/tr/deneyimler');
   assert.equal(duplicateTrRedirect.usedFallback, true);
 
   const experienceToInsight = await resolveWithFinalUrl(
@@ -283,13 +283,13 @@ async function main() {
     'tr',
     `${origin}/tr/insights/private-life-of-istanbul`
   );
-  assert.equal(experienceToInsight.targetPath, '/tr/experiences');
+  assert.equal(experienceToInsight.targetPath, '/tr/deneyimler');
   assert.equal(experienceToInsight.usedFallback, true);
 
   const insightToExperience = await resolveWithFinalUrl(
     '/insights/private-life-of-istanbul',
     'tr',
-    `${origin}/tr/experiences/silk-road-istanbul`
+    `${origin}/tr/deneyimler/silk-road-istanbul`
   );
   assert.equal(insightToExperience.targetPath, '/tr/insights');
   assert.equal(insightToExperience.usedFallback, true);
@@ -307,7 +307,7 @@ async function main() {
     'tr',
     '//external.example/tr/experiences/silk-road-istanbul'
   );
-  assert.equal(protocolRelativeRedirect.targetPath, '/tr/experiences');
+  assert.equal(protocolRelativeRedirect.targetPath, '/tr/deneyimler');
   assert.equal(protocolRelativeRedirect.usedFallback, true);
 
   const malformedRedirect = await resolveWithFinalUrl(
@@ -315,17 +315,17 @@ async function main() {
     'tr',
     'http://[malformed-url'
   );
-  assert.equal(malformedRedirect.targetPath, '/tr/experiences');
+  assert.equal(malformedRedirect.targetPath, '/tr/deneyimler');
   assert.equal(malformedRedirect.usedFallback, true);
 
   const failedProbe = await resolveWithFinalUrl(
     '/experiences/silk-road-istanbul',
     'tr',
-    `${origin}/tr/experiences/silk-road-istanbul`,
+    `${origin}/tr/deneyimler/silk-road-istanbul`,
     500,
     false
   );
-  assert.equal(failedProbe.targetPath, '/tr/experiences');
+  assert.equal(failedProbe.targetPath, '/tr/deneyimler');
   assert.equal(failedProbe.usedFallback, true);
 }
 

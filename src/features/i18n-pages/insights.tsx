@@ -384,9 +384,9 @@ function CompactInsightsList({
                 {insight.destinationName}
               </p>
             )}
-            <h2 className="motion-link font-display text-lg sm:text-xl font-light text-white group-hover:text-white/70 mb-1.5 leading-snug">
+            <h3 className="motion-link font-display text-lg sm:text-xl font-light text-white group-hover:text-white/70 mb-1.5 leading-snug">
               {insight.title}
-            </h2>
+            </h3>
             {insight.excerpt && (
               <p className="font-body text-sm text-white/48 leading-relaxed mb-2.5">
                 {insight.excerpt}

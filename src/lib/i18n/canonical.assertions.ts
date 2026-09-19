@@ -163,7 +163,7 @@ assertRoute(
   '/tr/cultural-worlds/istanbul'
 );
 assertRoute('EN experiences listing canonical', routeExpectations[6].url, '/experiences');
-assertRoute('TR experiences listing canonical', routeExpectations[7].url, '/tr/experiences');
+assertRoute('TR experiences listing canonical', routeExpectations[7].url, '/tr/deneyimler');
 assertRoute(
   'EN experience detail canonical',
   routeExpectations[8].url,
@@ -172,7 +172,7 @@ assertRoute(
 assertRoute(
   'TR experience detail canonical',
   routeExpectations[9].url,
-  '/tr/experiences/beylerbeyi-1869-empire-interrupted'
+  '/tr/deneyimler/beylerbeyi-1869-empire-interrupted'
 );
 assertRoute('EN insights listing canonical', routeExpectations[10].url, '/insights');
 assertRoute('TR insights listing canonical', routeExpectations[11].url, '/tr/insights');
@@ -208,12 +208,12 @@ assert.deepEqual(
     slug: 'beylerbeyi-1869-empire-interrupted',
   }),
   {
-    canonical: 'https://crearetravel.com/tr/experiences/beylerbeyi-1869-empire-interrupted',
+    canonical: 'https://crearetravel.com/tr/deneyimler/beylerbeyi-1869-empire-interrupted',
     languages: {
       en: 'https://crearetravel.com/experiences/beylerbeyi-1869-empire-interrupted',
-      tr: 'https://crearetravel.com/tr/experiences/beylerbeyi-1869-empire-interrupted',
-      'zh-Hans': 'https://crearetravel.com/zh/experiences/beylerbeyi-1869-empire-interrupted',
-      ru: 'https://crearetravel.com/ru/experiences/beylerbeyi-1869-empire-interrupted',
+      tr: 'https://crearetravel.com/tr/deneyimler/beylerbeyi-1869-empire-interrupted',
+      'zh-Hans': 'https://crearetravel.com/zh/tiyan/beylerbeyi-1869-empire-interrupted',
+      ru: 'https://crearetravel.com/ru/vpechatleniya/beylerbeyi-1869-empire-interrupted',
       'x-default': 'https://crearetravel.com/experiences/beylerbeyi-1869-empire-interrupted',
     },
   }
@@ -232,9 +232,9 @@ assert.deepEqual(buildMetadataAlternates('/experiences/signature'), {
   canonical: 'https://crearetravel.com/experiences/signature',
   languages: {
     en: 'https://crearetravel.com/experiences/signature',
-    tr: 'https://crearetravel.com/tr/experiences/signature',
-    'zh-Hans': 'https://crearetravel.com/zh/experiences/signature',
-    ru: 'https://crearetravel.com/ru/experiences/signature',
+    tr: 'https://crearetravel.com/tr/deneyimler/signature',
+    'zh-Hans': 'https://crearetravel.com/zh/tiyan/signature',
+    ru: 'https://crearetravel.com/ru/vpechatleniya/signature',
     'x-default': 'https://crearetravel.com/experiences/signature',
   },
 });
