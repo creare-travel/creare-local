@@ -1,16 +1,10 @@
 import { buildCloudinaryUrl } from '@/lib/cloudinary';
-import { buildCinematicBlurDataUrl } from '@/lib/lqip';
+import { HERO_PLACEHOLDER } from './hero-placeholder';
 import HomeHeroInquiryLink from '@/app/home/components/HomeHeroInquiryLink';
 import { DEFAULT_SITE_LOCALE, type LocaleKey, type SiteLocale } from '@/lib/i18n/config';
 import type { Dictionary } from '@/lib/i18n/types';
 
 const HOMEPAGE_HERO_PUBLIC_ID = 'creare-hero-image.jpg';
-const HOMEPAGE_HERO_IMAGE = buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
-  profile: 'hero',
-  format: 'auto',
-  quality: 'auto:good',
-  dpr: 'auto',
-});
 const HOMEPAGE_HERO_ALT =
   'Library of Celsus and the Gate of Augustus at sunset with warm architectural light';
 const HOMEPAGE_HERO_ACCESSIBILITY = {
@@ -47,10 +41,6 @@ export default function HeroSection({
   const heroCopy = dictionary?.home.hero;
   const ctaCopy = dictionary?.home.cta;
   const accessibility = HOMEPAGE_HERO_ACCESSIBILITY[locale];
-  const heroBlurDataUrl = buildCinematicBlurDataUrl(HOMEPAGE_HERO_IMAGE, {
-    atmosphere: 'dark',
-    profile: 'hero',
-  });
   const heroSrc = buildCloudinaryUrl(HOMEPAGE_HERO_PUBLIC_ID, {
     profile: 'hero',
     width: 1440,
@@ -94,8 +84,8 @@ export default function HeroSection({
     >
       <div className="absolute inset-0 z-0">
         <div
-          className="absolute inset-0 bg-cover bg-center blur-2xl"
-          style={{ backgroundImage: `url("${heroBlurDataUrl}")` }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url("${HERO_PLACEHOLDER}")` }}
           aria-hidden="true"
         />
         <picture>
