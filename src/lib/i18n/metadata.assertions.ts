@@ -328,7 +328,7 @@ assertThrows('TR route canonical rejects missing Turkish prefix', () =>
 assertThrows('EN route canonical rejects Turkish-prefixed route', () =>
   assertRouteCanonicalOwnership(
     { family: 'experience-detail', locale: 'en', slug: 'beylerbeyi-1869' },
-    `${SITE_URL}/tr/experiences/beylerbeyi-1869`
+    `${SITE_URL}/tr/deneyimler/beylerbeyi-1869`
   )
 );
 assertThrows('metadata canonical rejects duplicate Turkish prefix', () =>
@@ -564,7 +564,7 @@ assert.equal(
 );
 assert.equal(
   trExperienceDetailAlternates.canonical,
-  `${SITE_URL}/tr/experiences/beylerbeyi-1869`,
+  `${SITE_URL}/tr/deneyimler/beylerbeyi-1869`,
   'TR experience detail canonical keeps localized slug identity'
 );
 assert.equal(
@@ -655,9 +655,9 @@ assert.ok(
 );
 assert.deepEqual(enLanguages, {
   en: `${SITE_URL}/experiences`,
-  tr: `${SITE_URL}/tr/experiences`,
-  'zh-Hans': `${SITE_URL}/zh/experiences`,
-  ru: `${SITE_URL}/ru/experiences`,
+  tr: `${SITE_URL}/tr/deneyimler`,
+  'zh-Hans': `${SITE_URL}/zh/tiyan`,
+  ru: `${SITE_URL}/ru/vpechatleniya`,
   'x-default': `${SITE_URL}/experiences`,
 });
 assert.deepEqual(trLanguages, {

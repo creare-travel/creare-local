@@ -9,14 +9,37 @@ export function buildOrganizationReference(): SchemaNode {
 
 function buildCoreCulturalWorldReferences(): SchemaNode[] {
   return [
-    { slug: 'istanbul', name: 'Istanbul' },
-    { slug: 'bodrum', name: 'Bodrum' },
+    {
+      slug: 'istanbul',
+      name: 'Istanbul',
+      addressLocality: 'İstanbul',
+      postalCode: '34394',
+      addressRegion: 'İstanbul',
+    },
+    {
+      slug: 'bodrum',
+      name: 'Bodrum',
+      addressLocality: 'Bodrum',
+      postalCode: '48400',
+      addressRegion: 'Muğla',
+    },
     { slug: 'cappadocia', name: 'Cappadocia' },
   ].map((world) => ({
     '@type': 'Place',
     '@id': culturalWorldIds(world.slug).place,
     name: world.name,
     url: culturalWorldIds(world.slug).canonical,
+    ...('postalCode' in world
+      ? {
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: world.addressLocality,
+            addressRegion: world.addressRegion,
+            postalCode: world.postalCode,
+            addressCountry: 'TR',
+          },
+        }
+      : {}),
   }));
 }
 
@@ -28,6 +51,7 @@ export function buildOrganizationSchema(): SchemaNode {
     legalName: 'CREARE Travel Consultancy Limited Co.',
     description: 'Experience design studio creating private cultural encounters.',
     url: SITE_URL,
+    priceRange: '$$$',
     logo: {
       '@type': 'ImageObject',
       '@id': `${ORGANIZATION_ID}-logo`,
@@ -47,6 +71,7 @@ export function buildOrganizationSchema(): SchemaNode {
       streetAddress: 'Ferko Signature Plaza, Buyukdere Cd. No.175',
       addressLocality: 'Şişli',
       addressRegion: 'İstanbul',
+      postalCode: '34394',
       addressCountry: 'TR',
     },
     areaServed: {

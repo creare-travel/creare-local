@@ -21,6 +21,27 @@ const ACTIVE_PREFIX_TO_LOCALE = new Map<string, SiteLocale>(
   })
 );
 
+const LOCALIZED_ROUTE_SEGMENTS = {
+  en: { experiences: 'experiences' },
+  tr: { experiences: 'deneyimler' },
+  zh: { experiences: 'tiyan' },
+  ru: { experiences: 'vpechatleniya' },
+} as const satisfies Record<LocaleKey, Record<'experiences', string>>;
+
+function canonicalizeFirstRouteSegment(segments: string[], locale: LocaleKey): string[] {
+  if (segments.length === 0) return segments;
+
+  const localizedExperiences = LOCALIZED_ROUTE_SEGMENTS[locale].experiences;
+  if (segments[0] !== localizedExperiences) return segments;
+
+  return ['experiences', ...segments.slice(1)];
+}
+
+function localizeFirstRouteSegment(segments: string[], locale: LocaleKey): string[] {
+  if (segments.length === 0 || segments[0] !== 'experiences') return segments;
+  return [LOCALIZED_ROUTE_SEGMENTS[locale].experiences, ...segments.slice(1)];
+}
+
 function normalizeSegments(pathname: string): string[] {
   const withRoot = pathname.trim() || '/';
   const normalized = (withRoot.startsWith('/') ? withRoot : `/${withRoot}`).replace(/\/{2,}/g, '/');
@@ -60,24 +81,32 @@ export function getLocaleFromPathname(pathname: string): SiteLocale {
 export function stripLocalePrefix(pathname: string): string {
   const normalized = normalizePathname(pathname);
   const segments = normalized.split('/').filter(Boolean);
+  const locale = PREFIX_TO_LOCALE.get(segments[0] ?? '') ?? DEFAULT_SITE_LOCALE;
 
   if (!PREFIX_TO_LOCALE.has(segments[0] ?? '')) {
-    return normalized;
+    const canonicalSegments = canonicalizeFirstRouteSegment(segments, locale);
+    return canonicalSegments.length === 0 ? '/' : `/${canonicalSegments.join('/')}`;
   }
 
-  const unprefixedSegments = segments.slice(1);
+  const unprefixedSegments = canonicalizeFirstRouteSegment(segments.slice(1), locale);
   return unprefixedSegments.length === 0 ? '/' : `/${unprefixedSegments.join('/')}`;
 }
 
 export function localizePathname(pathname: string, locale: LocaleKey): string {
   const unprefixedPathname = stripLocalePrefix(pathname);
   const prefix = LOCALE_REGISTRY[locale].urlPrefix;
+  const localizedSegments = localizeFirstRouteSegment(
+    unprefixedPathname.split('/').filter(Boolean),
+    locale
+  );
+  const localizedPathname =
+    localizedSegments.length === 0 ? '/' : `/${localizedSegments.join('/')}`;
 
   if (!prefix) {
-    return unprefixedPathname;
+    return localizedPathname;
   }
 
-  return unprefixedPathname === '/' ? `/${prefix}` : `/${prefix}${unprefixedPathname}`;
+  return localizedPathname === '/' ? `/${prefix}` : `/${prefix}${localizedPathname}`;
 }
 
 export function buildLocalizedRouteTarget(

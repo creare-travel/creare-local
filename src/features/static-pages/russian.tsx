@@ -71,12 +71,9 @@ export function RussianPhilosophyPage() {
           </p>
           <h1 className="font-display text-[clamp(2rem,4.6vw,4.4rem)] font-light leading-[1.18] text-white">
             {t(2)}
-            <br />
-            {t(3)}
-            <br />
-            {t(4)}
-            <br />
-            <span className="text-white/60">{t(5)}</span>
+            <br /> {t(3)}
+            <br /> {t(4)}
+            <br /> <span className="text-white/60">{t(5)}</span>
           </h1>
         </div>
       </section>

@@ -12,10 +12,8 @@ export function TurkishPhilosophyPage() {
           </p>
           <h1 className="font-display font-light leading-[1.18] text-white text-[clamp(2rem,4.6vw,4.4rem)]">
             BİZ, STRATEJİK BİR
-            <br />
-            DENEYİM TASARIM
-            <br />
-            STÜDYOSUYUZ.
+            <br /> DENEYİM TASARIM
+            <br /> STÜDYOSUYUZ.
           </h1>
         </div>
       </section>

@@ -272,12 +272,12 @@ assert.equal(turkishCookiesContent.sections[2].heading, 'Kullandığımız Çere
 
 assert.deepEqual(
   getPrimaryNavigationRoutes('tr').map((route) => route.href),
-  ['/tr/cultural-worlds', '/tr/experiences', '/tr/insights', '/tr/philosophy', '/tr/contact'],
+  ['/tr/cultural-worlds', '/tr/deneyimler', '/tr/insights', '/tr/philosophy', '/tr/contact'],
   'TR Header links must include Philosophy and Contact'
 );
 assert.deepEqual(
   getFooterNavigationRoutes('tr').map((route) => route.href),
-  ['/tr/cultural-worlds', '/tr/experiences', '/tr/insights', '/tr/philosophy', '/tr/contact'],
+  ['/tr/cultural-worlds', '/tr/deneyimler', '/tr/insights', '/tr/philosophy', '/tr/contact'],
   'TR Footer links must include Philosophy and Contact'
 );
 assert.deepEqual(

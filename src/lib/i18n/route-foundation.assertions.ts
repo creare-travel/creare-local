@@ -34,7 +34,7 @@ assert.equal(
   buildLocaleAwareStrapiPath('/api/experiences?filters[slug][$eq]=test', 'tr'),
   '/api/experiences?filters%5Bslug%5D%5B%24eq%5D=test&locale=tr-TR'
 );
-assert.equal(localizePathname('/experiences/test', 'tr'), '/tr/experiences/test');
+assert.equal(localizePathname('/experiences/test', 'tr'), '/tr/deneyimler/test');
 assert.equal(localizePathname('/tr/experiences/test', 'en'), '/experiences/test');
 assert.equal(
   buildLocalizedRouteTarget('/experiences', 'canonical-slug', 'en'),
@@ -42,7 +42,7 @@ assert.equal(
 );
 assert.equal(
   buildLocalizedRouteTarget('/experiences', 'canonical-slug', 'tr'),
-  '/tr/experiences/canonical-slug'
+  '/tr/deneyimler/canonical-slug'
 );
 assert.equal(
   buildLocalizedRouteTarget('/insights', 'canonical-slug', 'en'),
@@ -58,7 +58,7 @@ assert.equal(
 );
 assert.equal(
   buildLocalizedRouteTarget('/tr/experiences', 'canonical-slug', 'tr'),
-  '/tr/experiences/canonical-slug'
+  '/tr/deneyimler/canonical-slug'
 );
 assert.equal(localizePathname('/travel', 'en'), '/travel');
 assert.equal(localizePathname('/trailing', 'en'), '/trailing');
