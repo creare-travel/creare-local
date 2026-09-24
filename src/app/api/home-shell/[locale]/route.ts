@@ -41,7 +41,10 @@ function stripNextHydration(html: string) {
         ? ''
         : tag;
     })
-    .replace('</body>', '<script src="/home-shell.js" defer></script></body>');
+    .replace(
+      '</body>',
+      '<script src="/home-shell.js" defer></script><script src="/assistant-shell.js" defer></script></body>'
+    );
 }
 
 export async function GET(
