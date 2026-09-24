@@ -37,30 +37,34 @@ export function buildHandoffContent(locale: AssistantState['locale'], ticket: st
   const content = {
     en: {
       emailPrompt:
-        'Please share the email address where you would like us to send your briefing reference and follow-up.',
-      confirmation: `Your private briefing file has been recorded under ${ticket}. A confirmation has been sent to your email, and the same reference has been forwarded to the CREARE team.`,
-      guestSubject: `CREARE Private Briefing — ${ticket}`,
-      guestBody: `Your CREARE private briefing file has been created under reference ${ticket}.\n\nOur team will review the context you shared and continue with this same reference.\n\nPlease keep ${ticket} for any follow-up correspondence.\n\nCREARE Travel`,
+        'Where would you like us to send your private briefing reference and follow-up details?',
+      confirmation: `Your private briefing has been recorded under ${ticket}. The confirmation is on its way to your email, and the CREARE team has received the same reference and context.`,
+      guestSubject: `Your CREARE Private Briefing — ${ticket}`,
+      guestBody: `Thank you for sharing the context of your journey.\n\nYour CREARE private briefing is now registered under reference ${ticket}.\n\nThe CREARE team will review the brief using the context you have already shared, so you will not need to repeat it.\n\nFor any follow-up correspondence, please keep ${ticket} as your reference.\n\nCREARE Travel`,
+      emailFailure: `We could not complete the email delivery for ${ticket}. Your briefing and conversation context remain safely preserved in CREARE's system. Please re-enter the same email address to retry. If the issue continues, contact direct@crearetravel.com and quote ${ticket}.`,
     },
     tr: {
       emailPrompt:
-        'Özel görüşme referansınızı ve takip bilgisini iletmemiz için e-posta adresinizi paylaşır mısınız?',
-      confirmation: `Özel görüşme dosyanız ${ticket} referansıyla kaydedildi. Teyit e-postanıza gönderildi ve aynı referans CREARE ekibine iletildi.`,
-      guestSubject: `CREARE Özel Görüşme — ${ticket}`,
-      guestBody: `CREARE özel görüşme dosyanız ${ticket} referansıyla oluşturuldu.\n\nEkibimiz paylaştığınız bağlamı inceleyecek ve aynı referans üzerinden devam edecektir.\n\nTakip yazışmalarınız için ${ticket} numarasını saklamanızı rica ederiz.\n\nCREARE Travel`,
+        'Özel görüşme referansınızı ve takip bilgilerini hangi e-posta adresine iletmemizi istersiniz?',
+      confirmation: `Özel görüşmeniz ${ticket} referansıyla kaydedildi. Teyit e-postanıza iletiliyor; CREARE ekibi de aynı referans ve görüşme bağlamını aldı.`,
+      guestSubject: `CREARE Özel Görüşmeniz — ${ticket}`,
+      guestBody: `Yolculuğunuzun bağlamını bizimle paylaştığınız için teşekkür ederiz.\n\nCREARE özel görüşmeniz ${ticket} referansıyla kaydedildi.\n\nCREARE ekibi, daha önce paylaştığınız görüşme bağlamını koruyarak briefinizi inceleyecek; aynı bilgileri yeniden aktarmanız gerekmeyecek.\n\nTakip yazışmalarınızda lütfen ${ticket} referansını kullanın.\n\nCREARE Travel`,
+      emailFailure: `${ticket} referanslı e-posta gönderimini tamamlayamadık. Özel görüşme kaydınız ve konuşma bağlamınız korunuyor. Yeniden denemek için aynı e-posta adresini tekrar girin. Sorun devam ederse direct@crearetravel.com adresine ${ticket} referansıyla yazabilirsiniz.`,
     },
     ru: {
       emailPrompt:
-        'Пожалуйста, укажите адрес электронной почты, на который мы можем отправить номер вашего приватного брифинга и дальнейшую информацию.',
-      confirmation: `Ваш приватный брифинг зарегистрирован под номером ${ticket}. Подтверждение отправлено на вашу электронную почту, а тот же номер передан команде CREARE.`,
-      guestSubject: `CREARE Частный брифинг — ${ticket}`,
-      guestBody: `Ваш приватный брифинг CREARE создан под номером ${ticket}.\n\nНаша команда изучит переданный вами контекст и продолжит работу с тем же номером.\n\nПожалуйста, сохраняйте ${ticket} для дальнейшей переписки.\n\nCREARE Travel`,
+        'На какой адрес электронной почты отправить номер вашего приватного брифинга и информацию для дальнейшей связи?',
+      confirmation: `Ваш приватный брифинг зарегистрирован под номером ${ticket}. Подтверждение отправляется на вашу электронную почту; команда CREARE получила тот же номер и весь сохранённый контекст разговора.`,
+      guestSubject: `Ваш приватный брифинг CREARE — ${ticket}`,
+      guestBody: `Благодарим вас за контекст, которым вы поделились о предстоящем путешествии.\n\nВаш приватный брифинг CREARE зарегистрирован под номером ${ticket}.\n\nКоманда CREARE рассмотрит запрос с учётом уже сохранённого контекста, поэтому вам не потребуется повторять предоставленную информацию.\n\nДля дальнейшей переписки, пожалуйста, используйте номер ${ticket}.\n\nCREARE Travel`,
+      emailFailure: `Не удалось завершить отправку письма для ${ticket}. Ваш брифинг и контекст разговора сохранены. Повторно введите тот же адрес электронной почты, чтобы попробовать ещё раз. Если проблема сохранится, напишите на direct@crearetravel.com и укажите ${ticket}.`,
     },
     zh: {
-      emailPrompt: '请提供您希望接收私人需求沟通编号及后续信息的电子邮箱。',
-      confirmation: `您的私人需求沟通档案已以 ${ticket} 编号记录。确认邮件已发送至您的邮箱，同一编号也已转交 CREARE 团队。`,
-      guestSubject: `CREARE 私人需求沟通 — ${ticket}`,
-      guestBody: `您的 CREARE 私人需求沟通档案已创建，编号为 ${ticket}。\n\n我们的团队将查看您已分享的背景信息，并继续使用同一编号跟进。\n\n请保留 ${ticket} 以便后续沟通。\n\nCREARE Travel`,
+      emailPrompt: '您希望我们将私人需求沟通编号及后续信息发送至哪个电子邮箱？',
+      confirmation: `您的私人需求沟通已以 ${ticket} 编号记录。确认邮件正在发送至您的邮箱；CREARE 团队也已收到同一编号及完整的沟通背景。`,
+      guestSubject: `您的 CREARE 私人需求沟通 — ${ticket}`,
+      guestBody: `感谢您与我们分享此次旅程的背景与期待。\n\n您的 CREARE 私人需求沟通已以 ${ticket} 编号登记。\n\nCREARE 团队将依据您已经提供的完整沟通背景进行审阅，因此无需再次重复相同信息。\n\n后续沟通时，请保留并使用 ${ticket} 作为您的参考编号。\n\nCREARE Travel`,
+      emailFailure: `${ticket} 的邮件发送未能完成。您的需求档案和对话背景均已保留。请重新输入同一电子邮箱以再次尝试。如果问题持续存在，请联系 direct@crearetravel.com 并注明 ${ticket}。`,
     },
   } as const;
   return content[locale];
