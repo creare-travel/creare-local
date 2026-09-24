@@ -1,3 +1,4 @@
+import { rankExperienceCandidates } from './recommendation';
 import type {
   AssistantLocale,
   AssistantState,
@@ -74,40 +75,9 @@ function normalizeText(value: string) {
     .replace(/卡帕多奇亚/gu, ' cappadocia ');
 }
 
-function tokensFrom(state: AssistantState, message: string) {
-  const raw = [state.destination, state.intention, ...state.interests, message]
-    .filter(Boolean)
-    .join(' ');
-  return normalizeText(raw)
-    .split(/[^\p{L}\p{N}]+/u)
-    .filter((token) => token.length >= 3)
-    .slice(0, 30);
-}
-
-function score(candidate: ExperienceCandidate, tokens: string[]) {
-  const title = normalizeText(candidate.title);
-  const location = normalizeText(candidate.location || '');
-  const description = normalizeText(candidate.short_description || '');
-  const category = normalizeText(candidate.category || '');
-  return tokens.reduce((total, token) => {
-    if (title.includes(token)) total += 6;
-    if (location.includes(token)) total += 5;
-    if (category.includes(token)) total += 2;
-    if (description.includes(token)) total += 1;
-    return total;
-  }, 0);
-}
-
 export async function retrieveExperienceCandidates(state: AssistantState, message: string) {
   const catalog = await fetchCatalog();
-  const tokens = tokensFrom(state, message);
-  if (!tokens.length) return catalog.slice(0, MAX_CANDIDATES);
-  return catalog
-    .map((candidate) => ({ candidate, score: score(candidate, tokens) }))
-    .filter(({ score }) => score > 0)
-    .sort((a, b) => b.score - a.score || a.candidate.title.localeCompare(b.candidate.title))
-    .slice(0, MAX_CANDIDATES)
-    .map(({ candidate }) => candidate);
+  return rankExperienceCandidates(catalog, state, message, MAX_CANDIDATES);
 }
 
 export function hasDestinationMatch(candidates: ExperienceCandidate[], destination: string) {

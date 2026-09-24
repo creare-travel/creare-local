@@ -22,6 +22,7 @@ const connectSrc = [
   'https://*.analytics.google.com',
   'https://*.google.com',
   'https://www.googletagmanager.com',
+  'https://typebot.io',
   configuredStrapiOrigin,
   ...(isDevelopment
     ? ['http://localhost:1337', 'http://127.0.0.1:1337', 'ws://localhost:*', 'ws://127.0.0.1:*']
@@ -33,6 +34,7 @@ const scriptSrc = [
   "'unsafe-inline'",
   'https://www.googletagmanager.com',
   'https://www.google-analytics.com',
+  'https://cdn.jsdelivr.net',
   ...(isDevelopment ? ["'unsafe-eval'"] : []),
 ];
 
