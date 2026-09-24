@@ -31,6 +31,7 @@ export type AssistantState = {
   recommended_experience_ids: string[];
   last_user_message: string | null;
   conversation_history: ConversationTurn[];
+  model_turn_count: number;
 };
 
 export type ExperienceCandidate = {
@@ -75,9 +76,16 @@ export type ModelStatePatch = Partial<
   >
 >;
 
+export type ModelUsage = {
+  promptTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+};
+
 export type ModelResult = {
   reply: string;
   statePatch: ModelStatePatch;
   recommendedExperienceIds: string[];
   handoffRecommended: boolean;
+  usage: ModelUsage | null;
 };

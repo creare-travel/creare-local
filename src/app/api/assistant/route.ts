@@ -1,5 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  detectServicePathSignal,
+  extractGuestCount,
+  extractLiteralDates,
+  extractLiteralDestination,
+} from '@/lib/assistant/extractors';
 import { runGemini } from '@/lib/assistant/gemini';
+import {
+  MAX_MODEL_TURNS,
+  availabilityBoundaryReply,
+  catalogueUnavailableReply,
+  isAvailabilityRequest,
+  isExactRepeat,
+  isPriceOnlyRequest,
+  isPromptInjectionAttempt,
+  isStandaloneBookingRequest,
+  modelUnavailableReply,
+  pricingBoundaryReply,
+  repeatReply,
+  securityReply,
+  standaloneBookingReply,
+  turnLimitReply,
+} from '@/lib/assistant/guardrails';
+import { assessLead } from '@/lib/assistant/lead';
+import { logAssistantMetric } from '@/lib/assistant/metrics';
 import { deriveConversationPolicy } from '@/lib/assistant/policy';
 import {
   buildAiControlNotes,
@@ -20,7 +44,7 @@ import {
   hydrateExperiences,
   retrieveExperienceCandidates,
 } from '@/lib/assistant/strapi';
-import type { AssistantLocale, AssistantRequest } from '@/lib/assistant/types';
+import type { AssistantLocale, AssistantRequest, AssistantState } from '@/lib/assistant/types';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -43,6 +67,43 @@ const LOCALE_MAP: Record<string, AssistantLocale> = {
 function localeOf(value: unknown): AssistantLocale {
   if (typeof value !== 'string') return 'en';
   return LOCALE_MAP[value.trim().toLocaleLowerCase('en-US')] || 'en';
+}
+
+function hasExplicitIntentSignal(message: string) {
+  const value = message.toLocaleLowerCase('en-US');
+  return [
+    'we want',
+    'i want',
+    ' want ',
+    'we would like',
+    'i would like',
+    'interested in',
+    'care most about',
+    'care about',
+    'cares about',
+    'looking for',
+    'hope to',
+    'celebrating',
+    'need a',
+    'need an',
+    'objective is',
+    'goal is',
+    'istiyoruz',
+    'isteriz',
+    'arıyoruz',
+    'ilgileniyoruz',
+    'kutluyoruz',
+    'хотим',
+    'интересуют',
+    'ищем',
+    'нужен',
+    'нужна',
+    '希望',
+    '想要',
+    '感兴趣',
+    '我们想',
+    '我想',
+  ].some((signal) => value.includes(signal));
 }
 
 function isChecklistTourismRequest(message: string) {
@@ -151,6 +212,42 @@ function qualificationQuestion(locale: AssistantLocale, focus: string) {
   return questions[locale][focus] || '';
 }
 
+function basicResponse(
+  state: ReturnType<typeof createInitialState>,
+  reply: string,
+  startedAt: number,
+  guardrail: string
+) {
+  const nextState = appendConversationTurn(state, 'assistant', reply);
+  logAssistantMetric({
+    state: nextState,
+    event: 'guardrail',
+    durationMs: Date.now() - startedAt,
+    guardrail,
+  });
+  return NextResponse.json({
+    success: true,
+    reply,
+    state_token: encryptState(nextState),
+    stage: nextState.conversation_stage,
+    experiences: [],
+    handoff_recommended: false,
+    ticket_no: nextState.ticket_no,
+    handoff_summary: null,
+    handoff_transcript: null,
+    handoff_control_notes: null,
+    handoff_email_prompt: null,
+    handoff_confirmation: null,
+    guest_email_subject: null,
+    guest_email_body: null,
+    lead_quality: null,
+    lead_priority: null,
+    lead_urgency_reason: null,
+    lead_missing_information: null,
+    lead_next_action: null,
+  });
+}
+
 function privateBriefingReply(locale: AssistantLocale, path: string, ticket: string | null) {
   const replies: Record<AssistantLocale, string> = {
     en:
@@ -174,6 +271,7 @@ function privateBriefingReply(locale: AssistantLocale, path: string, ticket: str
 }
 
 export async function POST(request: NextRequest) {
+  const startedAt = Date.now();
   try {
     const raw = await request.text();
     if (new TextEncoder().encode(raw).byteLength > MAX_REQUEST_BYTES) {
@@ -223,20 +321,166 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    if (isPromptInjectionAttempt(message)) {
+      state = appendConversationTurn(state, 'visitor', message);
+      return basicResponse(state, securityReply(state.locale), startedAt, 'prompt_injection');
+    }
+
+    if (isStandaloneBookingRequest(message)) {
+      state = appendConversationTurn(state, 'visitor', message);
+      return basicResponse(
+        state,
+        standaloneBookingReply(state.locale),
+        startedAt,
+        'standalone_booking'
+      );
+    }
+
+    if (isPriceOnlyRequest(message)) {
+      state = appendConversationTurn(state, 'visitor', message);
+      return basicResponse(
+        state,
+        pricingBoundaryReply(state.locale),
+        startedAt,
+        'pricing_boundary'
+      );
+    }
+
+    if (isAvailabilityRequest(message)) {
+      state = appendConversationTurn(state, 'visitor', message);
+      return basicResponse(
+        state,
+        availabilityBoundaryReply(state.locale),
+        startedAt,
+        'availability_boundary'
+      );
+    }
+
+    if (isExactRepeat(state, message)) {
+      state = appendConversationTurn(state, 'visitor', message);
+      const policy = deriveConversationPolicy(state);
+      const nextQuestion =
+        policy.nextQuestionFocus !== 'none' && policy.nextQuestionFocus !== 'private_briefing'
+          ? qualificationQuestion(state.locale, policy.nextQuestionFocus)
+          : '';
+      const reply = [repeatReply(state.locale), nextQuestion].filter(Boolean).join(' ');
+      return basicResponse(state, reply, startedAt, 'exact_repeat');
+    }
+
+    if ((state.model_turn_count ?? 0) >= MAX_MODEL_TURNS) {
+      state = appendConversationTurn(state, 'visitor', message);
+      const ticket = state.ticket_no || createTicketNo();
+      let nextState: AssistantState = {
+        ...state,
+        ticket_no: ticket,
+        service_path: state.service_path === 'undetermined' ? ('lab' as const) : state.service_path,
+        conversation_stage: 'private_briefing' as const,
+        last_user_message: message,
+      };
+      const reply = turnLimitReply(nextState.locale, ticket);
+      nextState = appendConversationTurn(nextState, 'assistant', reply);
+      const handoffContent = buildHandoffContent(nextState.locale, ticket);
+      const leadAssessment = assessLead(nextState);
+      return NextResponse.json({
+        success: true,
+        reply,
+        state_token: encryptState(nextState),
+        stage: nextState.conversation_stage,
+        experiences: [],
+        handoff_recommended: true,
+        ticket_no: ticket,
+        handoff_summary: buildHandoffSummary(nextState),
+        handoff_transcript: buildConversationTranscript(nextState),
+        handoff_control_notes: buildAiControlNotes(nextState),
+        handoff_email_prompt: handoffContent.emailPrompt,
+        handoff_confirmation: handoffContent.confirmation,
+        guest_email_subject: handoffContent.guestSubject,
+        guest_email_body: handoffContent.guestBody,
+        lead_quality: leadAssessment.quality,
+        lead_priority: leadAssessment.priority.toUpperCase(),
+        lead_urgency_reason: leadAssessment.urgency_reason,
+        lead_missing_information: leadAssessment.missing_information.join(', ') || 'none',
+        lead_next_action: leadAssessment.next_action,
+      });
+    }
+
     state = appendConversationTurn(state, 'visitor', message);
-    const candidates = await retrieveExperienceCandidates(state, modelMessage);
+    let candidates;
+    try {
+      candidates = await retrieveExperienceCandidates(state, modelMessage);
+    } catch (error) {
+      console.error('[assistant] catalogue retrieval failed', {
+        error: error instanceof Error ? error.message : 'unknown_error',
+      });
+      return basicResponse(
+        state,
+        catalogueUnavailableReply(state.locale),
+        startedAt,
+        'catalogue_unavailable'
+      );
+    }
     const currentPolicy = deriveConversationPolicy(state);
     const modelState = { ...state, conversation_history: [] };
-    const model = await runGemini(modelState, modelMessage, candidates, currentPolicy);
+    let model;
+    try {
+      model = await runGemini(modelState, modelMessage, candidates, currentPolicy);
+    } catch (error) {
+      console.error('[assistant] model request failed', {
+        error: error instanceof Error ? error.message : 'unknown_error',
+      });
+      return basicResponse(
+        state,
+        modelUnavailableReply(state.locale),
+        startedAt,
+        'model_unavailable'
+      );
+    }
     const statePatch = { ...model.statePatch };
-    let provisionalState = mergeState(state, statePatch, message, []);
+    if (!state.destination && !statePatch.destination) {
+      const literalDestination = extractLiteralDestination(message);
+      if (literalDestination) statePatch.destination = literalDestination;
+    }
+    if (!state.dates && !statePatch.dates) {
+      const literalDates = extractLiteralDates(message);
+      if (literalDates) statePatch.dates = literalDates;
+    }
+    if (!state.guest_count && !statePatch.guest_count) {
+      const guestCount = extractGuestCount(message);
+      if (guestCount) statePatch.guest_count = guestCount;
+    }
+    if (
+      !state.intention &&
+      state.interests.length === 0 &&
+      !statePatch.intention &&
+      (!statePatch.interests || statePatch.interests.length === 0) &&
+      hasExplicitIntentSignal(message)
+    ) {
+      statePatch.intention = message.slice(0, 300);
+    }
+    const explicitServicePath = detectServicePathSignal(message);
+    if (explicitServicePath && state.service_path === 'undetermined') {
+      statePatch.service_path = explicitServicePath;
+    }
+    let provisionalState = {
+      ...mergeState(state, statePatch, message, []),
+      model_turn_count: (state.model_turn_count ?? 0) + 1,
+    };
     const destinationMismatch =
       provisionalState.destination &&
       !hasDestinationMatch(candidates, provisionalState.destination);
-    const provisionalPolicyBeforePath = deriveConversationPolicy(provisionalState);
+    let provisionalPolicyBeforePath = deriveConversationPolicy(provisionalState);
+    if (
+      state.service_path === 'undetermined' &&
+      provisionalPolicyBeforePath.stage === 'discovery' &&
+      provisionalPolicyBeforePath.nextQuestionFocus === 'destination'
+    ) {
+      provisionalState = { ...provisionalState, service_path: 'undetermined' };
+      provisionalPolicyBeforePath = deriveConversationPolicy(provisionalState);
+    }
     const enteredLabBecauseNoMatch = Boolean(
       destinationMismatch &&
       state.service_path === 'undetermined' &&
+      provisionalState.service_path === 'undetermined' &&
       provisionalPolicyBeforePath.nextQuestionFocus !== 'destination'
     );
 
@@ -286,6 +530,21 @@ export async function POST(request: NextRequest) {
     const handoffContent = nextState.ticket_no
       ? buildHandoffContent(nextState.locale, nextState.ticket_no)
       : null;
+    const leadAssessment = nextPolicy.shouldOfferPrivateBriefing ? assessLead(nextState) : null;
+
+    logAssistantMetric({
+      state: nextState,
+      event: nextPolicy.shouldOfferPrivateBriefing ? 'handoff' : 'model_turn',
+      durationMs: Date.now() - startedAt,
+      candidateCount: candidates.length,
+      recommendationCount: experiences.length,
+      usage: model.usage,
+      ranking: candidates.slice(0, 3).map((candidate) => ({
+        id: candidate.id,
+        score: 'score' in candidate ? candidate.score : undefined,
+        reasons: 'match_reasons' in candidate ? candidate.match_reasons : undefined,
+      })),
+    });
 
     return NextResponse.json({
       success: true,
@@ -308,6 +567,13 @@ export async function POST(request: NextRequest) {
       handoff_confirmation: handoffContent?.confirmation ?? null,
       guest_email_subject: handoffContent?.guestSubject ?? null,
       guest_email_body: handoffContent?.guestBody ?? null,
+      lead_quality: leadAssessment?.quality ?? null,
+      lead_priority: leadAssessment?.priority.toUpperCase() ?? null,
+      lead_urgency_reason: leadAssessment?.urgency_reason ?? null,
+      lead_missing_information: leadAssessment
+        ? leadAssessment.missing_information.join(', ') || 'none'
+        : null,
+      lead_next_action: leadAssessment?.next_action ?? null,
     });
   } catch (error) {
     console.error('[assistant] request failed', {

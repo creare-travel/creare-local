@@ -34,6 +34,7 @@ export function createInitialState(
     recommended_experience_ids: [],
     last_user_message: null,
     conversation_history: [],
+    model_turn_count: 0,
   };
 }
 
@@ -65,7 +66,17 @@ export function decryptState(token: string): AssistantState {
     decipher.update(Buffer.from(ciphertextPart, 'base64url')),
     decipher.final(),
   ]).toString('utf8');
-  return JSON.parse(plaintext) as AssistantState;
+  const parsed = JSON.parse(plaintext) as AssistantState;
+  return {
+    ...parsed,
+    conversation_history: Array.isArray(parsed.conversation_history)
+      ? parsed.conversation_history
+      : [],
+    model_turn_count:
+      typeof parsed.model_turn_count === 'number' && Number.isFinite(parsed.model_turn_count)
+        ? parsed.model_turn_count
+        : 0,
+  };
 }
 
 const MAX_TRANSCRIPT_TURNS = 40;

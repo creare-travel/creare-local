@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { assessLead } from './lead';
 import type { AssistantState } from './types';
 
 export function createTicketNo(now = new Date()) {
@@ -52,7 +53,7 @@ export function buildHandoffContent(locale: AssistantState['locale'], ticket: st
       emailPrompt:
         'Пожалуйста, укажите адрес электронной почты, на который мы можем отправить номер вашего приватного брифинга и дальнейшую информацию.',
       confirmation: `Ваш приватный брифинг зарегистрирован под номером ${ticket}. Подтверждение отправлено на вашу электронную почту, а тот же номер передан команде CREARE.`,
-      guestSubject: `CREARE Private Briefing — ${ticket}`,
+      guestSubject: `CREARE Частный брифинг — ${ticket}`,
       guestBody: `Ваш приватный брифинг CREARE создан под номером ${ticket}.\n\nНаша команда изучит переданный вами контекст и продолжит работу с тем же номером.\n\nПожалуйста, сохраняйте ${ticket} для дальнейшей переписки.\n\nCREARE Travel`,
     },
     zh: {
@@ -73,6 +74,7 @@ export function buildConversationTranscript(state: AssistantState) {
 }
 
 export function buildAiControlNotes(state: AssistantState) {
+  const assessment = assessLead(state);
   const known = [
     state.destination && 'destination',
     state.dates && 'timing',
@@ -93,6 +95,11 @@ export function buildAiControlNotes(state: AssistantState) {
           : 'Human follow-up requested by conversation policy';
   const lines = [
     `Human review required: yes`,
+    `Lead quality: ${assessment.quality}`,
+    `Priority: ${assessment.priority}`,
+    `Urgency reason: ${assessment.urgency_reason}`,
+    `Missing information: ${assessment.missing_information.length ? assessment.missing_information.join(', ') : 'none'}`,
+    `Recommended next action: ${assessment.next_action}`,
     `Handoff reason: ${handoffReason}`,
     `Service path: ${state.service_path}`,
     `Conversation stage: ${state.conversation_stage}`,

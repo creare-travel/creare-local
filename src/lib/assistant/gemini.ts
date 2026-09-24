@@ -168,18 +168,86 @@ export async function runGemini(
     generationConfig: {
       temperature: 0.25,
       maxOutputTokens: 700,
-      responseMimeType: 'application/json',
+      responseFormat: {
+        text: {
+          mimeType: 'APPLICATION_JSON',
+          schema: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+              reply: { type: 'string' },
+              statePatch: {
+                type: 'object',
+                additionalProperties: false,
+                properties: {
+                  locale: { type: 'string', enum: ['tr', 'en', 'ru', 'zh'] },
+                  name: { type: 'string' },
+                  destination: { type: 'string' },
+                  dates: { type: 'string' },
+                  guest_count: { type: 'integer' },
+                  interests: { type: 'array', items: { type: 'string' } },
+                  intention: { type: 'string' },
+                  profile: { type: 'string' },
+                  mindset: { type: 'string' },
+                  emotional_goal: { type: 'string' },
+                  preferred_environments: { type: 'array', items: { type: 'string' } },
+                  group_dynamics: { type: 'string' },
+                  service_path: {
+                    type: 'string',
+                    enum: ['undetermined', 'signature', 'lab', 'black', 'corporate'],
+                  },
+                  budget_band: { type: 'string' },
+                  conversation_stage: {
+                    type: 'string',
+                    enum: [
+                      'discovery',
+                      'qualification',
+                      'recommendation',
+                      'private_briefing',
+                      'handoff',
+                    ],
+                  },
+                },
+              },
+              recommendedExperienceIds: { type: 'array', items: { type: 'string' }, maxItems: 2 },
+              handoffRecommended: { type: 'boolean' },
+            },
+            required: ['reply', 'statePatch', 'recommendedExperienceIds', 'handoffRecommended'],
+          },
+        },
+      },
     },
   };
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(15000),
-  });
-  if (!response.ok) throw new Error(`Gemini request failed: ${response.status}`);
+  let response: Response | null = null;
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(15000),
+      });
+      if (response.ok) break;
+      const retryable = response.status === 429 || response.status >= 500;
+      if (!retryable || attempt === 1) {
+        throw new Error(`Gemini request failed: ${response.status}`);
+      }
+    } catch (error) {
+      lastError = error;
+      if (attempt === 1) throw error;
+    }
+  }
+  if (!response?.ok) {
+    throw lastError instanceof Error ? lastError : new Error('Gemini request failed');
+  }
   const result = (await response.json()) as {
     candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+    usageMetadata?: {
+      promptTokenCount?: number;
+      candidatesTokenCount?: number;
+      totalTokenCount?: number;
+    };
   };
   const text =
     result.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('') || '';
@@ -195,5 +263,12 @@ export async function runGemini(
           .slice(0, 2)
       : [],
     handoffRecommended: parsed.handoffRecommended === true,
+    usage: result.usageMetadata
+      ? {
+          promptTokens: result.usageMetadata.promptTokenCount ?? 0,
+          outputTokens: result.usageMetadata.candidatesTokenCount ?? 0,
+          totalTokens: result.usageMetadata.totalTokenCount ?? 0,
+        }
+      : null,
   };
 }

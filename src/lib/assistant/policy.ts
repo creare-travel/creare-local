@@ -65,17 +65,6 @@ export function deriveConversationPolicy(state: AssistantState): ConversationPol
     };
   }
 
-  if (!hasIntent(state)) {
-    return {
-      servicePath,
-      stage: 'qualification',
-      nextQuestionFocus: 'intention',
-      mayRecommendPublishedExperiences: false,
-      shouldOfferPrivateBriefing: false,
-      shouldAvoidBudgetQuestion: true,
-    };
-  }
-
   if (servicePath === 'black') {
     return {
       servicePath,
@@ -83,6 +72,28 @@ export function deriveConversationPolicy(state: AssistantState): ConversationPol
       nextQuestionFocus: state.emotional_goal ? 'private_briefing' : 'emotional_goal',
       mayRecommendPublishedExperiences: false,
       shouldOfferPrivateBriefing: true,
+      shouldAvoidBudgetQuestion: true,
+    };
+  }
+
+  if (servicePath === 'corporate') {
+    return {
+      servicePath,
+      stage: 'private_briefing',
+      nextQuestionFocus: 'private_briefing',
+      mayRecommendPublishedExperiences: false,
+      shouldOfferPrivateBriefing: true,
+      shouldAvoidBudgetQuestion: true,
+    };
+  }
+
+  if (!hasIntent(state)) {
+    return {
+      servicePath,
+      stage: 'qualification',
+      nextQuestionFocus: 'intention',
+      mayRecommendPublishedExperiences: false,
+      shouldOfferPrivateBriefing: false,
       shouldAvoidBudgetQuestion: true,
     };
   }
@@ -135,17 +146,6 @@ export function deriveConversationPolicy(state: AssistantState): ConversationPol
       mayRecommendPublishedExperiences: false,
       shouldOfferPrivateBriefing: true,
       shouldAvoidBudgetQuestion: false,
-    };
-  }
-
-  if (servicePath === 'corporate') {
-    return {
-      servicePath,
-      stage: 'private_briefing',
-      nextQuestionFocus: 'private_briefing',
-      mayRecommendPublishedExperiences: false,
-      shouldOfferPrivateBriefing: true,
-      shouldAvoidBudgetQuestion: true,
     };
   }
 
