@@ -9,7 +9,7 @@ Do not publish or merge to production until UAT approval.
 
 - Release branch: `release/creare-assistant-v2-rc`
 - Assistant source branch: `feat/creare-assistant-conversation-design`
-- Assistant source commit: `c198aee969bc199a81dd401c57d36c7bd4b65228`
+- Assistant source commit: `a8a8e59408545ba94e1baa7e99bec412df96108d`
 - Website bubble source branch: `feat/creare-assistant-embed`
 - Website bubble source commit: `d5626722b8c105a3ff6134a7159c5d92d639d7fe`
 - Production base at RC creation: `6a7298f13c68df6c3905590603589704c9717242`
@@ -38,6 +38,7 @@ Required Assistant response mappings:
 - `data.handoff_confirmation` -> `HandoffConfirmation`
 - `data.guest_email_subject` -> `GuestEmailSubject`
 - `data.guest_email_body` -> `GuestEmailBody`
+- `data.handoff_email_failure` -> `HandoffEmailFailure`
 - `data.lead_quality` -> `LeadQuality`
 - `data.lead_priority` -> `LeadPriority`
 - `data.lead_urgency_reason` -> `LeadUrgencyReason`
@@ -79,6 +80,10 @@ The production release must include:
 - Gemini failure fallback
 - one controlled Gemini retry only for network/429/5xx
 - anonymous token/usage observability without PII
+- Gmail delivery idempotency using Gmail Thread ID response mapping
+- separate guest/internal email success tracking so retries only send missing email(s)
+- localized email-delivery failure fallback with preserved ticket/context
+- Typebot transport guard: clear stale assistant reply before each webhook call and show localized fallback if webhook fails
 
 ## Validation baseline
 
@@ -90,6 +95,14 @@ Latest validated state before RC creation:
 - prompt-injection guard: EN/TR/RU/ZH PASS
 - real guest email delivery: EN/TR/RU/ZH PASS
 - real internal CRM email delivery: PASS
+- malformed JSON / invalid state / oversize / overlong input: PASS
+- model outage fallback: PASS
+- Strapi outage fallback: PASS
+- 24-turn ceiling -> controlled Private Briefing: PASS
+- invalid email remains on email input: PASS
+- duplicate email submit -> no duplicate delivery: PASS
+- partial Gmail failure -> no false success confirmation: PASS
+- webhook transport failure -> localized EN/TR fallback without stale reply: PASS
 - Typebot V2: UNPUBLISHED
 
 ## Production cutover order
