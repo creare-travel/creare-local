@@ -108,7 +108,7 @@ export function hydrateExperiences(
   ids: string[],
   locale: AssistantLocale
 ): HydratedExperience[] {
-  const prefix = locale === 'en' ? '' : `/${locale}`;
+  const prefix = locale === 'tr' ? '/tr' : '';
   const byId = new Map(candidates.map((candidate) => [candidate.id, candidate]));
   return ids
     .map((id) => byId.get(id))

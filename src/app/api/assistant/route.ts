@@ -8,12 +8,23 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const MAX_REQUEST_BYTES = 12_000;
-const LOCALES = new Set<AssistantLocale>(['tr', 'en', 'ru', 'zh']);
+const LOCALE_MAP: Record<string, AssistantLocale> = {
+  tr: 'tr',
+  en: 'en',
+  ru: 'ru',
+  zh: 'zh',
+  turkish: 'tr',
+  english: 'en',
+  russian: 'ru',
+  chinese: 'zh',
+  türkçe: 'tr',
+  русский: 'ru',
+  中文: 'zh',
+};
 
 function localeOf(value: unknown): AssistantLocale {
-  return typeof value === 'string' && LOCALES.has(value as AssistantLocale)
-    ? (value as AssistantLocale)
-    : 'en';
+  if (typeof value !== 'string') return 'en';
+  return LOCALE_MAP[value.trim().toLocaleLowerCase('en-US')] || 'en';
 }
 
 export async function POST(request: NextRequest) {
@@ -29,9 +40,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Invalid request.' }, { status: 400 });
     }
     const message = typeof body.message === 'string' ? body.message.trim() : '';
-    if (!message || message.length > 3000) {
+    const isInitialTurn =
+      !body.state_token && typeof body.name === 'string' && body.name.trim().length > 0;
+    if ((!message && !isInitialTurn) || message.length > 3000) {
       return NextResponse.json({ success: false, error: 'Invalid message.' }, { status: 400 });
     }
+    const modelMessage = message || 'START_SESSION';
 
     let state;
     if (body.state_token) {
@@ -50,8 +64,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const candidates = await retrieveExperienceCandidates(state, message);
-    const model = await runGemini(state, message, candidates);
+    const candidates = await retrieveExperienceCandidates(state, modelMessage);
+    const model = await runGemini(state, modelMessage, candidates);
     const nextState = mergeState(state, model.statePatch, message, model.recommendedExperienceIds);
     const experiences = hydrateExperiences(
       candidates,
@@ -59,9 +73,16 @@ export async function POST(request: NextRequest) {
       nextState.locale
     );
 
+    const groundedLinks = experiences.map(
+      (experience) => `[${experience.title}](${experience.url})`
+    );
+    const reply = groundedLinks.length
+      ? `${model.reply}\n\n${groundedLinks.join('\n')}`
+      : model.reply;
+
     return NextResponse.json({
       success: true,
-      reply: model.reply,
+      reply,
       state_token: encryptState(nextState),
       stage: nextState.conversation_stage,
       experiences,
