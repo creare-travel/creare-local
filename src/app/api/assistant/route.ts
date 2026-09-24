@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runGemini } from '@/lib/assistant/gemini';
 import { deriveConversationPolicy } from '@/lib/assistant/policy';
-import { buildHandoffContent, buildHandoffSummary, createTicketNo } from '@/lib/assistant/ticket';
-import { createInitialState, decryptState, encryptState, mergeState } from '@/lib/assistant/state';
+import {
+  buildAiControlNotes,
+  buildConversationTranscript,
+  buildHandoffContent,
+  buildHandoffSummary,
+  createTicketNo,
+} from '@/lib/assistant/ticket';
+import {
+  appendConversationTurn,
+  createInitialState,
+  decryptState,
+  encryptState,
+  mergeState,
+} from '@/lib/assistant/state';
 import {
   hasDestinationMatch,
   hydrateExperiences,
@@ -199,9 +211,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (isInitialTurn && !message && state.name) {
+      const reply = initialReply(state.locale, state.name);
+      state = appendConversationTurn(state, 'assistant', reply);
       return NextResponse.json({
         success: true,
-        reply: initialReply(state.locale, state.name),
+        reply,
         state_token: encryptState(state),
         stage: state.conversation_stage,
         experiences: [],
@@ -209,9 +223,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    state = appendConversationTurn(state, 'visitor', message);
     const candidates = await retrieveExperienceCandidates(state, modelMessage);
     const currentPolicy = deriveConversationPolicy(state);
-    const model = await runGemini(state, modelMessage, candidates, currentPolicy);
+    const modelState = { ...state, conversation_history: [] };
+    const model = await runGemini(modelState, modelMessage, candidates, currentPolicy);
     const statePatch = { ...model.statePatch };
     let provisionalState = mergeState(state, statePatch, message, []);
     const destinationMismatch =
@@ -265,6 +281,7 @@ export async function POST(request: NextRequest) {
               ? recommendationLead(nextState.locale)
               : model.reply.trim() || recommendationLead(nextState.locale);
     const reply = groundedLinks.length ? `${baseReply}\n\n${groundedLinks.join('\n')}` : baseReply;
+    nextState = appendConversationTurn(nextState, 'assistant', reply);
 
     const handoffContent = nextState.ticket_no
       ? buildHandoffContent(nextState.locale, nextState.ticket_no)
@@ -280,6 +297,12 @@ export async function POST(request: NextRequest) {
       ticket_no: nextState.ticket_no,
       handoff_summary: nextPolicy.shouldOfferPrivateBriefing
         ? buildHandoffSummary(nextState)
+        : null,
+      handoff_transcript: nextPolicy.shouldOfferPrivateBriefing
+        ? buildConversationTranscript(nextState)
+        : null,
+      handoff_control_notes: nextPolicy.shouldOfferPrivateBriefing
+        ? buildAiControlNotes(nextState)
         : null,
       handoff_email_prompt: handoffContent?.emailPrompt ?? null,
       handoff_confirmation: handoffContent?.confirmation ?? null,

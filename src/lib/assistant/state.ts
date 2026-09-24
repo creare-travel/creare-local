@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import type { AssistantLocale, AssistantState, ModelStatePatch } from './types';
+import type { AssistantLocale, AssistantState, ConversationTurn, ModelStatePatch } from './types';
 
 const TOKEN_VERSION = 'v1';
 
@@ -33,6 +33,7 @@ export function createInitialState(
     conversation_stage: 'discovery',
     recommended_experience_ids: [],
     last_user_message: null,
+    conversation_history: [],
   };
 }
 
@@ -65,6 +66,35 @@ export function decryptState(token: string): AssistantState {
     decipher.final(),
   ]).toString('utf8');
   return JSON.parse(plaintext) as AssistantState;
+}
+
+const MAX_TRANSCRIPT_TURNS = 40;
+const MAX_TRANSCRIPT_CHARS = 30_000;
+
+function trimTranscript(turns: ConversationTurn[]) {
+  const kept = turns.slice(-MAX_TRANSCRIPT_TURNS);
+  let total = kept.reduce((sum, turn) => sum + turn.text.length, 0);
+  while (kept.length > 2 && total > MAX_TRANSCRIPT_CHARS) {
+    const removed = kept.shift();
+    total -= removed?.text.length ?? 0;
+  }
+  return kept;
+}
+
+export function appendConversationTurn(
+  state: AssistantState,
+  role: ConversationTurn['role'],
+  text: string
+): AssistantState {
+  const clean = text.trim();
+  if (!clean) return state;
+  return {
+    ...state,
+    conversation_history: trimTranscript([
+      ...(state.conversation_history || []),
+      { role, text: clean.slice(0, 6_000) },
+    ]),
+  };
 }
 
 export function mergeState(

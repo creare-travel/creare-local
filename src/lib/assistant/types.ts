@@ -5,6 +5,11 @@ export type ConversationStage =
 
 export type ServicePath = 'undetermined' | 'signature' | 'lab' | 'black' | 'corporate';
 
+export type ConversationTurn = {
+  role: 'visitor' | 'assistant';
+  text: string;
+};
+
 export type AssistantState = {
   session_id: string;
   locale: AssistantLocale;
@@ -25,6 +30,7 @@ export type AssistantState = {
   conversation_stage: ConversationStage;
   recommended_experience_ids: string[];
   last_user_message: string | null;
+  conversation_history: ConversationTurn[];
 };
 
 export type ExperienceCandidate = {

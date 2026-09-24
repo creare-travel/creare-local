@@ -64,3 +64,44 @@ export function buildHandoffContent(locale: AssistantState['locale'], ticket: st
   } as const;
   return content[locale];
 }
+
+export function buildConversationTranscript(state: AssistantState) {
+  if (!state.conversation_history.length) return 'No assistant conversation recorded.';
+  return state.conversation_history
+    .map((turn) => `${turn.role === 'visitor' ? '[VISITOR]' : '[CREARE ASSISTANT]'}\n${turn.text}`)
+    .join('\n\n');
+}
+
+export function buildAiControlNotes(state: AssistantState) {
+  const known = [
+    state.destination && 'destination',
+    state.dates && 'timing',
+    state.guest_count && 'guest_count',
+    (state.intention || state.interests.length) && 'intention/interests',
+    state.emotional_goal && 'emotional_goal',
+    state.preferred_environments.length && 'preferred_environments',
+    state.group_dynamics && 'group_dynamics',
+    state.budget_band && 'budget',
+  ].filter(Boolean);
+  const handoffReason =
+    state.service_path === 'black'
+      ? 'Explicit discretion / private-access context'
+      : state.service_path === 'corporate'
+        ? 'Corporate / professional briefing path'
+        : state.service_path === 'lab'
+          ? 'Bespoke LAB path / published Experience not sufficient for the brief'
+          : 'Human follow-up requested by conversation policy';
+  const lines = [
+    `Human review required: yes`,
+    `Handoff reason: ${handoffReason}`,
+    `Service path: ${state.service_path}`,
+    `Conversation stage: ${state.conversation_stage}`,
+    `Captured qualification fields: ${known.length ? known.join(', ') : 'none'}`,
+    `Grounded Experience IDs retained in state: ${
+      state.recommended_experience_ids.length ? state.recommended_experience_ids.join(', ') : 'none'
+    }`,
+    `Transcript turns: ${state.conversation_history.length}`,
+    `Control note: Review the transcript against the structured brief before replying to the guest.`,
+  ];
+  return lines.join('\n');
+}
