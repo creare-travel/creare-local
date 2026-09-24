@@ -4,9 +4,9 @@ import type { AssistantLocale, AssistantState, ModelStatePatch } from './types';
 const TOKEN_VERSION = 'v1';
 
 function getKey() {
-  const secret = process.env.ASSISTANT_STATE_SECRET;
-  if (!secret) throw new Error('ASSISTANT_STATE_SECRET is not configured');
-  return crypto.createHash('sha256').update(secret).digest();
+  const secret = process.env.ASSISTANT_STATE_SECRET || process.env.GEMINI_API_KEY;
+  if (!secret) throw new Error('Assistant state encryption secret is not configured');
+  return crypto.createHash('sha256').update(`creare-assistant-state-v1:${secret}`).digest();
 }
 
 export function createInitialState(
