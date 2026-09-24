@@ -46,6 +46,8 @@ curl -fsS -H "Authorization: Bearer $TYPEBOT_API_TOKEN" -H 'Accept: application/
 curl -fsS -H "Authorization: Bearer $TYPEBOT_API_TOKEN" -H 'Accept: application/json' \
   "https://app.typebot.com/api/v1/typebots/$TYPEBOT_ID/publishedTypebot" > "$tmp_pub"
 
+python3 scripts/verify-typebot-graph.py "$tmp_typebot"
+
 public_id=$(jq -r '.typebot.publicId' "$tmp_typebot")
 [ "$public_id" = "$EXPECTED_PUBLIC_ID" ] || fail "Typebot publicId mismatch: $public_id"
 pass 'Typebot publicId correct'
