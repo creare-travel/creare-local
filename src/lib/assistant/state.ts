@@ -9,7 +9,10 @@ function getKey() {
   return crypto.createHash('sha256').update(secret).digest();
 }
 
-export function createInitialState(locale: AssistantLocale = 'en', name: string | null = null): AssistantState {
+export function createInitialState(
+  locale: AssistantLocale = 'en',
+  name: string | null = null
+): AssistantState {
   return {
     session_id: crypto.randomUUID(),
     locale,
@@ -32,13 +35,23 @@ export function encryptState(state: AssistantState) {
   const plaintext = Buffer.from(JSON.stringify(state), 'utf8');
   const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final()]);
   const tag = cipher.getAuthTag();
-  return [TOKEN_VERSION, iv.toString('base64url'), tag.toString('base64url'), ciphertext.toString('base64url')].join('.');
+  return [
+    TOKEN_VERSION,
+    iv.toString('base64url'),
+    tag.toString('base64url'),
+    ciphertext.toString('base64url'),
+  ].join('.');
 }
 
 export function decryptState(token: string): AssistantState {
   const [version, ivPart, tagPart, ciphertextPart] = token.split('.');
-  if (version !== TOKEN_VERSION || !ivPart || !tagPart || !ciphertextPart) throw new Error('Invalid state token');
-  const decipher = crypto.createDecipheriv('aes-256-gcm', getKey(), Buffer.from(ivPart, 'base64url'));
+  if (version !== TOKEN_VERSION || !ivPart || !tagPart || !ciphertextPart)
+    throw new Error('Invalid state token');
+  const decipher = crypto.createDecipheriv(
+    'aes-256-gcm',
+    getKey(),
+    Buffer.from(ivPart, 'base64url')
+  );
   decipher.setAuthTag(Buffer.from(tagPart, 'base64url'));
   const plaintext = Buffer.concat([
     decipher.update(Buffer.from(ciphertextPart, 'base64url')),
@@ -47,7 +60,12 @@ export function decryptState(token: string): AssistantState {
   return JSON.parse(plaintext) as AssistantState;
 }
 
-export function mergeState(state: AssistantState, patch: ModelStatePatch, message: string, recommendedIds: string[]) {
+export function mergeState(
+  state: AssistantState,
+  patch: ModelStatePatch,
+  message: string,
+  recommendedIds: string[]
+) {
   const next: AssistantState = {
     ...state,
     ...patch,

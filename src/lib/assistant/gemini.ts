@@ -26,11 +26,18 @@ handoffRecommended: boolean`;
 }
 
 function extractJson(text: string) {
-  const trimmed = text.trim().replace(/^```json\s*/i, '').replace(/\s*```$/, '');
+  const trimmed = text
+    .trim()
+    .replace(/^```json\s*/i, '')
+    .replace(/\s*```$/, '');
   return JSON.parse(trimmed);
 }
 
-export async function runGemini(state: AssistantState, message: string, candidates: ExperienceCandidate[]): Promise<ModelResult> {
+export async function runGemini(
+  state: AssistantState,
+  message: string,
+  candidates: ExperienceCandidate[]
+): Promise<ModelResult> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
   const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
@@ -60,15 +67,21 @@ export async function runGemini(state: AssistantState, message: string, candidat
     signal: AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error(`Gemini request failed: ${response.status}`);
-  const result = await response.json();
-  const text = result?.candidates?.[0]?.content?.parts?.map((part: any) => part?.text || '').join('') || '';
+  const result = (await response.json()) as {
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+  };
+  const text =
+    result.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('') || '';
   const parsed = extractJson(text) as Partial<ModelResult>;
   const validIds = new Set(candidates.map((candidate) => candidate.id));
   return {
     reply: typeof parsed.reply === 'string' ? parsed.reply.trim() : '',
     statePatch: parsed.statePatch && typeof parsed.statePatch === 'object' ? parsed.statePatch : {},
     recommendedExperienceIds: Array.isArray(parsed.recommendedExperienceIds)
-      ? parsed.recommendedExperienceIds.map(String).filter((id) => validIds.has(id)).slice(0, 3)
+      ? parsed.recommendedExperienceIds
+          .map(String)
+          .filter((id) => validIds.has(id))
+          .slice(0, 3)
       : [],
     handoffRecommended: parsed.handoffRecommended === true,
   };

@@ -1,11 +1,7 @@
 export type AssistantLocale = 'tr' | 'en' | 'ru' | 'zh';
 
 export type ConversationStage =
-  | 'discovery'
-  | 'qualification'
-  | 'recommendation'
-  | 'private_briefing'
-  | 'handoff';
+  'discovery' | 'qualification' | 'recommendation' | 'private_briefing' | 'handoff';
 
 export type AssistantState = {
   session_id: string;

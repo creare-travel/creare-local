@@ -1,4 +1,9 @@
-import type { AssistantLocale, AssistantState, ExperienceCandidate, HydratedExperience } from './types';
+import type {
+  AssistantLocale,
+  AssistantState,
+  ExperienceCandidate,
+  HydratedExperience,
+} from './types';
 
 const MAX_CANDIDATES = 6;
 const CATALOG_CACHE_MS = 5 * 60 * 1000;
@@ -8,14 +13,25 @@ function strapiBaseUrl() {
   return (process.env.STRAPI_URL || process.env.NEXT_PUBLIC_STRAPI_URL || '').replace(/\/$/, '');
 }
 
-function normalizeItem(item: any): ExperienceCandidate | null {
-  const source = item?.attributes ? { ...item.attributes, id: item.id, documentId: item.documentId } : item;
-  if (!source?.title || !source?.slug) return null;
+function normalizeItem(item: unknown): ExperienceCandidate | null {
+  if (!item || typeof item !== 'object') return null;
+  const record = item as Record<string, unknown>;
+  const attributes =
+    record.attributes && typeof record.attributes === 'object'
+      ? (record.attributes as Record<string, unknown>)
+      : null;
+  const source: Record<string, unknown> = attributes
+    ? { ...attributes, id: record.id, documentId: record.documentId }
+    : record;
+  if (!source.title || !source.slug) return null;
   return {
     id: String(source.documentId || source.id),
     title: String(source.title),
     slug: String(source.slug),
-    category: ['signature', 'lab', 'black'].includes(source.category) ? source.category : null,
+    category:
+      typeof source.category === 'string' && ['signature', 'lab', 'black'].includes(source.category)
+        ? (source.category as 'signature' | 'lab' | 'black')
+        : null,
     short_description: source.short_description ? String(source.short_description) : null,
     location: source.location ? String(source.location) : null,
     duration: source.duration ? String(source.duration) : null,
@@ -38,17 +54,24 @@ async function fetchCatalog(): Promise<ExperienceCandidate[]> {
   });
   if (!response.ok) throw new Error(`Strapi request failed: ${response.status}`);
   const payload = await response.json();
-  const items = (Array.isArray(payload?.data) ? payload.data : []).map(normalizeItem).filter(Boolean) as ExperienceCandidate[];
+  const items = (Array.isArray(payload?.data) ? payload.data : [])
+    .map(normalizeItem)
+    .filter(Boolean) as ExperienceCandidate[];
   catalogCache = { items, expiresAt: Date.now() + CATALOG_CACHE_MS };
   return items;
 }
 
 function normalizeText(value: string) {
-  return value.toLocaleLowerCase('en-US').normalize('NFKD').replace(/[\u0300-\u036f]/g, ' ');
+  return value
+    .toLocaleLowerCase('en-US')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, ' ');
 }
 
 function tokensFrom(state: AssistantState, message: string) {
-  const raw = [state.destination, state.intention, ...state.interests, message].filter(Boolean).join(' ');
+  const raw = [state.destination, state.intention, ...state.interests, message]
+    .filter(Boolean)
+    .join(' ');
   return normalizeText(raw)
     .split(/[^\p{L}\p{N}]+/u)
     .filter((token) => token.length >= 3)
@@ -80,7 +103,11 @@ export async function retrieveExperienceCandidates(state: AssistantState, messag
     .map(({ candidate }) => candidate);
 }
 
-export function hydrateExperiences(candidates: ExperienceCandidate[], ids: string[], locale: AssistantLocale): HydratedExperience[] {
+export function hydrateExperiences(
+  candidates: ExperienceCandidate[],
+  ids: string[],
+  locale: AssistantLocale
+): HydratedExperience[] {
   const prefix = locale === 'en' ? '' : `/${locale}`;
   const byId = new Map(candidates.map((candidate) => [candidate.id, candidate]));
   return ids

@@ -11,7 +11,9 @@ const MAX_REQUEST_BYTES = 12_000;
 const LOCALES = new Set<AssistantLocale>(['tr', 'en', 'ru', 'zh']);
 
 function localeOf(value: unknown): AssistantLocale {
-  return typeof value === 'string' && LOCALES.has(value as AssistantLocale) ? (value as AssistantLocale) : 'en';
+  return typeof value === 'string' && LOCALES.has(value as AssistantLocale)
+    ? (value as AssistantLocale)
+    : 'en';
 }
 
 export async function POST(request: NextRequest) {
@@ -36,16 +38,26 @@ export async function POST(request: NextRequest) {
       try {
         state = decryptState(body.state_token);
       } catch {
-        return NextResponse.json({ success: false, error: 'Invalid session state.' }, { status: 400 });
+        return NextResponse.json(
+          { success: false, error: 'Invalid session state.' },
+          { status: 400 }
+        );
       }
     } else {
-      state = createInitialState(localeOf(body.locale), typeof body.name === 'string' && body.name.trim() ? body.name.trim() : null);
+      state = createInitialState(
+        localeOf(body.locale),
+        typeof body.name === 'string' && body.name.trim() ? body.name.trim() : null
+      );
     }
 
     const candidates = await retrieveExperienceCandidates(state, message);
     const model = await runGemini(state, message, candidates);
     const nextState = mergeState(state, model.statePatch, message, model.recommendedExperienceIds);
-    const experiences = hydrateExperiences(candidates, model.recommendedExperienceIds, nextState.locale);
+    const experiences = hydrateExperiences(
+      candidates,
+      model.recommendedExperienceIds,
+      nextState.locale
+    );
 
     return NextResponse.json({
       success: true,
@@ -59,6 +71,9 @@ export async function POST(request: NextRequest) {
     console.error('[assistant] request failed', {
       error: error instanceof Error ? error.message : 'unknown_error',
     });
-    return NextResponse.json({ success: false, error: 'Assistant is temporarily unavailable.' }, { status: 503 });
+    return NextResponse.json(
+      { success: false, error: 'Assistant is temporarily unavailable.' },
+      { status: 503 }
+    );
   }
 }
