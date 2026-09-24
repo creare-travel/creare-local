@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import type { AssistantLocale, AssistantState, ModelStatePatch } from './types';
+import type { AssistantLocale, AssistantState, ConversationTurn, ModelStatePatch } from './types';
 
 const TOKEN_VERSION = 'v1';
 
@@ -22,10 +22,19 @@ export function createInitialState(
     guest_count: null,
     interests: [],
     intention: null,
+    profile: null,
+    mindset: null,
+    emotional_goal: null,
+    preferred_environments: [],
+    group_dynamics: null,
+    service_path: 'undetermined',
+    ticket_no: null,
     budget_band: null,
     conversation_stage: 'discovery',
     recommended_experience_ids: [],
     last_user_message: null,
+    conversation_history: [],
+    model_turn_count: 0,
   };
 }
 
@@ -57,7 +66,46 @@ export function decryptState(token: string): AssistantState {
     decipher.update(Buffer.from(ciphertextPart, 'base64url')),
     decipher.final(),
   ]).toString('utf8');
-  return JSON.parse(plaintext) as AssistantState;
+  const parsed = JSON.parse(plaintext) as AssistantState;
+  return {
+    ...parsed,
+    conversation_history: Array.isArray(parsed.conversation_history)
+      ? parsed.conversation_history
+      : [],
+    model_turn_count:
+      typeof parsed.model_turn_count === 'number' && Number.isFinite(parsed.model_turn_count)
+        ? parsed.model_turn_count
+        : 0,
+  };
+}
+
+const MAX_TRANSCRIPT_TURNS = 40;
+const MAX_TRANSCRIPT_CHARS = 30_000;
+
+function trimTranscript(turns: ConversationTurn[]) {
+  const kept = turns.slice(-MAX_TRANSCRIPT_TURNS);
+  let total = kept.reduce((sum, turn) => sum + turn.text.length, 0);
+  while (kept.length > 2 && total > MAX_TRANSCRIPT_CHARS) {
+    const removed = kept.shift();
+    total -= removed?.text.length ?? 0;
+  }
+  return kept;
+}
+
+export function appendConversationTurn(
+  state: AssistantState,
+  role: ConversationTurn['role'],
+  text: string
+): AssistantState {
+  const clean = text.trim();
+  if (!clean) return state;
+  return {
+    ...state,
+    conversation_history: trimTranscript([
+      ...(state.conversation_history || []),
+      { role, text: clean.slice(0, 6_000) },
+    ]),
+  };
 }
 
 export function mergeState(
@@ -70,6 +118,9 @@ export function mergeState(
     ...state,
     ...patch,
     interests: Array.isArray(patch.interests) ? patch.interests.slice(0, 12) : state.interests,
+    preferred_environments: Array.isArray(patch.preferred_environments)
+      ? patch.preferred_environments.slice(0, 8)
+      : state.preferred_environments,
     guest_count:
       typeof patch.guest_count === 'number' && Number.isFinite(patch.guest_count)
         ? Math.max(1, Math.min(100, Math.round(patch.guest_count)))
