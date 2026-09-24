@@ -139,20 +139,20 @@ function initialReply(locale: AssistantLocale, name: string) {
 
 function recommendationLead(locale: AssistantLocale) {
   const replies: Record<AssistantLocale, string> = {
-    en: 'These published CREARE Experiences are the closest grounded matches to what you have shared:',
-    tr: 'Paylaştığınız tercihlere en yakın yayımlanmış CREARE deneyimleri:',
-    ru: 'Наиболее близкие опубликованные варианты CREARE по вашему запросу:',
-    zh: '根据您目前分享的偏好，以下是最接近的已发布 CREARE 体验：',
+    en: 'Based on what you have shared, these CREARE Experiences feel especially relevant:',
+    tr: 'Paylaştıklarınıza göre, şu CREARE deneyimleri özellikle anlamlı görünüyor:',
+    ru: 'Исходя из того, чем вы поделились, эти форматы CREARE кажутся особенно подходящими:',
+    zh: '根据您目前分享的内容，以下 CREARE 体验尤其契合您的方向：',
   };
   return replies[locale];
 }
 
 function noMatchReply(locale: AssistantLocale, destination: string) {
   const replies: Record<AssistantLocale, string> = {
-    en: `I don't have a matching published CREARE Experience for ${destination} in the retrieved catalogue. We can instead shape this as a bespoke journey. What kind of moment would make this journey unforgettable for you?`,
-    tr: `${destination} için getirilen katalogda doğrudan eşleşen yayımlanmış bir CREARE deneyimi görünmüyor. Bunu size özel bir yolculuk olarak tasarlayabiliriz. Bu yolculuğu sizin için unutulmaz kılacak nasıl bir an hayal ediyorsunuz?`,
-    ru: `В полученном каталоге нет опубликованного опыта CREARE, напрямую соответствующего запросу по направлению ${destination}. Мы можем создать это как индивидуальное путешествие. Какой момент сделал бы его по-настоящему незабываемым для вас?`,
-    zh: `在当前检索到的目录中，没有与 ${destination} 直接匹配的已发布 CREARE 体验。我们可以将其作为专属旅程来构思。什么样的时刻会让这段旅程对您而言真正难忘？`,
+    en: `We do not currently have a published CREARE Experience that directly fits ${destination}. This is a better starting point for a bespoke journey. What kind of moment would make it unforgettable for you?`,
+    tr: `${destination} için doğrudan uyum sağlayan yayımlanmış bir CREARE deneyimimiz şu anda bulunmuyor. Bu talep, size özel bir yolculuk tasarlamak için daha doğru bir başlangıç. Bu yolculuğu sizin için unutulmaz kılacak nasıl bir an hayal ediyorsunuz?`,
+    ru: `Сейчас среди опубликованных форматов CREARE нет варианта, который напрямую соответствовал бы направлению ${destination}. Такой запрос лучше раскрыть как индивидуальное путешествие. Какой момент сделал бы его для вас по-настоящему незабываемым?`,
+    zh: `目前已发布的 CREARE 体验中，没有与 ${destination} 直接对应的方案。这个需求更适合作为专属旅程来展开。什么样的时刻会让这段旅程对您而言真正难忘？`,
   };
   return replies[locale];
 }

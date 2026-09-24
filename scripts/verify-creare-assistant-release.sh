@@ -98,10 +98,10 @@ pass 'CREARE internal recipient present'
 webhook=$(jq -r '[.typebot.groups[].blocks[]? | .options.webhook.url? | select(. != null and contains("/api/assistant"))][0] // "missing"' "$tmp_typebot")
 published=$(jq -r 'if .publishedTypebot then "true" else "false" end' "$tmp_pub")
 echo "INFO: Typebot webhook currently $webhook"
-echo "INFO: production webhook target https://crearetravel.com/api/assistant"
+echo "INFO: canonical same-origin webhook target /api/assistant"
 echo "INFO: Typebot published=$published"
 
 if [ "${STRICT_PRODUCTION:-0}" = "1" ]; then
-  [ "$webhook" = "https://crearetravel.com/api/assistant" ] || fail "production webhook mismatch: $webhook"
-  pass "production webhook correct"
+  [ "$webhook" = "/api/assistant" ] || fail "canonical webhook mismatch: $webhook"
+  pass "canonical same-origin webhook correct"
 fi

@@ -22,11 +22,13 @@ The RC must contain the Assistant, website bubble, and Assistant UI hardening so
 
 - Typebot V2 ID: `cmufapz3700000agmskmdsvaz`
 - Public ID: `creare-assistant`
-- Required production Assistant API URL:
-  `https://crearetravel.com/api/assistant`
+- Canonical Assistant webhook: `/api/assistant` (same-origin)
+- On local UAT this resolves to `http://localhost:4028/api/assistant`.
+- On production this resolves to `https://crearetravel.com/api/assistant`.
 - Pre-cutover state: UNPUBLISHED
-- Local UAT uses an unpublished Typebot preview bridge and same-origin `/api/assistant`; no public tunnel is required.
-- Production cutover must replace the local relative webhook target with the absolute production API URL immediately before publish.
+- Local UAT uses an unpublished Typebot preview bridge; no public tunnel or CORS exception is required.
+- The relative webhook is intentional and MUST remain `/api/assistant` through production cutover. This eliminates environment-specific webhook patching.
+- Typebot's standalone/editor preview is not the production acceptance surface for this configuration; embedded website UAT is authoritative because the relative webhook resolves against the embedding site's origin.
 
 Required Assistant response mappings:
 
@@ -91,7 +93,7 @@ The production release must include:
 - localized email-delivery failure fallback with preserved ticket/context
 - Typebot transport guard: clear stale assistant reply before each webhook call and show localized fallback if webhook fails
 - custom CREARE website launcher with desktop pill and mobile compact control
-- mobile Typebot panel full-screen at viewport size
+- mobile Typebot panel full-screen at viewport size with a persistent top-right close control
 - hydration-free homepage Assistant shell compatible with the existing home performance shell
 - non-production Typebot preview bridge that keeps the Typebot API token server-side
 - Typebot graph integrity preflight and obsolete-graph rejection
@@ -135,14 +137,14 @@ Latest validated state before RC creation:
 3. Merge the RC to `main`.
 4. Wait for the exact merged commit to reach Vercel Production READY.
 5. Smoke-test `/api/assistant` using a zero/low-cost deterministic request.
-6. Patch Typebot V2 webhook URL to `https://crearetravel.com/api/assistant`.
-7. Read back Typebot V2 and verify all required mappings and Gmail blocks.
-8. Publish Typebot V2.
-9. Verify public Typebot ID `creare-assistant`.
-10. Enable/ship website bubble only after Typebot public smoke test passes.
+6. Read back Typebot V2 and verify the webhook is exactly `/api/assistant`, with all required mappings and Gmail blocks intact.
+7. Publish Typebot V2.
+8. Verify public Typebot ID `creare-assistant`.
+9. Smoke-test the public Assistant from `crearetravel.com` so `/api/assistant` resolves same-origin.
+10. Enable/ship the website bubble only after the public Typebot smoke test passes.
 11. Run desktop/mobile smoke tests.
 12. Run one controlled real handoff test to CREARE's own test inbox.
-13. Monitor assistant metrics and Gmail delivery.
+13. Monitor Assistant metrics and Gmail delivery.
 14. Declare live only after all checks pass.
 
 ## Rollback

@@ -10,15 +10,33 @@
 
   let typebot;
   let isOpen = false;
+  let isReady = false;
+
+  const locale = (document.documentElement.lang || 'en').slice(0, 2);
+  const copy = {
+    en: { hint: 'Begin a conversation', close: 'Close conversation' },
+    tr: { hint: 'Görüşmeyi başlat', close: 'Görüşmeyi kapat' },
+    ru: { hint: 'Начать диалог', close: 'Закрыть диалог' },
+    zh: { hint: '开始沟通', close: '关闭对话' },
+  }[locale] || { hint: 'Begin a conversation', close: 'Close conversation' };
+  const hint = launcher.querySelector('.creare-assistant-hint');
+
+  const syncHint = () => {
+    if (!(hint instanceof HTMLElement)) return;
+    hint.textContent = isReady ? (isOpen ? copy.close : copy.hint) : '…';
+  };
 
   const setOpen = (open) => {
     isOpen = open;
     launcher.dataset.open = open ? 'true' : 'false';
     launcher.setAttribute('aria-expanded', open ? 'true' : 'false');
+    syncHint();
   };
 
   const setReady = (ready) => {
+    isReady = ready;
     launcher.dataset.ready = ready ? 'true' : 'false';
+    syncHint();
   };
 
   const init = async () => {

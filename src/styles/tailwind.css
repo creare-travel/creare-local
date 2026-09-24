@@ -381,9 +381,36 @@ typebot-bubble::part(bot) {
   }
 
   .creare-assistant-launcher[data-open='true'] {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(8px);
+    top: 14px;
+    right: 14px;
+    bottom: auto;
+    width: 44px;
+    height: 44px;
+    padding: 4px;
+    opacity: 1;
+    border-color: rgba(245, 241, 234, 0.2);
+    background: rgba(11, 11, 12, 0.88);
+    transform: none;
+  }
+
+  .creare-assistant-launcher[data-open='true'] .creare-assistant-mark {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+    background: transparent;
+    color: var(--color-warm-mineral-white);
+  }
+
+  .creare-assistant-launcher[data-open='true'] .creare-assistant-mark > span {
+    font-size: 0;
+  }
+
+  .creare-assistant-launcher[data-open='true'] .creare-assistant-mark > span::after {
+    content: '×';
+    font-family: var(--font-body);
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 1;
   }
 
   typebot-bubble::part(bot) {
