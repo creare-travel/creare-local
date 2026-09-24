@@ -34,7 +34,15 @@ Required Assistant response mappings:
 - `data.handoff_summary` -> `SohbetGecmisi`
 - `data.handoff_transcript` -> `HandoffTranscript`
 - `data.handoff_control_notes` -> `HandoffControlNotes`
-- localized guest email fields must remain mapped.
+- `data.handoff_email_prompt` -> `HandoffEmailPrompt`
+- `data.handoff_confirmation` -> `HandoffConfirmation`
+- `data.guest_email_subject` -> `GuestEmailSubject`
+- `data.guest_email_body` -> `GuestEmailBody`
+- `data.lead_quality` -> `LeadQuality`
+- `data.lead_priority` -> `LeadPriority`
+- `data.lead_urgency_reason` -> `LeadUrgencyReason`
+- `data.lead_missing_information` -> `LeadMissingInformation`
+- `data.lead_next_action` -> `LeadNextAction`
 
 ## Website target
 
