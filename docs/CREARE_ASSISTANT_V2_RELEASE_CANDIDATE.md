@@ -12,9 +12,11 @@ Do not publish or merge to production until UAT approval.
 - Assistant source commit: `a8a8e59408545ba94e1baa7e99bec412df96108d`
 - Website bubble source branch: `feat/creare-assistant-embed`
 - Website bubble source commit: `d5626722b8c105a3ff6134a7159c5d92d639d7fe`
+- Assistant UI hardening branch: `feat/creare-assistant-ui`
+- Assistant UI hardening commit: `d81f30db85d5a632dd010dfd01159b17d32643bf`
 - Production base at RC creation: `6a7298f13c68df6c3905590603589704c9717242`
 
-The RC must contain both source commits before production cutover.
+The RC must contain the Assistant, website bubble, and Assistant UI hardening source commits before production cutover.
 
 ## Typebot production target
 
@@ -23,9 +25,11 @@ The RC must contain both source commits before production cutover.
 - Required production Assistant API URL:
   `https://crearetravel.com/api/assistant`
 - Pre-cutover state: UNPUBLISHED
-- Current local-test tunnel URL is temporary and MUST be replaced by the production API URL immediately before publish.
+- Local UAT uses an unpublished Typebot preview bridge and same-origin `/api/assistant`; no public tunnel is required.
+- Production cutover must replace the local relative webhook target with the absolute production API URL immediately before publish.
 
 Required Assistant response mappings:
+
 - `data.reply` -> `YapayZekaCevabi`
 - `data.state_token` -> `AssistantStateToken`
 - `data.stage` -> `AssistantStage`
@@ -48,6 +52,7 @@ Required Assistant response mappings:
 ## Website target
 
 The website bubble must use:
+
 - Typebot public ID: `creare-assistant`
 
 The bubble and the Typebot publish are a coordinated release.
@@ -56,6 +61,7 @@ Do not expose the bubble before the V2 Typebot production webhook is set and V2 
 ## Functional release baseline
 
 The production release must include:
+
 - deterministic conversation policy
 - Signature / LAB / BLACK / Corporate routing
 - deterministic multilingual literal extraction
@@ -84,10 +90,17 @@ The production release must include:
 - separate guest/internal email success tracking so retries only send missing email(s)
 - localized email-delivery failure fallback with preserved ticket/context
 - Typebot transport guard: clear stale assistant reply before each webhook call and show localized fallback if webhook fails
+- custom CREARE website launcher with desktop pill and mobile compact control
+- mobile Typebot panel full-screen at viewport size
+- hydration-free homepage Assistant shell compatible with the existing home performance shell
+- non-production Typebot preview bridge that keeps the Typebot API token server-side
+- Typebot graph integrity preflight and obsolete-graph rejection
+- clean visitor input after every normal Assistant reply (no previous-message prefill)
 
 ## Validation baseline
 
 Latest validated state before RC creation:
+
 - type-check: PASS
 - production build: PASS
 - 20-persona regression: 20/20 PASS
@@ -103,6 +116,16 @@ Latest validated state before RC creation:
 - duplicate email submit -> no duplicate delivery: PASS
 - partial Gmail failure -> no false success confirmation: PASS
 - webhook transport failure -> localized EN/TR fallback without stale reply: PASS
+- Typebot graph integrity audit: 27 groups / 34 blocks / 39 edges, 0 broken references: PASS
+- homepage hydration-free Assistant shell: PASS
+- normal Next.js page Assistant launcher: PASS
+- desktop open/close/reopen: PASS
+- mobile full-screen panel 390×844 at top/left 0: PASS
+- EN/TR/RU/ZH name → localized Assistant greeting UI: PASS
+- recommendation → clean next input (no prefilled previous message): PASS
+- BLACK → Private Briefing → full name → email prompt UI: PASS
+- launcher axe accessibility audit: 0 violations
+- Typebot panel axe accessibility audit: 0 violations
 - Typebot V2: UNPUBLISHED
 
 ## Production cutover order
@@ -125,6 +148,7 @@ Latest validated state before RC creation:
 ## Rollback
 
 If any production gate fails:
+
 1. Remove/disable the website bubble first.
 2. Unpublish or revert Typebot V2 to the previous safe flow as appropriate.
 3. Roll back the Vercel production deployment to the known-good production deployment.

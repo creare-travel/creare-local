@@ -3,6 +3,7 @@ set -eu
 
 EXPECTED_ASSISTANT_COMMIT='a8a8e59408545ba94e1baa7e99bec412df96108d'
 EXPECTED_BUBBLE_COMMIT='d5626722b8c105a3ff6134a7159c5d92d639d7fe'
+EXPECTED_UI_COMMIT='d81f30db85d5a632dd010dfd01159b17d32643bf'
 EXPECTED_PUBLIC_ID='creare-assistant'
 TYPEBOT_ID='cmufapz3700000agmskmdsvaz'
 
@@ -13,6 +14,8 @@ git merge-base --is-ancestor "$EXPECTED_ASSISTANT_COMMIT" HEAD || fail 'assistan
 pass 'assistant source commit present'
 git merge-base --is-ancestor "$EXPECTED_BUBBLE_COMMIT" HEAD || fail 'bubble source commit missing'
 pass 'website bubble source commit present'
+git merge-base --is-ancestor "$EXPECTED_UI_COMMIT" HEAD || fail 'assistant UI source commit missing'
+pass 'assistant UI source commit present'
 
 grep -q "TYPEBOT_PUBLIC_ID = '$EXPECTED_PUBLIC_ID'" src/components/CreareAssistantBubble.tsx || fail 'bubble publicId mismatch'
 pass 'bubble publicId correct'
