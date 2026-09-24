@@ -22,6 +22,12 @@ export function createInitialState(
     guest_count: null,
     interests: [],
     intention: null,
+    profile: null,
+    mindset: null,
+    emotional_goal: null,
+    preferred_environments: [],
+    group_dynamics: null,
+    service_path: 'undetermined',
     budget_band: null,
     conversation_stage: 'discovery',
     recommended_experience_ids: [],
@@ -70,6 +76,9 @@ export function mergeState(
     ...state,
     ...patch,
     interests: Array.isArray(patch.interests) ? patch.interests.slice(0, 12) : state.interests,
+    preferred_environments: Array.isArray(patch.preferred_environments)
+      ? patch.preferred_environments.slice(0, 8)
+      : state.preferred_environments,
     guest_count:
       typeof patch.guest_count === 'number' && Number.isFinite(patch.guest_count)
         ? Math.max(1, Math.min(100, Math.round(patch.guest_count)))

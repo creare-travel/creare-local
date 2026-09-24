@@ -3,6 +3,8 @@ export type AssistantLocale = 'tr' | 'en' | 'ru' | 'zh';
 export type ConversationStage =
   'discovery' | 'qualification' | 'recommendation' | 'private_briefing' | 'handoff';
 
+export type ServicePath = 'undetermined' | 'signature' | 'lab' | 'black' | 'corporate';
+
 export type AssistantState = {
   session_id: string;
   locale: AssistantLocale;
@@ -12,6 +14,12 @@ export type AssistantState = {
   guest_count: number | null;
   interests: string[];
   intention: string | null;
+  profile: string | null;
+  mindset: string | null;
+  emotional_goal: string | null;
+  preferred_environments: string[];
+  group_dynamics: string | null;
+  service_path: ServicePath;
   budget_band: string | null;
   conversation_stage: ConversationStage;
   recommended_experience_ids: string[];
@@ -49,6 +57,12 @@ export type ModelStatePatch = Partial<
     | 'guest_count'
     | 'interests'
     | 'intention'
+    | 'profile'
+    | 'mindset'
+    | 'emotional_goal'
+    | 'preferred_environments'
+    | 'group_dynamics'
+    | 'service_path'
     | 'budget_band'
     | 'conversation_stage'
   >
