@@ -65,7 +65,13 @@ function normalizeText(value: string) {
   return value
     .toLocaleLowerCase('en-US')
     .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, ' ');
+    .replace(/[\u0300-\u036f]/g, ' ')
+    .replace(/стамбул[а-я]*/gu, ' istanbul ')
+    .replace(/伊斯坦布尔/gu, ' istanbul ')
+    .replace(/бодрум[а-я]*/gu, ' bodrum ')
+    .replace(/博德鲁姆/gu, ' bodrum ')
+    .replace(/каппадоки[а-я]*/gu, ' cappadocia ')
+    .replace(/卡帕多奇亚/gu, ' cappadocia ');
 }
 
 function tokensFrom(state: AssistantState, message: string) {
@@ -98,9 +104,20 @@ export async function retrieveExperienceCandidates(state: AssistantState, messag
   if (!tokens.length) return catalog.slice(0, MAX_CANDIDATES);
   return catalog
     .map((candidate) => ({ candidate, score: score(candidate, tokens) }))
+    .filter(({ score }) => score > 0)
     .sort((a, b) => b.score - a.score || a.candidate.title.localeCompare(b.candidate.title))
     .slice(0, MAX_CANDIDATES)
     .map(({ candidate }) => candidate);
+}
+
+export function hasDestinationMatch(candidates: ExperienceCandidate[], destination: string) {
+  const normalizedDestination = normalizeText(destination).trim();
+  if (!normalizedDestination) return false;
+  return candidates.some((candidate) => {
+    const location = normalizeText(candidate.location || '');
+    const title = normalizeText(candidate.title);
+    return location.includes(normalizedDestination) || title.includes(normalizedDestination);
+  });
 }
 
 export function hydrateExperiences(
