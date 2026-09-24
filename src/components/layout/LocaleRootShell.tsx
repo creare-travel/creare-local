@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GoogleTagManager from '@/components/GoogleTagManager';
+import CreareAssistantBubble from '@/components/CreareAssistantBubble';
 import UnderConstruction from '@/components/UnderConstruction';
 import { LanguageProvider } from '@/context/LanguageContext';
 import JsonLd from '@/components/JsonLd';
@@ -105,6 +106,7 @@ export default function LocaleRootShell({ children, locale }: LocaleRootShellPro
             <Header />
             {children}
             <Footer />
+            <CreareAssistantBubble />
           </>
         )}
       </LanguageProvider>
