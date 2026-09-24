@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runGemini } from '@/lib/assistant/gemini';
 import { deriveConversationPolicy } from '@/lib/assistant/policy';
+import { buildHandoffContent, buildHandoffSummary, createTicketNo } from '@/lib/assistant/ticket';
 import { createInitialState, decryptState, encryptState, mergeState } from '@/lib/assistant/state';
 import {
   hasDestinationMatch,
@@ -30,6 +31,27 @@ const LOCALE_MAP: Record<string, AssistantLocale> = {
 function localeOf(value: unknown): AssistantLocale {
   if (typeof value !== 'string') return 'en';
   return LOCALE_MAP[value.trim().toLocaleLowerCase('en-US')] || 'en';
+}
+
+function isChecklistTourismRequest(message: string) {
+  const value = message.toLocaleLowerCase('en-US');
+  return [
+    'top 10 tourist',
+    'cheap package',
+    'fastest sightseeing',
+    'checklist tourism',
+    'budget package tour',
+  ].some((signal) => value.includes(signal));
+}
+
+function checklistRedirect(locale: AssistantLocale) {
+  const replies: Record<AssistantLocale, string> = {
+    en: 'CREARE is not designed around checklist sightseeing or low-cost packages. If you would like, we can instead focus on one or two meaningful encounters shaped around what genuinely interests you. What would you most like to understand or feel in Istanbul?',
+    tr: 'CREARE, hızlı gezi listeleri veya düşük maliyetli paketler üzerine kurulmaz. İsterseniz bunun yerine gerçekten ilginizi çeken bir veya iki anlamlı karşılaşmaya odaklanabiliriz. İstanbul’da en çok neyi anlamak veya hissetmek istersiniz?',
+    ru: 'CREARE не строит путешествия вокруг списков достопримечательностей или бюджетных пакетов. Вместо этого мы можем сосредоточиться на одном-двух содержательных культурных впечатлениях. Что в Стамбуле вам действительно хотелось бы понять или почувствовать?',
+    zh: 'CREARE 并不以打卡式观光或低价套餐为核心。如果您愿意，我们可以转而聚焦一到两个真正有意义的文化体验。您在伊斯坦布尔最希望理解或感受到什么？',
+  };
+  return replies[locale];
 }
 
 function initialReply(locale: AssistantLocale, name: string) {
@@ -117,24 +139,24 @@ function qualificationQuestion(locale: AssistantLocale, focus: string) {
   return questions[locale][focus] || '';
 }
 
-function privateBriefingReply(locale: AssistantLocale, path: string) {
+function privateBriefingReply(locale: AssistantLocale, path: string, ticket: string | null) {
   const replies: Record<AssistantLocale, string> = {
     en:
       path === 'black'
-        ? 'What you have shared is enough to move this into a discreet Private Briefing. CREARE can continue from here without asking you to repeat these details.'
-        : 'What you have shared is enough to move into a Private Briefing. CREARE can continue from here without asking you to repeat these details.',
+        ? `What you have shared is enough to move this into a discreet Private Briefing${ticket ? ` under ${ticket}` : ''}. To open the file, please share your full name.`
+        : `What you have shared is enough to move into a Private Briefing${ticket ? ` under ${ticket}` : ''}. To open the file, please share your full name.`,
     tr:
       path === 'black'
-        ? 'Paylaştıklarınız bu talebi mahrem bir özel görüşmeye taşımak için yeterli. CREARE bundan sonraki aşamada bu bilgileri size tekrar sordurmadan devam edebilir.'
-        : 'Paylaştıklarınız özel görüşme aşamasına geçmek için yeterli. CREARE bundan sonraki aşamada bu bilgileri size tekrar sordurmadan devam edebilir.',
+        ? `Paylaştıklarınız bu talebi mahrem bir özel görüşmeye taşımak için yeterli${ticket ? `; dosya referansınız ${ticket}` : ''}. Dosyayı açabilmemiz için lütfen adınızı ve soyadınızı paylaşın.`
+        : `Paylaştıklarınız özel görüşme aşamasına geçmek için yeterli${ticket ? `; dosya referansınız ${ticket}` : ''}. Dosyayı açabilmemiz için lütfen adınızı ve soyadınızı paylaşın.`,
     ru:
       path === 'black'
-        ? 'Этого достаточно, чтобы перевести запрос в конфиденциальный частный брифинг. CREARE продолжит с уже сохранённым контекстом, не заставляя вас повторять детали.'
-        : 'Этого достаточно, чтобы перейти к частному брифингу. CREARE продолжит с уже сохранённым контекстом, не заставляя вас повторять детали.',
+        ? `Этого достаточно, чтобы перевести запрос в конфиденциальный частный брифинг${ticket ? ` под номером ${ticket}` : ''}. Чтобы открыть файл, пожалуйста, укажите имя и фамилию.`
+        : `Этого достаточно, чтобы перейти к частному брифингу${ticket ? ` под номером ${ticket}` : ''}. Чтобы открыть файл, пожалуйста, укажите имя и фамилию.`,
     zh:
       path === 'black'
-        ? '您目前提供的信息已足够进入私密沟通阶段。CREARE 会保留这些背景信息，后续无需您重复说明。'
-        : '您目前提供的信息已足够进入私人需求沟通阶段。CREARE 会保留这些背景信息，后续无需您重复说明。',
+        ? `您目前提供的信息已足够进入私密沟通阶段${ticket ? `，档案编号为 ${ticket}` : ''}。为建立档案，请提供您的姓名。`
+        : `您目前提供的信息已足够进入私人需求沟通阶段${ticket ? `，档案编号为 ${ticket}` : ''}。为建立档案，请提供您的姓名。`,
   };
   return replies[locale];
 }
@@ -195,37 +217,58 @@ export async function POST(request: NextRequest) {
     const destinationMismatch =
       provisionalState.destination &&
       !hasDestinationMatch(candidates, provisionalState.destination);
+    const provisionalPolicyBeforePath = deriveConversationPolicy(provisionalState);
     const enteredLabBecauseNoMatch = Boolean(
-      destinationMismatch && state.service_path === 'undetermined'
+      destinationMismatch &&
+      state.service_path === 'undetermined' &&
+      provisionalPolicyBeforePath.nextQuestionFocus !== 'destination'
     );
 
     if (enteredLabBecauseNoMatch) {
       provisionalState = { ...provisionalState, service_path: 'lab' };
+    } else if (
+      provisionalState.service_path === 'undetermined' &&
+      provisionalPolicyBeforePath.stage === 'recommendation' &&
+      candidates.length > 0
+    ) {
+      provisionalState = { ...provisionalState, service_path: 'signature' };
     }
 
     const nextPolicy = deriveConversationPolicy(provisionalState);
     const allowedRecommendationIds = nextPolicy.mayRecommendPublishedExperiences
-      ? model.recommendedExperienceIds
+      ? model.recommendedExperienceIds.length > 0
+        ? model.recommendedExperienceIds
+        : candidates.slice(0, 2).map((candidate) => candidate.id)
       : [];
-    const nextState = {
+    let nextState = {
       ...mergeState(provisionalState, {}, message, allowedRecommendationIds),
       conversation_stage: nextPolicy.stage,
     };
+    if (nextPolicy.shouldOfferPrivateBriefing && !nextState.ticket_no) {
+      nextState = { ...nextState, ticket_no: createTicketNo() };
+    }
     const experiences = hydrateExperiences(candidates, allowedRecommendationIds, nextState.locale);
 
     const groundedLinks = experiences.map(
       (experience) => `[${experience.title}](${experience.url})`
     );
-    const baseReply = enteredLabBecauseNoMatch
-      ? noMatchReply(nextState.locale, nextState.destination!)
-      : nextPolicy.shouldOfferPrivateBriefing
-        ? privateBriefingReply(nextState.locale, nextState.service_path)
-        : nextPolicy.stage === 'qualification' && nextPolicy.nextQuestionFocus !== 'none'
-          ? qualificationQuestion(nextState.locale, nextPolicy.nextQuestionFocus)
-          : nextPolicy.stage === 'recommendation' && experiences.length > 0
-            ? recommendationLead(nextState.locale)
-            : model.reply.trim() || recommendationLead(nextState.locale);
+    const baseReply = isChecklistTourismRequest(message)
+      ? checklistRedirect(nextState.locale)
+      : enteredLabBecauseNoMatch
+        ? noMatchReply(nextState.locale, nextState.destination!)
+        : nextPolicy.shouldOfferPrivateBriefing
+          ? privateBriefingReply(nextState.locale, nextState.service_path, nextState.ticket_no)
+          : (nextPolicy.stage === 'discovery' || nextPolicy.stage === 'qualification') &&
+              nextPolicy.nextQuestionFocus !== 'none'
+            ? qualificationQuestion(nextState.locale, nextPolicy.nextQuestionFocus)
+            : nextPolicy.stage === 'recommendation' && experiences.length > 0
+              ? recommendationLead(nextState.locale)
+              : model.reply.trim() || recommendationLead(nextState.locale);
     const reply = groundedLinks.length ? `${baseReply}\n\n${groundedLinks.join('\n')}` : baseReply;
+
+    const handoffContent = nextState.ticket_no
+      ? buildHandoffContent(nextState.locale, nextState.ticket_no)
+      : null;
 
     return NextResponse.json({
       success: true,
@@ -234,6 +277,14 @@ export async function POST(request: NextRequest) {
       stage: nextState.conversation_stage,
       experiences,
       handoff_recommended: nextPolicy.shouldOfferPrivateBriefing,
+      ticket_no: nextState.ticket_no,
+      handoff_summary: nextPolicy.shouldOfferPrivateBriefing
+        ? buildHandoffSummary(nextState)
+        : null,
+      handoff_email_prompt: handoffContent?.emailPrompt ?? null,
+      handoff_confirmation: handoffContent?.confirmation ?? null,
+      guest_email_subject: handoffContent?.guestSubject ?? null,
+      guest_email_body: handoffContent?.guestBody ?? null,
     });
   } catch (error) {
     console.error('[assistant] request failed', {

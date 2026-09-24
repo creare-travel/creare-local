@@ -20,6 +20,7 @@ export type AssistantState = {
   preferred_environments: string[];
   group_dynamics: string | null;
   service_path: ServicePath;
+  ticket_no: string | null;
   budget_band: string | null;
   conversation_stage: ConversationStage;
   recommended_experience_ids: string[];

@@ -22,10 +22,17 @@ export type ConversationPolicy = {
 const hasIntent = (state: AssistantState) =>
   Boolean(state.intention?.trim()) || state.interests.length > 0;
 
+const broadDestinations = new Set(['turkey', 'türkiye', 'turkiye', 'турция', '土耳其']);
+
+function hasSpecificDestination(state: AssistantState) {
+  if (!state.destination?.trim()) return false;
+  return !broadDestinations.has(state.destination.trim().toLocaleLowerCase('en-US'));
+}
+
 export function deriveConversationPolicy(state: AssistantState): ConversationPolicy {
   const servicePath = state.service_path;
 
-  if (!state.destination) {
+  if (!hasSpecificDestination(state)) {
     return {
       servicePath,
       stage: 'discovery',

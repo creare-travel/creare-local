@@ -28,6 +28,7 @@ export function createInitialState(
     preferred_environments: [],
     group_dynamics: null,
     service_path: 'undetermined',
+    ticket_no: null,
     budget_band: null,
     conversation_stage: 'discovery',
     recommended_experience_ids: [],
