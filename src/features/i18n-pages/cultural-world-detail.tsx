@@ -694,7 +694,7 @@ export async function generateCulturalWorldDetailMetadata({
     availableLocales
   );
 
-  if (locale !== DEFAULT_SITE_LOCALE) {
+  if (slug === 'istanbul' || locale !== DEFAULT_SITE_LOCALE) {
     return buildLocalizedCulturalWorldDetailMetadata({
       locale,
       slug,
