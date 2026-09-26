@@ -66,17 +66,13 @@ assert.equal(stripLocalePrefix('/zh/experiences/test'), '/experiences/test');
 
 assert.equal(localizePathname('/', 'tr'), '/tr');
 assert.equal(localizePathname('/tr', 'en'), '/');
-assert.equal(localizePathname('/experiences/test', 'tr'), '/tr/deneyimler/test');
+assert.equal(localizePathname('/experiences/test', 'tr'), '/tr/experiences/test');
 assert.equal(localizePathname('/tr/experiences/test', 'en'), '/experiences/test');
-assert.equal(localizePathname('/tr/experiences/test', 'tr'), '/tr/deneyimler/test');
-assert.equal(localizePathname('/tr/tr/experiences/test', 'tr'), '/tr/deneyimler/test');
+assert.equal(localizePathname('/tr/experiences/test', 'tr'), '/tr/experiences/test');
+assert.equal(localizePathname('/tr/tr/experiences/test', 'tr'), '/tr/experiences/test');
 assert.equal(localizePathname('/tr/tr/experiences/test', 'en'), '/experiences/test');
-assert.equal(localizePathname('/experiences/signature', 'zh'), '/zh/tiyan/signature');
-assert.equal(localizePathname('/experiences/signature', 'ru'), '/ru/vpechatleniya/signature');
-
-assert.equal(stripLocalePrefix('/tr/deneyimler/test'), '/experiences/test');
-assert.equal(stripLocalePrefix('/zh/tiyan/test'), '/experiences/test');
-assert.equal(stripLocalePrefix('/ru/vpechatleniya/test'), '/experiences/test');
+assert.equal(localizePathname('/experiences/signature', 'zh'), '/zh/experiences/signature');
+assert.equal(localizePathname('/experiences/signature', 'ru'), '/ru/experiences/signature');
 
 assert.equal(
   buildLocalizedStrapiPath('/api/destinations?populate=deep', 'tr'),

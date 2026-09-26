@@ -43,6 +43,29 @@ const INHERITED_EN_SOCIAL_DESCRIPTION =
 const canonicalInsightSlug = (slug?: string) =>
   slug === 'the-private-life-of-istanbul' ? 'private-life-of-istanbul' : slug;
 
+const ISTANBUL_SEARCH_COPY: Record<SiteLocale, { title: string; description: string }> = {
+  en: {
+    title: 'Private Cultural Experiences in Istanbul | CREARE',
+    description:
+      'Discover Istanbul through private cultural access, living heritage and carefully composed encounters shaped by context, trust and time.',
+  },
+  tr: {
+    title: 'İstanbul’da Özel Kültürel Deneyimler | CREARE',
+    description:
+      'İstanbul’u özel kültürel erişim, yaşayan miras ve bağlam, güven ve zamanla özenle kurgulanan deneyimler üzerinden keşfedin.',
+  },
+  zh: {
+    title: '伊斯坦布尔私人文化体验 | CREARE',
+    description:
+      '通过私人文化渠道、鲜活遗产与精心策划的深度体验，探索伊斯坦布尔的历史、当代生活与独特文化脉络。',
+  },
+  ru: {
+    title: 'Частные культурные впечатления в Стамбуле | CREARE',
+    description:
+      'Откройте Стамбул через частный культурный доступ, живое наследие и тщательно продуманные встречи, основанные на контексте и доверии.',
+  },
+};
+
 function buildCulturalWorldNotFoundMetadata(locale: SiteLocale): Metadata {
   if (locale === DEFAULT_SITE_LOCALE) {
     return {
@@ -196,6 +219,7 @@ export function buildLocalizedCulturalWorldDetailMetadata({
   destination: CulturalWorldDetailMetadataDestination;
   availableLocales?: readonly SiteLocale[];
 }): Metadata {
+  const searchCopy = slug === 'istanbul' ? ISTANBUL_SEARCH_COPY[locale] : undefined;
   return buildLocaleOwnedMetadata({
     locale,
     copyLocale: locale,
@@ -204,13 +228,16 @@ export function buildLocalizedCulturalWorldDetailMetadata({
       locale,
       slug,
     },
-    title: destination.meta_title || destination.name,
+    title: searchCopy?.title || destination.meta_title || destination.name,
     description:
-      destination.meta_description || destination.highlight || destination.short_description,
+      searchCopy?.description ||
+      destination.meta_description ||
+      destination.highlight ||
+      destination.short_description,
     image: resolveImageUrl(destination.cover_image),
     imageAlt: destination.name || destination.cover_image?.alternativeText,
     robots: { index: true, follow: true },
-    titleMode: destination.meta_title ? 'absolute' : 'templated',
+    titleMode: searchCopy || destination.meta_title ? 'absolute' : 'templated',
     availableLocales,
   });
 }

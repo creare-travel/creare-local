@@ -17,6 +17,71 @@ import { buildExperienceInquiryHref } from '@/lib/inquiry';
 import { buildCanonicalUrl, buildExperienceListingGraph } from '@/lib/schema-builder';
 import { buildLocaleOwnedMetadata } from '@/lib/seo';
 
+const EXPERIENCE_SEARCH_COPY: Record<
+  SiteLocale,
+  { title: string; description: string; h1: string }
+> = {
+  en: {
+    title: 'Private Cultural Experiences in Türkiye | CREARE',
+    description:
+      'Private cultural encounters in Istanbul, Bodrum and Cappadocia, composed through access, context and narrative for discerning clients.',
+    h1: 'Private Cultural Experiences in Türkiye',
+  },
+  tr: {
+    title: 'Türkiye’de Özel Kültürel Deneyimler | CREARE',
+    description:
+      'İstanbul, Bodrum ve Kapadokya’da; erişim, bağlam ve anlatı üzerinden özenle kurgulanan seçici özel kültürel deneyimler.',
+    h1: 'Türkiye’de Özel Kültürel Deneyimler',
+  },
+  zh: {
+    title: '土耳其私人文化体验 | CREARE',
+    description:
+      '探索伊斯坦布尔、博德鲁姆与卡帕多奇亚的私人文化体验，以深度背景、独特渠道与叙事方式精心策划。',
+    h1: '土耳其私人文化体验',
+  },
+  ru: {
+    title: 'Частные культурные впечатления в Турции | CREARE',
+    description:
+      'Частные культурные впечатления в Стамбуле, Бодруме и Каппадокии, созданные через доступ, контекст и продуманную историю.',
+    h1: 'Частные культурные впечатления в Турции',
+  },
+};
+
+const CULTURAL_WORLD_LINKS: Record<
+  SiteLocale,
+  {
+    eyebrow: string;
+    heading: string;
+    insights: string;
+    places: Record<'istanbul' | 'bodrum' | 'cappadocia', string>;
+  }
+> = {
+  en: {
+    eyebrow: 'Cultural context',
+    heading: 'Explore the worlds behind the experiences',
+    insights: 'Read the insights',
+    places: { istanbul: 'Istanbul', bodrum: 'Bodrum', cappadocia: 'Cappadocia' },
+  },
+  tr: {
+    eyebrow: 'Kültürel bağlam',
+    heading: 'Deneyimlerin ardındaki dünyaları keşfedin',
+    insights: 'Yazıları okuyun',
+    places: { istanbul: 'İstanbul', bodrum: 'Bodrum', cappadocia: 'Kapadokya' },
+  },
+  zh: {
+    eyebrow: '文化背景',
+    heading: '探索体验背后的文化世界',
+    insights: '阅读文化洞察',
+    places: { istanbul: '伊斯坦布尔', bodrum: '博德鲁姆', cappadocia: '卡帕多奇亚' },
+  },
+  ru: {
+    eyebrow: 'Культурный контекст',
+    heading: 'Исследуйте миры, стоящие за впечатлениями',
+    insights: 'Читать статьи',
+    places: { istanbul: 'Стамбул', bodrum: 'Бодрум', cappadocia: 'Каппадокия' },
+  },
+};
+
 function splitParagraphs(value: string): string[] {
   return value
     .split(/\n\s*\n/)
@@ -29,12 +94,13 @@ export function buildExperienceLandingMetadata(
   landing: CmsExperienceLanding
 ): Metadata {
   const image = getCmsImageUrl(landing.hero_image);
+  const searchCopy = EXPERIENCE_SEARCH_COPY[locale];
   const metadata = buildLocaleOwnedMetadata({
     locale,
     copyLocale: locale,
     route: { family: 'experiences', locale },
-    title: landing.seo_title,
-    description: landing.seo_description,
+    title: searchCopy.title,
+    description: searchCopy.description,
     image: image ?? undefined,
     imageAlt: landing.hero_alt_text,
     robots: { index: true, follow: true },
@@ -58,6 +124,8 @@ export async function generateExperiencesMetadata(locale: SiteLocale): Promise<M
 
 export async function renderExperiencesPage(locale: SiteLocale = DEFAULT_SITE_LOCALE) {
   const dictionary = getDictionary(locale);
+  const searchCopy = EXPERIENCE_SEARCH_COPY[locale];
+  const culturalWorldLinks = CULTURAL_WORLD_LINKS[locale];
   const [landing, categoryPages, publishedExperiences] = await Promise.all([
     fetchExperienceLanding(locale),
     fetchExperienceCategoryPages(locale),
@@ -73,12 +141,12 @@ export async function renderExperiencesPage(locale: SiteLocale = DEFAULT_SITE_LO
     itemListId: `${canonicalUrl}#itemlist`,
     breadcrumbId: `${canonicalUrl}#breadcrumbs`,
     path: canonicalUrl,
-    title: landing.hero_title,
+    title: searchCopy.h1,
     inLanguage: LOCALE_REGISTRY[locale].jsonLdLanguage,
-    description: landing.seo_description,
+    description: searchCopy.description,
     breadcrumbs: [
       { name: dictionary.common.home, url: buildCanonicalUrl(localizePathname('/', locale)) },
-      { name: landing.hero_title, url: canonicalUrl },
+      { name: searchCopy.h1, url: canonicalUrl },
     ],
     items: categoryPages.map((category) => ({
       title: category.eyebrow,
@@ -114,7 +182,7 @@ export async function renderExperiencesPage(locale: SiteLocale = DEFAULT_SITE_LO
             className="max-w-4xl font-display font-light leading-[1.05] text-white"
             style={{ fontSize: 'clamp(2.8rem, 6vw, 5.8rem)' }}
           >
-            {landing.hero_title}
+            {searchCopy.h1}
           </h1>
           <p className="mt-8 max-w-2xl font-body text-sm leading-relaxed text-white/65 sm:text-[0.95rem]">
             {landing.hero_subtitle}
@@ -228,6 +296,43 @@ export async function renderExperiencesPage(locale: SiteLocale = DEFAULT_SITE_LO
           ))}
         </ul>
       </section>
+
+      <nav
+        aria-labelledby={`experience-cultural-worlds-${locale}`}
+        className="mx-auto max-w-7xl px-6 pb-28 sm:px-10 lg:px-16"
+      >
+        <div className="border-t border-white/10 pt-12">
+          <p className="mb-3 font-body text-[0.6rem] uppercase tracking-[0.28em] text-white/35">
+            {culturalWorldLinks.eyebrow}
+          </p>
+          <h2
+            id={`experience-cultural-worlds-${locale}`}
+            className="mb-8 font-display text-2xl font-light text-white sm:text-3xl"
+          >
+            {culturalWorldLinks.heading}
+          </h2>
+          <ul className="flex flex-wrap gap-x-8 gap-y-4 font-body text-sm text-white/55">
+            {(['istanbul', 'bodrum', 'cappadocia'] as const).map((slug) => (
+              <li key={slug}>
+                <Link
+                  href={localizePathname(`/cultural-worlds/${slug}`, locale)}
+                  className="transition-colors hover:text-white"
+                >
+                  {culturalWorldLinks.places[slug]} →
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link
+                href={localizePathname('/insights', locale)}
+                className="transition-colors hover:text-white"
+              >
+                {culturalWorldLinks.insights} →
+              </Link>
+            </li>
+          </ul>
+        </div>
+      </nav>
 
       <section className="border-t border-white/10 bg-neutral-950 py-24 md:py-32">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10 lg:px-16">

@@ -104,30 +104,6 @@ const nextConfig = {
           missing: [{ type: 'header', key: 'rsc' }],
           destination: '/api/home-shell/ru',
         },
-        {
-          source: '/tr/deneyimler',
-          destination: '/tr/experiences',
-        },
-        {
-          source: '/tr/deneyimler/:path*',
-          destination: '/tr/experiences/:path*',
-        },
-        {
-          source: '/zh/tiyan',
-          destination: '/zh/experiences',
-        },
-        {
-          source: '/zh/tiyan/:path*',
-          destination: '/zh/experiences/:path*',
-        },
-        {
-          source: '/ru/vpechatleniya',
-          destination: '/ru/experiences',
-        },
-        {
-          source: '/ru/vpechatleniya/:path*',
-          destination: '/ru/experiences/:path*',
-        },
       ],
       afterFiles: [],
       fallback: [],
@@ -136,36 +112,6 @@ const nextConfig = {
 
   async redirects() {
     return [
-      {
-        source: '/tr/experiences',
-        destination: '/tr/deneyimler',
-        permanent: true,
-      },
-      {
-        source: '/tr/experiences/:path*',
-        destination: '/tr/deneyimler/:path*',
-        permanent: true,
-      },
-      {
-        source: '/zh/experiences',
-        destination: '/zh/tiyan',
-        permanent: true,
-      },
-      {
-        source: '/zh/experiences/:path*',
-        destination: '/zh/tiyan/:path*',
-        permanent: true,
-      },
-      {
-        source: '/ru/experiences',
-        destination: '/ru/vpechatleniya',
-        permanent: true,
-      },
-      {
-        source: '/ru/experiences/:path*',
-        destination: '/ru/vpechatleniya/:path*',
-        permanent: true,
-      },
       {
         source: '/experience/:slug',
         destination: '/experiences/:slug',

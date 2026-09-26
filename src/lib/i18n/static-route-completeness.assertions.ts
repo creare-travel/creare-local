@@ -46,12 +46,12 @@ function assertNonEmptyTurkishKey(path: string): void {
 const trPrimaryLinks = getPrimaryNavigationRoutes('tr');
 assert.deepEqual(
   trPrimaryLinks.map((route) => route.href),
-  ['/tr/cultural-worlds', '/tr/deneyimler', '/tr/insights', '/tr/philosophy', '/tr/contact'],
+  ['/tr/cultural-worlds', '/tr/experiences', '/tr/insights', '/tr/philosophy', '/tr/contact'],
   'TR primary navigation must expose implemented Turkish routes'
 );
 assert.deepEqual(
   getFooterNavigationRoutes('tr').map((route) => route.href),
-  ['/tr/cultural-worlds', '/tr/deneyimler', '/tr/insights', '/tr/philosophy', '/tr/contact'],
+  ['/tr/cultural-worlds', '/tr/experiences', '/tr/insights', '/tr/philosophy', '/tr/contact'],
   'TR footer navigation must expose implemented Turkish routes'
 );
 assert.deepEqual(
@@ -82,7 +82,7 @@ assert.equal(
 EXPERIENCE_CATEGORY_ROUTES.forEach((path) => {
   assert.equal(
     getExperienceCategoryTarget(path, 'tr'),
-    path.replace('/experiences', '/tr/deneyimler'),
+    `/tr${path}`,
     `TR category route must preserve the localized collection path: ${path}`
   );
   assert.equal(
