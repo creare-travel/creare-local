@@ -104,6 +104,7 @@ export function buildExperienceLandingMetadata(
     image: image ?? undefined,
     imageAlt: landing.hero_alt_text,
     robots: { index: true, follow: true },
+    titleMode: 'absolute',
     availableLocales: getAvailableStaticRouteLocales('/experiences'),
   });
 
