@@ -163,6 +163,18 @@ export type ExperienceDetailMetadataItem = Pick<
   | 'hero_alt_text'
 >;
 
+const EXPERIENCE_DETAIL_SEARCH_COPY: Partial<
+  Record<SiteLocale, Record<string, { title: string; description: string }>>
+> = {
+  zh: {
+    'golden-horn-regatta': {
+      title: '伊斯坦布尔金角湾私人水上体验 | CREARE',
+      description:
+        '在伊斯坦布尔金角湾，通过私人策划的水上体验，探索这座城市的海洋文化、历史水域与独特城市视角。',
+    },
+  },
+};
+
 function getExperienceDescription(item: ExperienceDetailMetadataItem) {
   const description = normalizeOptionalText(item.seo_description);
   if (!description) throw new Error('Missing CMS Experience SEO description');
@@ -190,8 +202,10 @@ export function buildLocalizedExperienceDetailMetadata({
   if (!experienceTitle) throw new Error('Missing CMS Experience title');
   if (!ogDescription) throw new Error('Missing CMS Experience Open Graph description');
   if (!heroAltText) throw new Error('Missing CMS Experience hero alt text');
-  const description = getExperienceDescription(item);
-  const useCompactSearchTitle = seoTitle.length > 65;
+  const searchCopy = EXPERIENCE_DETAIL_SEARCH_COPY[locale]?.[slug];
+  const description = searchCopy?.description || getExperienceDescription(item);
+  const resolvedTitle = searchCopy?.title || seoTitle;
+  const useCompactSearchTitle = !searchCopy && resolvedTitle.length > 65;
 
   const metadata = buildLocaleOwnedMetadata({
     locale,
@@ -201,7 +215,7 @@ export function buildLocalizedExperienceDetailMetadata({
       locale,
       slug,
     },
-    title: useCompactSearchTitle ? experienceTitle : seoTitle,
+    title: useCompactSearchTitle ? experienceTitle : resolvedTitle,
     description,
     image: image ?? undefined,
     imageAlt: heroAltText,

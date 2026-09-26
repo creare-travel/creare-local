@@ -384,9 +384,9 @@ function CompactInsightsList({
                 {insight.destinationName}
               </p>
             )}
-            <h2 className="motion-link font-display text-lg sm:text-xl font-light text-white group-hover:text-white/70 mb-1.5 leading-snug">
+            <h3 className="motion-link font-display text-lg sm:text-xl font-light text-white group-hover:text-white/70 mb-1.5 leading-snug">
               {insight.title}
-            </h2>
+            </h3>
             {insight.excerpt && (
               <p className="font-body text-sm text-white/48 leading-relaxed mb-2.5">
                 {insight.excerpt}
@@ -462,12 +462,13 @@ function CulturalWorldEssayGroups({
           className={index > 0 ? 'pt-1' : undefined}
         >
           <div className="mb-4 sm:mb-5">
-            <p
+            <Link
+              href={localizePathname(`/cultural-worlds/${group.key}`, locale)}
               id={`cultural-world-group-${group.key}`}
-              className="font-body text-[0.66rem] uppercase tracking-[0.24em] text-white/24"
+              className="font-body text-[0.66rem] uppercase tracking-[0.24em] text-white/24 transition-colors hover:text-white/60"
             >
-              {group.label}
-            </p>
+              {group.label} →
+            </Link>
           </div>
           <CompactInsightsList
             items={group.items}

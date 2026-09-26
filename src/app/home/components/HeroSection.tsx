@@ -127,16 +127,14 @@ export default function HeroSection({
             {heroCopy?.eyebrow ?? 'Curated Cultural Experiences'}
           </p>
 
-          <h1 className="hero-title-lg mb-3 font-display text-[clamp(2.45rem,10.4vw,5.5rem)] font-light leading-[1.11] tracking-[-0.018em] text-white sm:mb-2 sm:text-[clamp(2.8rem,6vw,5.5rem)] sm:leading-[1.06] sm:tracking-tight">
-            {heroCopy?.title ?? 'Experiences.'}
+          <h1 className="mb-14 font-display font-light sm:mb-12">
+            <span className="hero-title-lg mb-3 block text-[clamp(2.45rem,10.4vw,5.5rem)] leading-[1.11] tracking-[-0.018em] text-white sm:mb-2 sm:text-[clamp(2.8rem,6vw,5.5rem)] sm:leading-[1.06] sm:tracking-tight">
+              {heroCopy?.title ?? 'Experiences.'}
+            </span>{' '}
+            <span className="hero-subtitle block text-[clamp(2.45rem,10.4vw,5.5rem)] leading-[1.11] tracking-[-0.018em] text-white/58 sm:text-[clamp(2.8rem,6vw,5.5rem)] sm:leading-[1.06] sm:tracking-tight sm:text-white/55">
+              {heroCopy?.subtitle ?? 'Composed as Art.'}
+            </span>
           </h1>
-
-          <p
-            className="hero-subtitle mb-14 font-display text-[clamp(2.45rem,10.4vw,5.5rem)] font-light leading-[1.11] tracking-[-0.018em] text-white/58 sm:mb-12 sm:text-[clamp(2.8rem,6vw,5.5rem)] sm:leading-[1.06] sm:tracking-tight sm:text-white/55"
-            aria-hidden="true"
-          >
-            {heroCopy?.subtitle ?? 'Composed as Art.'}
-          </p>
 
           <HomeHeroInquiryLink
             label={ctaCopy?.label}
